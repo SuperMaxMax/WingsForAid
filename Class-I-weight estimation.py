@@ -27,7 +27,7 @@ class Weight:
 
     def L_D_cruise(self):
         # Lift over drag calculation
-        self.L_D = np.sqrt(np.pi * self.para.A * self.para.e / self.para.CD0)
+        self.L_D = np.sqrt(np.pi * self.para.A * self.para.e /(4 * self.para.CD0))
 
     def W5W4(self):
         # Cruise fuel fraction calculation
@@ -45,7 +45,7 @@ class Weight:
         W7W5 = weight.W7W5()
         W5W4 = weight.W5W4()
 
-        self.Mff = self.para.W1W_TO * self.para.W2W1 * self.para.W3W2 * self.para.W4W3 * W5W4 * W7W5 * W5W4 * self.para.W10W9 * self.para.WfinalW10
+        self.Mff = self.para.W1W_TO * self.para.W2W1 * self.para.W3W2 * self.para.W4W3 * W5W4 * (W7W5 * W5W4)**self.para.n_drops * self.para.W10W9 * self.para.WfinalW10
 
     def weight_fuel_used(self):
         weight.Mff_calculation()

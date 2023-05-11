@@ -1,13 +1,15 @@
+"Physical parameters"
+g = 9.80665  # m/s^2
+
 "Parameters of aircraft"
 
-n_drops = 1
-R = 500 #km
-M_res = 0.20
+# Mission flight plan
+n_drops = 3
+R = 500  # km
 W_PL = 240
-g = 9.80665
+M_res = 0.20
 
 # Wing characteristics
-W_TO = 2000 #lbs
 S = 180 #ft^2
 n_ult = 1.5
 A = 3
@@ -17,16 +19,7 @@ b = 8 #ft
 sweep_angle = 0.36
 CD0 = 0.15
 
-# Horizontal plane characteristics
-S_h = 40
-A_h = 4
-t_rh = 3
 
-# Vertical plane characteristics
-S_v = 60
-A_v =  2.5
-t_rv = 6
-labda_quarter = 0.4
 
 prop_eff = 0.9
 c_p = 9*10**-6
