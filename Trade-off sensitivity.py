@@ -11,8 +11,10 @@ for i in range(2, (len(columns))):
 
 def model(weight_vec, scores_mat):
     weight_vec = np.array(weight_vec)
-    scores_mat = np.array(scores_mat)
+    scores_mat = np.array(scores_mat) 
     scores_mat = scores_mat.transpose()
     output = np.matmul(scores_mat, weight_vec)
+    output = np.argsort(output)
     return output
+
 
