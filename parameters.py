@@ -31,3 +31,6 @@ W4W3 = 0.992            # climb
 W10W9 = 0.993           # descent
 WfinalW10 = 0.993       # landing, taxi, shut-down
 
+lin_par1 = 0.5482 #gradient of the linear trend OEW/MTOW
+lin_par2 = 486.68  #y axis crossing of the linear trend OEW/MTOW
+
