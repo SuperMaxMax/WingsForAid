@@ -5,8 +5,10 @@ class initial_sizing:
     def __init__(self):
         pass
 
-    def iteration:
+    def iteration(self):
         run = True
         if run:
+            c1.weight.iteration()
+
 
 
