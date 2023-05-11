@@ -81,7 +81,7 @@ env_oper = np.array([0.25, 0.05, 0.1, 0.15, 0.1, 0.15, 0.2])
 env_manu = np.array([0.7, 0.3])
 
 # Create the random input weights for the model
-input = total_weights(1000, 1)
+input = total_weights(10000, 0.15)
 
 # Create the final matrix with the rankings
 final = np.zeros((10, 10))
@@ -98,5 +98,3 @@ df = df.style.background_gradient(cmap='Blues')
 
 # Save as excel file
 df.to_excel("Ranking.xlsx")
-
-print(df)
