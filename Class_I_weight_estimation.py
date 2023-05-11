@@ -1,7 +1,7 @@
 import numpy as np
 from math import *
 import parameters as para
-
+import matplotlib.pyplot as plt
 
 class Weight:
     def __init__(self, para):
@@ -28,11 +28,13 @@ class Weight:
     def L_D_cruise(self):
         # Lift over drag calculation
         self.L_D = np.sqrt(np.pi * self.para.A * self.para.e / (4 * self.para.CD0))
+        print(self.L_D)
 
     def W5W4(self):
         # Cruise fuel fraction calculation
         weight.L_D_cruise() # Lift over drag ratio from method above
-        W5W4 = 1/exp(self.R * self.para.g * self.para.c_p / (self.para.prop_eff * self.L_D))
+        W5W4 = 1/exp(self.para.R * self.para.g * self.para.c_p / (self.para.prop_eff * self.L_D))
+        print(W5W4)
         return(W5W4)
 
     def W7W5(self):
@@ -41,11 +43,10 @@ class Weight:
         return(W7W5)
 
     def Mff_calculation(self):
-        self.R = self.para.R/self.para.n_drops  # flight range between drops
         W7W5 = weight.W7W5()
         W5W4 = weight.W5W4()
 
-        self.Mff = self.para.W1W_TO * self.para.W2W1 * self.para.W3W2 * self.para.W4W3 * W5W4 * (W7W5 * W5W4)**self.para.n_drops * self.para.W10W9 * self.para.WfinalW10
+        self.Mff = self.para.W1W_TO * self.para.W2W1 * self.para.W3W2 * self.para.W4W3 * W5W4 * W7W5**self.para.n_drops * self.para.W10W9 * self.para.WfinalW10
 
     def weight_fuel_used(self):
         weight.Mff_calculation()
@@ -70,7 +71,6 @@ class Weight:
                 it = False
             else:
                 self.W_TO = W_TO_new
-                print(self.W_TO)
 
         print(f"W_OE:{self.W_OE}")
         print(f"W_F:{self.W_F}")
@@ -83,3 +83,4 @@ class Weight:
 if __name__ == "__main__":
     weight = Weight(para)
     weight.iteration()
+    weight.payload_range_diagram()
