@@ -7,8 +7,9 @@ class initial_sizing:
 
     def iteration(self):
         run = True
-        if run:
+        while run:
             c1.weight.iteration()
+
 
 
 

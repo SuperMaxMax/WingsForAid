@@ -11,7 +11,7 @@ class Weight:
         self.W_TO = 750
 
     #########################################################################
-    "CLASS I WEIGHT ESTIMATION"
+    "CLASS II WEIGHT ESTIMATION"
     #########################################################################
 
     def weight_take_off(self):
@@ -21,7 +21,7 @@ class Weight:
 
     def weight_empty_operational(self):
         # Operational empty weigth is a function of the empty weight and the trapped fuel weight, which are both a function of take_off weight
-        W_E = 0.5482 * self.W_TO + 486.68  # relation from Roskam
+        W_E = para.lin_par1 * self.W_TO + para.lin_par2  # relation from Roskam
         W_tfo = 0.002 * self.W_TO
         self.W_OE = W_E + W_tfo
 
