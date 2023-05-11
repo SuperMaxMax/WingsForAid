@@ -11,7 +11,7 @@ class Weight:
         self.W_TO = 750
 
     #########################################################################
-    "CLASS I WEIGHT ESTIMATION"
+    "CLASS II WEIGHT ESTIMATION"
     #########################################################################
 
     def weight_take_off(self):
