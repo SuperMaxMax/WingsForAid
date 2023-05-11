@@ -4,22 +4,20 @@ g = 9.80665  # m/s^2
 "Parameters of aircraft"
 
 # Mission flight plan
-n_drops = 1
-R = 500  # km
+n_drops = 2
+R = 500000  # m
 W_PL = 240
 M_res = 0.15
 
 # Wing characteristics
 S = 180 #ft^2
 n_ult = 1.5
-A = 3
+A = 7.3
 e = 0.9
 t_r = 2 #ft
 b = 8 #ft
 sweep_angle = 0.36
-CD0 = 0.15
-
-
+CD0 = 0.04
 
 prop_eff = 0.82
 c_p = 90E-9

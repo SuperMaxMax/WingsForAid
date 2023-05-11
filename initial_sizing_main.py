@@ -1,5 +1,6 @@
 
 import Class_I_weight_estimation as c1
+import geometry_determination as geo
 
 class initial_sizing:
     def __init__(self):
@@ -9,7 +10,7 @@ class initial_sizing:
         run = True
         while run:
             c1.weight.iteration()
-
+            geo()
 
 
 
