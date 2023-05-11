@@ -1,7 +1,9 @@
-## Repository for Wings for Aid
-Design Synthesis Exercise 2023 | Group 18
+# Repository for Wings for Aid
 
 ## Git structure
-Main branch: contains complete and working code 
+### Branches
+main branch: contains complete and working code  
+weight_estimation branch: contains all files for weight estimation
 
-... branch: contains ...
+### Folder
+Trade-off: contains files for sensitivity analysis of qualitative trade-off
