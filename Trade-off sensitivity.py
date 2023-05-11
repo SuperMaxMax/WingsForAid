@@ -9,4 +9,10 @@ columns = np.array(scores.columns)
 for i in range(2, (len(columns))):
     scores[columns[i]] = scores[columns[i]].str.split(";").str[0]
 
+def model(weight_vec, scores_mat):
+    weight_vec = np.array(weight_vec)
+    scores_mat = np.array(scores_mat)
+    scores_mat = scores_mat.transpose()
+    output = np.matmul(scores_mat, weight_vec)
+    return output
 
