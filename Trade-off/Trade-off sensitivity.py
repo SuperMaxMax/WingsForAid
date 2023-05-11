@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 def random_value(value, perc):
     """
@@ -47,6 +49,26 @@ def total_weights(x, perc):
     
     return tot_weights
 
+def model(weight_vec, scores_mat):
+    """
+    multiply the weights with the scores and return the ranking of the concepts
+    """
+    scores_mat = scores_mat.transpose()
+    output = np.matmul(scores_mat, weight_vec)
+    output = np.argsort(output)[::-1]
+    return output
+
+# Get the scores from excel file
+data = pd.read_excel("Trade Off.xlsx", sheet_name="General Trade-off table", usecols=(np.arange(0,12,1)), nrows=17)
+
+scores = data.head(15)
+columns = np.array(scores.columns)
+for i in range(2, (len(columns))):
+    scores[columns[i]] = scores[columns[i]].str.split(";").str[0]
+
+scores = scores.iloc[:,2:]
+scores = np.array(scores.astype(int))
+
 # Define the weights
 cost_top = np.array([0.35, 0.1, 0.35, 0.2])
 cost_perf = np.array([0.4, 0.2, 0.1, 0.1, 0.2])
@@ -58,5 +80,23 @@ env_perf = np.array([0.4, 0.05, 0.05, 0.15, 0.35])
 env_oper = np.array([0.25, 0.05, 0.1, 0.15, 0.1, 0.15, 0.2])
 env_manu = np.array([0.7, 0.3])
 
-input = total_weights(3, 0)
-print(input)
+# Create the random input weights for the model
+input = total_weights(1000, 1)
+
+# Create the final matrix with the rankings
+final = np.zeros((10, 10))
+
+for weight in input:
+    ranking = model(weight, scores)
+    for i in enumerate(ranking):
+        final[i[1], i[0]] += 1
+
+# Put results in dataframe, the index is the concept (1-10) and the columns are the ranking (1-10)
+concepts = ['CON-1', 'CON-2', 'CON-3', 'CON-4', 'CON-5', 'CON-6', 'CON-7', 'CON-8', 'CON-9', 'CON-10']
+df = pd.DataFrame(final, index=concepts, columns=np.arange(1,11,1))
+df = df.style.background_gradient(cmap='Blues')
+
+# Save as excel file
+df.to_excel("Ranking.xlsx")
+
+print(df)
