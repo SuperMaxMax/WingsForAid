@@ -20,8 +20,10 @@ b = 8 #ft
 sweep_angle = 0.36
 CD0 = 0.15
 
-prop_eff = 0.9
-c_p = 9*10**-6
+
+
+prop_eff = 0.82
+c_p = 90E-9
 
 W1W_TO = 0.995          # engine start-up
 W2W1 = 0.997            # taxi
