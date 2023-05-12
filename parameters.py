@@ -1,23 +1,27 @@
-"Physical parameters"
+import numpy as np
+# Physical parameters
 g = 9.80665  # m/s^2
 
-"Parameters of aircraft"
+# Aircraft parameters
 
 # Mission flight plan
 n_drops = 1
-R = 500000   # m
+R = 500  # km
 W_PL = 240
 M_res = 0.15
+h_cruise = 10000*0.3048     # cruising at 10000 ft
 
 # Wing characteristics
-S = 180 #ft^2
+S = 180 # ft^2
 n_ult = 1.5
-A = 7.52
-e = 0.65
-t_r = 2
-b = 8
+A = 8
+e = 0.9
+t_r = 2 # ft
+b = 8 # ft
 sweep_angle = 0.36
-CD0 = 0.0341
+CD0 = 0.15
+CL_CD = 10 # conservative
+l_LE = 1 # Leading edge root position
 
 # Rotax 912
 prop_eff = 0.8
@@ -42,54 +46,24 @@ WfinalW10 = 0.993       # landing, taxi, shut-down
 lin_par1 = 0.5522
 lin_par2 = 39.162
 
-
-
-
-b = 1
-lambda_mid = 1
-n_ult = 1
-t_c = 1
-cwr = 1
-W_loading = 1
-W_G = 1
-s_tail = 1
-W_TO = 1
-P_TO = 1
-V_D = 1
-l_t = 1
-b_f = 1
-h_f = 1
-S_G = 1
-N_e = 1
-W_e = 1
-l_f = 1
-
-h_cruise = 10000*0.3048     #cruising at 10000 ft
-
-import numpy as np
-"Physical parameters"
-g = 9.80665  # m/s^2
-
-"Parameters of aircraft"
-
-# Mission flight plan
-n_drops = 1
-R = 500  # km
-W_PL = 240
-M_res = 0.15
-h_cruise = 10000*0.3048     #cruising at 10000 ft
-
-# Wing characteristics
-S = 180 #ft^2
-n_ult = 1.5
-A = 8
-e = 0.9
-t_r = 2 #ft
-b = 8 #ft
-sweep_angle = 0.36
-CD0 = 0.15
-CL_CD = 10 #conservative
-l_LE = 1#Leading edge root position
+b = 14 # m
+lambda_mid = 0.36 #rad
+n_ult = 1.5 # -
+t_c = 0.12 # -
+cwr = 2.5 # m
+W_loading = 50 # N/m^2
+W_G = 700*9.81 # N
+s_tail = 2 # m^2
+W_TO = 700*9.81 # N
+P_TO = 62 # hp
+V_D = 150*0.514444 # m/s
+l_t = 3.5 # m
+b_f = 1.1 # m
+h_f = 1.1 # m
+S_G = 4*np.pi*b_f # m^2
+N_e = 1 # -
+W_e = 62.6*9.81 # N
+l_f = 4 # m
 
 W_fuel_estimated = 75*0.82    # estimated value based on 20L/h fuel burn of rotax and 3 hour sortie and 15L reserve and density of fuel
 W_LDG   = W_TO - W_PL - W_fuel_estimated
