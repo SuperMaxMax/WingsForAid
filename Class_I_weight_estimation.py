@@ -2,17 +2,17 @@ import numpy as np
 from math import *
 import parameters as para
 import matplotlib.pyplot as plt
-
+import initial_sizing_main as ini
 
 class Weight:
     def __init__(self, para):
         # parameters.py is a file containing all constant parameters of the aircraft
         self.para = para
+        self.W_TO = ini.W_TO
         # take_off weight that is assumed initially
-        self.W_TO = 600
 
     #########################################################################
-    "CLASS II WEIGHT ESTIMATION"
+    "CLASS I WEIGHT ESTIMATION"
     #########################################################################
 
     def weight_take_off(self):
@@ -59,7 +59,6 @@ class Weight:
 
     def iteration(self):
         it = True
-
         while it:
             weight.weight_fuel()                        # perform calculation of fuel weight
             weight.weight_empty_operational()           # perform calculation of operational empty weight
