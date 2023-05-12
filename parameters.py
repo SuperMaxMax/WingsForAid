@@ -49,6 +49,7 @@ h_f = 1
 S_G = 1
 N_e = 1
 W_e = 1
+l_f = 1
 
 import numpy as np
 "Physical parameters"
