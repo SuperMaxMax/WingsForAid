@@ -13,4 +13,7 @@ class initial_sizing:
 
 
 
+if __name__ == "__main__":
+    weight = initial_sizing()
+    weight.iteration()
 

@@ -3,12 +3,13 @@ from math import *
 import parameters as para
 import matplotlib.pyplot as plt
 
+
 class Weight:
     def __init__(self, para):
         # parameters.py is a file containing all constant parameters of the aircraft
         self.para = para
         # take_off weight that is assumed initially
-        self.W_TO = 750
+        self.W_TO = 770
 
     #########################################################################
     "CLASS II WEIGHT ESTIMATION"
@@ -28,7 +29,6 @@ class Weight:
     def L_D_cruise(self):
         # Lift over drag calculation
         self.L_D = np.sqrt(np.pi * self.para.A * self.para.e / (4 * self.para.CD0))
-
 
     def W5W4(self):
         # Cruise fuel fraction calculation
@@ -66,7 +66,7 @@ class Weight:
             self.W_PL = self.para.W_PL              # finds payload weight from mission profile
             W_TO_new = weight.weight_take_off()     # combines weights to find total weight
             change = (W_TO_new - self.W_TO)/self.W_TO
-            if change < 0.01:  # change between iteration is smaller than one percent
+            if abs(change) < 0.01:  # change between iteration is smaller than one percent
                 it = False
             else:
                 self.W_TO = W_TO_new

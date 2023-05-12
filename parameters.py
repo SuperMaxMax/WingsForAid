@@ -4,23 +4,24 @@ g = 9.80665  # m/s^2
 "Parameters of aircraft"
 
 # Mission flight plan
-n_drops = 2
-R = 500000  # m
+n_drops = 1
+R = 500000   # m
 W_PL = 240
 M_res = 0.15
 
 # Wing characteristics
 S = 180 #ft^2
 n_ult = 1.5
-A = 12
-e = 0.9
-t_r = 2 #ft
-b = 8 #ft
+A = 7.52
+e = 0.65
+t_r = 2
+b = 8
 sweep_angle = 0.36
-CD0 = 0.06
+CD0 = 0.0341
 
-prop_eff = 0.82
-c_p = 90E-9
+# Rotax 912
+prop_eff = 0.8
+c_p = 79.16E-9
 
 W1W_TO = 0.995          # engine start-up
 W2W1 = 0.997            # taxi
@@ -29,8 +30,20 @@ W4W3 = 0.992            # climb
 W10W9 = 0.993           # descent
 WfinalW10 = 0.993       # landing, taxi, shut-down
 
-lin_par1 = 0.5482 #gradient of the linear trend OEW/MTOW
-lin_par2 = 486.68  #y axis crossing of the linear trend OEW/MTOW
+# MTOW vs OEW reduced by pilot weight
+#lin_par1 = 0.5522 #gradient of the linear trend OEW/MTOW
+#lin_par2 = -40.838 #y axis crossing of the linear trend OEW/MTOW
+
+#MTOW for drones
+#lin_par1 = 0.4631
+#lin_par2 = 52.058
+
+# MTOW vs OEW for general aviation 0.5482 x + 486.68
+lin_par1 = 0.5522
+lin_par2 = 39.162
+
+
+
 
 b = 1
 lambda_mid = 1
@@ -50,6 +63,8 @@ S_G = 1
 N_e = 1
 W_e = 1
 l_f = 1
+
+h_cruise = 10000*0.3048     #cruising at 10000 ft
 
 import numpy as np
 "Physical parameters"
@@ -72,20 +87,10 @@ e = 0.9
 t_r = 2 #ft
 b = 8 #ft
 sweep_angle = 0.36
-CD0 = 0.029
+CD0 = 0.15
 CL_CD = 10 #conservative
 
-prop_eff = 0.82
-c_p = 90E-9
-
-W_TO   = 750            # kg
-W1W_TO = 0.995          # engine start-up
-W2W1 = 0.997            # taxi
-W3W2 = 0.998            # take_off
-W4W3 = 0.992            # climb
-W10W9 = 0.993           # descent
-WfinalW10 = 0.993       # landing, taxi, shut-down
-W_fuel_estimated = 75*0.82       # estimated value based on 20L/h fuel burn of rotax and 3 hour sortie and 15L reserve and density of fuel
+W_fuel_estimated = 75*0.82    # estimated value based on 20L/h fuel burn of rotax and 3 hour sortie and 15L reserve and density of fuel
 W_LDG   = W_TO - W_PL - W_fuel_estimated
 f = W_LDG/W_TO
 cruise_frac = W1W_TO*W2W1*W3W2*W4W3*0.85       #assume halfway through the cruise with cruise fuel fraction 0.3
@@ -111,7 +116,7 @@ p0      = 101325        #Pa
 rho0    = 1.225         #kg/m^3
 T0      = 288.15        #K
 Lambda  = -0.0065       #deg K/m
-R       = 287.05        #J/kgK
+#R       = 287.05        #J/kgK
 g0      = 9.80665       #m/s^2
 
 #speeds
@@ -132,5 +137,3 @@ power_setting = 0.9    #cruise power
 #Take off distance
 TO_dist = 750           #m, seems long, might need to change this, STOL gang
 LDG_dist= 750
-lin_par1 = 0.5482 #gradient of the linear trend OEW/MTOW
-lin_par2 = 486.68  #y axis crossing of the linear trend OEW/MTOW
