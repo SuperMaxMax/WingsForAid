@@ -17,7 +17,7 @@ e = 0.9
 t_r = 2 #ft
 b = 8 #ft
 sweep_angle = 0.36
-CD0 = 0.04
+CD0 = 0.06
 
 prop_eff = 0.82
 c_p = 90E-9
@@ -31,6 +31,24 @@ WfinalW10 = 0.993       # landing, taxi, shut-down
 
 lin_par1 = 0.5482 #gradient of the linear trend OEW/MTOW
 lin_par2 = 486.68  #y axis crossing of the linear trend OEW/MTOW
+
+b = 1
+lambda_mid = 1
+n_ult = 1
+t_c = 1
+cwr = 1
+W_loading = 1
+W_G = 1
+s_tail = 1
+W_TO = 1
+P_TO = 1
+V_D = 1
+l_t = 1
+b_f = 1
+h_f = 1
+S_G = 1
+N_e = 1
+W_e = 1
 
 import numpy as np
 "Physical parameters"

@@ -10,7 +10,7 @@ class initial_sizing:
         run = True
         while run:
             c1.weight.iteration()
-            geo()
+
 
 
 

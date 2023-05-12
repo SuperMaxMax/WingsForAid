@@ -28,13 +28,12 @@ class Weight:
     def L_D_cruise(self):
         # Lift over drag calculation
         self.L_D = np.sqrt(np.pi * self.para.A * self.para.e / (4 * self.para.CD0))
-        print(self.L_D)
+
 
     def W5W4(self):
         # Cruise fuel fraction calculation
         weight.L_D_cruise() # Lift over drag ratio from method above
         W5W4 = 1/exp(self.para.R * self.para.g * self.para.c_p / (self.para.prop_eff * self.L_D))
-        print(W5W4)
         return(W5W4)
 
     def W7W5(self):
@@ -62,12 +61,12 @@ class Weight:
         it = True
 
         while it:
-            weight.weight_fuel()
-            weight.weight_empty_operational()
-            self.W_PL = self.para.W_PL
-            W_TO_new = weight.weight_take_off()
+            weight.weight_fuel()                    # perform calculation of fuel weight
+            weight.weight_empty_operational()       # perform calculation of operational empty weight
+            self.W_PL = self.para.W_PL              # finds payload weight from mission profile
+            W_TO_new = weight.weight_take_off()     # combines weights to find total weight
             change = (W_TO_new - self.W_TO)/self.W_TO
-            if change < 0.01:
+            if change < 0.01:  # change between iteration is smaller than one percent
                 it = False
             else:
                 self.W_TO = W_TO_new
@@ -83,4 +82,3 @@ class Weight:
 if __name__ == "__main__":
     weight = Weight(para)
     weight.iteration()
-    weight.payload_range_diagram()
