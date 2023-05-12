@@ -75,8 +75,6 @@ class Weight:
 
         # If number of cylinder and volume of cylinder are known use figure 4-12 Torenbeek
 
-    def weight_empty(self):
-        self.W_OEW = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_uc + self.W_t + self.W_w
 
     def weight_empty(self):
         self.W_OEW = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_t + self.W_w  + self.W_uc
