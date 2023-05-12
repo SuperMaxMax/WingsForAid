@@ -29,14 +29,39 @@ class Weight:
         #IF TAILPLANE AREA UNKNOWN, WEIGHT ASSUMED TO BE 3.5-4% OF EMPTY WEIGHT
 
     def gear_weight(self):
-        A1 = float(input("Give A for main gear (Table 8-6 Torenbeek)", ))
-        B1 = float(input("Give B for main gear (Table 8-6 Torenbeek)", ))
-        C1 = float(input("Give C for main gear (Table 8-6 Torenbeek)", ))
-        D1 = float(input("Give D for main gear (Table 8-6 Torenbeek)", ))
-        A2 = float(input("Give A for nose gear (Table 8-6 Torenbeek)", ))
-        B2 = float(input("Give B for nose gear (Table 8-6 Torenbeek)", ))
-        C2 = float(input("Give C for nose gear (Table 8-6 Torenbeek)", ))
-        D2 = float(input("Give D for nose gear (Table 8-6 Torenbeek)", ))
+        maingear_type = "a"
+        nosegear_type = "a"
+
+        maingear_type = input("Is the main gear fixed or retractable [f/r]",)
+        nosegear_type = input("Is the nose gear fixed or retractable [f/r]",)
+
+        if (maingear_type!="f" and maingear_type!="r") and (nosegear_type!="f" and nosegear_type!="r"):
+            print("Input f or r for the gear type")
+            return
+        
+        A1, B1, C1, D1, A2, B2, C2, D2 = 0, 0, 0, 0, 0, 0, 0, 0
+
+        if maingear_type=="f":
+            A1 = 9.1
+            B1 = 0.082
+            C1 = 0.019
+            D1 = 0
+        else:
+            A1 = 18.1
+            B1 = 0.131
+            C1 = 0.019
+            D1 = 2.23 * 10**-5
+
+        if nosegear_type=="f":
+            A2 = 11.3
+            B2 = 0
+            C2 = 0.0024
+            D2 = 0
+        else:
+            A2 = 9.1
+            B2 = 0.082
+            C2 = 0
+            D2 = 2.97 * 10**-6
 
         #Main gear:
         W_uc1 = 1.08 * (A1 + B1 * self.para.W_TO**0.75 + C1 * self.para.W_TO + D1 * self.para.W_TO**1.5)
