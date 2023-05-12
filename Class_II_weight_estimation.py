@@ -1,14 +1,11 @@
 import numpy as np
 import parameters as para
 
-
-
 class Weight:
     def __init__(self, para):
         # parameters.py is a file containing all constant parameters of the aircraft
         self.para = para
         # take_off weight that is assumed initially        
-
 
     #########################################################################
     "CLASS II WEIGHT ESTIMATION"
@@ -23,8 +20,7 @@ class Weight:
         self.W_w = k_w * b_s**0.75 * (1 + (b_ref/self.para.b_s)**0.5) * self.para.n_ult**0.55 * ((b_s/t_r)/self.para.W_loading)**0.3 * self.para.W_G
         
         #ADD 30% IF BRACED WING USED, 10% IF STRUT USED?
-
-    
+   
     def tail_weight(self): #ultimate load factor, tail surface area
         self.W_t = 0.64 * (self.para.n_ult * self.para.s_tail**2)**0.75
 
@@ -50,7 +46,6 @@ class Weight:
     def nacelle_weight(self): #Take off power in hp
         self.W_n = 1.134 * self.para.P_TO**0.5
 
-
     def equipment_weight(self):
         self.W_eq = 0.08 * self.para.W_TO
         #MORE DETAILED ESTIMATION CAN BE MADE BUT NOT NECESSARY FOR TRADE-OFF
@@ -70,13 +65,11 @@ class Weight:
         # Add 20% for LE flap or slat
         # Add 15% for lift dumper controls
 
-
     def propulsion_weight(self):
         k_pg = 1.16 # tractor single propeller aircraft
         self.W_pg = k_pg*self.para.N_e*(self.para.W_e+0.109*self.para.P_TO)
 
         # If number of cylinder and volume of cylinder are known use figure 4-12 Torenbeek
-
 
     def weight_empty(self):
         self.W_OEW = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_uc + self.W_t + self.W_w
@@ -86,10 +79,10 @@ class Weight:
     
     def cg_calc(self):
         self.wing_cg = 0
-        if self.sweep_angle = 0:
+        if self.sweep_angle == 0:
             self.wing_cg = 0.4 * self.cwr + self.l_LE #40% of root chord plus Leading Edge location
         else:
-            self.wing_cg = 
+            self.wing_cg = 0 # to be done later, depends on spar locations (table 8-15 Torenbeek)
         
         self.fus_cg = 0.335 * self.l_f #32-35% of fuselage length
         self.tail_cg = 0.42 * self.cwr + self.l_LE #42% of root chord plus Leading Edge location
