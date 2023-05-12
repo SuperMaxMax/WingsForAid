@@ -80,9 +80,20 @@ class Weight:
 
     def weight_take_off(self):
         self.W_TO = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_uc + self.W_t + self.W_w
+
+        print(f"W_TO:{self.W_TO}")
+        return self.W_TO
 if __name__ == "__main__":
     weight = Weight(para)
-
+    weight.wing_weight()
+    weight.tail_weight()
+    weight.gear_weight()
+    weight.nacelle_weight()
+    weight.equipment_weight()
+    weight.fuselage_weight()
+    weight.control_surface_weight()
+    weight.propulsion_weight()
+    weight.weight_take_off()
 
 
 
