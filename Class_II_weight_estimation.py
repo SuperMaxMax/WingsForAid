@@ -15,7 +15,7 @@ class Weight:
     #########################################################################
 
     def wing_weight(self):   #Span, sweep, ultimate load factor, thickness over chord, cord length at root, wing loading, gross weight
-        k_w = 4.9*10**(-3)
+        k_w = 4.9E-3
         b_s = self.para.b / np.cos(self.para.lambda_mid)
         b_ref = 1.905
         t_r = self.para.t_c * self.para.cwr
