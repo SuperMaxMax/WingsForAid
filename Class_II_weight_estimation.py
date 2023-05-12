@@ -7,8 +7,6 @@ class Weight:
     def __init__(self, para):
         # parameters.py is a file containing all constant parameters of the aircraft
         self.para = para
-        self.W_TO = 750
-        # take_off weight that is assumed initially
 
 
     #########################################################################
