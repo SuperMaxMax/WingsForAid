@@ -34,17 +34,21 @@ W4W3 = 0.992            # climb
 W10W9 = 0.993           # descent
 WfinalW10 = 0.993       # landing, taxi, shut-down
 
-# MTOW vs OEW reduced by pilot weight
-#lin_par1 = 0.5522 #gradient of the linear trend OEW/MTOW
-#lin_par2 = -40.838 #y axis crossing of the linear trend OEW/MTOW
+# # MTOW vs OEW reduced by pilot weight
+# lin_par1 = 0.5522 #gradient of the linear trend OEW/MTOW
+# lin_par2 = -40.838 #y axis crossing of the linear trend OEW/MTOW
 
-#MTOW for drones
+# # MTOW for drones
 #lin_par1 = 0.4631
 #lin_par2 = 52.058
 
-# MTOW vs OEW for general aviation 0.5482 x + 486.68
-lin_par1 = 0.5522
-lin_par2 = 39.162
+# # MTOW vs OEW for general aviation 0.5482 x + 486.68
+# lin_par1 = 0.5522
+# lin_par2 = 39.162
+
+# MTOW vs OEW ultra-light
+lin_par1 = 0.7134
+lin_par2 = -132.98
 
 b = 14 # m
 lambda_mid = 0.36 #rad
