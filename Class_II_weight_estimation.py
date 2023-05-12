@@ -8,7 +8,6 @@ class Weight:
         # parameters.py is a file containing all constant parameters of the aircraft
         self.para = para
 
-
     #########################################################################
     "CLASS II WEIGHT ESTIMATION"
     #########################################################################
@@ -30,14 +29,12 @@ class Weight:
 
     def gear_weight(self):
       
-
         maingear_type = input("Is the main gear fixed or retractable [f/r]",)
         nosegear_type = input("Is the nose gear fixed or retractable [f/r]",)
 
         if (maingear_type!="f" and maingear_type!="r") and (nosegear_type!="f" and nosegear_type!="r"):
             print("Input f or r for the gear type")
             return
-        
 
         if maingear_type=="f":
             A1 = 9.1
@@ -71,7 +68,6 @@ class Weight:
     def nacelle_weight(self): #Take off power in hp
         self.W_n = 1.134 * self.para.P_TO**0.5
 
-
     def equipment_weight(self):
         self.W_eq = 0.08 * self.para.W_TO
         #MORE DETAILED ESTIMATION CAN BE MADE BUT NOT NECESSARY FOR TRADE-OFF
@@ -91,19 +87,28 @@ class Weight:
         # Add 20% for LE flap or slat
         # Add 15% for lift dumper controls
 
-
     def propulsion_weight(self):
         k_pg = 1.16 # tractor single propeller aircraft
         self.W_pg = k_pg*self.para.N_e*(self.para.W_e+0.109*self.para.P_TO)
 
         # If number of cylinder and volume of cylinder are known use figure 4-12 Torenbeek
 
-
     def weight_empty(self):
         self.W_OEW = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_t + self.W_w  + self.W_uc
-        print((f"W_pg:{self.W_pg}"))
-        print(f"W_OEW:{self.W_OEW}")
 
+        # Print all weights
+        print(f"W_pg:{self.W_pg}")
+        print(f"W_sc:{self.W_sc}")
+        print(f"W_f:{self.W_f}")
+        print(f"W_eq:{self.W_eq}")
+        print(f"W_n:{self.W_n}")
+        print(f"W_t:{self.W_t}")
+        print(f"W_w:{self.W_w}")
+        print(f"W_uc:{self.W_uc}")
+
+        # Operative empty weight
+        print(f"W_OEW:{self.W_OEW}")
+    
         return self.W_OEW
 
     def cg_calc(self):
