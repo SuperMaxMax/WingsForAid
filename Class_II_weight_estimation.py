@@ -113,3 +113,4 @@ if __name__ == "__main__":
     weight.control_surface_weight()
     weight.propulsion_weight()
     weight.weight_empty()
+    weight.cg_calc()
