@@ -82,14 +82,10 @@ class Weight:
     def weight_empty(self):
         self.W_OEW = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_uc + self.W_t + self.W_w
 
-    def weight_take_off(self):
-        self.W_TO = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_t + self.W_w # + self.W_uc
         print((f"W_pg:{self.W_pg}"))
-        print(f"W_TO:{self.W_TO}")
-        return self.W_TO
-
         print(f"W_OEW:{self.W_OEW}")
         return self.W_OEW
+
 
     def cg_calc(self):
         self.wing_cg = 0
@@ -113,7 +109,7 @@ if __name__ == "__main__":
     weight = Weight(para)
     weight.wing_weight()
     weight.tail_weight()
-    #weight.gear_weight()
+    weight.gear_weight()
     weight.nacelle_weight()
     weight.equipment_weight()
     weight.fuselage_weight()
