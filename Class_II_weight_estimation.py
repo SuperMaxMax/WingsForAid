@@ -1,14 +1,11 @@
 import numpy as np
 import parameters as para
 
-
-
 class Weight:
     def __init__(self, para):
         # parameters.py is a file containing all constant parameters of the aircraft
         self.para = para
         # take_off weight that is assumed initially        
-
 
     #########################################################################
     "CLASS II WEIGHT ESTIMATION"
@@ -50,7 +47,6 @@ class Weight:
     def nacelle_weight(self): #Take off power in hp
         self.W_n = 1.134 * self.para.P_TO**0.5
 
-
     def equipment_weight(self):
         self.W_eq = 0.08 * self.para.W_TO
         #MORE DETAILED ESTIMATION CAN BE MADE BUT NOT NECESSARY FOR TRADE-OFF
@@ -70,13 +66,11 @@ class Weight:
         # Add 20% for LE flap or slat
         # Add 15% for lift dumper controls
 
-
     def propulsion_weight(self):
         k_pg = 1.16 # tractor single propeller aircraft
         self.W_pg = k_pg*self.para.N_e*(self.para.W_e+0.109*self.para.P_TO)
 
         # If number of cylinder and volume of cylinder are known use figure 4-12 Torenbeek
-
 
     def weight_empty(self):
         self.W_OEW = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_uc + self.W_t + self.W_w
@@ -94,11 +88,13 @@ class Weight:
         self.fus_cg = 0.335 * self.l_f #32-35% of fuselage length
         self.tail_cg = 0.42 * self.cwr + self.l_LE #42% of root chord plus Leading Edge location
 
+        self.engine_cg = 0 # to be done later
+        # c.g. or rotax 912is is at 32.7 cm from the front of the engine
 
-        self.cg =         
+        self.landing_gear_cg = 0 # to be done later
+        # can be at airplane c.g. -> iteration needed, or use location main and nose landing gear
 
-
-
+        self.cg = (self.wing_cg * self.W_w + self.fus_cg * self.W_f + self.tail_cg * self.W_t + self.engine_cg * self.W_pg + self.landing_gear_cg * self.W_uc) / (self.W_w + self.W_f + self.W_t + self.W_pg + self.W_uc)
 
 if __name__ == "__main__":
     weight = Weight(para)
@@ -111,9 +107,3 @@ if __name__ == "__main__":
     weight.control_surface_weight()
     weight.propulsion_weight()
     weight.weight_empty()
-
-
-
-
-
-
