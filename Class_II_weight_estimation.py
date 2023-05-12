@@ -29,8 +29,7 @@ class Weight:
         #IF TAILPLANE AREA UNKNOWN, WEIGHT ASSUMED TO BE 3.5-4% OF EMPTY WEIGHT
 
     def gear_weight(self):
-        maingear_type = "a"
-        nosegear_type = "a"
+      
 
         maingear_type = input("Is the main gear fixed or retractable [f/r]",)
         nosegear_type = input("Is the nose gear fixed or retractable [f/r]",)
@@ -39,7 +38,6 @@ class Weight:
             print("Input f or r for the gear type")
             return
         
-        A1, B1, C1, D1, A2, B2, C2, D2 = 0, 0, 0, 0, 0, 0, 0, 0
 
         if maingear_type=="f":
             A1 = 9.1
