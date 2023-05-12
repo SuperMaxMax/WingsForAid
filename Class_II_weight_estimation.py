@@ -82,7 +82,6 @@ class Weight:
     def weight_empty(self):
         self.W_OEW = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_uc + self.W_t + self.W_w
 
-        print((f"W_pg:{self.W_pg}"))
         print(f"W_OEW:{self.W_OEW}")
         return self.W_OEW
 
