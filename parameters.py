@@ -30,7 +30,7 @@ W4W3 = 0.992            # climb
 W10W9 = 0.993           # descent
 WfinalW10 = 0.993       # landing, taxi, shut-down
 
-# MTOW vs OEW reduced by pilot weight
+ #MTOW vs OEW reduced by pilot weight
 #lin_par1 = 0.5522 #gradient of the linear trend OEW/MTOW
 #lin_par2 = -40.838 #y axis crossing of the linear trend OEW/MTOW
 
@@ -72,12 +72,7 @@ g = 9.80665  # m/s^2
 
 "Parameters of aircraft"
 
-# Mission flight plan
-n_drops = 1
-R = 500  # km
-W_PL = 240
-M_res = 0.15
-h_cruise = 10000*0.3048     #cruising at 10000 ft
+
 
 # Wing characteristics
 S = 180 #ft^2
