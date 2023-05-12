@@ -69,7 +69,7 @@ class Weight:
         self.W_n = 1.134 * self.para.P_TO**0.5
 
     def equipment_weight(self):
-        self.W_eq = 0.08 * self.para.W_TO
+        self.W_eq = 0.008 * self.para.W_TO
         #MORE DETAILED ESTIMATION CAN BE MADE BUT NOT NECESSARY FOR TRADE-OFF
 
     def fuselage_weight(self):
@@ -97,14 +97,14 @@ class Weight:
         self.W_OEW = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_t + self.W_w  + self.W_uc
 
         # Print all weights
-        print(f"W_pg:{self.W_pg}")
-        print(f"W_sc:{self.W_sc}")
-        print(f"W_f:{self.W_f}")
-        print(f"W_eq:{self.W_eq}")
-        print(f"W_n:{self.W_n}")
-        print(f"W_t:{self.W_t}")
-        print(f"W_w:{self.W_w}")
-        print(f"W_uc:{self.W_uc}")
+        print(f"W_pg:{round(self.W_pg,3)} [kg]")
+        print(f"W_sc:{round(self.W_sc,3)} [kg]")
+        print(f"W_f:{round(self.W_f)} [kg]")
+        print(f"W_eq:{round(self.W_eq)}")
+        print(f"W_n:{round(self.W_n)}")
+        print(f"W_t:{round(self.W_t)} [kg]")
+        print(f"W_w:{round(self.W_w)} [kg]")
+        print(f"W_uc:{round(self.W_uc)} [kg]")
 
         # Operative empty weight
         print(f"W_OEW:{self.W_OEW}")
