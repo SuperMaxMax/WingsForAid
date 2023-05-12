@@ -39,10 +39,12 @@ WfinalW10 = 0.993       # landing, taxi, shut-down
 #lin_par2 = 52.058
 
 # MTOW vs OEW for general aviation 0.5482 x + 486.68
-lin_par1 = 0.5522
-lin_par2 = 39.162
+#lin_par1 = 0.5522
+#lin_par2 = 39.162
 
-
+# MTOW vs OEW ultra-light
+lin_par1 = 0.7134
+lin_par2 = -132.98
 
 
 b = 1

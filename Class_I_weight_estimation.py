@@ -9,7 +9,7 @@ class Weight:
         # parameters.py is a file containing all constant parameters of the aircraft
         self.para = para
         # take_off weight that is assumed initially
-        self.W_TO = 900
+        self.W_TO = 600
 
     #########################################################################
     "CLASS II WEIGHT ESTIMATION"

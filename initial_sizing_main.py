@@ -9,7 +9,13 @@ class initial_sizing:
     def iteration(self):
         run = True
         while run:
-            c1.weight.iteration()
+            # Loop over class 1 and geometry determination
+
+                # Class 1 iteration
+                c1.weight.iteration()
+                # Geometry determination
+
+            # Class II estimation
 
 
 
