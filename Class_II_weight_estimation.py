@@ -18,7 +18,7 @@ class Weight:
         b_ref = 1.905
         t_r = self.para.t_c * self.para.cwr
 
-        self.W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * self.para.n_ult**0.55 * ((b_s/t_r)/self.para.W_loading)**0.3 * self.para.W_G
+        self.W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * self.para.n_ult**0.55 * ((b_s/t_r)/self.para.W_loading)**0.3 * self.W_TO
         
         #ADD 30% IF BRACED WING USED, 10% IF STRUT USED?
 
