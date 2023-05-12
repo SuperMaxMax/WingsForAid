@@ -74,6 +74,7 @@ b = 8 #ft
 sweep_angle = 0.36
 CD0 = 0.029
 CL_CD = 10 #conservative
+l_LE = 1#Leading edge root position
 
 prop_eff = 0.82
 c_p = 90E-9

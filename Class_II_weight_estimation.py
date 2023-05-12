@@ -17,7 +17,7 @@ class Weight:
         b_ref = 1.905
         t_r = self.para.t_c * self.para.cwr
 
-        self.W_w = k_w * b_s**0.75 * (1 + (b_ref/self.para.b_s)**0.5) * self.para.n_ult**0.55 * ((b_s/t_r)/self.para.W_loading)**0.3 * self.para.W_G
+        self.W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * self.para.n_ult**0.55 * ((b_s/t_r)/self.para.W_loading)**0.3 * self.para.W_G
         
         #ADD 30% IF BRACED WING USED, 10% IF STRUT USED?
    
@@ -27,14 +27,14 @@ class Weight:
         #IF TAILPLANE AREA UNKNOWN, WEIGHT ASSUMED TO BE 3.5-4% OF EMPTY WEIGHT
 
     def gear_weight(self):
-        A1 = input("Give A for main gear (Table 8-6 Torenbeek)", )
-        B1 = input("Give B for main gear (Table 8-6 Torenbeek)", )
-        C1 = input("Give C for main gear (Table 8-6 Torenbeek)", )
-        D1 = input("Give D for main gear (Table 8-6 Torenbeek)", )
-        A2 = input("Give A for nose gear (Table 8-6 Torenbeek)", )
-        B2 = input("Give B for nose gear (Table 8-6 Torenbeek)", )
-        C2 = input("Give C for nose gear (Table 8-6 Torenbeek)", )
-        D2 = input("Give D for nose gear (Table 8-6 Torenbeek)", )
+        A1 = float(input("Give A for main gear (Table 8-6 Torenbeek)", ))
+        B1 = float(input("Give B for main gear (Table 8-6 Torenbeek)", ))
+        C1 = float(input("Give C for main gear (Table 8-6 Torenbeek)", ))
+        D1 = float(input("Give D for main gear (Table 8-6 Torenbeek)", ))
+        A2 = float(input("Give A for nose gear (Table 8-6 Torenbeek)", ))
+        B2 = float(input("Give B for nose gear (Table 8-6 Torenbeek)", ))
+        C2 = float(input("Give C for nose gear (Table 8-6 Torenbeek)", ))
+        D2 = float(input("Give D for nose gear (Table 8-6 Torenbeek)", ))
 
         #Main gear:
         W_uc1 = 1.08 * (A1 + B1 * self.para.W_TO**0.75 + C1 * self.para.W_TO + D1 * self.para.W_TO**1.5)
@@ -52,7 +52,7 @@ class Weight:
 
     def fuselage_weight(self):
         k_wf = 0.23
-        self.W_f = self.para.k_wf*(self.para.V_D*(self.para.l_t/(self.para.b_f+self.para.h_f)))**0.5*self.para.S_G**1.2
+        self.W_f = k_wf*(self.para.V_D*(self.para.l_t/(self.para.b_f+self.para.h_f)))**0.5*self.para.S_G**1.2
 
         # Add 7% if the main landing gear is attached to the fuselage, but 4% can be subtracted from the fuselage weight if there is no attachment structure for the main landing gear
         # Add 10% for freighter aircraft
@@ -79,13 +79,13 @@ class Weight:
     
     def cg_calc(self):
         self.wing_cg = 0
-        if self.sweep_angle == 0:
+        if self.para.sweep_angle == 0:
             self.wing_cg = 0.4 * self.cwr + self.l_LE #40% of root chord plus Leading Edge location
         else:
             self.wing_cg = 0 # to be done later, depends on spar locations (table 8-15 Torenbeek)
         
-        self.fus_cg = 0.335 * self.l_f #32-35% of fuselage length
-        self.tail_cg = 0.42 * self.cwr + self.l_LE #42% of root chord plus Leading Edge location
+        self.fus_cg = 0.335 * self.para.l_f #32-35% of fuselage length
+        self.tail_cg = 0.42 * self.para.cwr + self.para.l_LE #42% of root chord plus Leading Edge location
 
         self.engine_cg = 0 # to be done later
         # c.g. or rotax 912is is at 32.7 cm from the front of the engine
