@@ -1,15 +1,10 @@
 import numpy as np
 import parameters as para
 
-
-
 class Weight:
     def __init__(self, para):
         # parameters.py is a file containing all constant parameters of the aircraft
         self.para = para
-        self.W_TO = 750
-        # take_off weight that is assumed initially
-
 
     #########################################################################
     "CLASS II WEIGHT ESTIMATION"
@@ -50,7 +45,6 @@ class Weight:
     def nacelle_weight(self): #Take off power in hp
         self.W_n = 1.134 * self.para.P_TO**0.5
 
-
     def equipment_weight(self):
         self.W_eq = 0.08 * self.para.W_TO
         #MORE DETAILED ESTIMATION CAN BE MADE BUT NOT NECESSARY FOR TRADE-OFF
@@ -70,7 +64,6 @@ class Weight:
         # Add 20% for LE flap or slat
         # Add 15% for lift dumper controls
 
-
     def propulsion_weight(self):
         k_pg = 1.16 # tractor single propeller aircraft
         self.W_pg = k_pg*self.para.N_e*(self.para.W_e+0.109*self.para.P_TO)
@@ -82,7 +75,6 @@ class Weight:
 
         print(f"W_OEW:{self.W_OEW}")
         return self.W_OEW
-
 
     def cg_calc(self):
         self.wing_cg = 0
