@@ -36,17 +36,17 @@ import numpy as np
 "Physical parameters"
 g = 9.80665             # m/s^2
 
-"Parameters of aircraft"
+# Aircraft parameters
 
 # Mission flight plan
 n_drops = 1
 R = 500                 # km
 W_PL = 240
 M_res = 0.15
-h_cruise = 10000*0.3048 #cruising at 10000 ft
+h_cruise = 10000*0.3048     # cruising at 10000 ft
 
 # Wing characteristics
-S = 180                 #ft^2
+S = 180 # ft^2
 n_ult = 1.5
 A = 10
 e = 0.9
@@ -56,14 +56,53 @@ sweep_angle = 0.36
 CD0 = 0.027
 CL_CD = 10              #conservative
 
-W_TO   = 750            # kg
 W1W_TO = 0.995          # engine start-up
 W2W1 = 0.997            # taxi
 W3W2 = 0.998            # take_off
 W4W3 = 0.992            # climb
 W10W9 = 0.993           # descent
 WfinalW10 = 0.993       # landing, taxi, shut-down
-W_fuel_estimated = 75*0.82                  # estimated value based on 20L/h fuel burn of rotax and 3 hour sortie and 15L reserve and density of fuel
+
+ #MTOW vs OEW reduced by pilot weight R2=0.9548
+#lin_par1 = 0.5522 #gradient of the linear trend OEW/MTOW
+#lin_par2 = -40.838 #y axis crossing of the linear trend OEW/MTOW
+
+#MTOW for drones, R2=0.9988
+#lin_par1 = 0.4631
+#lin_par2 = 52.058
+
+# MTOW vs OEW for general aviation R2=0.9548 , original y=0.5482 x + 486.68
+#lin_par1 = 0.5522
+#lin_par2 = 39.162
+
+# MTOW vs OEW ultra-light, R2=0.8704
+lin_par1 = 0.7134
+lin_par2 = -52.981
+
+# MTOW vs OEW ultra-light reduced by pilot weight, R2=0.9704
+lin_par1 = 0.7134
+lin_par2 = -132.98
+
+b = 14 # m
+lambda_mid = 0.36 #rad
+n_ult = 1.5 # -
+t_c = 0.12 # -
+cwr = 2.5 # m
+W_loading = 562/9.81 # kg/m^2
+W_G = 700 # kg
+s_tail = 2 # m^2
+W_TO = 700 # kg
+P_TO = 62 # hp
+V_D = 150*0.514444 # m/s
+l_t = 3.5 # m
+b_f = 1.1 # m
+h_f = 1.1 # m
+S_G = 4*np.pi*b_f # m^2 #TO CHANGE
+N_e = 1 # -
+W_e = 62.6 # kg
+l_f = 4 # m
+
+W_fuel_estimated = 75*0.82    # estimated value based on 20L/h fuel burn of rotax and 3 hour sortie and 15L reserve and density of fuel
 W_LDG   = W_TO - W_PL - W_fuel_estimated
 f = W_LDG/W_TO
 cruise_frac = W1W_TO*W2W1*W3W2*W4W3*0.85    #assume halfway through the cruise with cruise fuel fraction 0.3
@@ -85,12 +124,12 @@ d_e_TO_Flaps    = 0.05
 d_e_LDG_Flaps   = 0.10
 
 #atmospheric properties
-p0      = 101325            #Pa
-rho0    = 1.225             #kg/m^3
-T0      = 288.15            #K
-Lambda  = -0.0065           #deg K/m
-R       = 287.05            #J/kgK
-g0      = 9.80665           #m/s^2
+p0      = 101325        #Pa
+rho0    = 1.225         #kg/m^3
+T0      = 288.15        #K
+Lambda  = -0.0065       #deg K/m
+#R       = 287.05        #J/kgK
+g0      = 9.80665       #m/s^2
 
 #speeds
 V_s_max = 61*(1.852/3.6)    #CS23 Vs at take off not allowed to be above 61 kts, *1.852 to get to m/s
