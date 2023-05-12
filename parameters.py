@@ -12,7 +12,7 @@ M_res = 0.15
 # Wing characteristics
 S = 180 #ft^2
 n_ult = 1.5
-A = 7.3
+A = 12
 e = 0.9
 t_r = 2 #ft
 b = 8 #ft
@@ -72,13 +72,13 @@ e = 0.9
 t_r = 2 #ft
 b = 8 #ft
 sweep_angle = 0.36
-CD0 = 0.15
+CD0 = 0.029
 CL_CD = 10 #conservative
 
 prop_eff = 0.82
 c_p = 90E-9
 
-W_TO   = 900            # kg
+W_TO   = 750            # kg
 W1W_TO = 0.995          # engine start-up
 W2W1 = 0.997            # taxi
 W3W2 = 0.998            # take_off
@@ -125,8 +125,8 @@ V_climb = 70*(1.852/3.6)
 
 #power
 P_max   = 100           #break horse power
-eta_p   = 0.7           #propeller efficiency
-power_setting = 0.85    #cruise power
+eta_p   = 0.82           #propeller efficiency
+power_setting = 0.9    #cruise power
 
 
 #Take off distance
