@@ -22,7 +22,6 @@ class Weight:
         t_r = self.para.t_c * self.para.cwr
 
         self.W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * self.para.n_ult**0.55 * ((b_s/t_r)/self.para.W_loading)**0.3 * self.para.W_G
-        self.W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * self.para.n_ult**0.55 * ((b_s/t_r)/self.para.W_loading)**0.3 * self.para.W_G
         
         #ADD 30% IF BRACED WING USED, 10% IF STRUT USED?
 
@@ -58,7 +57,6 @@ class Weight:
 
     def fuselage_weight(self):
         k_wf = 0.23
-        self.W_f = k_wf*(self.para.V_D*(self.para.l_t/(self.para.b_f+self.para.h_f)))**0.5*self.para.S_G**1.2
         self.W_f = k_wf*(self.para.V_D*(self.para.l_t/(self.para.b_f+self.para.h_f)))**0.5*self.para.S_G**1.2
 
         # Add 7% if the main landing gear is attached to the fuselage, but 4% can be subtracted from the fuselage weight if there is no attachment structure for the main landing gear
