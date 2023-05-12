@@ -162,13 +162,6 @@ def geometry_determination(MTOW, plot=True):
         x_lemac = LE[0][np.where(np.abs(LE[1]-y_mac)<=tolerance)][0]
         x_temac = TE[0][np.where(np.abs(TE[1]-y_mac)<=tolerance)][0]
         MAC = np.array([np.linspace(x_temac, x_lemac, 1000), np.full(1000, y_mac)])
-        
-        
-        # x_lemac = LE[1][mask]
-        # x_temac = TE[1][mask]
-        # print(x_lemac, x_temac)
-        # MAC = np.vstack((np.full(1000, y_mac),np.linspace(x_lemac, x_temac, 1000)))
-        # MAC_length = x_lemac - x_temac
         if plot:
             plt.plot(LE[0], LE[1], color='black')
             plt.plot(ct[0], ct[1], color='black')
@@ -176,17 +169,12 @@ def geometry_determination(MTOW, plot=True):
             plt.plot(cr[0], cr[1], color='black')
             plt.plot(qc[0], qc[1], color='black')
             plt.plot(hc[0], hc[1], color='black')
-            plt.plot(constr_line[0], constr_line[1], color='red')
+            #plt.plot(constr_line[0], constr_line[1], color='red')
             plt.plot(MAC[0], MAC[1], color='black')
             plt.gca().set_aspect('equal', adjustable = 'box')
             plt.xlabel("y [m]")
             plt.show()
-
         
-        # if i == 0:
-        #     wings = points
-        # else:
-        #     wings = np.hstack((wings, points))
     
         
         
