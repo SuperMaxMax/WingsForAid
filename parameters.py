@@ -31,7 +31,7 @@ class UAV:
         self.boom                = True          # Boom, true if boom tail is implemented
         self.b_boom              = 0.2           # Boom width [m]
         self.h_boom              = 0.2           # Boom height [m]
-        self.d_eff_boom          = 1.421         # tbd
+        self.d_eff_boom          = np.sqrt(0.2*0.2) # 
         self.l_f_boom            = 3             # Boom length [m]
         self.S_G_boom            = self.l_f_boom*np.pi*self.d_eff_boom + 2*np.pi*(self.d_eff_boom/2)**2
 
@@ -73,9 +73,9 @@ class UAV:
         self.W10W9               = 0.993         # Descent fraction [-]
         self.WfinalW10           = 0.993         # Landing, taxi & shut-down fraction [-]
 
-        self.W_fuel_estimated    = 75*0.82                                          # Fuel weight [kg] | ASSUMPTION: Estimated value based on 20L/h fuel burn of rotax and 3 hour sortie and 15L reserve and density of fuel
-        self.W_LDG               = self.W_TO - self.W_PL - self.W_fuel_estimated    # Weight at landing [kg] | ASSUMPTION: All packages have been dropped
-        self.fuel_frac           = self.W_LDG/self.W_TO                             # Fuel fraction [-]
+        # self.W_fuel_estimated    = 75*0.82                                          # Fuel weight [kg] | ASSUMPTION: Estimated value based on 20L/h fuel burn of rotax and 3 hour sortie and 15L reserve and density of fuel
+        # self.W_LDG               = self.W_TO - self.W_PL - self.W_fuel_estimated    # Weight at landing [kg] | ASSUMPTION: All packages have been dropped
+        # self.fuel_frac           = self.W_LDG/self.W_TO                             # Fuel fraction [-]
         self.cruise_frac         = self.W1W_TO*self.W2W1*self.W3W2*self.W4W3*0.85   # Assume halfway through the cruise with cruise fuel fraction 0.3
 
         "-Propulsive properties"
