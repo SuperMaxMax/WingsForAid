@@ -4,6 +4,7 @@ class UAV:
     def __init__(self, name):
         "==== Aircraft Parameters ===="
         self.name                = name          # Name of the aircraft [-]
+
         "-Aircraft geometry"
         self.Sw                  = 14           # Surface area [m2]
         self.A                   = 12            # Aspect ratio [-]
@@ -23,6 +24,8 @@ class UAV:
         self.l_t                 = 3.5           # Tail arm [m]
 
         self.boom                = True          # Boom
+
+        self.xc_OEW_p            = 0.25          # Longitudinal position of the OEW [m] | ASSUMPTION: 25% of MAC
 
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
@@ -61,6 +64,7 @@ class UAV:
         self.cruise_frac         = self.W1W_TO*self.W2W1*self.W3W2*self.W4W3*0.85   # Assume halfway through the cruise with cruise fuel fraction 0.3
 
         "-Propulsive properties"
+        self.engine_pos          = 'tractor'     # Engine position
         self.P_max               = 100           # Maximum power [bhp]
         self.P_TO                = 62            # Power at take-off [hp]
 
