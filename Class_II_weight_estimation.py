@@ -10,7 +10,7 @@ def wing_weight(obj):   #Span, sweep, ultimate load factor, thickness over chord
     b_ref = 1.905
     t_r = obj.t_c * obj.cwr
 
-    W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * obj.n_ult**0.55 * ((b_s/t_r)/(obj.W_TO/obj.S))**0.3 * obj.W_TO
+    W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * obj.n_ult**0.55 * ((b_s/t_r)/(obj.W_TO/obj.Sw))**0.3 * obj.W_TO
 
     #ADD 30% IF BRACED WING USED, 10% IF STRUT USED?
     return W_w

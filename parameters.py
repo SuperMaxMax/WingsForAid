@@ -5,7 +5,7 @@ class UAV:
         "==== Aircraft Parameters ===="
         self.name                = name          # Name of the aircraft [-]
         "-Aircraft geometry"
-        self.S                   = 180           # Surface area [m]
+        self.Sw                  = 14           # Surface area [m2]
         self.A                   = 12            # Aspect ratio [-]
         self.e                   = 0.9           # Oswald factor [-]
         self.b                   = 8             # Wing span [m]
@@ -21,6 +21,8 @@ class UAV:
 
         self.s_tail              = 2             # Tail surface area [m]
         self.l_t                 = 3.5           # Tail arm [m]
+
+        self.boom                = True          # Boom
 
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
@@ -73,9 +75,11 @@ class UAV:
         "==== Mission profile/Atmospheric properties ===="
         "-Mission characteristics"
         self.n_drops             = 2             # Number of drops [-]
+        self.n_boxes             = 12            # Number of boxes [-]
         self.R                   = 500000        # Range [m]
         self.M_res               = 0.15          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
-        self.h_cruise            = 10000*0.3048  # Cruise altitude [m] | NOTES: Conversion 
+        self.h_cruise            = 10000*0.3048  # Cruise altitude [m] | NOTES: Conversion
+        self.h_TO                = 0             # Take-off Height [m]
 
         self.TO_dist             = 750           # Take-off distance [m]           
         self.LDG_dist            = 750           # Landing distance [m]
