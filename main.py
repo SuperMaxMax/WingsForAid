@@ -17,27 +17,33 @@ for concept in [concept_1]:#[concept_1, concept_2, concept_3, concept_4, concept
     while it:
         # class 1
         c1.iteration(concept)
+        print("After class 1 iteration:")
+        print(f"Mff: {concept.Mff}, L/D: {concept.L_D}, W_TO: {concept.W_TO}, W_OE: {concept.W_OE}, W_F: {concept.W_F}")
         W_TO_c1 = concept.W_TO
-        print(W_TO_c1)
         
         # geometry determination
         geo.geometry_determination(concept)
+        print("After geometry determination:")
+        print(f"b: {concept.b} Sw: {concept.Sw} S_G: {concept.S_G}")
 
         # class 2
         c2.weight_empty(concept)
+        print("After class 2 iteration:")
+        print(f"W_OE: {concept.W_OE}, W_TO: {concept.W_TO}")
         W_TO_c2 = concept.W_TO
-        print(W_TO_c1)
+
+        print("")
+        print("----------------------------------")
+        print("")
 
         # iterate between class 1 and class 2
-        # change = (W_TO_c2 - W_TO_c1)/W_TO_c1
-        # if abs(change) < 0.01:
-        #     it = False
-        # else:
-        #     continue
+        change = (W_TO_c2 - W_TO_c1)/W_TO_c1
+        if abs(change) < 0.01:
+            it = False
+        else:
+            continue
 
-        # cg calculation
-        c2.cg_calc(concept)
-        
-        it = False
+    # cg calculation
+    c2.cg_calc(concept)
     
     print(f"Concept {concept.name} has a weight of {concept.W_TO} kg")
