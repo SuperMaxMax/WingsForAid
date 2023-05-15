@@ -42,6 +42,7 @@ class UAV:
         self.W_e                 = 62.6          # Definitive weight per engine [kg]
         self.W_G                 = 700           # Gross weight [kg]
         self.W_TO                = 700           # Take-off weight [kg]
+        self.W_PL                = 240           # Payload weight [kg]
 
         "-Weight fractions"
         self.W1W_TO              = 0.995         # Engine startup fraction [-]
@@ -72,7 +73,6 @@ class UAV:
         "-Mission characteristics"
         self.n_drops             = 2             # Number of drops [-]
         self.R                   = 500000        # Range [m]
-        self.W_PL                = 240           # Payload weight [kg]
         self.M_res               = 0.15          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
         self.h_cruise            = 10000*0.3048  # Cruise altitude [m] | NOTES: Conversion 
 
