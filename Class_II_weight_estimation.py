@@ -1,4 +1,5 @@
 from math import cos
+import matplotlib.pyplot as plt
 
 #########################################################################
 "CLASS II WEIGHT ESTIMATION"
@@ -97,31 +98,108 @@ def propulsion_weight(obj):
     return W_pg
 
 def weight_empty(obj):
-    W_w = wing_weight(obj)
-    W_t = tail_weight(obj)
-    W_uc = gear_weight(obj)
-    W_n = nacelle_weight(obj)
-    W_eq = equipment_weight(obj)
-    W_fus = fuselage_weight(obj)
-    W_sc = control_surface_weight(obj)
-    W_pg = propulsion_weight(obj)
+    obj.W_w = wing_weight(obj)
+    obj.W_t = tail_weight(obj)
+    obj.W_uc = gear_weight(obj)
+    obj.W_n = nacelle_weight(obj)
+    obj.W_eq = equipment_weight(obj)
+    obj.W_fus = fuselage_weight(obj)
+    obj.W_sc = control_surface_weight(obj)
+    obj.W_pg = propulsion_weight(obj)
 
-    obj.W_OE = W_pg + W_sc + W_fus + W_eq + W_n + W_t + W_w  + W_uc
+    obj.W_OE = obj.W_w + obj.W_t + obj.W_uc + obj.W_n + obj.W_eq + obj.W_fus + obj.W_sc + obj.W_pg
 
-# def cg_calc():
-#     wing_cg = 0
-#     if sweep_angle == 0:
-#         wing_cg = 0.4 * cwr + l_LE #40% of root chord plus Leading Edge location
-#     else:
-#         wing_cg = 0 # to be done later, depends on spar locations (table 8-15 Torenbeek)
+def cg_calc(obj):
+    # wing group
+    if obj.sweep_angle == 0:
+        wing_cg = 0.4 * obj.cwr                 # 40% of root chord plus Leading Edge location
+    else:
+        wing_cg = 0.4 * obj.cwr                 # to be done later, depends on spar locations (table 8-15 Torenbeek)
+    
+    W_wing_gr = obj.W_w
+    x_wcg = wing_cg
 
-#     fus_cg = 0.335 * l_f #32-35% of fuselage length
-#     tail_cg = 0.42 * cwr + l_LE #42% of root chord plus Leading Edge location
+    # fuselage group (Torenbeek: #32-35% of fuselage length)
+    if obj.engine_pos == 'tractor':
+        fus_cg = 0.45 * obj.l_f                 # educated guess
+        engine_cg = 0.327                       # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
+    elif obj.engine_pos == 'pusher':
+        fus_cg = 0.55 * obj.l_f                 # educated guess
+        engine_cg = obj.l_f - (0.6651-0.327)    # based on Rotax 912is
+    elif obj.engine_pos == 'fuselage':
+        fus_cg = 0.53 * obj.l_f                 # educated guess
+        engine_cg = 0.8 * obj.l_f               # educated guess
 
-#     engine_cg = 0 # to be done later
-#     # c.g. or rotax 912is is at 32.7 cm from the front of the engine
+    tail_cg = 0.42 * obj.cwr + 0.9*obj.l_f      # to be more detailed !!
 
-#     landing_gear_cg = 0 # to be done later
-#     # can be at airplane c.g. -> iteration needed, or use location main and nose landing gear
+    W_fus_gr = obj.W_fus + obj.W_t + obj.W_pg
+    X_FCG = (fus_cg*obj.W_fus + tail_cg*obj.W_t + engine_cg*obj.W_pg)/(obj.W_fus + obj.W_t + obj.W_pg)
 
-#     cg = (wing_cg * W_w + fus_cg * W_f + tail_cg * W_t + engine_cg * W_pg + landing_gear_cg * W_uc) / (W_w + W_f + W_t + W_pg + W_uc)
+    # X_LEMAC and xc_OEW
+    xc_OEW = obj.xc_OEW_p*obj.MAC_length
+    X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
+
+    # landing_gear_cg = 0 # to be done later | neglected for now
+    # # can be at airplane c.g. -> iteration needed, or use location main and nose landing gear
+
+    # Final CG
+    W_OEW = W_wing_gr+W_fus_gr
+    X_OEW = X_LEMAC + xc_OEW
+
+    # Fuel
+    W_fuel_wi = obj.W_fuel_estimated
+    X_fuel_wi = X_LEMAC + 0.5*obj.MAC_length
+
+    # Payload
+    if obj.engine_pos == 'tractor':
+        dist_front = 0.6651 + 0.15  # [m]
+        dist_back = 0.4             # [m]
+    elif obj.engine_pos == 'pusher':
+        dist_front = 0.15
+        dist_back = 0.6651 + 0.15
+    elif obj.engine_pos == 'fuselage':
+        dist_front = 0.15
+        dist_back = 0.15
+    
+    # 2 boxes in front
+    W_2box_f = 1/6*obj.W_PL
+    X_2box_f = dist_front + 0.45/2
+    # 4 boxes in the front
+    W_4box_f = 1/3*obj.W_PL
+    X_4box_f = dist_front + 2*0.45/2
+    # 2 boxes in back
+    W_2box_b = 1/6*obj.W_PL
+    X_2box_b = obj.l_f-dist_back - 0.45/2
+    # 4 boxes in back
+    W_4box_b = 1/3*obj.W_PL
+    X_4box_b = obj.l_f-dist_back - 2*0.45/2
+    # all boxes
+    W_allbox = obj.W_PL
+    X_allbox = dist_front + 6*0.45/2
+
+    # Calculate points to plot
+    # OEW + fuel
+    W_OEW_fuel = W_OEW + W_fuel_wi
+    X_OEW_fuel = (W_OEW*X_OEW + W_fuel_wi*X_fuel_wi)/W_OEW_fuel
+    # OEW + fuel + 2 boxes in front
+    W_OEW_fuel_2box_f = W_OEW_fuel + W_2box_f
+    X_OEW_fuel_2box_f = (W_OEW_fuel*X_OEW_fuel + W_2box_f*X_2box_f)/W_OEW_fuel_2box_f
+    # OEW + fuel + 4 boxes in front
+    W_OEW_fuel_4box_f = W_OEW_fuel + W_4box_f
+    X_OEW_fuel_4box_f = (W_OEW_fuel*X_OEW_fuel + W_4box_f*X_4box_f)/W_OEW_fuel_4box_f
+    # OEW + fuel + 2 boxes in back
+    W_OEW_fuel_2box_b = W_OEW_fuel + W_2box_b
+    X_OEW_fuel_2box_b = (W_OEW_fuel*X_OEW_fuel + W_2box_b*X_2box_b)/W_OEW_fuel_2box_b
+    # OEW + fuel + 4 boxes in back
+    W_OEW_fuel_4box_b = W_OEW_fuel + W_4box_b
+    X_OEW_fuel_4box_b = (W_OEW_fuel*X_OEW_fuel + W_4box_b*X_4box_b)/W_OEW_fuel_4box_b
+    # OEW + fuel + all boxes
+    W_OEW_fuel_allbox = W_OEW_fuel + W_allbox
+    X_OEW_fuel_allbox = (W_OEW_fuel*X_OEW_fuel + W_allbox*X_allbox)/W_OEW_fuel_allbox
+
+    # Plot each point
+    plt.plot([X_OEW_fuel_allbox, X_OEW_fuel_4box_b, X_OEW_fuel_2box_b, X_OEW_fuel, X_OEW_fuel_2box_f, X_OEW_fuel_4box_f, X_OEW_fuel_allbox], [W_OEW_fuel_allbox, W_OEW_fuel_4box_b, W_OEW_fuel_2box_b, W_OEW_fuel, W_OEW_fuel_2box_f, W_OEW_fuel_4box_f, W_OEW_fuel_allbox], 'ro')
+    plt.xlabel('X_cg [m]')
+    plt.ylabel('Mass fraction [-]')
+    plt.grid()
+    plt.show()
