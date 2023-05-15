@@ -6,10 +6,10 @@ class UAV:
         self.name                = name          # Name of the aircraft [-]
 
         "-Aircraft geometry"
-        self.Sw                  = 14           # Surface area [m2]
+        self.Sw                  = 13            # Surface area [m2]
         self.A                   = 12            # Aspect ratio [-]
         self.e                   = 0.9           # Oswald factor [-]
-        self.b                   = 8             # Wing span [m]
+        self.b                   = 11            # Wing span [m]
         self.sweep_angle         = 0.36          # Sweep angle [rad]
         self.lambda_mid          = 0.36          # Sweep angle at mid-wing [rad]
         self.t_c                 = 0.12          # Thickness over chord ratio [-]
@@ -17,24 +17,25 @@ class UAV:
 
         self.b_f                 = 1.1           # Fuselage width [m]
         self.h_f                 = 1.1           # Fuselage height [m]
+        self.d_eff               = 1.421         # meter, ADSEE 1 slides 
         self.l_f                 = 4             # Fuselage length [m]
-        self.S_G                 = self.l_f*np.pi*self.b_f + 2*np.pi*(self.b_f/2)**2   # Gross shell area of fuselage [m] CHANGE THIS!
+        self.S_G                 = self.l_f*np.pi*self.d_eff + 2*np.pi*(self.d_eff/2)**2   # Gross shell area of fuselage [m] CHANGE THIS!
 
         self.s_tail              = 2             # Tail surface area [m]
         self.l_t                 = 3.5           # Tail arm [m]
 
-        self.boom                = True          # Boom
-
-        self.xc_OEW_p            = 0.25          # Longitudinal position of the OEW [m] | ASSUMPTION: 25% of MAC
+        self.boom                = True          # Boom, true if boom tail is implemented
 
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
-        self.L_D               = 10            # Lift over drag [-] | ASSUMPTION/NOTES: Conservative
+        self.L_D                 = 10            # Lift over drag [-] | ASSUMPTION/NOTES: Conservative
 
-        # ASSUMPTION/NOTES: From ADSEE 1 slides, taking average of reported range of values  
-        self.CL_max_clean        = 1.3           # Maximum lift coefficient [-] | Range: 1.3 - 1.9
-        self.CL_max_TO           = 1.3           # Maximum lift coefficient at take-off [-]
-        self.CL_max_land         = 1.6           # Maximum lift coefficietn at landing [-]
+        # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
+        # but this means that CL_max_clean, CL_max_TO and CL_max_land must always be stored in an array. For an array with length 1
+        # the code just runs once
+        self.CL_max_clean        = np.array([1.3])              # Maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.CL_max_TO           = np.array([1.3])              # Maximum lift coefficient at take-off [-]
+        self.CL_max_land         = np.array([1.6])              # Maximum lift coefficient at landing [-]
         self.CL_TO               = self.CL_max_TO / (1.1**2)    # [-]
         self.CL_LDG              = self.CL_max_land / (1.1**2)  # [-]
 
