@@ -4,7 +4,6 @@ from math import sqrt, pi, exp
 "CLASS I WEIGHT ESTIMATION"
 #########################################################################
 
-
 def weight_take_off(W_OE, W_F, W_PL):
     W_TO = W_OE + W_F + W_PL
 
