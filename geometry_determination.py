@@ -7,29 +7,27 @@ def metertofeet(meter):
     feet = meter*3.2808399
     return feet
 
-def dragpolar(CL, CD0, e, A):
-    CD = CD0 + (CL**2/(np.pi*A*e))
+# W/S and W/P diagrams
+# drag polar
+def dragpolar(obj):
+    CD = obj.CD0 + (obj.CL**2/(np.pi*obj.A*obj.e))
     return CD
 
-def stallWS(V, rho, CL_max):
-    WoS = 1/2 * rho * V**2 * CL_max
+def stallWS(obj, CL_max):
+    WoS = 1/2 * obj.rho * obj.V**2 * CL_max
     return WoS
 
-def TOP_calc(WS, sigma, CL_TO, BHP, W_TO):
-    TOP = WS/(sigma*CL_TO*(BHP/W_TO))
-    return TOP
-
-def altitude_effects(h, Lambda, R, g, T0, rho0, BHP0):
-    rho     = rho0*(1+ ((Lambda*h)/T0))**(-((g/(R*Lambda))+1))
-    sigma   = rho/rho0
-    BHP     = BHP0*(sigma)**(3/4)
-    return rho, sigma, BHP
+def altitude_effects(obj):
+    obj.rho     = obj.rho0*(1+ ((obj.Lambda*obj.h)/obj.T0))**(-((obj.g/(obj.R_gas*obj.Lambda))+1))
+    obj.sigma   = obj.rho/obj.rho0
+    obj.BHP     = obj.BHP0*(obj.sigma)**(3/4)
 
 def create_line(x1, y1, x2, y2, num_points):
     x = np.linspace(x1, x2, num_points)
     y = np.linspace(y1, y2, num_points)
     line = np.vstack((x, y))
     return line
+
 
 def geometry_determination(obj):
     #create empty array for capturing design points from W/P - W/S diagrams
@@ -41,35 +39,35 @@ def geometry_determination(obj):
         CL_TO           = CL_max_TO/(1.1**2)
         CL_LDG          = CL_max_land/(1.1**2)
         # find atmospheric properties and power at altitude according to ISA
-        rho, sigma, BHP = altitude_effects(obj.h_TO, Lambda, R, g0, T0, rho0, P_max)
+        rho, sigma, BHP = altitude_effects(obj)
         
         # define a W/S and W/P array to make graphs later on
         WS  = np.arange(100.0, 2201.0, 1.0)
         WP  = np.arange(0.0, 1.501, (1.5/len(WS)))
         
         # sizing for stall, maximum W/S values based on a CL max and a Vstall of 50 kts for dropping
-        WS_stall = stallWS(V_s_min, rho, CL_max_clean)
+        WS_stall = stallWS(obj, CL_max_clean)
         WS_stall = np.full(len(WP), WS_stall)
         WS_stall = np.vstack((WS_stall, WP))
         
         # Take off sizing using Take-off parameter (TOP) 
-        TOP_req = 250 
-        WP_TO = (TOP_req/WS)*CL_TO*sigma                                     #read from graph of ADSEE 1 slides, slide 29 lecture 3
+        obj.TOP_req = 250
+        WP_TO = (obj.TOP_req/WS)*CL_TO*obj.sigma                                     #read from graph of ADSEE 1 slides, slide 29 lecture 3
         WP_TO = np.vstack((WP_TO, WS))
 
         # Landing W/S
-        WS_landing = (CL_LDG*rho*(LDG_dist/0.5915))/(2*f)
+        WS_landing = (CL_LDG*obj.rho*(obj.LDG_dist/0.5915))/(2*obj.f)
         WS_landing = np.full(len(WP), WS_landing)
         WS_landing = np.vstack((WS_landing, WP))
         
         # W/P cruise
-        rho_cruise, sigma_cruise, BHP_cruise = altitude_effects(h_cruise, Lambda, R, g0, T0, rho0, P_max)
-        WP_cruise   = (power_setting/cruise_frac)*eta_p*sigma**(3/4)*(((CD0*1/2*rho_cruise*V_cruise**3)/(WS*cruise_frac))+(WS*(1/(np.pi*A*e*rho_cruise*V_cruise))))**(-1)
+        rho_cruise, sigma_cruise, BHP_cruise = altitude_effects(obj)
+        WP_cruise   = (obj.power_setting/obj.cruise_frac)*obj.eta_p*sigma**(3/4)*(((obj.CD0*1/2*rho_cruise*obj.V_cruise**3)/(WS*obj.cruise_frac))+(WS*(1/(np.pi * obj.A * obj.e* obj.rho_cruise * obj.V_cruise))))**(-1)
         WP_cruise   = np.vstack((WP_cruise, WS))
 
         #Climb performance
-        climb_rate  = (8.3/100)*V_climb                      #8.3% climb gradient found in CS23
-        WP_Climb    = eta_p/(climb_rate+((np.sqrt(WS)*np.sqrt(2/rho0))/(1.345*(A*e)**(3/4)/CD0**(1/4))))
+        obj.climb_rate  = (8.3/100) * obj.V_climb                      #8.3% climb gradient found in CS23
+        WP_Climb    = obj.eta_p/(obj.climb_rate+((np.sqrt(WS)*np.sqrt(2/obj.rho0))/(1.345*(obj.A*obj.e)**(3/4)/obj.CD0**(1/4))))
         WP_Climb    = np.vstack((WP_Climb, WS))
         
         #Evaluating if stall WS or landing WS is limiting
@@ -143,7 +141,7 @@ def geometry_determination(obj):
 
     #THIS SECTION CALCULATES WING PARAMETERS                    #run the code for the diagrams
     W_TO = obj.MTOW*g0                                          #find the take off weight in newtons
-    WS_values = design_points[0:12:2]                           #take the S/W values   
+    WS_values = design_points[0:12:2]                           #take the S/W values
     WP_values = design_points[1:13:2]                           #take the P/W values
     #find surface area
     Sw = W_TO/WS_values
@@ -235,4 +233,6 @@ def geometry_determination(obj):
     'Dihedral [deg]': dihedral
     }   
     wingdata = pd.DataFrame(data)
+        
+    return wingdata
 
