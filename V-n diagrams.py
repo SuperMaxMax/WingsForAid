@@ -43,8 +43,7 @@ def plot(obj):
     D = obj.V_D
     E = D
     F = obj.V_cruise
-    H = np.interp(n_min, n_neg, V)
-    print(H)
+    H = np.interp(-n_min, n_pos, V)
 
     #V_S
     V_S = np.interp(1, n_pos, V)
@@ -64,11 +63,12 @@ def plot(obj):
     plt.plot(H, n_min, 'ro')    #H
 
 
-
     #Plotting straight lines
     plt.plot([A, D], [n_max, n_max])            #Between A and D
     plt.plot([D, E], [n_max, 0])    #Between D and E
     plt.plot([E, F], [0, n_min])    #Between E and F
+    plt.plot([F, H], [n_min, n_min])    #Between F and H
+
 
 
 
