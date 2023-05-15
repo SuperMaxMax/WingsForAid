@@ -1,6 +1,7 @@
 import  numpy as np
 from    parameters import *
 import  matplotlib.pyplot as plt
+import  pandas as pd
 
 def metertofeet(meter):
     feet = meter*3.2808399
@@ -32,7 +33,7 @@ def create_line(x1, y1, x2, y2, num_points):
     line = np.vstack((x, y))
     return line
 
-def WP_WSdiagrams(h, plot=True, CLrange=True):
+def WP_WSdiagrams(h, plot=True):
     design_points = np.empty(0)
     for i in range(7):
         CL_max_clean    = 1.3+(0.1*i)   #1.3 - 1.9
@@ -125,30 +126,61 @@ def WP_WSdiagrams(h, plot=True, CLrange=True):
     
     return design_points
 
+def fuselage_sizing(n_boxes, boom = True):
+    #instruments are
+    cumulative_box_length   = n_boxes*0.4                       #box 40x40x60, cumulative length in meter
+    length_between_boxes    = (n_boxes-1)*0.2                   #20 cm in between boxes
+    engine_length           = 0.593                             #engine length in cm, EASA type certificate data sheet ROTAX 912 series
+    engine_fairing          = 0.2                               #20 cm room around the engine 
+    d_eff                   = np.sqrt(1.10*1.40)                #from cross sectional drawing with width 1.40 m and height 1.10 m
+    d_engine_boxes          = 0.4                               #40 cm, leaves room for possible fire wall
+    if boom:                                                    #assume one effective diameter after last box
+        l_tc = d_eff
+    else:                                                       #ADSEE 1, lecture 5, slide 58, source Roskam
+        l_tc = 3.5*d_eff
+    #fuselage dimensions
+    h_out = 1.10                                                #meter, from cross sectional drawing
+    h_in  = 0.90
+    w_out = 1.40
+    w_in  = 1.20
+    l_fuselage = cumulative_box_length + length_between_boxes + engine_length + engine_fairing + l_tc + d_engine_boxes
+
+    return h_out, w_out, l_fuselage
+    
 #W/P and W/S are now known, define wing surface area
-def geometry_determination(MTOW, plot=True):
-    WPWS = WP_WSdiagrams(0, plot=False)
-    W_TO = MTOW*g0
-    WS_values = np.array(WPWS[0:12:2])
-    WP_values = np.array(WPWS[1:13:2])
+def wing_sizing(MTOW, plot=True):
+    WPWS = WP_WSdiagrams(0, plot=False)                     #run the code for the diagrams
+    W_TO = MTOW*g0                                          #find the take off weight in newtons
+    WS_values = np.array(WPWS[0:12:2])                      #take the S/W values   
+    WP_values = np.array(WPWS[1:13:2])                      #take the P/W values
+    #find surface area
     Sw = W_TO/WS_values
+    #find power value                 
     P_values = W_TO/WP_values*0.00134102209                 #convert to horsepower
+    #wingspan
     b = np.sqrt(A*Sw)
+    #quarter chord sweep angle (0 as the cruise speed is around 100-110 knots which equates to M<0.2)
     cos_lambda_c04 = 1
     lambda_co4 = np.arccos(cos_lambda_c04)                  #rad, As Mcruise < 0.7, use 0 sweep angle
+    #taper ratio
     taper = 0.2*(2-lambda_co4)
+    #root and tipchord
     rootchord = (2*Sw)/((1+taper)*b)
     tipchord = taper*rootchord
+    #define empty arrays in which values will be stored
     wings = np.empty(0)
+    MAC_parameters = np.empty(0)
+    lambda_co2 = np.empty(0)
     for i in range(len(Sw)):
+        #define important points on the wing planform (corners, quarther and half chord points)
         points = np.array([[0, rootchord[i]/4, tipchord[i]/4, 0, -tipchord[i]/4, -3*tipchord[i]/4, -3*rootchord[i]/4, -rootchord[i]/4],
                             [0, 0, b[i]/2, b[i]/2, b[i]/2, b[i]/2, 0, 0]])
-        LE = create_line(points[0][1], points[1][1], points[0][2], points[1][2], 1000) #leading edge
-        ct = create_line(points[0][2], points[1][2], points[0][4], points[1][4], 1000)  #tip chord
-        TE = create_line(points[0][4], points[1][4], points[0][6], points[1][6], 1000) #trailing edge
-        cr = create_line(points[0][6], points[1][6], points[0][1], points[1][1], 1000)  #root chord
-        qc = create_line(points[0][0], points[1][0], points[0][3], points[1][3], 1000) #quarter chord line
-        hc = create_line(points[0][-1], points[1][-1], points[0][4], points[1][4], 1000) #half chord line
+        LE = create_line(points[0][1], points[1][1], points[0][2], points[1][2], 1000)      #leading edge
+        ct = create_line(points[0][2], points[1][2], points[0][4], points[1][4], 1000)      #tip chord
+        TE = create_line(points[0][4], points[1][4], points[0][6], points[1][6], 1000)      #trailing edge
+        cr = create_line(points[0][6], points[1][6], points[0][1], points[1][1], 1000)      #root chord
+        qc = create_line(points[0][0], points[1][0], points[0][3], points[1][3], 1000)      #quarter chord line
+        hc = create_line(points[0][-1], points[1][-1], points[0][4], points[1][4], 1000)    #half chord line
         #points used to create MAC
         point_tip = (points[0][2]+rootchord[i], points[1][2])
         point_root= (points[0][6]-tipchord[i], points[1][6])
@@ -157,11 +189,16 @@ def geometry_determination(MTOW, plot=True):
         mask = mask[0] + mask[1]
         min = np.min(mask)
         index = np.where(mask == min)
-        y_mac = hc[1][index]
+        y_mac = hc[1][index][0]
         tolerance = 0.0000005
         x_lemac = LE[0][np.where(np.abs(LE[1]-y_mac)<=tolerance)][0]
         x_temac = TE[0][np.where(np.abs(TE[1]-y_mac)<=tolerance)][0]
         MAC = np.array([np.linspace(x_temac, x_lemac, 1000), np.full(1000, y_mac)])
+        MAC_length = x_lemac-x_temac
+        #half chord sweep angle
+        tan_lambda_co2 = (points[0][-1]-points[0][4])/(points[1][4]-points[1][-1])
+        lambda_co2_i = np.arctan(tan_lambda_co2)*(180/np.pi)
+        #plot the wings
         if plot:
             plt.plot(LE[0], LE[1], color='black')
             plt.plot(ct[0], ct[1], color='black')
@@ -174,25 +211,39 @@ def geometry_determination(MTOW, plot=True):
             plt.gca().set_aspect('equal', adjustable = 'box')
             plt.xlabel("y [m]")
             plt.show()
+        MAC_i = np.array([y_mac, MAC_length])
+        lambda_co2 = np.append(lambda_co2, lambda_co2_i)
+        if i == 0:
+            wings = points
+            MAC_parameters = MAC_i
+        else:
+            wings = np.vstack((wings, points))
+            MAC_parameters = np.vstack((MAC_parameters, MAC_i))
+
+    tc = np.full(np.shape(Sw), 0.18)                                    #thickness over chord. 0.18 ADSEE 1, Lecture 6, Slide 22; no supercritical airfoils considered
+    dihedral = np.full(np.shape(Sw), 1)                                 #degree, high wing value, same slides as above.
+    #define a dataframe with all wing parameters
+    data = {
+    'surface area [m^2]': Sw,
+    'power [BHP]': P_values,
+    'wing span [m]': b,
+    'quarter chord sweep angle [deg]': lambda_co4,
+    'half chord sweep angle [deg]': lambda_co2,
+    'rootchord [m]': rootchord,
+    'tipchord [m]': tipchord,
+    'y MAC [m]': [arr[0] for arr in MAC_parameters],
+    'MAC length [m]': [arr[1] for arr in MAC_parameters],
+    'thickness to chord ratio [-]': tc,
+    'dihedral [deg]': dihedral
+    }   
+    wingdata = pd.DataFrame(data)
         
-    
-        
-        
-    return Sw, P_values, b, lambda_co4, taper, rootchord, tipchord, 
+    return wingdata
 
-a=geometry_determination(W_TO)
+print(wing_sizing(W_TO, plot=False)['half chord sweep angle [deg]'])
 
-
-
-
-
-    
-
-
-
-
-
-
-
-
+# def empennage_sizing(W_TO, strut = False):
+#     wing_param = wing_sizing(W_TO, plot=False)
+#     if strut:
+#         Ww = 0.04674*
 
