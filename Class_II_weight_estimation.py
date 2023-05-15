@@ -108,21 +108,6 @@ def weight_empty(obj):
 
     obj.W_OE = W_pg + W_sc + W_fus + W_eq + W_n + W_t + W_w  + W_uc
 
-    # # Print all weights
-    # print(f"W_pg:{round(W_pg,3)} [kg]")
-    # print(f"W_sc:{round(W_sc,3)} [kg]")
-    # print(f"W_fus:{round(W_fus)} [kg]")
-    # print(f"W_eq:{round(W_eq)}")
-    # print(f"W_n:{round(W_n)}")
-    # print(f"W_t:{round(W_t)} [kg]")
-    # print(f"W_w:{round(W_w)} [kg]")
-    # print(f"W_uc:{round(W_uc)} [kg]")
-
-    # # Operative empty weight
-    # print(f"W_OEW:{obj.W_OE}")
-
-    # return obj.W_OE
-
 # def cg_calc():
 #     wing_cg = 0
 #     if sweep_angle == 0:
