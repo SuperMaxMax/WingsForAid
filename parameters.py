@@ -91,7 +91,7 @@ cwr = 2.5 # m
 W_loading = 562/9.81 # kg/m^2
 W_G = 700 # kg
 s_tail = 2 # m^2
-W_TO = 700 # kg
+#W_TO = 700 # kg
 P_TO = 62 # hp
 V_D = 150*0.514444 # m/s
 l_t = 3.5 # m
@@ -103,8 +103,8 @@ W_e = 62.6 # kg
 l_f = 4 # m
 
 W_fuel_estimated = 75*0.82    # estimated value based on 20L/h fuel burn of rotax and 3 hour sortie and 15L reserve and density of fuel
-W_LDG   = W_TO - W_PL - W_fuel_estimated
-f = W_LDG/W_TO
+#W_LDG   = W_TO - W_PL - W_fuel_estimated
+#f = W_LDG/W_TO
 cruise_frac = W1W_TO*W2W1*W3W2*W4W3*0.85    #assume halfway through the cruise with cruise fuel fraction 0.3
 
 # Parameters for geometry estimation

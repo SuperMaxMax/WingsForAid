@@ -1,143 +1,141 @@
 import numpy as np
-import parameters as para
+from parameters import *
 
 
+#########################################################################
+"CLASS II WEIGHT ESTIMATION"
+#########################################################################
 
-class Weight:
-    def __init__(self, para):
-        # parameters.py is a file containing all constant parameters of the aircraft
-        self.para = para
+def wing_weight(W_TO):   #Span, sweep, ultimate load factor, thickness over chord, cord length at root, wing loading, gross weight
+    k_w = 4.9E-3
+    b_s = b / np.cos(lambda_mid)
+    b_ref = 1.905
+    t_r = t_c * cwr
 
-    #########################################################################
-    "CLASS II WEIGHT ESTIMATION"
-    #########################################################################
+    W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * n_ult**0.55 * ((b_s/t_r)/W_loading)**0.3 * W_TO
 
-    def wing_weight(self):   #Span, sweep, ultimate load factor, thickness over chord, cord length at root, wing loading, gross weight
-        k_w = 4.9E-3
-        b_s = self.para.b / np.cos(self.para.lambda_mid)
-        b_ref = 1.905
-        t_r = self.para.t_c * self.para.cwr
+    #ADD 30% IF BRACED WING USED, 10% IF STRUT USED?
+    return W_w
 
-        self.W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * self.para.n_ult**0.55 * ((b_s/t_r)/self.para.W_loading)**0.3 * self.W_TO
-        
-        #ADD 30% IF BRACED WING USED, 10% IF STRUT USED?
+def tail_weight(): #ultimate load factor, tail surface area
+    W_t = 0.64 * (n_ult * s_tail**2)**0.75
+    return W_t
+    #IF TAILPLANE AREA UNKNOWN, WEIGHT ASSUMED TO BE 3.5-4% OF EMPTY WEIGHT
 
-    def tail_weight(self): #ultimate load factor, tail surface area
-        self.W_t = 0.64 * (self.para.n_ult * self.para.s_tail**2)**0.75
+def gear_weight(W_TO):
 
-        #IF TAILPLANE AREA UNKNOWN, WEIGHT ASSUMED TO BE 3.5-4% OF EMPTY WEIGHT
+    maingear_type = input("Is the main gear fixed or retractable [f/r]",)
+    nosegear_type = input("Is the nose gear fixed or retractable [f/r]",)
 
-    def gear_weight(self):
-      
-        maingear_type = input("Is the main gear fixed or retractable [f/r]",)
-        nosegear_type = input("Is the nose gear fixed or retractable [f/r]",)
+    if (maingear_type!="f" and maingear_type!="r") and (nosegear_type!="f" and nosegear_type!="r"):
+        print("Input f or r for the gear type")
+        return
 
-        if (maingear_type!="f" and maingear_type!="r") and (nosegear_type!="f" and nosegear_type!="r"):
-            print("Input f or r for the gear type")
-            return
+    if maingear_type=="f":
+        A1 = 9.1
+        B1 = 0.082
+        C1 = 0.019
+        D1 = 0
+    else:
+        A1 = 18.1
+        B1 = 0.131
+        C1 = 0.019
+        D1 = 2.23 * 10**-5
 
-        if maingear_type=="f":
-            A1 = 9.1
-            B1 = 0.082
-            C1 = 0.019
-            D1 = 0
-        else:
-            A1 = 18.1
-            B1 = 0.131
-            C1 = 0.019
-            D1 = 2.23 * 10**-5
+    if nosegear_type=="f":
+        A2 = 11.3
+        B2 = 0
+        C2 = 0.0024
+        D2 = 0
+    else:
+        A2 = 9.1
+        B2 = 0.082
+        C2 = 0
+        D2 = 2.97 * 10**-6
 
-        if nosegear_type=="f":
-            A2 = 11.3
-            B2 = 0
-            C2 = 0.0024
-            D2 = 0
-        else:
-            A2 = 9.1
-            B2 = 0.082
-            C2 = 0
-            D2 = 2.97 * 10**-6
+    #Main gear:
+    W_uc1 = 1.08 * (A1 + B1 * W_TO**0.75 + C1 * W_TO + D1 * W_TO**1.5)
 
-        #Main gear:
-        W_uc1 = 1.08 * (A1 + B1 * self.para.W_TO**0.75 + C1 * self.para.W_TO + D1 * self.para.W_TO**1.5)
+    #Nose gear:
+    W_uc2 = 1.08 * (A2 + B2 * W_TO**0.75 + C2 * W_TO + D2 * W_TO**1.5)
+    W_uc = W_uc1 + W_uc2
+    return W_uc
 
-        #Nose gear:
-        W_uc2 = 1.08 * (A2 + B2 * self.para.W_TO**0.75 + C2 * self.para.W_TO + D2 * self.para.W_TO**1.5)
-        self.W_uc = W_uc1 + W_uc2
+def nacelle_weight(): #Take off power in hp
+    W_n = 1.134 * P_TO**0.5
+    return W_n
 
-    def nacelle_weight(self): #Take off power in hp
-        self.W_n = 1.134 * self.para.P_TO**0.5
+def equipment_weight(W_TO):
+    W_eq = 0.008 * W_TO
+    return W_eq
+    #MORE DETAILED ESTIMATION CAN BE MADE BUT NOT NECESSARY FOR TRADE-OFF
 
-    def equipment_weight(self):
-        self.W_eq = 0.008 * self.para.W_TO
-        #MORE DETAILED ESTIMATION CAN BE MADE BUT NOT NECESSARY FOR TRADE-OFF
+def fuselage_weight():
+    k_wf = 0.23
+    W_fus = k_wf*(V_D*(l_t/(b_f+h_f)))**0.5*S_G**1.2
+    return W_fus
+    # Add 7% if the main landing gear is attached to the fuselage, but 4% can be subtracted from the fuselage weight if there is no attachment structure for the main landing gear
+    # Add 10% for freighter aircraft
+    # For booms l_t is defined as distance between local wing chord and horizontal tailplane
 
-    def fuselage_weight(self):
-        k_wf = 0.23
-        self.W_f = k_wf*(self.para.V_D*(self.para.l_t/(self.para.b_f+self.para.h_f)))**0.5*self.para.S_G**1.2
+def control_surface_weight(W_TO):
+    k_sc = 0.44*0.768
+    W_sc = k_sc*W_TO**(2/3)
+    return W_sc
+    # Add 20% for LE flap or slat
+    # Add 15% for lift dumper controls
 
-        # Add 7% if the main landing gear is attached to the fuselage, but 4% can be subtracted from the fuselage weight if there is no attachment structure for the main landing gear
-        # Add 10% for freighter aircraft
-        # For booms l_t is defined as distance between local wing chord and horizontal tailplane
+def propulsion_weight():
+    k_pg = 1.16 # tractor single propeller aircraft
+    W_pg = k_pg*N_e*(W_e+0.109*P_TO)
+    return W_pg
+    # If number of cylinder and volume of cylinder are known use figure 4-12 Torenbeek
 
-    def control_surface_weight(self):
-        k_sc = 0.44*0.768
-        self.W_sc = k_sc*self.para.W_TO**(2/3)
+def weight_empty(W_pg, W_sc, W_fus, W_eq, W_n, W_t, W_w, W_uc):
+    W_OEW = W_pg + W_sc + W_fus + W_eq + W_n + W_t + W_w  + W_uc
 
-        # Add 20% for LE flap or slat
-        # Add 15% for lift dumper controls
+    # Print all weights
+    print(f"W_pg:{round(W_pg,3)} [kg]")
+    print(f"W_sc:{round(W_sc,3)} [kg]")
+    print(f"W_fus:{round(W_fus)} [kg]")
+    print(f"W_eq:{round(W_eq)}")
+    print(f"W_n:{round(W_n)}")
+    print(f"W_t:{round(W_t)} [kg]")
+    print(f"W_w:{round(W_w)} [kg]")
+    print(f"W_uc:{round(W_uc)} [kg]")
 
-    def propulsion_weight(self):
-        k_pg = 1.16 # tractor single propeller aircraft
-        self.W_pg = k_pg*self.para.N_e*(self.para.W_e+0.109*self.para.P_TO)
+    # Operative empty weight
+    print(f"W_OEW:{W_OEW}")
 
-        # If number of cylinder and volume of cylinder are known use figure 4-12 Torenbeek
+    return W_OEW
 
-    def weight_empty(self):
-        self.W_OEW = self.W_pg + self.W_sc + self.W_f + self.W_eq + self.W_n + self.W_t + self.W_w  + self.W_uc
+def cg_calc():
+    wing_cg = 0
+    if sweep_angle == 0:
+        wing_cg = 0.4 * cwr + l_LE #40% of root chord plus Leading Edge location
+    else:
+        wing_cg = 0 # to be done later, depends on spar locations (table 8-15 Torenbeek)
 
-        # Print all weights
-        print(f"W_pg:{round(self.W_pg,3)} [kg]")
-        print(f"W_sc:{round(self.W_sc,3)} [kg]")
-        print(f"W_f:{round(self.W_f)} [kg]")
-        print(f"W_eq:{round(self.W_eq)}")
-        print(f"W_n:{round(self.W_n)}")
-        print(f"W_t:{round(self.W_t)} [kg]")
-        print(f"W_w:{round(self.W_w)} [kg]")
-        print(f"W_uc:{round(self.W_uc)} [kg]")
+    fus_cg = 0.335 * l_f #32-35% of fuselage length
+    tail_cg = 0.42 * cwr + l_LE #42% of root chord plus Leading Edge location
 
-        # Operative empty weight
-        print(f"W_OEW:{self.W_OEW}")
-    
-        return self.W_OEW
+    engine_cg = 0 # to be done later
+    # c.g. or rotax 912is is at 32.7 cm from the front of the engine
 
-    def cg_calc(self):
-        self.wing_cg = 0
-        if self.para.sweep_angle == 0:
-            self.wing_cg = 0.4 * self.cwr + self.l_LE #40% of root chord plus Leading Edge location
-        else:
-            self.wing_cg = 0 # to be done later, depends on spar locations (table 8-15 Torenbeek)
+    landing_gear_cg = 0 # to be done later
+    # can be at airplane c.g. -> iteration needed, or use location main and nose landing gear
 
-        self.fus_cg = 0.335 * self.para.l_f #32-35% of fuselage length
-        self.tail_cg = 0.42 * self.para.cwr + self.para.l_LE #42% of root chord plus Leading Edge location
-
-        self.engine_cg = 0 # to be done later
-        # c.g. or rotax 912is is at 32.7 cm from the front of the engine
-
-        self.landing_gear_cg = 0 # to be done later
-        # can be at airplane c.g. -> iteration needed, or use location main and nose landing gear
-
-        self.cg = (self.wing_cg * self.W_w + self.fus_cg * self.W_f + self.tail_cg * self.W_t + self.engine_cg * self.W_pg + self.landing_gear_cg * self.W_uc) / (self.W_w + self.W_f + self.W_t + self.W_pg + self.W_uc)
+    cg = (wing_cg * W_w + fus_cg * W_f + tail_cg * W_t + engine_cg * W_pg + landing_gear_cg * W_uc) / (W_w + W_f + W_t + W_pg + W_uc)
 
 if __name__ == "__main__":
-    weight = Weight(para)
-    weight.wing_weight()
-    weight.tail_weight()
-    weight.gear_weight()
-    weight.nacelle_weight()
-    weight.equipment_weight()
-    weight.fuselage_weight()
-    weight.control_surface_weight()
-    weight.propulsion_weight()
-    weight.weight_empty()
-    weight.cg_calc()
+    W_TO = 600
+    W_w = wing_weight(W_TO)
+    W_t = tail_weight()
+    W_uc = gear_weight(W_TO)
+    W_n = nacelle_weight()
+    W_eq = equipment_weight(W_TO)
+    W_fus = fuselage_weight()
+    W_sc = control_surface_weight(W_TO)
+    W_pg = propulsion_weight()
+
+    weight_empty(W_pg, W_sc, W_fus, W_eq, W_n, W_t, W_w, W_uc)
