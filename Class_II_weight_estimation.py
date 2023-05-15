@@ -108,6 +108,8 @@ def weight_empty(obj):
 
     obj.W_OE = W_pg + W_sc + W_fus + W_eq + W_n + W_t + W_w  + W_uc
 
+    obj.W_TO = obj.W_OE + obj.W_F
+
 # def cg_calc():
 #     wing_cg = 0
 #     if sweep_angle == 0:

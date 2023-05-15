@@ -105,12 +105,12 @@ class UAV:
 
         "==== Miscellaneous ===="
 
-        self.lin_par1            = 0.5482        # Gradient of the linear trend OEW/MTOW
-        self.lin_par2            = 486.68        # Y axis crossing of the linear trend OEW/MTOW
+        #self.lin_par1            = 0.5482        # Gradient of the linear trend OEW/MTOW
+        #self.lin_par2            = 486.68        # Y axis crossing of the linear trend OEW/MTOW
 
         "-MTOW vs OEW reduced by pilot weight R2=0.9548"
-        #lin_par1           = 0.5522       
-        #lin_par2           = -40.838 
+        self.lin_par1           = 0.5522
+        self.lin_par2           = -40.838
 
         "-MTOW for drones, R2=0.9988"
         #lin_par1           = 0.4631
