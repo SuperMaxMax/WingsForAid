@@ -142,6 +142,7 @@ def geometry_determination(obj, plot=False):
     obj.w_out = 1.40
     obj.w_in  = 1.20
     obj.l_f   = cumulative_box_length + length_between_boxes + engine_length + engine_fairing + l_tc + d_engine_boxes
+    obj.S_G   = obj.l_f*np.pi*obj.d_eff + 2*np.pi*(obj.d_eff/2)**2
 
     #THIS SECTION CALCULATES WING PARAMETERS                    #run the code for the diagrams
     Weight_TO = obj.W_TO*obj.g0                                 #find the take off weight in newtons
@@ -214,5 +215,5 @@ def geometry_determination(obj, plot=False):
             wings = np.vstack((wings, points))
             MAC_parameters = np.vstack((MAC_parameters, MAC_i))
 
-    tc = np.full(np.shape(obj.Sw), 0.18)                                    #thickness over chord. 0.18 ADSEE 1, Lecture 6, Slide 22; no supercritical airfoils considered
-    dihedral = np.full(np.shape(obj.Sw), 1)                                 #degree, high wing value, same slides as above.
+    obj.tc = np.full(np.shape(obj.Sw), 0.12)                                    #thickness over chord. 0.18 ADSEE 1, Lecture 6, Slide 22; no supercritical airfoils considered
+    obj.dihedral = np.full(np.shape(obj.Sw), 1)                                 #degree, high wing value, same slides as above.

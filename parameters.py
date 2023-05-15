@@ -17,17 +17,20 @@ class UAV:
         self.lambda_mid          = 0.36          # Sweep angle at mid-wing [rad]
         self.t_c                 = 0.12          # Thickness over chord ratio [-]
         self.cwr                 = 2.5           # Chord length at root [m]
+        self.dihedral            = 1             # Wing dihedral [deg]
 
         self.b_f                 = 1.1           # Fuselage width [m]
         self.h_f                 = 1.1           # Fuselage height [m]
         self.d_eff               = 1.421         # meter, ADSEE 1 slides 
         self.l_f                 = 4             # Fuselage length [m]
-        self.S_G                 = self.l_f*np.pi*self.d_eff + 2*np.pi*(self.d_eff/2)**2   # Gross shell area of fuselage [m] CHANGE THIS!
+        self.S_G                 = 21.029        # Gross shell area of fuselage [m^2]
 
         self.s_tail              = 2             # Tail surface area [m]
         self.l_t                 = 3.5           # Tail arm [m]
 
         self.boom                = True          # Boom, true if boom tail is implemented
+
+        self.xc_OEW_p            = 0.25           # Center of gravity of OEW as a fraction of the fuselage length [-]
 
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]

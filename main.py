@@ -13,22 +13,31 @@ concept_5 = UAV('concept_5')
 # iteration
 it = True
 
-for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
+for concept in [concept_1]:#[concept_1, concept_2, concept_3, concept_4, concept_5]:
     while it:
+        # class 1
         c1.iteration(concept)
         W_TO_c1 = concept.W_TO
         print(W_TO_c1)
-        # geometry determination stuff
+        
+        # geometry determination
         geo.geometry_determination(concept)
 
+        # class 2
         c2.weight_empty(concept)
-        W_TO_c2_new = concept.W_TO
+        W_TO_c2 = concept.W_TO
+        print(W_TO_c1)
 
-        change = (W_TO_c2_new - W_TO_c2)/W_TO_c2
-        if abs(change) < 0.01:
-            it = False
-        else:
-            W_to_c2 = W_TO_c2_new
-            continue
+        # iterate between class 1 and class 2
+        # change = (W_TO_c2 - W_TO_c1)/W_TO_c1
+        # if abs(change) < 0.01:
+        #     it = False
+        # else:
+        #     continue
+
+        # cg calculation
+        c2.cg_calc(concept)
+        
+        it = False
     
     print(f"Concept {concept.name} has a weight of {concept.W_TO} kg")

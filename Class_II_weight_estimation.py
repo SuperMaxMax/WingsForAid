@@ -23,8 +23,8 @@ def tail_weight(obj): #ultimate load factor, tail surface area
     return W_t
 
 def gear_weight(obj):
-    maingear_type = input("Is the main gear fixed or retractable [f/r]",)
-    nosegear_type = input("Is the nose gear fixed or retractable [f/r]",)
+    maingear_type = 'f'#input("Is the main gear fixed or retractable [f/r]",)
+    nosegear_type = 'F'#input("Is the nose gear fixed or retractable [f/r]",)
 
     if (maingear_type!="f" and maingear_type!="r") and (nosegear_type!="f" and nosegear_type!="r"):
         print("Input f or r for the gear type")
@@ -110,7 +110,14 @@ def weight_empty(obj):
     obj.W_OE = obj.W_w + obj.W_t + obj.W_uc + obj.W_n + obj.W_eq + obj.W_fus + obj.W_sc + obj.W_pg
 
 def cg_calc(obj):
-    # wing group
+    """
+    so far this is a preliminary calculation, to be done more detailed later
+    this means that the gear, nacelle, equipment and control surface weights are neglected
+    wing group consists of the wing only
+    fuselage group consists of the fuselage, engine and tail
+    todo: add changes when boom = True
+    """
+    # Wing group
     if obj.sweep_angle == 0:
         wing_cg = 0.4 * obj.cwr                 # 40% of root chord plus Leading Edge location
     else:
@@ -119,7 +126,7 @@ def cg_calc(obj):
     W_wing_gr = obj.W_w
     x_wcg = wing_cg
 
-    # fuselage group (Torenbeek: #32-35% of fuselage length)
+    # Fuselage group (Torenbeek: #32-35% of fuselage length)
     if obj.engine_pos == 'tractor':
         fus_cg = 0.45 * obj.l_f                 # educated guess
         engine_cg = 0.327                       # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
@@ -134,10 +141,12 @@ def cg_calc(obj):
 
     W_fus_gr = obj.W_fus + obj.W_t + obj.W_pg
     X_FCG = (fus_cg*obj.W_fus + tail_cg*obj.W_t + engine_cg*obj.W_pg)/(obj.W_fus + obj.W_t + obj.W_pg)
+    print(f"W_fus_gr = {W_fus_gr} N, X_FCG = {X_FCG} m")
 
     # X_LEMAC and xc_OEW
     xc_OEW = obj.xc_OEW_p*obj.MAC_length
     X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
+    print(f"xc_OEW = {xc_OEW} m, X_LEMAC = {X_LEMAC} m")
 
     # landing_gear_cg = 0 # to be done later | neglected for now
     # # can be at airplane c.g. -> iteration needed, or use location main and nose landing gear
@@ -145,10 +154,12 @@ def cg_calc(obj):
     # Final CG
     W_OEW = W_wing_gr+W_fus_gr
     X_OEW = X_LEMAC + xc_OEW
+    print(f"W_OEW = {W_OEW} N, X_OEW = {X_OEW} m")
 
     # Fuel
     W_fuel_wi = obj.W_fuel_estimated
     X_fuel_wi = X_LEMAC + 0.5*obj.MAC_length
+    print(f"W_fuel_wi = {W_fuel_wi} N, X_fuel_wi = {X_fuel_wi} m")
 
     # Payload
     if obj.engine_pos == 'tractor':
@@ -180,22 +191,28 @@ def cg_calc(obj):
     # Calculate points to plot
     # OEW + fuel
     W_OEW_fuel_frac = (W_OEW + W_fuel_wi)/obj.W_TO
-    X_OEW_fuel = (W_OEW*X_OEW + W_fuel_wi*X_fuel_wi)/W_OEW_fuel_frac
+    X_OEW_fuel = (W_OEW*X_OEW + W_fuel_wi*X_fuel_wi)/(W_OEW + W_fuel_wi)
+    print(f"W_OEW_fuel_frac = {W_OEW_fuel_frac}, X_OEW_fuel = {X_OEW_fuel}")
     # OEW + fuel + 2 boxes in front
     W_OEW_fuel_2box_f_frac = (W_OEW_fuel_frac + W_2box_f)/obj.W_TO
-    X_OEW_fuel_2box_f = (W_OEW_fuel_frac*X_OEW_fuel + W_2box_f*X_2box_f)/W_OEW_fuel_2box_f_frac
+    X_OEW_fuel_2box_f = (W_OEW_fuel_frac*X_OEW_fuel + W_2box_f*X_2box_f)/(W_OEW_fuel_frac + W_2box_f)
+    print(f"W_OEW_fuel_2box_f_frac = {W_OEW_fuel_2box_f_frac}, X_OEW_fuel_2box_f = {X_OEW_fuel_2box_f}")
     # OEW + fuel + 4 boxes in front
     W_OEW_fuel_4box_f_frac = (W_OEW_fuel_frac + W_4box_f)/obj.W_TO
-    X_OEW_fuel_4box_f = (W_OEW_fuel_frac*X_OEW_fuel + W_4box_f*X_4box_f)/W_OEW_fuel_4box_f_frac
+    X_OEW_fuel_4box_f = (W_OEW_fuel_frac*X_OEW_fuel + W_4box_f*X_4box_f)/(W_OEW_fuel_frac + W_4box_f)
+    print(f"W_OEW_fuel_4box_f_frac = {W_OEW_fuel_4box_f_frac}, X_OEW_fuel_4box_f = {X_OEW_fuel_4box_f}")
     # OEW + fuel + 2 boxes in back
     W_OEW_fuel_2box_b_frac = (W_OEW_fuel_frac + W_2box_b)/obj.W_TO
-    X_OEW_fuel_2box_b = (W_OEW_fuel_frac*X_OEW_fuel + W_2box_b*X_2box_b)/W_OEW_fuel_2box_b_frac
+    X_OEW_fuel_2box_b = (W_OEW_fuel_frac*X_OEW_fuel + W_2box_b*X_2box_b)/(W_OEW_fuel_frac + W_2box_b)
+    print(f"W_OEW_fuel_2box_b_frac = {W_OEW_fuel_2box_b_frac}, X_OEW_fuel_2box_b = {X_OEW_fuel_2box_b}")
     # OEW + fuel + 4 boxes in back
     W_OEW_fuel_4box_b_frac = (W_OEW_fuel_frac + W_4box_b)/obj.W_TO
-    X_OEW_fuel_4box_b = (W_OEW_fuel_frac*X_OEW_fuel + W_4box_b*X_4box_b)/W_OEW_fuel_4box_b_frac
+    X_OEW_fuel_4box_b = (W_OEW_fuel_frac*X_OEW_fuel + W_4box_b*X_4box_b)/(W_OEW_fuel_frac + W_4box_b)
+    print(f"W_OEW_fuel_4box_b_frac = {W_OEW_fuel_4box_b_frac}, X_OEW_fuel_4box_b = {X_OEW_fuel_4box_b}")
     # OEW + fuel + all boxes
     W_OEW_fuel_allbox_frac = (W_OEW_fuel_frac + W_allbox)/obj.W_TO
-    X_OEW_fuel_allbox = (W_OEW_fuel_frac*X_OEW_fuel + W_allbox*X_allbox)/W_OEW_fuel_allbox_frac
+    X_OEW_fuel_allbox = (W_OEW_fuel_frac*X_OEW_fuel + W_allbox*X_allbox)/(W_OEW_fuel_frac + W_allbox)
+    print(f"W_OEW_fuel_allbox_frac = {W_OEW_fuel_allbox_frac}, X_OEW_fuel_allbox = {X_OEW_fuel_allbox}")
 
     # Plot each point
     plt.plot([X_OEW_fuel, X_OEW_fuel_2box_f, X_OEW_fuel_4box_f, X_OEW_fuel_2box_b, X_OEW_fuel_4box_b, X_OEW_fuel_allbox], [W_OEW_fuel_frac, W_OEW_fuel_2box_f_frac, W_OEW_fuel_4box_f_frac, W_OEW_fuel_2box_b_frac, W_OEW_fuel_4box_b_frac, W_OEW_fuel_allbox_frac], 'o', color='black')

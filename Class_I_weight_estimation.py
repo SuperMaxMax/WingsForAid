@@ -12,7 +12,7 @@ def weight_take_off(W_OE, W_F, W_PL):
 
 def weight_empty_operational(obj):
     # Operational empty weigth is a function of the empty weight and the trapped fuel weight, which are both a function of take_off weight
-    W_E = obj.lin_par1 * obj.W_TO + obj.lin_par2  # Relation from Roskam or own relation
+    W_E = obj.lin_par1 * obj.W_TO + obj.lin_par2                        # Relation from Roskam or own relation
     W_tfo = 0.002 * obj.W_TO
     W_OE = W_E + W_tfo
 
