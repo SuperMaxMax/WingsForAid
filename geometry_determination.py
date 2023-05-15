@@ -9,23 +9,18 @@ def metertofeet(meter):
 
 # W/S and W/P diagrams
 # drag polar
-def dragpolar(CL, CD0, e, A):
-    CD = CD0 + (CL**2/(np.pi*A*e))
+def dragpolar(obj):
+    CD = obj.CD0 + (obj.CL**2/(np.pi*obj.A*obj.e))
     return CD
 
-def stallWS(V, rho, CL_max):
-    WoS = 1/2 * rho * V**2 * CL_max
+def stallWS(obj, CL_max):
+    WoS = 1/2 * obj.rho * obj.V**2 * CL_max
     return WoS
 
-def TOP_calc(WS, sigma, CL_TO, BHP, W_TO):
-    TOP = WS/(sigma*CL_TO*(BHP/W_TO))
-    return TOP
-
-def altitude_effects(h, Lambda, R, g, T0, rho0, BHP0):
-    rho     = rho0*(1+ ((Lambda*h)/T0))**(-((g/(R*Lambda))+1))
-    sigma   = rho/rho0
-    BHP     = BHP0*(sigma)**(3/4)
-    return rho, sigma, BHP
+def altitude_effects(obj):
+    obj.rho     = obj.rho0*(1+ ((obj.Lambda*obj.h)/obj.T0))**(-((obj.g/(obj.R_gas*obj.Lambda))+1))
+    obj.sigma   = obj.rho/obj.rho0
+    obj.BHP     = obj.BHP0*(obj.sigma)**(3/4)
 
 def create_line(x1, y1, x2, y2, num_points):
     x = np.linspace(x1, x2, num_points)
@@ -33,7 +28,9 @@ def create_line(x1, y1, x2, y2, num_points):
     line = np.vstack((x, y))
     return line
 
-def WP_WSdiagrams(h, plot=True):
+
+def geometry_determination(obj):
+    #create empty array for capturing design points from W/P - W/S diagrams
     design_points = np.empty(0)
     for i in range(7):
         CL_max_clean    = 1.3+(0.1*i)   #1.3 - 1.9
@@ -42,35 +39,35 @@ def WP_WSdiagrams(h, plot=True):
         CL_TO           = CL_max_TO/(1.1**2)
         CL_LDG          = CL_max_land/(1.1**2)
         # find atmospheric properties and power at altitude according to ISA
-        rho, sigma, BHP = altitude_effects(h, Lambda, R, g0, T0, rho0, P_max)
+        rho, sigma, BHP = altitude_effects(obj)
         
         # define a W/S and W/P array to make graphs later on
         WS  = np.arange(100.0, 2201.0, 1.0)
         WP  = np.arange(0.0, 1.501, (1.5/len(WS)))
         
         # sizing for stall, maximum W/S values based on a CL max and a Vstall of 50 kts for dropping
-        WS_stall = stallWS(V_s_min, rho, CL_max_clean)
+        WS_stall = stallWS(obj, CL_max_clean)
         WS_stall = np.full(len(WP), WS_stall)
         WS_stall = np.vstack((WS_stall, WP))
         
         # Take off sizing using Take-off parameter (TOP) 
-        TOP_req = 250 
-        WP_TO = (TOP_req/WS)*CL_TO*sigma                                     #read from graph of ADSEE 1 slides, slide 29 lecture 3
+        obj.TOP_req = 250
+        WP_TO = (obj.TOP_req/WS)*CL_TO*obj.sigma                                     #read from graph of ADSEE 1 slides, slide 29 lecture 3
         WP_TO = np.vstack((WP_TO, WS))
 
         # Landing W/S
-        WS_landing = (CL_LDG*rho*(LDG_dist/0.5915))/(2*f)
+        WS_landing = (CL_LDG*obj.rho*(obj.LDG_dist/0.5915))/(2*obj.f)
         WS_landing = np.full(len(WP), WS_landing)
         WS_landing = np.vstack((WS_landing, WP))
         
         # W/P cruise
-        rho_cruise, sigma_cruise, BHP_cruise = altitude_effects(h_cruise, Lambda, R, g0, T0, rho0, P_max)
-        WP_cruise   = (power_setting/cruise_frac)*eta_p*sigma**(3/4)*(((CD0*1/2*rho_cruise*V_cruise**3)/(WS*cruise_frac))+(WS*(1/(np.pi*A*e*rho_cruise*V_cruise))))**(-1)
+        rho_cruise, sigma_cruise, BHP_cruise = altitude_effects(obj)
+        WP_cruise   = (obj.power_setting/obj.cruise_frac)*obj.eta_p*sigma**(3/4)*(((obj.CD0*1/2*rho_cruise*obj.V_cruise**3)/(WS*obj.cruise_frac))+(WS*(1/(np.pi * obj.A * obj.e* obj.rho_cruise * obj.V_cruise))))**(-1)
         WP_cruise   = np.vstack((WP_cruise, WS))
 
         #Climb performance
-        climb_rate  = (8.3/100)*V_climb                      #8.3% climb gradient found in CS23
-        WP_Climb    = eta_p/(climb_rate+((np.sqrt(WS)*np.sqrt(2/rho0))/(1.345*(A*e)**(3/4)/CD0**(1/4))))
+        obj.climb_rate  = (8.3/100) * obj.V_climb                      #8.3% climb gradient found in CS23
+        WP_Climb    = obj.eta_p/(obj.climb_rate+((np.sqrt(WS)*np.sqrt(2/obj.rho0))/(1.345*(obj.A*obj.e)**(3/4)/obj.CD0**(1/4))))
         WP_Climb    = np.vstack((WP_Climb, WS))
         
         #Evaluating if stall WS or landing WS is limiting
@@ -124,10 +121,7 @@ def WP_WSdiagrams(h, plot=True):
         #plt.legend(loc='upper right')
         plt.show()
     
-    return design_points
-
-def fuselage_sizing(n_boxes, boom = True):
-    #instruments are
+    #THIS SECTION CALCULATES FUSELAGE PARAMETERS
     cumulative_box_length   = n_boxes*0.4                       #box 40x40x60, cumulative length in meter
     length_between_boxes    = (n_boxes-1)*0.2                   #20 cm in between boxes
     engine_length           = 0.593                             #engine length in cm, EASA type certificate data sheet ROTAX 912 series
@@ -145,14 +139,10 @@ def fuselage_sizing(n_boxes, boom = True):
     w_in  = 1.20
     l_fuselage = cumulative_box_length + length_between_boxes + engine_length + engine_fairing + l_tc + d_engine_boxes
 
-    return h_out, w_out, l_fuselage
-    
-#W/P and W/S are now known, define wing surface area
-def wing_sizing(MTOW, plot=True):
-    WPWS = WP_WSdiagrams(0, plot=False)                     #run the code for the diagrams
-    W_TO = MTOW*g0                                          #find the take off weight in newtons
-    WS_values = np.array(WPWS[0:12:2])                      #take the S/W values   
-    WP_values = np.array(WPWS[1:13:2])                      #take the P/W values
+    #THIS SECTION CALCULATES WING PARAMETERS                    #run the code for the diagrams
+    W_TO = obj.MTOW*g0                                          #find the take off weight in newtons
+    WS_values = design_points[0:12:2]                           #take the S/W values
+    WP_values = design_points[1:13:2]                           #take the P/W values
     #find surface area
     Sw = W_TO/WS_values
     #find power value                 
@@ -174,7 +164,7 @@ def wing_sizing(MTOW, plot=True):
     for i in range(len(Sw)):
         #define important points on the wing planform (corners, quarther and half chord points)
         points = np.array([[0, rootchord[i]/4, tipchord[i]/4, 0, -tipchord[i]/4, -3*tipchord[i]/4, -3*rootchord[i]/4, -rootchord[i]/4],
-                            [0, 0, b[i]/2, b[i]/2, b[i]/2, b[i]/2, 0, 0]])
+                           [0, 0, b[i]/2, b[i]/2, b[i]/2, b[i]/2, 0, 0]])
         LE = create_line(points[0][1], points[1][1], points[0][2], points[1][2], 1000)      #leading edge
         ct = create_line(points[0][2], points[1][2], points[0][4], points[1][4], 1000)      #tip chord
         TE = create_line(points[0][4], points[1][4], points[0][6], points[1][6], 1000)      #trailing edge
@@ -224,26 +214,25 @@ def wing_sizing(MTOW, plot=True):
     dihedral = np.full(np.shape(Sw), 1)                                 #degree, high wing value, same slides as above.
     #define a dataframe with all wing parameters
     data = {
-    'surface area [m^2]': Sw,
-    'power [BHP]': P_values,
-    'wing span [m]': b,
-    'quarter chord sweep angle [deg]': lambda_co4,
-    'half chord sweep angle [deg]': lambda_co2,
-    'rootchord [m]': rootchord,
-    'tipchord [m]': tipchord,
-    'y MAC [m]': [arr[0] for arr in MAC_parameters],
+    'Wing loading [N/m^2]': WS_values,
+    'Power loading [N/W]': WP_values,
+    'Fuselage length [m]': l_fuselage,
+    'Fuselage outer width [m]': w_out,
+    'Fuselage outer height [m]': h_out,
+    'Fuselage effective diameter [m]': d_eff,
+    'Surface area [m^2]': Sw,
+    'Power [BHP]': P_values,
+    'Wing span [m]': b,
+    'Quarter chord sweep angle [deg]': lambda_co4,
+    'Half chord sweep angle [deg]': lambda_co2,
+    'Rootchord [m]': rootchord,
+    'Tipchord [m]': tipchord,
+    'Y MAC [m]': [arr[0] for arr in MAC_parameters],
     'MAC length [m]': [arr[1] for arr in MAC_parameters],
-    'thickness to chord ratio [-]': tc,
-    'dihedral [deg]': dihedral
+    'Thickness to chord ratio [-]': tc,
+    'Dihedral [deg]': dihedral
     }   
     wingdata = pd.DataFrame(data)
         
     return wingdata
-
-print(wing_sizing(W_TO, plot=False)['half chord sweep angle [deg]'])
-
-# def empennage_sizing(W_TO, strut = False):
-#     wing_param = wing_sizing(W_TO, plot=False)
-#     if strut:
-#         Ww = 0.04674*
 
