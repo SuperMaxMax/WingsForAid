@@ -5,6 +5,9 @@ class UAV:
         "==== Aircraft Parameters ===="
         self.name                = name          # Name of the aircraft [-]
 
+        "-CS23 Type"
+        self.type                = "normal"      # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
+
         "-Aircraft geometry"
         self.Sw                  = 13            # Surface area [m2]
         self.A                   = 12            # Aspect ratio [-]
@@ -52,6 +55,7 @@ class UAV:
         self.W_G                 = 700           # Gross weight [kg]
         self.W_TO                = 700           # Take-off weight [kg]
         self.W_PL                = 240           # Payload weight [kg]
+        self.WS                  = 600           # Wing Loading [N/m^2]
 
         "-Weight fractions"
         self.W1W_TO              = 0.995         # Engine startup fraction [-]
