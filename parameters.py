@@ -26,6 +26,8 @@ class UAV:
 
         self.boom                = True          # Boom, true if boom tail is implemented
 
+        self.xc_OEW_p            = 0.25           # Center of gravity of OEW as a fraction of the fuselage length [-]
+
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
         self.L_D                 = 10            # Lift over drag [-] | ASSUMPTION/NOTES: Conservative
