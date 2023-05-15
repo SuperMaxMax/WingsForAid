@@ -43,7 +43,7 @@ def Mff_calculation(obj):
     W5W4 = W5W4_calculation(obj)
 
     Mff = obj.W1W_TO * obj.W2W1 * obj.W3W2 * obj.W4W3 * W5W4 * W7W5**obj.n_drops * obj.W10W9 * obj.WfinalW10
-
+    obj.Mff = Mff
     return Mff
 
 def weight_fuel_used(obj):

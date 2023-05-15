@@ -9,10 +9,10 @@ class UAV:
         self.type                = "normal"      # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
 
         "-Aircraft geometry"
-        self.S                   = 180           # Surface area [m]
+        self.Sw                  = 13            # Surface area [m2]
         self.A                   = 12            # Aspect ratio [-]
         self.e                   = 0.9           # Oswald factor [-]
-        self.b                   = 8             # Wing span [m]
+        self.b                   = 11            # Wing span [m]
         self.sweep_angle         = 0.36          # Sweep angle [rad]
         self.lambda_mid          = 0.36          # Sweep angle at mid-wing [rad]
         self.t_c                 = 0.12          # Thickness over chord ratio [-]
@@ -20,20 +20,25 @@ class UAV:
 
         self.b_f                 = 1.1           # Fuselage width [m]
         self.h_f                 = 1.1           # Fuselage height [m]
+        self.d_eff               = 1.421         # meter, ADSEE 1 slides 
         self.l_f                 = 4             # Fuselage length [m]
-        self.S_G                 = self.l_f*np.pi*self.b_f + 2*np.pi*(self.b_f/2)**2   # Gross shell area of fuselage [m] CHANGE THIS!
+        self.S_G                 = self.l_f*np.pi*self.d_eff + 2*np.pi*(self.d_eff/2)**2   # Gross shell area of fuselage [m] CHANGE THIS!
 
         self.s_tail              = 2             # Tail surface area [m]
         self.l_t                 = 3.5           # Tail arm [m]
 
+        self.boom                = True          # Boom, true if boom tail is implemented
+
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
-        self.L_D               = 10            # Lift over drag [-] | ASSUMPTION/NOTES: Conservative
+        self.L_D                 = 10            # Lift over drag [-] | ASSUMPTION/NOTES: Conservative
 
-        # ASSUMPTION/NOTES: From ADSEE 1 slides, taking average of reported range of values  
-        self.CL_max_clean        = 1.3           # Maximum lift coefficient [-] | Range: 1.3 - 1.9
-        self.CL_max_TO           = 1.3           # Maximum lift coefficient at take-off [-]
-        self.CL_max_land         = 1.6           # Maximum lift coefficietn at landing [-]
+        # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
+        # but this means that CL_max_clean, CL_max_TO and CL_max_land must always be stored in an array. For an array with length 1
+        # the code just runs once
+        self.CL_max_clean        = np.array([1.3])              # Maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.CL_max_TO           = np.array([1.3])              # Maximum lift coefficient at take-off [-]
+        self.CL_max_land         = np.array([1.6])              # Maximum lift coefficient at landing [-]
         self.CL_TO               = self.CL_max_TO / (1.1**2)    # [-]
         self.CL_LDG              = self.CL_max_land / (1.1**2)  # [-]
 
@@ -64,6 +69,7 @@ class UAV:
         self.cruise_frac         = self.W1W_TO*self.W2W1*self.W3W2*self.W4W3*0.85   # Assume halfway through the cruise with cruise fuel fraction 0.3
 
         "-Propulsive properties"
+        self.engine_pos          = 'tractor'     # Engine position
         self.P_max               = 100           # Maximum power [bhp]
         self.P_TO                = 62            # Power at take-off [hp]
 
@@ -78,9 +84,11 @@ class UAV:
         "==== Mission profile/Atmospheric properties ===="
         "-Mission characteristics"
         self.n_drops             = 2             # Number of drops [-]
+        self.n_boxes             = 12            # Number of boxes [-]
         self.R                   = 500000        # Range [m]
         self.M_res               = 0.15          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
-        self.h_cruise            = 10000*0.3048  # Cruise altitude [m] | NOTES: Conversion 
+        self.h_cruise            = 10000*0.3048  # Cruise altitude [m] | NOTES: Conversion
+        self.h_TO                = 0             # Take-off Height [m]
 
         self.TO_dist             = 750           # Take-off distance [m]           
         self.LDG_dist            = 750           # Landing distance [m]
@@ -106,12 +114,12 @@ class UAV:
 
         "==== Miscellaneous ===="
 
-        self.lin_par1            = 0.5482        # Gradient of the linear trend OEW/MTOW
-        self.lin_par2            = 486.68        # Y axis crossing of the linear trend OEW/MTOW
+        #self.lin_par1            = 0.5482        # Gradient of the linear trend OEW/MTOW
+        #self.lin_par2            = 486.68        # Y axis crossing of the linear trend OEW/MTOW
 
         "-MTOW vs OEW reduced by pilot weight R2=0.9548"
-        #lin_par1           = 0.5522       
-        #lin_par2           = -40.838 
+        self.lin_par1           = 0.5522
+        self.lin_par2           = -40.838
 
         "-MTOW for drones, R2=0.9988"
         #lin_par1           = 0.4631
