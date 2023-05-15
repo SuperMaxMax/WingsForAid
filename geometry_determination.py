@@ -7,8 +7,6 @@ def metertofeet(meter):
     feet = meter*3.2808399
     return feet
 
-# W/S and W/P diagrams
-# drag polar
 def dragpolar(obj):
     CD = obj.CD0 + (obj.CL**2/(np.pi*obj.A*obj.e))
     return CD
@@ -34,12 +32,12 @@ def create_line(x1, y1, x2, y2, num_points):
 def geometry_determination(obj, plot=False):
     #create empty array for capturing design points from W/P - W/S diagrams
     design_points = np.empty(0)
-    for i in range(7):
-        CL_max_clean    = 1.3+(0.1*i)   #1.3 - 1.9
-        CL_max_TO       = 1.3+(0.1*i)
-        CL_max_land     = 1.6+(0.1*i)
-        CL_TO           = CL_max_TO/(1.1**2)
-        CL_LDG          = CL_max_land/(1.1**2)
+    for i in range(len(obj.CL_max_clean)):                  
+        CL_max_clean    = obj.CL_max_clean[i]   
+        CL_max_TO       = obj.CL_max_TO[i]
+        CL_max_land     = obj.CL_max_land[i]
+        CL_TO           = obj.CL_TO[i]
+        CL_LDG          = obj.CL_LDG[i]
         # find atmospheric properties and power at altitude according to ISA
         rho_TO, sigma_TO, BHP_TO = altitude_effects(obj, obj.h_TO)
         obj.rho_TO = rho_TO
@@ -56,8 +54,8 @@ def geometry_determination(obj, plot=False):
         WS_stall = np.vstack((WS_stall, WP))
         
         # Take off sizing using Take-off parameter (TOP) 
-        obj.TOP_req = 250
-        WP_TO = (obj.TOP_req/WS)*CL_TO*obj.sigma_TO                                     #read from graph of ADSEE 1 slides, slide 29 lecture 3
+        obj.TOP_req = 250                               #read from graph of ADSEE 1 slides, slide 29 lecture 3
+        WP_TO = (obj.TOP_req/WS)*CL_TO*obj.sigma_TO         
         WP_TO = np.vstack((WP_TO, WS))
 
         # Landing W/S
@@ -74,13 +72,11 @@ def geometry_determination(obj, plot=False):
         WP_cruise   = np.vstack((WP_cruise, WS))
 
         #Climb performance
-        obj.climb_rate  = (8.3/100) * obj.V_climb                      #8.3% climb gradient found in CS23
+        obj.climb_rate  = (8.3/100) * obj.V_climb    #8.3% climb gradient found in CS23
         WP_Climb    = obj.eta_p/(obj.climb_rate+((np.sqrt(WS)*np.sqrt(2/obj.rho0))/(1.345*(obj.A*obj.e)**(3/4)/obj.CD0**(1/4))))
         WP_Climb    = np.vstack((WP_Climb, WS))
         
         #Evaluating if stall WS or landing WS is limiting
-        stall_limit     = 0
-        landing_limit   = 0
         plot_stall_WS   = False
         plot_both_WS    = False
         plot_LDG_WS     = False
@@ -132,29 +128,29 @@ def geometry_determination(obj, plot=False):
     #THIS SECTION CALCULATES FUSELAGE PARAMETERS
     cumulative_box_length   = obj.n_boxes*0.4                       #box 40x40x60, cumulative length in meter
     length_between_boxes    = (obj.n_boxes-1)*0.2                   #20 cm in between boxes
-    engine_length           = 0.593                             #engine length in cm, EASA type certificate data sheet ROTAX 912 series
-    engine_fairing          = 0.2                               #20 cm room around the engine 
-    d_eff                   = np.sqrt(1.10*1.40)                #from cross sectional drawing with width 1.40 m and height 1.10 m
-    d_engine_boxes          = 0.4                               #40 cm, leaves room for possible fire wall
+    engine_length           = 0.593                                 #engine length in cm, EASA type certificate data sheet ROTAX 912 series
+    engine_fairing          = 0.2                                   #20 cm room around the engine 
+    obj.d_eff               = np.sqrt(1.10*1.40)                    #from cross sectional drawing with width 1.40 m and height 1.10 m
+    d_engine_boxes          = 0.4                                   #40 cm, leaves room for possible fire wall
     if obj.boom:                                                    #assume one effective diameter after last box
-        l_tc = d_eff
-    else:                                                       #ADSEE 1, lecture 5, slide 58, source Roskam
-        l_tc = 3.5*d_eff
+        l_tc = obj.d_eff
+    else:                                                       
+        l_tc = 3.5*obj.d_eff                                        #ADSEE 1, lecture 5, slide 58, source Roskam
     #fuselage dimensions
-    h_out = 1.10                                                #meter, from cross sectional drawing
-    h_in  = 0.90
-    w_out = 1.40
-    w_in  = 1.20
-    l_fuselage = cumulative_box_length + length_between_boxes + engine_length + engine_fairing + l_tc + d_engine_boxes
+    obj.h_out = 1.10                                                #meter, from cross sectional drawing
+    obj.h_in  = 0.90
+    obj.w_out = 1.40
+    obj.w_in  = 1.20
+    obj.l_f   = cumulative_box_length + length_between_boxes + engine_length + engine_fairing + l_tc + d_engine_boxes
 
     #THIS SECTION CALCULATES WING PARAMETERS                    #run the code for the diagrams
-    Weight_TO = obj.W_TO*obj.g0                                          #find the take off weight in newtons
+    Weight_TO = obj.W_TO*obj.g0                                 #find the take off weight in newtons
     WS_values = design_points[0:12:2]                           #take the S/W values
     WP_values = design_points[1:13:2]                           #take the P/W values
     #find surface area
     obj.Sw = Weight_TO/WS_values
     #find power value                 
-    obj.P_values = Weight_TO/WP_values*0.00134102209                 #convert to horsepower
+    obj.P_values = Weight_TO/WP_values*0.00134102209            #convert to horsepower
     #wingspan
     obj.b = np.sqrt(obj.A*obj.Sw)
     #quarter chord sweep angle (0 as the cruise speed is around 100-110 knots which equates to M<0.2)
@@ -220,26 +216,3 @@ def geometry_determination(obj, plot=False):
 
     tc = np.full(np.shape(obj.Sw), 0.18)                                    #thickness over chord. 0.18 ADSEE 1, Lecture 6, Slide 22; no supercritical airfoils considered
     dihedral = np.full(np.shape(obj.Sw), 1)                                 #degree, high wing value, same slides as above.
-    #define a dataframe with all wing parameters
-    # data = {
-    # 'Wing loading [N/m^2]': WS_values,
-    # 'Power loading [N/W]': WP_values,
-    # 'Fuselage length [m]': l_fuselage,
-    # 'Fuselage outer width [m]': w_out,
-    # 'Fuselage outer height [m]': h_out,
-    # 'Fuselage effective diameter [m]': d_eff,
-    # 'Surface area [m^2]': Sw,
-    # 'Power [BHP]': P_values,
-    # 'Wing span [m]': b,
-    # 'Quarter chord sweep angle [deg]': lambda_co4,
-    # 'Half chord sweep angle [deg]': lambda_co2,
-    # 'Rootchord [m]': rootchord,
-    # 'Tipchord [m]': tipchord,
-    # 'Y MAC [m]': [arr[0] for arr in MAC_parameters],
-    # 'MAC length [m]': [arr[1] for arr in MAC_parameters],
-    # 'Thickness to chord ratio [-]': tc,
-    # 'Dihedral [deg]': dihedral
-    # }
-    # wingdata = pd.DataFrame(data)
-
-
