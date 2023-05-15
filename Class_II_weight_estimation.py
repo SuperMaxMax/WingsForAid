@@ -141,3 +141,4 @@ if __name__ == "__main__":
     weight.propulsion_weight()
     weight.weight_empty()
     weight.cg_calc()
+
