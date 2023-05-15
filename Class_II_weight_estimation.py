@@ -76,6 +76,9 @@ def fuselage_weight(obj):
     k_wf = 0.23
     W_fus = k_wf*(obj.V_D*(obj.l_t/(obj.b_f+obj.h_f)))**0.5*obj.S_G**1.2
 
+    if obj.engine_pos == 'pusher':
+        W_fus *= 1.04
+
     # Add 7% if the main landing gear is attached to the fuselage, but 4% can be subtracted from the fuselage weight if there is no attachment structure for the main landing gear
     # Add 10% for freighter aircraft
     # For booms l_t is defined as distance between local wing chord and horizontal tailplane
@@ -126,7 +129,8 @@ def cg_calc(obj):
     W_wing_gr = obj.W_w
     x_wcg = wing_cg
 
-    # Fuselage group (Torenbeek: #32-35% of fuselage length)
+    # Fuselage group # ALSO ADD PROPELLOR WEIGHT !!! (Torenbeek: #32-35% of fuselage length) 
+    # Fuselage and engine
     if obj.engine_pos == 'tractor':
         fus_cg = 0.45 * obj.l_f                 # educated guess
         engine_cg = 0.327                       # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
@@ -137,11 +141,14 @@ def cg_calc(obj):
         fus_cg = 0.53 * obj.l_f                 # educated guess
         engine_cg = 0.8 * obj.l_f               # educated guess
 
+    # Tail
+    if obj.boom == True:
+        tail_cg = obj.l_f + 0.9*obj.l_b             # to be done later
     tail_cg = 0.42 * obj.cwr + 0.9*obj.l_f      # to be more detailed !!
 
     W_fus_gr = obj.W_fus + obj.W_t + obj.W_pg
     X_FCG = (fus_cg*obj.W_fus + tail_cg*obj.W_t + engine_cg*obj.W_pg)/(obj.W_fus + obj.W_t + obj.W_pg)
-    print(f"W_fus_gr = {W_fus_gr} N, X_FCG = {X_FCG} m")
+    print(f"W_fus_gr = {W_fus_gr} kg, X_FCG = {X_FCG} m")
 
     # X_LEMAC and xc_OEW
     xc_OEW = obj.xc_OEW_p*obj.MAC_length
@@ -163,14 +170,14 @@ def cg_calc(obj):
 
     # Payload
     if obj.engine_pos == 'tractor':
-        dist_front = 0.6651 + 0.15  # [m]
+        dist_front = 0.6651 + 0.4  # [m]
         dist_back = 0.4             # [m]
     elif obj.engine_pos == 'pusher':
-        dist_front = 0.15
-        dist_back = 0.6651 + 0.15
+        dist_front = 0.4
+        dist_back = 0.6651 + 0.4
     elif obj.engine_pos == 'fuselage':
-        dist_front = 0.15
-        dist_back = 0.15
+        dist_front = 0.4
+        dist_back = 0.4
     
     # 2 boxes in front
     W_2box_f = 1/6*obj.W_PL
@@ -181,9 +188,11 @@ def cg_calc(obj):
     # 2 boxes in back
     W_2box_b = 1/6*obj.W_PL
     X_2box_b = obj.l_f-dist_back - 0.45/2
+    print(f"X_2box_b = {X_2box_b}")
     # 4 boxes in back
     W_4box_b = 1/3*obj.W_PL
     X_4box_b = obj.l_f-dist_back - 2*0.45/2
+    print(f"X_4box_b = {X_4box_b}")
     # all boxes
     W_allbox = obj.W_PL
     X_allbox = dist_front + 6*0.45/2
