@@ -179,26 +179,26 @@ def cg_calc(obj):
 
     # Calculate points to plot
     # OEW + fuel
-    W_OEW_fuel = W_OEW + W_fuel_wi
-    X_OEW_fuel = (W_OEW*X_OEW + W_fuel_wi*X_fuel_wi)/W_OEW_fuel
+    W_OEW_fuel_frac = (W_OEW + W_fuel_wi)/obj.W_TO
+    X_OEW_fuel = (W_OEW*X_OEW + W_fuel_wi*X_fuel_wi)/W_OEW_fuel_frac
     # OEW + fuel + 2 boxes in front
-    W_OEW_fuel_2box_f = W_OEW_fuel + W_2box_f
-    X_OEW_fuel_2box_f = (W_OEW_fuel*X_OEW_fuel + W_2box_f*X_2box_f)/W_OEW_fuel_2box_f
+    W_OEW_fuel_2box_f_frac = (W_OEW_fuel_frac + W_2box_f)/obj.W_TO
+    X_OEW_fuel_2box_f = (W_OEW_fuel_frac*X_OEW_fuel + W_2box_f*X_2box_f)/W_OEW_fuel_2box_f_frac
     # OEW + fuel + 4 boxes in front
-    W_OEW_fuel_4box_f = W_OEW_fuel + W_4box_f
-    X_OEW_fuel_4box_f = (W_OEW_fuel*X_OEW_fuel + W_4box_f*X_4box_f)/W_OEW_fuel_4box_f
+    W_OEW_fuel_4box_f_frac = (W_OEW_fuel_frac + W_4box_f)/obj.W_TO
+    X_OEW_fuel_4box_f = (W_OEW_fuel_frac*X_OEW_fuel + W_4box_f*X_4box_f)/W_OEW_fuel_4box_f_frac
     # OEW + fuel + 2 boxes in back
-    W_OEW_fuel_2box_b = W_OEW_fuel + W_2box_b
-    X_OEW_fuel_2box_b = (W_OEW_fuel*X_OEW_fuel + W_2box_b*X_2box_b)/W_OEW_fuel_2box_b
+    W_OEW_fuel_2box_b_frac = (W_OEW_fuel_frac + W_2box_b)/obj.W_TO
+    X_OEW_fuel_2box_b = (W_OEW_fuel_frac*X_OEW_fuel + W_2box_b*X_2box_b)/W_OEW_fuel_2box_b_frac
     # OEW + fuel + 4 boxes in back
-    W_OEW_fuel_4box_b = W_OEW_fuel + W_4box_b
-    X_OEW_fuel_4box_b = (W_OEW_fuel*X_OEW_fuel + W_4box_b*X_4box_b)/W_OEW_fuel_4box_b
+    W_OEW_fuel_4box_b_frac = (W_OEW_fuel_frac + W_4box_b)/obj.W_TO
+    X_OEW_fuel_4box_b = (W_OEW_fuel_frac*X_OEW_fuel + W_4box_b*X_4box_b)/W_OEW_fuel_4box_b_frac
     # OEW + fuel + all boxes
-    W_OEW_fuel_allbox = W_OEW_fuel + W_allbox
-    X_OEW_fuel_allbox = (W_OEW_fuel*X_OEW_fuel + W_allbox*X_allbox)/W_OEW_fuel_allbox
+    W_OEW_fuel_allbox_frac = (W_OEW_fuel_frac + W_allbox)/obj.W_TO
+    X_OEW_fuel_allbox = (W_OEW_fuel_frac*X_OEW_fuel + W_allbox*X_allbox)/W_OEW_fuel_allbox_frac
 
     # Plot each point
-    plt.plot([X_OEW_fuel_allbox, X_OEW_fuel_4box_b, X_OEW_fuel_2box_b, X_OEW_fuel, X_OEW_fuel_2box_f, X_OEW_fuel_4box_f, X_OEW_fuel_allbox], [W_OEW_fuel_allbox, W_OEW_fuel_4box_b, W_OEW_fuel_2box_b, W_OEW_fuel, W_OEW_fuel_2box_f, W_OEW_fuel_4box_f, W_OEW_fuel_allbox], 'ro')
+    plt.plot([X_OEW_fuel, X_OEW_fuel_2box_f, X_OEW_fuel_4box_f, X_OEW_fuel_2box_b, X_OEW_fuel_4box_b, X_OEW_fuel_allbox], [W_OEW_fuel_frac, W_OEW_fuel_2box_f_frac, W_OEW_fuel_4box_f_frac, W_OEW_fuel_2box_b_frac, W_OEW_fuel_4box_b_frac, W_OEW_fuel_allbox_frac], 'o', color='black')
     plt.xlabel('X_cg [m]')
     plt.ylabel('Mass fraction [-]')
     plt.grid()
