@@ -1,8 +1,9 @@
 import numpy as np
 
 class UAV:
-    def __init__(self):
+    def __init__(self, name):
         "==== Aircraft Parameters ===="
+        self.name                = name          # Name of the aircraft [-]
         "-Aircraft geometry"
         self.S                   = 180           # Surface area [m]
         self.A                   = 12            # Aspect ratio [-]
