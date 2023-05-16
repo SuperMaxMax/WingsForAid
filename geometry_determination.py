@@ -28,7 +28,7 @@ def create_line(x1, y1, x2, y2, num_points):
     line = np.vstack((x, y))
     return line
 
-def geometry_determination(obj, plot=False):
+def geometry_determination(obj, plot=True):
     # create empty array for capturing design points from W/P - W/S diagrams
     design_points = np.empty(0)
     for i in range(len(obj.CL_max_clean)):                  
@@ -128,14 +128,14 @@ def geometry_determination(obj, plot=False):
     # --- Fuselage parameters
     cumulative_box_length   = obj.n_boxes*0.4                   # box 40x40x60, cumulative length in meter
     length_between_boxes    = ((obj.n_boxes/2)-1)*0.2           # 20 cm in between boxes
-    engine_length           = 0.593                             # engine length in cm, EASA type certificate data sheet ROTAX 912 series
+    engine_length           = 0.6651                            # engine length in cm, EASA type certificate data sheet ROTAX 912 series
     engine_fairing          = 0.2                               # 20 cm room around the engine 
     obj.d_eff               = np.sqrt(1.10*1.40)                # from cross sectional drawing with width 1.40 m and height 1.10 m
     d_engine_boxes          = 0.4                               # 40 cm, leaves room for possible fire wall
     if obj.boom:                                                # assume one effective diameter after last box
-        l_tc = obj.d_eff
+        l_tc = 0.8                                              # from drawing [m]
     else:                                                       
-        l_tc = 3.5*obj.d_eff                                    # ADSEE 1, lecture 5, slide 58, source Roskam
+        l_tc = 1.75*obj.d_eff                                    # ADSEE 1, lecture 5, slide 58, source Roskam
 
     # Fuselage dimensions
     obj.h_out = 1.10                                            # meter, from cross sectional drawing
