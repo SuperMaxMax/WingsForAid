@@ -195,7 +195,10 @@ def plot_gust(obj):
 
 
 #print(guessV_B(concept))
+concept.n_ult = max_n(concept)
+
 plot_Vn(concept)
 plot_gust(concept)
+
 
  
