@@ -49,27 +49,41 @@ def plot(obj):
     #Setting plot limits:
     left, right = 0, obj.V_D * 1.2
     plt.xlim(left, right)
-    bottom, top = n_min * 1.2, n_max * 1.2
+    bottom, top =  -1 * np.ceil(n_min * -1.2 * 2) / 2 , np.ceil(n_max*1.1 * 2) / 2
     y_range = top - bottom
-
     plt.ylim(bottom, top)
 
+    yticks = np.arange(bottom, top, 0.5)
+    plt.yticks(yticks)
+    
+    #X-axis:
     plt.axhline(y = 0, color = "black", linewidth = '0.7')
 
 
     #Plotting points:
-    plt.plot(A_x, n_max, 'ro')    #A
-    plt.plot(D_x, n_max, 'ro')    #D
-    plt.plot(D_x, 0, 'ro')        #E
-    plt.plot(F_x, n_min, 'ro')    #F
-    plt.plot(H_x, n_min, 'ro')    #H
+    plt.plot(A_x, n_max, 'ro', color = 'black')    #A
+    plt.text(A_x, n_max + 0.35 , s = 'A', ha='center', va='top')
+
+    plt.plot(D_x, n_max, 'ro', color = 'black')    #D
+    plt.text(D_x, n_max + 0.35 , s = 'D', ha='center', va='top')
+
+    plt.plot(E_x, 0, 'ro', color = 'black')        #E
+    plt.text(E_x + 2,  0 + 0.35 , s = 'E', ha='center', va='top')
+
+    plt.plot(F_x, n_min, 'ro', color = 'black')    #F
+    plt.text(F_x, n_min - 0.15 , s = 'F', ha='center', va='top')
+
+    plt.plot(H_x, n_min, 'ro', color = 'black')    #H
+    plt.text(H_x, n_min - 0.15 , s = 'H', ha='center', va='top')
+
+
 
 
     #Plotting straight lines
-    plt.plot([A_x, D_x], [n_max, n_max])            #Between A and D
-    plt.plot([D_x, E_x], [n_max, 0])    #Between D and E
-    plt.plot([E_x, F_x], [0, n_min])    #Between E and F
-    plt.plot([F_x, H_x], [n_min, n_min])    #Between F and H
+    plt.plot([A_x, D_x], [n_max, n_max], color = 'black')            #Between A and D
+    plt.plot([D_x, E_x], [n_max, 0], color = 'black')    #Between D and E
+    plt.plot([E_x, F_x], [0, n_min], color = 'black')    #Between E and F
+    plt.plot([F_x, H_x], [n_min, n_min], color = 'black')    #Between F and H
 
 
     #Plot stall speed requirement until point A for positive and until point H for negative:
@@ -78,8 +92,8 @@ def plot(obj):
     V_neg = V[V<=H_x]
     n_neg = n_neg[0:V_neg.size]
 
-    plt.plot(V_pos, n_pos)
-    plt.plot(V_neg, n_neg)
+    plt.plot(V_pos, n_pos, color = 'black')
+    plt.plot(V_neg, n_neg, color = 'black')
 
     #Plot V_S
     y0_frac_VS = abs(bottom) / y_range
