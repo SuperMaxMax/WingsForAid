@@ -233,3 +233,10 @@ def cg_calc(obj):
     plt.grid()
     plt.legend()
     plt.show()
+
+    # Save most forward and most aft and fully loaded c.g. in object
+    obj.X_cg_fwd = min(xs)
+    obj.X_cg_aft = max(xs)
+    obj.X_cg_range = obj.X_cg_aft - obj.X_cg_fwd
+    obj.X_cg_full = X_OEW_fuel_allbox
+    
