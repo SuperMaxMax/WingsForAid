@@ -95,6 +95,10 @@ class UAV:
         self.prop_eff            = 0.82          # Propulsive efficiency [-]
         self.eta_p               = self.prop_eff # Propulsive efficiency [-]
 
+        if engine_pos == "pusher":
+            self.prop_eff        *= 0.92           # Propulsive efficiency [-]
+            self.eta_p           *= 0.92
+
         self.power_setting       = 0.9           # Power setting in cruise [-]
 
         self.c_p                 = 72E-9         #
