@@ -28,7 +28,7 @@ def create_line(x1, y1, x2, y2, num_points):
     line = np.vstack((x, y))
     return line
 
-def geometry_determination(obj, plot=False):
+def geometry_determination(obj, plot=True):
     # create empty array for capturing design points from W/P - W/S diagrams
     design_points = np.empty(0)
     for i in range(len(obj.CL_max_clean)):                  
