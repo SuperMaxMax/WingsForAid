@@ -174,7 +174,6 @@ def geometry_determination(obj, plot=True):
     # define empty arrays in which values will be stored
     wings = np.empty(0)
     MAC_parameters = np.empty(0)
-    lambda_co2 = np.empty(0)
 
     for i in range(len(obj.Sw)):
         # define important points on the wing planform (corners, quarther and half chord points)
@@ -204,7 +203,7 @@ def geometry_determination(obj, plot=True):
         
         # half chord sweep angle
         tan_lambda_co2 = (points[0][-1]-points[0][4])/(points[1][4]-points[1][-1])
-        lambda_co2_i = np.arctan(tan_lambda_co2)*(180/np.pi)
+        obj.lambda_co2 = np.arctan(tan_lambda_co2)*(180/np.pi)
 
         # plot the wings
         if plot:
@@ -220,7 +219,6 @@ def geometry_determination(obj, plot=True):
             plt.xlabel("y [m]")
             plt.show()
         MAC_i = np.array([obj.y_mac, obj.MAC_length])
-        lambda_co2 = np.append(lambda_co2, lambda_co2_i)
         if i == 0:
             wings = points
             MAC_parameters = MAC_i
