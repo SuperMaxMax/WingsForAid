@@ -1,7 +1,7 @@
-
 from parameters import UAV
 import Class_I_weight_estimation as c1
 import Class_II_weight_estimation as c2
+import Class_II_cg_estimation as c2cg
 import geometry_determination as geo
 import pandas as pd
 
@@ -49,7 +49,7 @@ for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
             W_TO_c2_old = W_TO_c2
 
     # cg calculation
-    c2.cg_calc(concept)
+    c2cg.cg_calc(concept)
 
     # save all attributes of object to csv file
     members = [attr for attr in dir(concept) if not callable(getattr(concept, attr)) and not attr.startswith("__")]
