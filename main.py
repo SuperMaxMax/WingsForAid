@@ -5,16 +5,16 @@ import Class_II_weight_estimation as c2
 import geometry_determination as geo
 import pandas as pd
 
-concept_1 = UAV('concept_1', 'tractor')
-concept_2 = UAV('concept_2', 'pusher')
-concept_3 = UAV('concept_3', 'fuselage')
-# concept_4 = UAV('concept_4')
-# concept_5 = UAV('concept_5')
+concept_1 = UAV('concept_1', 'tractor', boom=True)
+concept_2 = UAV('concept_2', 'tractor', boom=False)
+concept_3 = UAV('concept_3', 'pusher', boom=False)
+concept_4 = UAV('concept_4', 'pusher', boom=False)
+concept_5 = UAV('concept_5', 'fuselage', boom=False)
 
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
 
-for concept in [concept_1, concept_2, concept_3]:
+for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
     # iteration
     it = True
     W_TO_c2_old = 6000

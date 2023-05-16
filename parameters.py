@@ -1,7 +1,7 @@
 import numpy as np
 
 class UAV:
-    def __init__(self, name, engine_pos):
+    def __init__(self, name, engine_pos, boom):
         "==== Aircraft Parameters ===="
         self.name                = name          # Name of the aircraft [-]
 
@@ -29,14 +29,14 @@ class UAV:
         self.s_tail              = 2             # Tail surface area [m]
         self.l_t                 = 3.5           # Tail arm [m]
 
-        self.boom                = True          # Boom, true if boom tail is implemented
+        self.boom                = boom          # Boom, true if boom tail is implemented
         self.b_boom              = 0.2           # Boom width [m]
         self.h_boom              = 0.2           # Boom height [m]
         self.d_eff_boom          = np.sqrt(0.2*0.2) # 
-        self.l_f_boom            = 3             # Boom length [m]
+        self.l_f_boom            = 2             # Boom length [m]
         self.S_G_boom            = self.l_f_boom*np.pi*self.d_eff_boom + 2*np.pi*(self.d_eff_boom/2)**2
 
-        self.l_t_boom            = self.l_f_boom+0.2*self.l_f           # Boom tail arm [m]
+        self.l_t_boom            = self.l_f_boom+0.4*self.l_f           # Boom tail arm [m]
 
         self.xc_OEW_p            = 0.25          # Center of gravity of OEW as a fraction of the fuselage length [-]
 
