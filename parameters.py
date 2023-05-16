@@ -10,13 +10,13 @@ class UAV:
 
         "-Aircraft geometry"
         self.Sw                  = 13            # Surface area [m2]
-        self.A                   = 8            # Aspect ratio [-]
+        self.A                   = 8             # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.b                   = 11            # Wing span [m]
         self.sweep_angle         = 0.36          # Sweep angle [rad]
         self.lambda_mid          = 0.36          # Sweep angle at mid-wing [rad]
         self.t_c                 = 0.12          # Thickness over chord ratio [-]
-        self.rootchord                 = 2.5           # Chord length at root [m]
+        self.rootchord           = 2.5           # Chord length at root [m]
         self.dihedral            = 1             # Wing dihedral [deg]
         self.braced_wing         = False         # True if wing is braced
 
@@ -30,9 +30,9 @@ class UAV:
         self.l_t                 = 3.5           # Tail arm [m]
 
         self.boom                = boom          # Boom, true if boom tail is implemented
-        self.b_boom              = 0.2           # Boom width [m]
-        self.h_boom              = 0.2           # Boom height [m]
-        self.d_eff_boom          = np.sqrt(0.2*0.2) # 
+        self.b_boom              = 0.15          # Boom width [m]
+        self.h_boom              = 0.15          # Boom height [m]
+        self.d_eff_boom          = np.sqrt(self.b_boom*self.h_boom) # 
         self.l_f_boom            = 2             # Boom length [m]
         self.S_G_boom            = self.l_f_boom*np.pi*self.d_eff_boom + 2*np.pi*(self.d_eff_boom/2)**2
 
