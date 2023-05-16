@@ -111,4 +111,5 @@ def weight_empty(obj):
 
     obj.W_OE = obj.W_w + obj.W_t + obj.W_uc + obj.W_n + obj.W_eq + obj.W_fus + obj.W_sc + obj.W_pg
 
+
     obj.W_TO = obj.W_OE + obj.W_F + obj.W_PL    

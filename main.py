@@ -16,10 +16,12 @@ df = pd.DataFrame()
 
 for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
     # iteration
+    n = 1
     it = True
     W_TO_c2_old = 6000
     while it:
         # class 1
+        print(f"- Iteration number: {n}, concept: {concept.name} - \n")
         c1.run(concept)
         print("After class 1 iteration:")
         print(f"Mff: {concept.Mff}, L/D: {concept.L_D}, W_TO: {concept.W_TO}, W_OE: {concept.W_OE}, W_F: {concept.W_F}")
@@ -37,7 +39,7 @@ for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
         W_TO_c2 = concept.W_TO
 
         print("")
-        print("----------------------------------")
+        print("-------------------------------------------------")
         print("")
 
         # iterate between class 1 and class 2
@@ -47,6 +49,7 @@ for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
             it = False
         else:
             W_TO_c2_old = W_TO_c2
+            n += 1
 
     # cg calculation
     c2cg.cg_calc(concept)

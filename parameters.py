@@ -10,13 +10,13 @@ class UAV:
 
         "-Aircraft geometry"
         self.Sw                  = 13            # Surface area [m2]
-        self.A                   = 12            # Aspect ratio [-]
+        self.A                   = 8            # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.b                   = 11            # Wing span [m]
         self.sweep_angle         = 0.36          # Sweep angle [rad]
         self.lambda_mid          = 0.36          # Sweep angle at mid-wing [rad]
         self.t_c                 = 0.12          # Thickness over chord ratio [-]
-        self.cwr                 = 2.5           # Chord length at root [m]
+        self.rootchord                 = 2.5           # Chord length at root [m]
         self.dihedral            = 1             # Wing dihedral [deg]
         self.braced_wing         = False         # True if wing is braced
 
