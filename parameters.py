@@ -20,8 +20,8 @@ class UAV:
         self.dihedral            = 1             # Wing dihedral [deg]
         self.braced_wing         = False         # True if wing is braced
 
-        self.b_f                 = 1.1           # Fuselage width [m]
-        self.h_f                 = 1.1           # Fuselage height [m]
+        self.h_out               = 1.1           # Fuselage width [m]
+        self.w_out               = 1.1           # Fuselage height [m]
         self.d_eff               = 1.421         # meter, ADSEE 1 slides 
         self.l_f                 = 4             # Fuselage length [m]
         self.S_G                 = 21.029        # Gross shell area of fuselage [m^2]

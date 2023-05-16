@@ -71,7 +71,7 @@ def equipment_weight(obj):
 
 def fuselage_weight(obj):
     k_wf = 0.23
-    W_fus = k_wf*(obj.V_D*(obj.l_t/(obj.b_f+obj.h_f)))**0.5*obj.S_G**1.2
+    W_fus = k_wf*(obj.V_D*(obj.l_t/(obj.h_out+obj.w_out)))**0.5*obj.S_G**1.2
 
     if obj.engine_pos == 'pusher':
         W_fus *= 1.04
