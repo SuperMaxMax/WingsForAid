@@ -1,7 +1,7 @@
 import numpy as np
 
 class UAV:
-    def __init__(self, name):
+    def __init__(self, name, engine_pos):
         "==== Aircraft Parameters ===="
         self.name                = name          # Name of the aircraft [-]
 
@@ -18,6 +18,7 @@ class UAV:
         self.t_c                 = 0.12          # Thickness over chord ratio [-]
         self.cwr                 = 2.5           # Chord length at root [m]
         self.dihedral            = 1             # Wing dihedral [deg]
+        self.braced_wing         = False         # True if wing is braced
 
         self.b_f                 = 1.1           # Fuselage width [m]
         self.h_f                 = 1.1           # Fuselage height [m]
@@ -37,7 +38,11 @@ class UAV:
 
         self.l_t_boom            = self.l_f_boom+0.2*self.l_f           # Boom tail arm [m]
 
-        self.xc_OEW_p            = 0.25           # Center of gravity of OEW as a fraction of the fuselage length [-]
+        self.xc_OEW_p            = 0.25          # Center of gravity of OEW as a fraction of the fuselage length [-]
+
+        self.pos_main_carriage   = "fuselage"    # Position of main carriage: "fuselage" or "wing"
+        self.main_gear_type      = "fixed"       # Type of main gear: "fixed" or "retractable"
+        self.nose_gear_type      = "fixed"       # Type of nose gear: "fixed" or "retractable"
 
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
@@ -79,7 +84,7 @@ class UAV:
         self.cruise_frac         = self.W1W_TO*self.W2W1*self.W3W2*self.W4W3*0.85   # Assume halfway through the cruise with cruise fuel fraction 0.3
 
         "-Propulsive properties"
-        self.engine_pos          = 'tractor'     # Engine position
+        self.engine_pos          = engine_pos     # Engine position
         self.P_max               = 100           # Maximum power [bhp]
         self.P_TO                = 62            # Power at take-off [hp]
 
