@@ -18,7 +18,7 @@ for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
     # iteration
     n = 1
     it = True
-    W_TO_c2_old = 6000
+    W_TO_c2_old = 750
     while it:
         # class 1
         print(f"- Iteration number: {n}, concept: {concept.name} - \n")
