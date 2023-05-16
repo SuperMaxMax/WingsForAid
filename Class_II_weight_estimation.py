@@ -25,6 +25,12 @@ def tail_weight(obj): #ultimate load factor, tail surface area
     # IF TAILPLANE AREA UNKNOWN, WEIGHT ASSUMED TO BE 3.5-4% OF EMPTY WEIGHT
     return W_t
 
+def tail_boom(obj):
+    k_wf = 0.23
+    W_boom = k_wf*(obj.V_D*(obj.l_t_boom/(obj.h_boom+obj.b_boom)))**0.5*obj.S_G_boom**1.2
+
+    return W_boom
+
 def gear_weight(obj):
     if obj.main_gear_type=="fixed":
         A1 = 9.1
@@ -102,14 +108,17 @@ def propulsion_weight(obj):
 def weight_empty(obj):
     obj.W_w = wing_weight(obj)
     obj.W_t = tail_weight(obj)
+    obj.W_boom = tail_boom(obj)
     obj.W_uc = gear_weight(obj)
     obj.W_n = nacelle_weight(obj)
     obj.W_eq = equipment_weight(obj)
     obj.W_fus = fuselage_weight(obj)
     obj.W_sc = control_surface_weight(obj)
     obj.W_pg = propulsion_weight(obj)
-
+    
     obj.W_OE = obj.W_w + obj.W_t + obj.W_uc + obj.W_n + obj.W_eq + obj.W_fus + obj.W_sc + obj.W_pg
 
+    if obj.boom == True:
+        obj.W_OE += obj.W_boom
 
     obj.W_TO = obj.W_OE + obj.W_F + obj.W_PL    

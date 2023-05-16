@@ -27,9 +27,10 @@ def cg_calc(obj):
         fus_cg = 0.53 * obj.l_f                 # educated guess
         engine_cg = 0.8 * obj.l_f               # educated guess
 
-    # Tail
+    # Tail and boom
     if obj.boom == True:
         tail_cg = obj.l_f + 0.9*obj.l_f_boom    # educated guess
+        boom_cg = obj.l_f + 0.5*obj.l_f_boom    # educated guess
     else:
         tail_cg = 0.9*obj.l_f                   # for now at 0.9 of fuselage length
 
@@ -42,8 +43,12 @@ def cg_calc(obj):
     # Undercarriage
     # For now: cg assumed to be at aircraft cg -> not taken into account for X_FCG, but is part of OEW
 
-    W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc
-    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + engine_cg*obj.W_n)/(W_fus_gr - obj.W_uc)
+    if obj.boom == True:
+        W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
+        X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + engine_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
+    else:
+        W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc
+        X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + engine_cg*obj.W_n)/(W_fus_gr - obj.W_uc)
 
     # X_LEMAC and xc_OEW
     xc_OEW = obj.xc_OEW_p*obj.MAC_length
@@ -111,7 +116,7 @@ def cg_calc(obj):
 
     # Plot each point
     xs = [X_OEW, X_fuel_wi, X_2box_f, X_4box_f, X_2box_b, X_4box_b, X_allbox]
-    w_fracs = [W_OEW_fuel_frac, W_OEW_fuel_frac, W_OEW_fuel_2box_f_frac, W_OEW_fuel_4box_f_frac, W_OEW_fuel_2box_b_frac, W_OEW_fuel_4box_b_frac, W_OEW_fuel_allbox_frac]
+    w_fracs = [W_OEW/obj.W_TO, W_OEW_fuel_frac, W_OEW_fuel_2box_f_frac, W_OEW_fuel_4box_f_frac, W_OEW_fuel_2box_b_frac, W_OEW_fuel_4box_b_frac, W_OEW_fuel_allbox_frac]
     labels = ['OEW', 'OEW + Fuel', 'OEW + Fuel + 2 boxes front', 'OEW + Fuel + 4 boxes front', 'OEW + Fuel + 2 boxes back', 'OEW + Fuel + 4 boxes back', 'OEW + Fuel + all boxes']
     # plot points with labels
     for x, w, label in zip(xs, w_fracs, labels):
