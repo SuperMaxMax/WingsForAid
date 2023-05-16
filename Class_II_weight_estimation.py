@@ -28,7 +28,7 @@ def tail_weight(obj): #ultimate load factor, tail surface area
 def tail_boom_weight(obj):
     # k_wf = 0.23
     # W_boom = k_wf*(obj.V_D*(obj.l_t_boom/(obj.h_boom+obj.b_boom)))**0.5*obj.S_G_boom**1.2
-    W_boom = 20
+    W_boom = obj.W_boom
 
     return W_boom
 
@@ -121,5 +121,7 @@ def weight_empty(obj):
     if obj.boom == True:
         obj.W_boom = tail_boom_weight(obj)
         obj.W_OE += obj.W_boom
+    else:
+        obj.W_boom = 0
 
     obj.W_TO = obj.W_OE + obj.W_F + obj.W_PL    

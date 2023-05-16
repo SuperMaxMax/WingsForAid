@@ -20,7 +20,7 @@ class UAV:
         self.l_t                 = 3.5           # Tail arm [m]
 
         self.boom                = boom          # Boom, true if boom tail is implemented
-        self.W_boom              = 0            # Boom weight [kg]
+        self.W_boom              = 20            # Boom weight [kg]
         self.l_f_boom            = 2             # Boom length [m]
 
         self.xc_OEW_p            = 0.2          # Center of gravity of OEW as a fraction of the fuselage length [-]
