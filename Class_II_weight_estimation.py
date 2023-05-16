@@ -6,7 +6,7 @@ from math import cos
 
 def wing_weight(obj):
     k_w = 4.9E-3
-    b_s = obj.b / cos(obj.lambda_mid)
+    b_s = obj.b / cos(obj.lambda_co2)
     b_ref = 1.905
     t_r = obj.t_c * obj.rootchord
 
