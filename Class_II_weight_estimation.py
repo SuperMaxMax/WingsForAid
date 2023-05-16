@@ -118,9 +118,9 @@ def cg_calc(obj):
     # --- Wing group
     # Wing
     if obj.sweep_angle == 0:
-        wing_cg = 0.4 * obj.cwr                 # 40% of root chord plus Leading Edge location
+        wing_cg = 0.4 * obj.rootchord                 # 40% of root chord plus Leading Edge location
     else:
-        wing_cg = 0.4 * obj.cwr                 # to be done later, depends on spar locations (table 8-15 Torenbeek)
+        wing_cg = 0.4 * obj.rootchord                 # to be done later, depends on spar locations (table 8-15 Torenbeek)
 
     # Control surfaces
     control_surfaces_cg = obj.x_lemac + obj.MAC_length  # guess for now
