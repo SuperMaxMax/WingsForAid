@@ -13,19 +13,19 @@ class UAV:
         self.A                   = 8             # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.b                   = 11            # Wing span [m]
-        self.MGC                 = self.Sw / self.b #Mean geometric chord [m]
+        # self.MGC                 = self.Sw / self.b #Mean geometric chord [m]
         self.lambda_co4          = 0.0           # Sweep angle at quarter chord [rad]
         self.lambda_co2          = 0.0           # Sweep angle at mid-wing [rad]
         self.t_c                 = 0.12          # Thickness over chord ratio [-]
-        self.rootchord           = 2.5           # Chord length at root [m]
-        self.dihedral            = 1             # Wing dihedral [deg]
+        # self.rootchord           = 2.5           # Chord length at root [m]
+        # self.dihedral            = 1             # Wing dihedral [deg]
         self.braced_wing         = False         # True if wing is braced
 
-        self.h_out               = 1.1           # Fuselage width [m]
-        self.w_out               = 1.1           # Fuselage height [m]
-        self.d_eff               = 1.421         # meter, ADSEE 1 slides 
-        self.l_f                 = 4             # Fuselage length [m]
-        self.S_G                 = 21.029        # Gross shell area of fuselage [m^2]
+        # self.h_out               = 1.1           # Fuselage width [m]
+        # self.w_out               = 1.1           # Fuselage height [m]
+        # self.d_eff               = 1.421         # meter, ADSEE 1 slides 
+        # self.l_f                 = 4             # Fuselage length [m]
+        # self.S_G                 = 21.029        # Gross shell area of fuselage [m^2]
 
         self.s_tail              = 2             # Tail surface area [m]
         self.l_t                 = 3.5           # Tail arm [m]
@@ -48,8 +48,8 @@ class UAV:
 
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
-        self.L_D                 = 10            # Lift over drag [-] | ASSUMPTION/NOTES: Conservative
-        self.CLa                 = 4.2          # Lift curve slope [] | CHANGE TO ACTUAL VALUE
+        # self.L_D                 = 10            # Lift over drag [-] | ASSUMPTION/NOTES: Conservative
+        # self.CLa                 = 4.2          # Lift curve slope [] | CHANGE TO ACTUAL VALUE
 
 
         # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
@@ -69,10 +69,10 @@ class UAV:
 
         "-Weights"
         self.W_e                 = 62.6          # Definitive weight per engine [kg]
-        self.W_G                 = 700           # Gross weight [kg]
+        # self.W_G                 = 700           # Gross weight [kg]
         self.W_TO                = 700           # Take-off weight [kg]
         self.W_PL                = 240           # Payload weight [kg]
-        self.WS                  = 600           # Wing Loading [N/m^2]
+        # self.WS                  = 600           # Wing Loading [N/m^2]
 
         "-Weight fractions"
         self.W1W_TO              = 0.995         # Engine startup fraction [-]
@@ -89,15 +89,14 @@ class UAV:
 
         "-Propulsive properties"
         self.engine_pos          = engine_pos     # Engine position
-        self.P_max               = 100           # Maximum power [bhp]
+        # self.P_max               = 100           # Maximum power [bhp]
         self.P_TO                = 62            # Power at take-off [hp]
 
         self.prop_eff            = 0.82          # Propulsive efficiency [-]
         self.eta_p               = self.prop_eff # Propulsive efficiency [-]
-
         if engine_pos == "pusher":
-            self.prop_eff        *= 0.92           # Propulsive efficiency [-]
-            self.eta_p           *= 0.92
+            self.prop_eff        *= 0.92         # Propulsive efficiency [-]
+            self.eta_p           *= 0.92         # Propulsive efficiency [-]
 
         self.power_setting       = 0.9           # Power setting in cruise [-]
 
@@ -109,28 +108,28 @@ class UAV:
         self.n_drops             = 1             # Number of drops [-]
         self.n_boxes             = 12            # Number of boxes [-]
         self.R                   = 500000        # Range [m]
-        self.R_ferry             = 1000000       # Ferry range [m]
+        # self.R_ferry             = 1000000       # Ferry range [m]
         self.M_res               = 0.10          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
         self.h_cruise            = 10000*0.3048  # Cruise altitude [m] | NOTES: Conversion
         self.h_TO                = 0             # Take-off Height [m]
 
-        self.TO_dist             = 750           # Take-off distance [m]           
+        # self.TO_dist             = 750           # Take-off distance [m]           
         self.LDG_dist            = 750           # Landing distance [m]
 
         self.n_ult               = 3.8 * 1.5     # Ultimate load factor [-]
 
         "-Speeds"
-        self.V_s_max             = 61*(1.852/3.6)    # CS23 Vs at take off not allowed to be above 61 kts [m/s] | NOTES: *1.852 to get to m/s
+        # self.V_s_max             = 61*(1.852/3.6)    # CS23 Vs at take off not allowed to be above 61 kts [m/s] | NOTES: *1.852 to get to m/s
         self.V_s_min             = 50*(1.852/3.6)    # Dropping speed [m/s]
-        self.V_cruise            = 120*(1.852/3.6)   # Cruise speed [m/s]
-        self.V_TO_max            = 1.1*self.V_s_max  # Maximum take off speed [m/s]
-        self.V_TO_min            = 1.1*self.V_s_min  # Minimum take off speed [m/s]
+        self.V_cruise            = 105*(1.852/3.6)   # Cruise speed [m/s]
+        # self.V_TO_max            = 1.1*self.V_s_max  # Maximum take off speed [m/s]
+        # self.V_TO_min            = 1.1*self.V_s_min  # Minimum take off speed [m/s]
         self.V_climb             = 70*(1.852/3.6)    # Climb speed [m/s]
         self.V_D                 = 140*0.514444      # Dive speed [m/s]
         self.V_B                 = 46.01347201449718 # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
 
         "-Atmospheric properties"
-        self.p0                  = 101325        # [Pa]
+        # self.p0                  = 101325        # [Pa]
         self.rho0                = 1.225         # [kg/m^3]
         self.T0                  = 288.15        # [K]
         self.Lambda              = -0.0065       # [deg K/m]
@@ -138,31 +137,6 @@ class UAV:
         self.g0                  = 9.80665       # [m/s^2]
 
         "==== Miscellaneous ===="
-
-        #self.lin_par1            = 0.5482        # Gradient of the linear trend OEW/MTOW
-        #self.lin_par2            = 486.68        # Y axis crossing of the linear trend OEW/MTOW
-
-        "-MTOW vs OEW reduced by pilot weight R2=0.9548"
-        #self.lin_par1           = 0.5522
-        #self.lin_par2           = -40.838
-
-        "-MTOW for drones, R2=0.9988"
-        #self.lin_par1           = 0.4631
-        #self.lin_par2           = 52.058
-
-        "-MTOW vs OEW for general aviation R2=0.9548 , original y=0.5482 x + 486.68"
-        #lin_par1           = 0.5522
-        #lin_par2           = 39.162
-
-        "- MTOW vs OEW ultra-light, R2=0.8704"
-        #lin_par1           = 0.7134
-        #lin_par2           = -52.981
-
-        "- MTOW vs OEW ultra-light reduced by pilot weight, R2=0.9704"
-        #self.lin_par1           = 0.7134
-        #self.lin_par2           = -132.98
-
         "MTOW vs OEW GA, "
         self.lin_par1            = 0.5249
         self.lin_par2            = 42.049
-
