@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 "CLASS II WEIGHT ESTIMATION"
 #########################################################################
 
-def wing_weight(obj):   #Span, sweep, ultimate load factor, thickness over chord, cord length at root, wing loading, gross weight
+def wing_weight(obj):
     k_w = 4.9E-3
     b_s = obj.b / cos(obj.lambda_mid)
     b_ref = 1.905
@@ -13,24 +13,21 @@ def wing_weight(obj):   #Span, sweep, ultimate load factor, thickness over chord
 
     W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * obj.n_ult**0.55 * ((b_s/t_r)/(obj.W_TO/obj.Sw))**0.3 * obj.W_TO
 
-    #ADD 30% IF BRACED WING USED, 10% IF STRUT USED?
+    if obj.braced_wing == True:
+        W_w *= 0.7
+    if obj.pos_main_carriage == 'fuselage':
+        W_w *= 0.95
+
     return W_w
 
 def tail_weight(obj): #ultimate load factor, tail surface area
     W_t = 0.64 * (obj.n_ult * obj.s_tail**2)**0.75
     
-    #IF TAILPLANE AREA UNKNOWN, WEIGHT ASSUMED TO BE 3.5-4% OF EMPTY WEIGHT
+    # IF TAILPLANE AREA UNKNOWN, WEIGHT ASSUMED TO BE 3.5-4% OF EMPTY WEIGHT
     return W_t
 
 def gear_weight(obj):
-    maingear_type = 'f'#input("Is the main gear fixed or retractable [f/r]",)
-    nosegear_type = 'F'#input("Is the nose gear fixed or retractable [f/r]",)
-
-    if (maingear_type!="f" and maingear_type!="r") and (nosegear_type!="f" and nosegear_type!="r"):
-        print("Input f or r for the gear type")
-        return
-
-    if maingear_type=="f":
+    if obj.main_gear_type=="fixed":
         A1 = 9.1
         B1 = 0.082
         C1 = 0.019
@@ -41,7 +38,7 @@ def gear_weight(obj):
         C1 = 0.019
         D1 = 2.23 * 10**-5
 
-    if nosegear_type=="f":
+    if obj.nose_gear_type=="retractable":
         A2 = 11.3
         B2 = 0
         C2 = 0.0024
@@ -52,17 +49,17 @@ def gear_weight(obj):
         C2 = 0
         D2 = 2.97 * 10**-6
 
-    #Main gear:
+    # Main gear:
     W_uc1 = 1.08 * (A1 + B1 * obj.W_TO**0.75 + C1 * obj.W_TO + D1 * obj.W_TO**1.5)
 
-    #Nose gear:
+    # Nose gear:
     W_uc2 = 1.08 * (A2 + B2 * obj.W_TO**0.75 + C2 * obj.W_TO + D2 * obj.W_TO**1.5)
     W_uc = W_uc1 + W_uc2
 
     return W_uc
 
-def nacelle_weight(obj): #Take off power in hp
-    W_n = 1.134 * obj.P_TO**0.5
+def nacelle_weight(obj):
+    W_n = 1.134 * obj.P_TO**0.5 # Take off power in hp
 
     return W_n
 
@@ -79,7 +76,11 @@ def fuselage_weight(obj):
     if obj.engine_pos == 'pusher':
         W_fus *= 1.04
 
-    # Add 7% if the main landing gear is attached to the fuselage, but 4% can be subtracted from the fuselage weight if there is no attachment structure for the main landing gear
+    if obj.pos_main_carriage == 'fuselage':
+        W_fus *= 1.07
+    else:
+        W_fus *= 0.96
+
     # Add 10% for freighter aircraft
     # For booms l_t is defined as distance between local wing chord and horizontal tailplane
     return W_fus
