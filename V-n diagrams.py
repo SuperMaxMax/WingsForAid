@@ -157,6 +157,12 @@ def guessV_B(obj):
 
     return V_S * n_c**0.5
 
+def max_n(obj):
+
+    V, n_peak = gust_points(obj)
+    n_peak = np.append(n_peak, CS23_max(obj))
+
+    return max(n_peak)
 
 def plot_gust(obj):
 
@@ -177,15 +183,14 @@ def plot_gust(obj):
     plt.plot([V[2], V[4]], [n_peak[2], n_peak[4]], color = 'pink')             #Between C' and D'
     plt.plot([V[3], V[5]], [n_peak[3], n_peak[5]], color = 'pink')             #Between F' and E'
     plt.plot([V[4], V[5]], [n_peak[4], n_peak[5]], color = 'pink')             #Between D' and E'
+
+    plt.axhline(y = max_n(obj), linestyle = "--", linewidth = "1.5", color = "red")
+    plt.text(10, max_n(obj) + 0.3 , s = "max n", ha='center', va='top', color = 'red', fontsize = 12)
+
     
     plt.show()
 
-def max_n(obj):
 
-    V, n_peak = gust_points(obj)
-    n_peak = np.append(n_peak, CS23_max(obj))
-
-    return max(n_peak)
 
 
 
