@@ -93,7 +93,7 @@ class UAV:
 
         self.power_setting       = 0.9           # Power setting in cruise [-]
 
-        self.c_p                 = 90E-9         # 
+        self.c_p                 = 72E-9         #
         self.N_e                 = 1             # Number of engines [-]
 
         "==== Mission profile/Atmospheric properties ===="
@@ -101,14 +101,15 @@ class UAV:
         self.n_drops             = 1             # Number of drops [-]
         self.n_boxes             = 12            # Number of boxes [-]
         self.R                   = 500000        # Range [m]
-        self.M_res               = 0.15          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
+        self.R_ferry             = 1000000       # Ferry range [m]
+        self.M_res               = 0.10          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
         self.h_cruise            = 10000*0.3048  # Cruise altitude [m] | NOTES: Conversion
         self.h_TO                = 0             # Take-off Height [m]
 
         self.TO_dist             = 750           # Take-off distance [m]           
         self.LDG_dist            = 750           # Landing distance [m]
 
-        self.n_ult               = 5.5           # Ultimate load factor [-]
+        self.n_ult               = 5.7           # Ultimate load factor [-]
 
         "-Speeds"
         self.V_s_max             = 61*(1.852/3.6)    # CS23 Vs at take off not allowed to be above 61 kts [m/s] | NOTES: *1.852 to get to m/s
@@ -137,8 +138,8 @@ class UAV:
         #self.lin_par2           = -40.838
 
         "-MTOW for drones, R2=0.9988"
-        self.lin_par1           = 0.4631
-        self.lin_par2           = 52.058
+        #self.lin_par1           = 0.4631
+        #self.lin_par2           = 52.058
 
         "-MTOW vs OEW for general aviation R2=0.9548 , original y=0.5482 x + 486.68"
         #lin_par1           = 0.5522
@@ -151,4 +152,8 @@ class UAV:
         "- MTOW vs OEW ultra-light reduced by pilot weight, R2=0.9704"
         #self.lin_par1           = 0.7134
         #self.lin_par2           = -132.98
+
+        "MTOW vs OEW GA, "
+        self.lin_par1            = 0.5249
+        self.lin_par2            = 42.049
 
