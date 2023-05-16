@@ -9,7 +9,7 @@ def cg_calc(obj):
         wing_cg = 0.4 * obj.rootchord                 # to be done later, depends on spar locations (table 8-15 Torenbeek)
 
     # Control surfaces
-    control_surfaces_cg = obj.x_lemac + obj.MAC_length  # guess for now
+    control_surfaces_cg = obj.x_lemac + 0.9*obj.MAC_length  # guess for now
     
     W_wing_gr = obj.W_w + obj.W_sc
     x_wcg = (wing_cg*obj.W_w + control_surfaces_cg*obj.W_sc)/(W_wing_gr)
@@ -18,13 +18,13 @@ def cg_calc(obj):
     # Fuselage and engine
     prop_correction = 0.06                      # correction for propeller weight
     if obj.engine_pos == 'tractor':
-        fus_cg = 0.45 * obj.l_f                 # educated guess
+        fus_cg = 0.48 * obj.l_f                 # educated guess
         engine_cg = 0.327 - prop_correction     # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
     elif obj.engine_pos == 'pusher':
-        fus_cg = 0.55 * obj.l_f                 # educated guess
+        fus_cg = 0.52 * obj.l_f                 # educated guess
         engine_cg = obj.l_f - (0.6651-0.327) + prop_correction # based on Rotax 912is
     elif obj.engine_pos == 'fuselage':
-        fus_cg = 0.53 * obj.l_f                 # educated guess
+        fus_cg = 0.5 * obj.l_f                 # educated guess
         engine_cg = 0.8 * obj.l_f               # educated guess
 
     # Tail and boom
@@ -68,25 +68,25 @@ def cg_calc(obj):
     if obj.engine_pos == 'tractor':
         dist_front = 0.6651 + 0.6  # [m]
     elif obj.engine_pos == 'pusher':
-        dist_front = 0.6
+        dist_front = 0.4
     elif obj.engine_pos == 'fuselage':
-        dist_front = 0.6
+        dist_front = 0.4
     
     # 2 boxes in front
     W_2box_f = 1/6*obj.W_PL
-    X_2box_f = dist_front + 0.60/2
+    X_2box_f = dist_front + 0.40/2
     # 4 boxes in the front
     W_4box_f = 1/3*obj.W_PL
-    X_4box_f = dist_front + 2*0.60/2
+    X_4box_f = dist_front + 1/2
     # 2 boxes in back
     W_2box_b = 1/6*obj.W_PL
-    X_2box_b = dist_front + 5*0.6 + 0.6/2
+    X_2box_b = dist_front + 3.2
     # 4 boxes in back
     W_4box_b = 1/3*obj.W_PL
-    X_4box_b = dist_front + 4*0.6 + 2*0.6/2
+    X_4box_b = dist_front + 2.9
     # all boxes
     W_allbox = obj.W_PL
-    X_allbox = dist_front + 6*0.6/2
+    X_allbox = dist_front + 1.7
 
     # Calculate points to plot
     # OEW + fuel
