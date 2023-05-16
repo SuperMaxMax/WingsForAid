@@ -10,19 +10,19 @@ class UAV:
 
         "-Aircraft geometry"
         self.Sw                  = 13            # Surface area [m2]
-        self.A                   = 12            # Aspect ratio [-]
+        self.A                   = 8             # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.b                   = 11            # Wing span [m]
         self.MGC                 = self.Sw / self.b #Mean geometric chord [m]
         self.sweep_angle         = 0.36          # Sweep angle [rad]
         self.lambda_mid          = 0.36          # Sweep angle at mid-wing [rad]
         self.t_c                 = 0.12          # Thickness over chord ratio [-]
-        self.cwr                 = 2.5           # Chord length at root [m]
+        self.rootchord           = 2.5           # Chord length at root [m]
         self.dihedral            = 1             # Wing dihedral [deg]
         self.braced_wing         = False         # True if wing is braced
 
-        self.b_f                 = 1.1           # Fuselage width [m]
-        self.h_f                 = 1.1           # Fuselage height [m]
+        self.h_out               = 1.1           # Fuselage width [m]
+        self.w_out               = 1.1           # Fuselage height [m]
         self.d_eff               = 1.421         # meter, ADSEE 1 slides 
         self.l_f                 = 4             # Fuselage length [m]
         self.S_G                 = 21.029        # Gross shell area of fuselage [m^2]
@@ -31,9 +31,9 @@ class UAV:
         self.l_t                 = 3.5           # Tail arm [m]
 
         self.boom                = boom          # Boom, true if boom tail is implemented
-        self.b_boom              = 0.2           # Boom width [m]
-        self.h_boom              = 0.2           # Boom height [m]
-        self.d_eff_boom          = np.sqrt(0.2*0.2) # 
+        self.b_boom              = 0.15          # Boom width [m]
+        self.h_boom              = 0.15          # Boom height [m]
+        self.d_eff_boom          = np.sqrt(self.b_boom*self.h_boom) # 
         self.l_f_boom            = 2             # Boom length [m]
         self.S_G_boom            = self.l_f_boom*np.pi*self.d_eff_boom + 2*np.pi*(self.d_eff_boom/2)**2
 
@@ -96,7 +96,7 @@ class UAV:
 
         self.power_setting       = 0.9           # Power setting in cruise [-]
 
-        self.c_p                 = 90E-9         # 
+        self.c_p                 = 72E-9         #
         self.N_e                 = 1             # Number of engines [-]
 
         "==== Mission profile/Atmospheric properties ===="
@@ -104,14 +104,15 @@ class UAV:
         self.n_drops             = 1             # Number of drops [-]
         self.n_boxes             = 12            # Number of boxes [-]
         self.R                   = 500000        # Range [m]
-        self.M_res               = 0.15          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
+        self.R_ferry             = 1000000       # Ferry range [m]
+        self.M_res               = 0.10          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
         self.h_cruise            = 10000*0.3048  # Cruise altitude [m] | NOTES: Conversion
         self.h_TO                = 0             # Take-off Height [m]
 
         self.TO_dist             = 750           # Take-off distance [m]           
         self.LDG_dist            = 750           # Landing distance [m]
 
-        self.n_ult               = 1.5           # Ultimate load factor [-]
+        self.n_ult               = 5.7           # Ultimate load factor [-]
 
         "-Speeds"
         self.V_s_max             = 61*(1.852/3.6)    # CS23 Vs at take off not allowed to be above 61 kts [m/s] | NOTES: *1.852 to get to m/s
@@ -141,8 +142,8 @@ class UAV:
         #self.lin_par2           = -40.838
 
         "-MTOW for drones, R2=0.9988"
-        self.lin_par1           = 0.4631
-        self.lin_par2           = 52.058
+        #self.lin_par1           = 0.4631
+        #self.lin_par2           = 52.058
 
         "-MTOW vs OEW for general aviation R2=0.9548 , original y=0.5482 x + 486.68"
         #lin_par1           = 0.5522
@@ -155,4 +156,8 @@ class UAV:
         "- MTOW vs OEW ultra-light reduced by pilot weight, R2=0.9704"
         #self.lin_par1           = 0.7134
         #self.lin_par2           = -132.98
+
+        "MTOW vs OEW GA, "
+        self.lin_par1            = 0.5249
+        self.lin_par2            = 42.049
 

@@ -1,7 +1,7 @@
-
 from parameters import UAV
 import Class_I_weight_estimation as c1
 import Class_II_weight_estimation as c2
+import Class_II_cg_estimation as c2cg
 import geometry_determination as geo
 import pandas as pd
 
@@ -16,10 +16,12 @@ df = pd.DataFrame()
 
 for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
     # iteration
+    n = 1
     it = True
-    W_TO_c2_old = 6000
+    W_TO_c2_old = 750
     while it:
         # class 1
+        print(f"- Iteration number: {n}, concept: {concept.name} - \n")
         c1.run(concept)
         print("After class 1 iteration:")
         print(f"Mff: {concept.Mff}, L/D: {concept.L_D}, W_TO: {concept.W_TO}, W_OE: {concept.W_OE}, W_F: {concept.W_F}")
@@ -37,19 +39,20 @@ for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
         W_TO_c2 = concept.W_TO
 
         print("")
-        print("----------------------------------")
+        print("-------------------------------------------------")
         print("")
 
         # iterate between class 1 and class 2
         change = (W_TO_c2 - W_TO_c2_old)/W_TO_c2_old
 
-        if abs(change) < 0.001:
+        if abs(change) < 0.00001:
             it = False
         else:
             W_TO_c2_old = W_TO_c2
+            n += 1
 
     # cg calculation
-    c2.cg_calc(concept)
+    c2cg.cg_calc(concept)
 
     # save all attributes of object to csv file
     members = [attr for attr in dir(concept) if not callable(getattr(concept, attr)) and not attr.startswith("__")]
