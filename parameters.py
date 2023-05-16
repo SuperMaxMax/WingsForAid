@@ -122,11 +122,11 @@ class UAV:
         "-Speeds"
         self.V_s_max             = 61*(1.852/3.6)    # CS23 Vs at take off not allowed to be above 61 kts [m/s] | NOTES: *1.852 to get to m/s
         self.V_s_min             = 50*(1.852/3.6)    # Dropping speed [m/s]
-        self.V_cruise            = 105*(1.852/3.6)   # Cruise speed [m/s]
+        self.V_cruise            = 120*(1.852/3.6)   # Cruise speed [m/s]
         self.V_TO_max            = 1.1*self.V_s_max  # Maximum take off speed [m/s]
         self.V_TO_min            = 1.1*self.V_s_min  # Minimum take off speed [m/s]
         self.V_climb             = 70*(1.852/3.6)    # Climb speed [m/s]
-        self.V_D                 = 140*0.514444      # Dive speed [m/s]
+        self.V_D                 = 150*0.514444      # Dive speed [m/s]
         self.V_B                 = 46.01347201449718 # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
 
         "-Atmospheric properties"
