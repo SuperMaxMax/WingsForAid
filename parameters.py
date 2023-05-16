@@ -14,7 +14,7 @@ class UAV:
         self.e                   = 0.7           # Oswald factor [-]
         self.b                   = 11            # Wing span [m]
         self.MGC                 = self.Sw / self.b #Mean geometric chord [m]
-        self.lambda_co4          = 0.0           # Sweep angle [rad]
+        self.lambda_co4          = 0.0           # Sweep angle at quarter chord [rad]
         self.lambda_co2          = 0.0           # Sweep angle at mid-wing [rad]
         self.t_c                 = 0.12          # Thickness over chord ratio [-]
         self.rootchord           = 2.5           # Chord length at root [m]

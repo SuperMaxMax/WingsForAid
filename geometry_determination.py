@@ -28,7 +28,7 @@ def create_line(x1, y1, x2, y2, num_points):
     line = np.vstack((x, y))
     return line
 
-def geometry_determination(obj, plot=True):
+def geometry_determination(obj, plot=False):
     # create empty array for capturing design points from W/P - W/S diagrams
     design_points = np.empty(0)
     for i in range(len(obj.CL_max_clean)):                  
@@ -170,10 +170,6 @@ def geometry_determination(obj, plot=True):
     # root and tipchord
     obj.rootchord = (2*obj.Sw)/((1+obj.taper)*obj.b)
     obj.tipchord = obj.taper*obj.rootchord
-    
-    # define empty arrays in which values will be stored
-    wings = np.empty(0)
-    MAC_parameters = np.empty(0)
 
     for i in range(len(obj.Sw)):
         # define important points on the wing planform (corners, quarther and half chord points)
@@ -195,7 +191,7 @@ def geometry_determination(obj, plot=True):
         min = np.min(mask)
         index = np.where(mask == min)
         obj.y_mac = hc[1][index][0]
-        tolerance = 0.0000005
+        tolerance = 0.000005
         obj.x_lemac = LE[0][np.where(np.abs(LE[1]-obj.y_mac)<=tolerance)][0]
         x_temac = TE[0][np.where(np.abs(TE[1]-obj.y_mac)<=tolerance)][0]
         MAC = np.array([np.linspace(x_temac, obj.x_lemac, 1000), np.full(1000, obj.y_mac)])
@@ -203,7 +199,7 @@ def geometry_determination(obj, plot=True):
         
         # half chord sweep angle
         tan_lambda_co2 = (points[0][-1]-points[0][4])/(points[1][4]-points[1][-1])
-        obj.lambda_co2 = np.arctan(tan_lambda_co2)*(180/np.pi)
+        obj.lambda_co2 = np.arctan(tan_lambda_co2)
 
         # plot the wings
         if plot:
