@@ -27,7 +27,7 @@ def tail_weight(obj): #ultimate load factor, tail surface area
     return W_t
 
 def gear_weight(obj):
-    if obj.maingear_type=="fixed":
+    if obj.main_gear_type=="fixed":
         A1 = 9.1
         B1 = 0.082
         C1 = 0.019
@@ -38,7 +38,7 @@ def gear_weight(obj):
         C1 = 0.019
         D1 = 2.23 * 10**-5
 
-    if obj.nosegear_type=="retractable":
+    if obj.nose_gear_type=="retractable":
         A2 = 11.3
         B2 = 0
         C2 = 0.0024
