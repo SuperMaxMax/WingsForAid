@@ -127,7 +127,7 @@ def geometry_determination(obj, plot=False):
     
     # --- Fuselage parameters
     cumulative_box_length   = obj.n_boxes*0.4                   # box 40x40x60, cumulative length in meter
-    length_between_boxes    = (obj.n_boxes-1)*0.2               # 20 cm in between boxes
+    length_between_boxes    = ((obj.n_boxes/2)-1)*0.2           # 20 cm in between boxes
     engine_length           = 0.593                             # engine length in cm, EASA type certificate data sheet ROTAX 912 series
     engine_fairing          = 0.2                               # 20 cm room around the engine 
     obj.d_eff               = np.sqrt(1.10*1.40)                # from cross sectional drawing with width 1.40 m and height 1.10 m
