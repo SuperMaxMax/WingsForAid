@@ -31,13 +31,14 @@ class UAV:
         self.l_t                 = 3.5           # Tail arm [m]
 
         self.boom                = boom          # Boom, true if boom tail is implemented
-        self.b_boom              = 0.15          # Boom width [m]
-        self.h_boom              = 0.15          # Boom height [m]
-        self.d_eff_boom          = np.sqrt(self.b_boom*self.h_boom) # 
+        self.W_boom              = 0            # Boom weight [kg]
+        # self.b_boom              = 0.15          # Boom width [m]
+        # self.h_boom              = 0.15          # Boom height [m]
+        # self.d_eff_boom          = np.sqrt(self.b_boom*self.h_boom) # 
         self.l_f_boom            = 2             # Boom length [m]
-        self.S_G_boom            = self.l_f_boom*np.pi*self.d_eff_boom + 2*np.pi*(self.d_eff_boom/2)**2
+        # self.S_G_boom            = self.l_f_boom*np.pi*self.d_eff_boom + 2*np.pi*(self.d_eff_boom/2)**2
 
-        self.l_t_boom            = self.l_f_boom+0.4*self.l_f           # Boom tail arm [m]
+        # self.l_t_boom            = self.l_f_boom+0.4*self.l_f           # Boom tail arm [m]
 
         self.xc_OEW_p            = 0.25          # Center of gravity of OEW as a fraction of the fuselage length [-]
 
