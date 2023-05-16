@@ -14,10 +14,10 @@ concept_5 = UAV('concept_5')
 it = True
 
 for concept in [concept_1]:#[concept_1, concept_2, concept_3, concept_4, concept_5]:
-    W_TO_c2_old = 600
+    W_TO_c2_old = 6000
     while it:
         # class 1
-        c1.iteration(concept)
+        c1.run(concept)
         print("After class 1 iteration:")
         print(f"Mff: {concept.Mff}, L/D: {concept.L_D}, W_TO: {concept.W_TO}, W_OE: {concept.W_OE}, W_F: {concept.W_F}")
         W_TO_c1 = concept.W_TO
@@ -39,11 +39,12 @@ for concept in [concept_1]:#[concept_1, concept_2, concept_3, concept_4, concept
 
         # iterate between class 1 and class 2
         change = (W_TO_c2 - W_TO_c2_old)/W_TO_c2_old
-        if abs(change) < 0.01:
+
+        if abs(change) < 0.001:
             it = False
         else:
             W_TO_c2_old = W_TO_c2
-            # continue
+
 
     # cg calculation
     c2.cg_calc(concept)

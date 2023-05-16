@@ -11,7 +11,7 @@ class UAV:
         "-Aircraft geometry"
         self.Sw                  = 13            # Surface area [m2]
         self.A                   = 12            # Aspect ratio [-]
-        self.e                   = 0.9           # Oswald factor [-]
+        self.e                   = 0.7           # Oswald factor [-]
         self.b                   = 11            # Wing span [m]
         self.sweep_angle         = 0.36          # Sweep angle [rad]
         self.lambda_mid          = 0.36          # Sweep angle at mid-wing [rad]
@@ -93,7 +93,7 @@ class UAV:
 
         "==== Mission profile/Atmospheric properties ===="
         "-Mission characteristics"
-        self.n_drops             = 2             # Number of drops [-]
+        self.n_drops             = 1             # Number of drops [-]
         self.n_boxes             = 12            # Number of boxes [-]
         self.R                   = 500000        # Range [m]
         self.M_res               = 0.15          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
@@ -128,12 +128,12 @@ class UAV:
         #self.lin_par2            = 486.68        # Y axis crossing of the linear trend OEW/MTOW
 
         "-MTOW vs OEW reduced by pilot weight R2=0.9548"
-        self.lin_par1           = 0.5522
-        self.lin_par2           = -40.838
+        #self.lin_par1           = 0.5522
+        #self.lin_par2           = -40.838
 
         "-MTOW for drones, R2=0.9988"
-        #lin_par1           = 0.4631
-        #lin_par2           = 52.058
+        self.lin_par1           = 0.4631
+        self.lin_par2           = 52.058
 
         "-MTOW vs OEW for general aviation R2=0.9548 , original y=0.5482 x + 486.68"
         #lin_par1           = 0.5522
@@ -144,6 +144,6 @@ class UAV:
         #lin_par2           = -52.981
 
         "- MTOW vs OEW ultra-light reduced by pilot weight, R2=0.9704"
-        #lin_par1           = 0.7134
-        #lin_par2           = -132.98
+        #self.lin_par1           = 0.7134
+        #self.lin_par2           = -132.98
 
