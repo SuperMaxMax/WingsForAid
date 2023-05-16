@@ -9,38 +9,21 @@ class UAV:
         self.type                = "normal"      # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
 
         "-Aircraft geometry"
-        self.Sw                  = 13            # Surface area [m2]
+        self.Sw                  = 13            # Surface area [m2] # Sw,b and MGC to be removed -> then V_n diagrams should be created after iteration instead of separate
         self.A                   = 8             # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.b                   = 11            # Wing span [m]
-        # self.MGC                 = self.Sw / self.b #Mean geometric chord [m]
-        self.lambda_co4          = 0.0           # Sweep angle at quarter chord [rad]
-        self.lambda_co2          = 0.0           # Sweep angle at mid-wing [rad]
-        self.t_c                 = 0.12          # Thickness over chord ratio [-]
-        # self.rootchord           = 2.5           # Chord length at root [m]
-        # self.dihedral            = 1             # Wing dihedral [deg]
+        self.MGC                 = self.Sw / self.b #Mean geometric chord [m]
         self.braced_wing         = False         # True if wing is braced
-
-        # self.h_out               = 1.1           # Fuselage width [m]
-        # self.w_out               = 1.1           # Fuselage height [m]
-        # self.d_eff               = 1.421         # meter, ADSEE 1 slides 
-        # self.l_f                 = 4             # Fuselage length [m]
-        # self.S_G                 = 21.029        # Gross shell area of fuselage [m^2]
 
         self.s_tail              = 2             # Tail surface area [m]
         self.l_t                 = 3.5           # Tail arm [m]
 
         self.boom                = boom          # Boom, true if boom tail is implemented
         self.W_boom              = 0            # Boom weight [kg]
-        # self.b_boom              = 0.15          # Boom width [m]
-        # self.h_boom              = 0.15          # Boom height [m]
-        # self.d_eff_boom          = np.sqrt(self.b_boom*self.h_boom) # 
         self.l_f_boom            = 2             # Boom length [m]
-        # self.S_G_boom            = self.l_f_boom*np.pi*self.d_eff_boom + 2*np.pi*(self.d_eff_boom/2)**2
 
-        # self.l_t_boom            = self.l_f_boom+0.4*self.l_f           # Boom tail arm [m]
-
-        self.xc_OEW_p            = 0.25          # Center of gravity of OEW as a fraction of the fuselage length [-]
+        self.xc_OEW_p            = 0.2          # Center of gravity of OEW as a fraction of the fuselage length [-]
 
         self.pos_main_carriage   = "fuselage"    # Position of main carriage: "fuselage" or "wing"
         self.main_gear_type      = "fixed"       # Type of main gear: "fixed" or "retractable"
@@ -48,9 +31,7 @@ class UAV:
 
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
-        # self.L_D                 = 10            # Lift over drag [-] | ASSUMPTION/NOTES: Conservative
-        # self.CLa                 = 4.2          # Lift curve slope [] | CHANGE TO ACTUAL VALUE
-
+        self.CLa                 = 4.2          # Lift curve slope [] | CHANGE TO ACTUAL VALUE
 
         # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
         # but this means that CL_max_clean, CL_max_TO and CL_max_land must always be stored in an array. For an array with length 1
@@ -61,18 +42,11 @@ class UAV:
         self.CL_TO               = self.CL_max_TO / (1.1**2)    # [-]
         self.CL_LDG              = self.CL_max_land / (1.1**2)  # [-]
 
-        # ASSUMPTION: Fixed undercarriage
-        self.d_CD0_TO_Flaps      = np.arange(0.010, 0.021, 0.001)    # Change in CD0 at take-off due to flaps [-] | Range: 0.010 - 0.020
-        self.d_CDO_LDG_Flaps     = np.arange(0.055, 0.076, 0.001)    # Change in CD0 at landing due to flaps [-] | Range: 0.055 - 0.075
-        self.d_e_TO_Flaps        = 0.05                              # Change in oswald factor at take-off due to flaps [-] 
-        self.d_e_LDG_Flaps       = 0.10                              # Change in oswald factor at landing due to flaps [-]
-
         "-Weights"
         self.W_e                 = 62.6          # Definitive weight per engine [kg]
-        # self.W_G                 = 700           # Gross weight [kg]
         self.W_TO                = 700           # Take-off weight [kg]
         self.W_PL                = 240           # Payload weight [kg]
-        # self.WS                  = 600           # Wing Loading [N/m^2]
+        self.WS                  = 600           # Wing Loading [N/m^2]
 
         "-Weight fractions"
         self.W1W_TO              = 0.995         # Engine startup fraction [-]
@@ -81,15 +55,10 @@ class UAV:
         self.W4W3                = 0.992         # Climb fraction [-]
         self.W10W9               = 0.993         # Descent fraction [-]
         self.WfinalW10           = 0.993         # Landing, taxi & shut-down fraction [-]
-
-        # self.W_fuel_estimated    = 75*0.82                                          # Fuel weight [kg] | ASSUMPTION: Estimated value based on 20L/h fuel burn of rotax and 3 hour sortie and 15L reserve and density of fuel
-        # self.W_LDG               = self.W_TO - self.W_PL - self.W_fuel_estimated    # Weight at landing [kg] | ASSUMPTION: All packages have been dropped
-        # self.fuel_frac           = self.W_LDG/self.W_TO                             # Fuel fraction [-]
         self.cruise_frac         = self.W1W_TO*self.W2W1*self.W3W2*self.W4W3*0.85   # Assume halfway through the cruise with cruise fuel fraction 0.3
 
         "-Propulsive properties"
         self.engine_pos          = engine_pos     # Engine position
-        # self.P_max               = 100           # Maximum power [bhp]
         self.P_TO                = 62            # Power at take-off [hp]
 
         self.prop_eff            = 0.82          # Propulsive efficiency [-]
@@ -108,28 +77,22 @@ class UAV:
         self.n_drops             = 1             # Number of drops [-]
         self.n_boxes             = 12            # Number of boxes [-]
         self.R                   = 500000        # Range [m]
-        # self.R_ferry             = 1000000       # Ferry range [m]
         self.M_res               = 0.10          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
         self.h_cruise            = 10000*0.3048  # Cruise altitude [m] | NOTES: Conversion
         self.h_TO                = 0             # Take-off Height [m]
-
-        # self.TO_dist             = 750           # Take-off distance [m]           
+        
         self.LDG_dist            = 750           # Landing distance [m]
 
         self.n_ult               = 3.8 * 1.5     # Ultimate load factor [-]
 
         "-Speeds"
-        # self.V_s_max             = 61*(1.852/3.6)    # CS23 Vs at take off not allowed to be above 61 kts [m/s] | NOTES: *1.852 to get to m/s
         self.V_s_min             = 50*(1.852/3.6)    # Dropping speed [m/s]
         self.V_cruise            = 105*(1.852/3.6)   # Cruise speed [m/s]
-        # self.V_TO_max            = 1.1*self.V_s_max  # Maximum take off speed [m/s]
-        # self.V_TO_min            = 1.1*self.V_s_min  # Minimum take off speed [m/s]
         self.V_climb             = 70*(1.852/3.6)    # Climb speed [m/s]
         self.V_D                 = 140*0.514444      # Dive speed [m/s]
         self.V_B                 = 46.01347201449718 # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
 
         "-Atmospheric properties"
-        # self.p0                  = 101325        # [Pa]
         self.rho0                = 1.225         # [kg/m^3]
         self.T0                  = 288.15        # [K]
         self.Lambda              = -0.0065       # [deg K/m]
