@@ -152,17 +152,17 @@ def cg_calc(obj):
     # at engine cg
 
     # Undercarriage
-    # For now: cg assumed to be at aircraft cg -> does not appear in W_fus_gr and X_FCG, however it is added to W_OEW
+    # For now: cg assumed to be at aircraft cg -> not taken into account for X_FCG, but is part of OEW
 
-    W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n
-    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + engine_cg*obj.W_n)/(W_fus_gr)
+    W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc
+    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + engine_cg*obj.W_n)/(W_fus_gr - obj.W_uc)
 
     # X_LEMAC and xc_OEW
     xc_OEW = obj.xc_OEW_p*obj.MAC_length
     X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
 
     # Final CG
-    W_OEW = W_wing_gr+W_fus_gr+obj.W_uc
+    W_OEW = W_wing_gr+W_fus_gr
     X_OEW = X_LEMAC + xc_OEW
     print(f"W_OEW = {W_OEW} N, X_OEW = {X_OEW} m")
 
@@ -233,3 +233,10 @@ def cg_calc(obj):
     plt.grid()
     plt.legend()
     plt.show()
+
+    # Save most forward and most aft and fully loaded c.g. in object
+    obj.X_cg_fwd = min(xs)
+    obj.X_cg_aft = max(xs)
+    obj.X_cg_range = obj.X_cg_aft - obj.X_cg_fwd
+    obj.X_cg_full = X_OEW_fuel_allbox
+    
