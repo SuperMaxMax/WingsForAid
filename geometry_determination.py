@@ -28,7 +28,7 @@ def create_line(x1, y1, x2, y2, num_points):
     line = np.vstack((x, y))
     return line
 
-def geometry_determination(obj, plot=True):
+def geometry_determination(obj, plot=False):
     # create empty array for capturing design points from W/P - W/S diagrams
     design_points = np.empty(0)
     for i in range(len(obj.CL_max_clean)):                  
@@ -159,6 +159,8 @@ def geometry_determination(obj, plot=True):
     
     # wingspan
     obj.b = np.sqrt(obj.A*obj.Sw)
+
+    obj.MGC = obj.Sw/obj.b                                       # Mean geometric chord [m]
     
     # quarter chord sweep angle (0 as the cruise speed is around 100-110 knots which equates to M<0.2)
     obj.cos_lambda_c04 = 1
