@@ -129,7 +129,7 @@ def plot_Vn(obj):
 
 
 def gust_points(obj):
-    rho = 1.225                                                  #CHANGE DENSITY TO DENSITY AT ALTITUDE CONSIDERED
+    rho = 0.9093                                               #CHANGE DENSITY TO DENSITY AT ALTITUDE CONSIDERED
     
     #ORDER: VB pos, VB neg, VC pos, VC, VD pos, VD neg
     V = np.array([obj.V_B, obj.V_B, obj.V_cruise, obj.V_cruise, obj.V_D, obj.V_D])                                      #DEFINE SPEEDS
@@ -142,20 +142,12 @@ def gust_points(obj):
 
     u = K * u_hat_ms
 
-    delta_n_mag = rho * V * obj.CLa * u / (2 * obj.WS)
+    delta_n_mag = obj.rho0 * V * obj.CLa * u / (2 * obj.WS)
     delta_n = np.array([1, -1, 1, -1, 1, -1]) * delta_n_mag
     
     n_peak = 1 + delta_n
     return V, n_peak
 
-def guessV_B(obj):
-    V, n_peak = gust_points(obj)
-    n_c = n_peak[2]
-
-    V, n_pos, n_neg = stall_req(obj)
-    V_S = np.interp(1, n_pos, V)
-
-    return V_S * n_c**0.5
 
 def max_n(obj):
 
@@ -192,9 +184,38 @@ def plot_gust(obj):
 
 
 
+def VC_lim_low(obj):
+    return 33 * (obj.WS * 0.020885) ** 0.5 * 0.51444 #[m/s]
+
+def VD_lim_low(obj):
+    return 1.4 * VC_lim_low(obj)    #[m/s]
+
+def VA_lim_low(obj): #Cant be greater than VC
+    V, n_pos, n_neg = stall_req(obj)
+    V_S = np.interp(1, n_pos, V)
+
+    n = CS23_max(obj)
+
+    return V_S * n**0.5 #[m/s]
+
+def VB_lim_low(obj): #Cant be greater than VC
+    V, n_peak = gust_points(obj)
+    n_c = n_peak[2]
+
+    V, n_pos, n_neg = stall_req(obj)
+    V_S = np.interp(1, n_pos, V)
+
+    return V_S * n_c**0.5 #[m/s]
+
+
+print(VC_lim_low(concept))
+print(VD_lim_low(concept))
+print(VA_lim_low(concept))
+print(VB_lim_low(concept))
+
+
 #print(guessV_B(concept))
 concept.n_ult = max_n(concept)
 
 plot_Vn(concept)
 plot_gust(concept)
-

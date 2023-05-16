@@ -13,7 +13,7 @@ class UAV:
         self.A                   = 8             # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.b                   = 11            # Wing span [m]
-        # self.MGC                 = self.Sw / self.b #Mean geometric chord [m]
+        self.MGC                 = self.Sw / self.b #Mean geometric chord [m]
         self.lambda_co4          = 0.0           # Sweep angle at quarter chord [rad]
         self.lambda_co2          = 0.0           # Sweep angle at mid-wing [rad]
         self.t_c                 = 0.12          # Thickness over chord ratio [-]
@@ -49,7 +49,7 @@ class UAV:
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
         # self.L_D                 = 10            # Lift over drag [-] | ASSUMPTION/NOTES: Conservative
-        # self.CLa                 = 4.2          # Lift curve slope [] | CHANGE TO ACTUAL VALUE
+        self.CLa                 = 4.2          # Lift curve slope [] | CHANGE TO ACTUAL VALUE
 
 
         # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
@@ -72,7 +72,7 @@ class UAV:
         # self.W_G                 = 700           # Gross weight [kg]
         self.W_TO                = 700           # Take-off weight [kg]
         self.W_PL                = 240           # Payload weight [kg]
-        # self.WS                  = 600           # Wing Loading [N/m^2]
+        self.WS                  = 600           # Wing Loading [N/m^2]
 
         "-Weight fractions"
         self.W1W_TO              = 0.995         # Engine startup fraction [-]
@@ -121,12 +121,12 @@ class UAV:
         "-Speeds"
         # self.V_s_max             = 61*(1.852/3.6)    # CS23 Vs at take off not allowed to be above 61 kts [m/s] | NOTES: *1.852 to get to m/s
         self.V_s_min             = 50*(1.852/3.6)    # Dropping speed [m/s]
-        self.V_cruise            = 105*(1.852/3.6)   # Cruise speed [m/s]
+        self.V_cruise            = 116.81720335635501*(1.852/3.6)   # Cruise speed [m/s]
         # self.V_TO_max            = 1.1*self.V_s_max  # Maximum take off speed [m/s]
         # self.V_TO_min            = 1.1*self.V_s_min  # Minimum take off speed [m/s]
         self.V_climb             = 70*(1.852/3.6)    # Climb speed [m/s]
-        self.V_D                 = 150*0.514444      # Dive speed [m/s]
-        self.V_B                 = 46.01347201449718 # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
+        self.V_D                 = 163.544084698897*0.514444      # Dive speed [m/s]
+        self.V_B                 = 42.22453478127882 # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
 
         "-Atmospheric properties"
         # self.p0                  = 101325        # [Pa]
