@@ -27,6 +27,10 @@ def L_D_cruise(obj):
 def W5W4_calculation(obj):
     # Cruise fuel fraction calculation
     L_D = L_D_cruise(obj) # Lift over drag ratio from method above
+
+    if obj.engine_pos == 'pusher':
+        obj.prop_eff *= 0.92
+
     W5W4 = 1/exp(obj.R * obj.g0 * obj.c_p / (obj.prop_eff * L_D)) # Breguet's range equation
 
     return W5W4

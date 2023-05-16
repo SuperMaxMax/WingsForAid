@@ -68,6 +68,8 @@ def geometry_determination(obj, plot=False):
         obj.rho_cruise = rho_cruise
         obj.sigma_cruise = sigma_cruise
         obj.BHP_cruise = BHP_cruise
+        if obj.engine_pos == 'pusher':
+            obj.eta_p *= 0.92
         WP_cruise   = (obj.power_setting/obj.cruise_frac)*obj.eta_p*obj.sigma_cruise**(3/4)*(((obj.CD0*1/2*obj.rho_cruise*obj.V_cruise**3)/(WS*obj.cruise_frac))+(WS*(1/(np.pi * obj.A * obj.e* obj.rho_cruise * obj.V_cruise))))**(-1)
         WP_cruise   = np.vstack((WP_cruise, WS))
 
