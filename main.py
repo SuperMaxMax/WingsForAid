@@ -43,7 +43,7 @@ for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
         # iterate between class 1 and class 2
         change = (W_TO_c2 - W_TO_c2_old)/W_TO_c2_old
 
-        if abs(change) < 0.001:
+        if abs(change) < 0.00001:
             it = False
         else:
             W_TO_c2_old = W_TO_c2

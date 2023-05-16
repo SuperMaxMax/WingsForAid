@@ -30,7 +30,7 @@ def stall_req(obj):
     return V, n_pos, n_neg
 
 
-def plot(obj):
+def plot_Vn(obj):
     V, n_pos, n_neg = stall_req(obj)
     n_max = CS23_max(obj)
     n_min = CS23_min(obj)
@@ -58,7 +58,7 @@ def plot(obj):
     
     #X-axis:
     plt.axhline(y = 0, color = "black", linewidth = '0.7')
-
+    
 
     #Plotting points:
     plt.plot(A_x, n_max, 'ro', color = 'black')    #A
@@ -124,5 +124,5 @@ def plot(obj):
     plt.show()
 
 
-plot(concept)
+plot_Vn(concept)
  

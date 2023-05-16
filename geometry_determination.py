@@ -120,8 +120,9 @@ def geometry_determination(obj, plot=False):
     
     if plot:
         plt.xlabel("W/S [N/m^2]")
+        plt.xlim((300, 1000))
         plt.ylabel("W/P [N/W]")
-        plt.ylim((0, 1.5))
+        plt.ylim((0, 0.7))
         # plt.legend(loc='upper right')
         plt.show()
     
