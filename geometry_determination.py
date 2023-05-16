@@ -227,5 +227,5 @@ def geometry_determination(obj, plot=False):
             wings = np.vstack((wings, points))
             MAC_parameters = np.vstack((MAC_parameters, MAC_i))
 
-    obj.tc = np.full(np.shape(obj.Sw), 0.12)                                    # thickness over chord. 0.18 ADSEE 1, Lecture 6, Slide 22; no supercritical airfoils considered
+    obj.t_c = np.full(np.shape(obj.Sw), 0.12)                                    # thickness over chord. 0.18 ADSEE 1, Lecture 6, Slide 22; no supercritical airfoils considered
     obj.dihedral = np.full(np.shape(obj.Sw), 1)                                 # degree, high wing value, same slides as above.
