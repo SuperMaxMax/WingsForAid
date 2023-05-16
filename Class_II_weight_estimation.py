@@ -9,7 +9,7 @@ def wing_weight(obj):
     k_w = 4.9E-3
     b_s = obj.b / cos(obj.lambda_mid)
     b_ref = 1.905
-    t_r = obj.t_c * obj.cwr
+    t_r = obj.t_c * obj.rootchord
 
     W_w = k_w * b_s**0.75 * (1 + (b_ref/b_s)**0.5) * obj.n_ult**0.55 * ((b_s/t_r)/(obj.W_TO/obj.Sw))**0.3 * obj.W_TO
 

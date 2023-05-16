@@ -108,7 +108,7 @@ class UAV:
         self.TO_dist             = 750           # Take-off distance [m]           
         self.LDG_dist            = 750           # Landing distance [m]
 
-        self.n_ult               = 1.5           # Ultimate load factor [-]
+        self.n_ult               = 5.5           # Ultimate load factor [-]
 
         "-Speeds"
         self.V_s_max             = 61*(1.852/3.6)    # CS23 Vs at take off not allowed to be above 61 kts [m/s] | NOTES: *1.852 to get to m/s
