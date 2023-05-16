@@ -34,16 +34,13 @@ def plot(obj):
     V, n_pos, n_neg = stall_req(obj)
     n_max = CS23_max(obj)
     n_min = CS23_min(obj)
-    print(n_min)
-    print(n_neg)
-    print(V)
    
-    #X-Values of points
-    A = np.interp(n_max, n_pos, V)
-    D = obj.V_D
-    E = D
-    F = obj.V_cruise
-    H = np.interp(-n_min, n_pos, V)
+    #X-Values of points. Points are from typical V-n diagram
+    A_x = np.interp(n_max, n_pos, V)
+    D_x = obj.V_D
+    E_x = D_x
+    F_x = obj.V_cruise
+    H_x = np.interp(-n_min, n_pos, V)
 
     #V_S
     V_S = np.interp(1, n_pos, V)
@@ -51,36 +48,66 @@ def plot(obj):
 
     #Setting plot limits:
     left, right = 0, obj.V_D * 1.2
-   # plt.xlim(left, right)
+    plt.xlim(left, right)
     bottom, top = n_min * 1.2, n_max * 1.2
-    #plt.ylim(bottom, top)
+    y_range = top - bottom
+
+    plt.ylim(bottom, top)
+
+    plt.axhline(y = 0, color = "black", linewidth = '0.7')
+
 
     #Plotting points:
-    plt.plot(A, n_max, 'ro')    #A
-    plt.plot(D, n_max, 'ro')    #D
-    plt.plot(D, 0, 'ro')        #E
-    plt.plot(F, n_min, 'ro')    #F
-    plt.plot(H, n_min, 'ro')    #H
+    plt.plot(A_x, n_max, 'ro')    #A
+    plt.plot(D_x, n_max, 'ro')    #D
+    plt.plot(D_x, 0, 'ro')        #E
+    plt.plot(F_x, n_min, 'ro')    #F
+    plt.plot(H_x, n_min, 'ro')    #H
 
 
     #Plotting straight lines
-    plt.plot([A, D], [n_max, n_max])            #Between A and D
-    plt.plot([D, E], [n_max, 0])    #Between D and E
-    plt.plot([E, F], [0, n_min])    #Between E and F
-    plt.plot([F, H], [n_min, n_min])    #Between F and H
+    plt.plot([A_x, D_x], [n_max, n_max])            #Between A and D
+    plt.plot([D_x, E_x], [n_max, 0])    #Between D and E
+    plt.plot([E_x, F_x], [0, n_min])    #Between E and F
+    plt.plot([F_x, H_x], [n_min, n_min])    #Between F and H
+
+
+    #Plot stall speed requirement until point A for positive and until point H for negative:
+    V_pos = V[V<=A_x]
+    n_pos = n_pos[0:V_pos.size]
+    V_neg = V[V<=H_x]
+    n_neg = n_neg[0:V_neg.size]
+
+    plt.plot(V_pos, n_pos)
+    plt.plot(V_neg, n_neg)
+
+    #Plot V_S
+    y0_frac_VS = abs(bottom) / y_range
+    y1_frac_VS = (abs(bottom) + 1) / y_range
+    plt.axvline(x = V_S, ymin = y0_frac_VS, ymax = y1_frac_VS, linestyle = "--", linewidth = "1", color = "black")
+    
+
+    #Plot V_A
+    y0_frac_VA = (abs(bottom) + n_max) / y_range
+    y1_frac_VA = (abs(bottom)) / y_range
+    plt.axvline(x = A_x, ymin = y0_frac_VA, ymax = y1_frac_VA, linestyle = "--", linewidth = "1", color = "black")
+    
+    #Plot V_C
+    y0_frac_VA = (abs(bottom) + n_min) / y_range
+    y1_frac_VA = (abs(bottom)) / y_range
+    plt.axvline(x = F_x, ymin = y0_frac_VA, ymax = y1_frac_VA, linestyle = "--", linewidth = "1", color = "black")
+    
+
+    #Plot V_C
 
 
 
-
-    plt.axvline(x = V_S, ymin = -1 * n_min / bottom)
-    plt.axhline(y = 1)
-
+    #Plot y=1
+    plt.axhline(y = 1, linestyle = "--", linewidth = "1", color = "black")
 
 
-    plt.plot(V, n_pos)
-    plt.plot(V, n_neg)
+
     plt.show()
-
 
 
 plot(concept)
