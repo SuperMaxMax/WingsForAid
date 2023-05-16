@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 def cg_calc(obj):
     # --- Wing group
     # Wing
-    if obj.sweep_angle == 0:
+    if obj.lambda_co4 == 0:
         wing_cg = 0.4 * obj.rootchord                 # 40% of root chord plus Leading Edge location
     else:
         wing_cg = 0.4 * obj.rootchord                 # to be done later, depends on spar locations (table 8-15 Torenbeek)
