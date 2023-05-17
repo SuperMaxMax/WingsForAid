@@ -136,7 +136,7 @@ def geometry_determination(obj, plot=False):
     if obj.boom:                                                # assume one effective diameter after last box
         l_tc = 0.8                                              # from drawing [m]
     else:                                                       
-        l_tc = 1.75*obj.d_eff                                    # ADSEE 1, lecture 5, slide 58, source Roskam
+        l_tc = 1.75*obj.d_eff                                   # Based on drawing of the aircraft.
 
     # Fuselage dimensions
     obj.h_out = 1.10                                            # meter, from cross sectional drawing
@@ -160,11 +160,11 @@ def geometry_determination(obj, plot=False):
     # wingspan
     obj.b = np.sqrt(obj.A*obj.Sw)
 
-    obj.MGC = obj.Sw/obj.b                                       # Mean geometric chord [m]
+    obj.MGC = obj.Sw/obj.b                                      # Mean geometric chord [m]
     
     # quarter chord sweep angle (0 as the cruise speed is around 100-110 knots which equates to M<0.2)
     obj.cos_lambda_c04 = 1
-    obj.lambda_co4 = np.arccos(obj.cos_lambda_c04)                  #rad, As Mcruise < 0.7, use 0 sweep angle
+    obj.lambda_co4 = np.arccos(obj.cos_lambda_c04)              #rad, As Mcruise < 0.7, use 0 sweep angle
     
     # taper ratio
     obj.taper = 0.2*(2-obj.lambda_co4)
@@ -225,6 +225,8 @@ def geometry_determination(obj, plot=False):
 
     if obj.braced_wing:
         obj.CD0  /= obj.Drag_increase
+        obj.W_OE -= obj.mass_penalty_struts
+        n_struts = 2
         kq_strut = 1
         l_strut  = 1.1/np.cos((45*np.pi/180))
         strut_taper = 1
@@ -237,6 +239,9 @@ def geometry_determination(obj, plot=False):
         Qw_strut = 2*((kq_strut*tc_strut)/(np.sqrt(1+strut_taper)))*S_strut*np.sqrt(S_strut/A_strut)*interference_penalty
         obj.Drag_increase = 1 + Qw_strut/obj.Qw_wing
         obj.CD0  *= obj.Drag_increase
+        m_strut = 3.5                                                                           #kg, estimate using length and density of AL2024 t3
+        mass_penalty_struts = n_struts*m_strut
+        obj.W_OE += mass_penalty_struts
     else:
         obj.Drag_increase = 1
     
