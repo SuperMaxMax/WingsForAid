@@ -225,8 +225,6 @@ def geometry_determination(obj, plot=False):
 
     if obj.braced_wing:
         obj.CD0  /= obj.Drag_increase
-        obj.W_OE -= obj.mass_penalty_struts
-        n_struts = 2
         kq_strut = 1
         l_strut  = 1.1/np.cos((45*np.pi/180))
         strut_taper = 1
@@ -238,10 +236,7 @@ def geometry_determination(obj, plot=False):
         interference_penalty = 2
         Qw_strut = 2*((kq_strut*tc_strut)/(np.sqrt(1+strut_taper)))*S_strut*np.sqrt(S_strut/A_strut)*interference_penalty
         obj.Drag_increase = 1 + Qw_strut/obj.Qw_wing
-        obj.CD0  *= obj.Drag_increase
-        m_strut = 3.5                                                                           #kg, estimate using length and density of AL2024 t3
-        mass_penalty_struts = n_struts*m_strut
-        obj.W_OE += mass_penalty_struts
+        obj.CD0  *= obj.Drag_increase                                                                         #kg, estimate using length and density of AL2024 t3
     else:
         obj.Drag_increase = 1
     
