@@ -145,7 +145,7 @@ def plot_gust(obj):
     labels = ["B'","G'","C'","F'","D'","E'"]
 
     for i in range(len(V)):
-        plt.plot(V[i], n_peak[i], 'ro', color = 'pink')
+        plt.plot(V[i], n_peak[i], 'o', color = 'pink')
         plt.text(V[i], n_peak[i] + 0.35 , s = labels[i], ha='center', va='top')
 
     # Plotting straight lines
