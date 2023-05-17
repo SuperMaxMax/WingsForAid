@@ -223,7 +223,8 @@ def geometry_determination(obj, plot=False):
 
     obj.Qw_wing = ((obj.kq*obj.t_c)/(np.sqrt(1+obj.taper)))*obj.Sw*np.sqrt((obj.Sw/obj.A))
 
-    if obj.strut:
+    if obj.braced_wing:
+        obj.CD0  /= obj.Drag_increase
         kq_strut = 1
         l_strut  = 1.1/np.cos((45*np.pi/180))
         strut_taper = 1
@@ -234,7 +235,8 @@ def geometry_determination(obj, plot=False):
         A_strut  = l_strut**2/S_strut
         Qw_strut = ((kq_strut*tc_strut)/(np.sqrt(1+strut_taper)))*S_strut*np.sqrt(S_strut/A_strut)
         obj.Drag_increase = 1 + Qw_strut/obj.Qw_wing
+        obj.CD0  *= obj.Drag_increase
     else:
         obj.Drag_increase = 1
-    obj.CD0 *= obj.Drag_increase
+    
     
