@@ -20,8 +20,8 @@ def wing_weight(obj):
     return W_w
 
 def tail_weight(obj): #ultimate load factor, tail surface area
-    W_t = 0.64 * (obj.n_ult * obj.s_tail**2)**0.75
-    
+    #W_t = 0.64 * (obj.n_ult * obj.s_tail**2)**0.75
+    W_t = obj.W_OE * 0.04
     # IF TAILPLANE AREA UNKNOWN, WEIGHT ASSUMED TO BE 3.5-4% OF EMPTY WEIGHT
     return W_t
 
