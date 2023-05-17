@@ -233,7 +233,8 @@ def geometry_determination(obj, plot=False):
         tc_strut = t_strut/c_strut
         S_strut  = c_strut * l_strut
         A_strut  = l_strut**2/S_strut
-        Qw_strut = 2*((kq_strut*tc_strut)/(np.sqrt(1+strut_taper)))*S_strut*np.sqrt(S_strut/A_strut)*1.1
+        interference_penalty = 2
+        Qw_strut = 2*((kq_strut*tc_strut)/(np.sqrt(1+strut_taper)))*S_strut*np.sqrt(S_strut/A_strut)*interference_penalty
         obj.Drag_increase = 1 + Qw_strut/obj.Qw_wing
         obj.CD0  *= obj.Drag_increase
     else:
