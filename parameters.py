@@ -6,7 +6,7 @@ class UAV:
         self.name                = name          # Name of the aircraft [-]
 
         "-CS23 Type"
-        self.type                = "normal"      # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
+        self.type                = "utility"      # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
 
         "-Aircraft geometry"
         self.A                   = 10            # Aspect ratio [-]
@@ -59,7 +59,7 @@ class UAV:
 
         "-Propulsive properties"
         self.engine_pos          = engine_pos    # Engine position
-        self.P_TO                = 62            # Power at take-off [hp]
+        self.P_TO                = 80            # Power at take-off [hp]
 
         self.prop_eff            = 0.82          # Propulsive efficiency [-]
         self.eta_p               = self.prop_eff # Propulsive efficiency [-]
