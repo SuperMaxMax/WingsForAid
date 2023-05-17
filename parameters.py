@@ -33,6 +33,7 @@ class UAV:
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
         self.CLa                 = 4.2           # Lift curve slope [] | CHANGE TO ACTUAL VALUE
+        self.Drag_increase       = 1.0           # This is used for the calculations of the strut drag if applicable
 
         # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
         # but this means that CL_max_clean, CL_max_TO and CL_max_land must always be stored in an array. For an array with length 1
