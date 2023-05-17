@@ -126,7 +126,6 @@ def cg_calc(obj):
     plt.grid()
     plt.legend()
     plt.title(f'Mass fraction vs X_cg for {obj.name}')
-    plt.show()
 
     # Save most forward and most aft and fully loaded c.g. in object
     obj.X_cg_fwd = min(xs)
