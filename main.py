@@ -61,7 +61,7 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
     # cg calculation
     plt.figure(1)
     plt.subplot(121)
-    c2cg.cg_calc(concept)
+    c2cg.cg_calc(concept, plot=False)
 
     # V-n diagram
     plt.subplot(122)
