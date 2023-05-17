@@ -76,7 +76,7 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
 
     # remove brackets and round values
     values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
-    values = [round(value, 3) if isinstance(value, float) else value for value in values]
+    values = [round(value, 4) if isinstance(value, float) else value for value in values]
 
     # add to dataframe
     df[concept.name] = values
