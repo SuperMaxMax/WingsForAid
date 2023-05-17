@@ -3,7 +3,9 @@ import Class_I_weight_estimation as c1
 import Class_II_weight_estimation as c2
 import Class_II_cg_estimation as c2cg
 import geometry_determination as geo
+import V_n_diagrams as Vn
 import pandas as pd
+import matplotlib.pyplot as plt
 
 concept_1 = UAV('concept_1', 'tractor', boom=True)
 concept_2 = UAV('concept_2', 'tractor', boom=False)
@@ -14,7 +16,7 @@ concept_5 = UAV('concept_5', 'fuselage', boom=False)
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
 
-for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
+for concept in [concept_1]: # [concept_1, concept_2, concept_3, concept_4, concept_5]:
     # iteration
     n = 1
     it = True
@@ -38,6 +40,9 @@ for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
         print(f"W_OE: {concept.W_OE}, W_TO: {concept.W_TO}")
         W_TO_c2 = concept.W_TO
 
+        # update load factor
+        concept.n_ult = Vn.max_n(concept)*1.5
+
         print("")
         print("-------------------------------------------------")
         print("")
@@ -51,9 +56,17 @@ for concept in [concept_1, concept_2, concept_3, concept_4, concept_5]:
             W_TO_c2_old = W_TO_c2
             n += 1
 
+    # Plotting of concept
     # cg calculation
+    plt.figure(1)
+    plt.subplot(121)
     c2cg.cg_calc(concept)
 
+    # V-n diagram
+    plt.subplot(122)
+    Vn.plot_all(concept)
+    plt.show()
+    
     # save all attributes of object to csv file
     members = [attr for attr in dir(concept) if not callable(getattr(concept, attr)) and not attr.startswith("__")]
     values = [getattr(concept, member) for member in members]
