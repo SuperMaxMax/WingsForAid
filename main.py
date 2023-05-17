@@ -20,7 +20,7 @@ CON_5 = UAV('CON_5', 'fuselage', boom=False, braced_wing=False)
 CON_5_braced = UAV('CON_5_braced', 'fuselage', boom=False, braced_wing=True)
 
 # start
-plot = True
+plot = False
 remove_duplicates = False
 
 # create dataframe with members and values, to save all concepts in
