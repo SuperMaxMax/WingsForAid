@@ -118,8 +118,9 @@ def gust_points(obj):
     V = np.array([obj.V_B, obj.V_B, obj.V_cruise, obj.V_cruise, obj.V_D, obj.V_D]) # DEFINE SPEEDS
     u_hat_fs = np.array([66, 66, 50, 50, 25, 25])   # [f/s]  
     u_hat_ms = u_hat_fs * 0.3048                                  
-
-    mu = 2 * obj.WS / (obj.rho_cruise * obj.g0 * obj.MGC * obj.CLa)  # Airplane mass ratio []
+    rho_cruise = 0.9
+    MGC = 13 / 10
+    mu = 2 * obj.WS / (rho_cruise * obj.g0 * MGC * obj.CLa)  # Airplane mass ratio []
 
     K = 0.88 * mu / (5.3 + mu)                              
 
@@ -188,3 +189,9 @@ def plot_all(obj):
     plot_Vn(obj)
     plot_gust(obj)
     plt.title(f"V-n diagram for {obj.name}")
+    plt.show()
+
+
+CON_1 = UAV('CON_1', 'tractor', boom=True, braced_wing=False)
+
+plot_all(CON_1)
