@@ -36,7 +36,6 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
         # class 1
         print(f"- Iteration number: {n}, concept: {concept.name} - \n")
         c1.run(concept)
-        W_TO_c1 = concept.W_TO
         
         # geometry determination
         geo.geometry_determination(concept)

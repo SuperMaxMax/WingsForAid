@@ -57,7 +57,6 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
             while it:
                 # class 1
                 c1.run(concept_analysis)
-                W_TO_c1 = concept_analysis.W_TO
                 
                 # geometry determination
                 geo.geometry_determination(concept_analysis)
