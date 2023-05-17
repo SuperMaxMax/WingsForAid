@@ -16,6 +16,10 @@ concept_5 = UAV('concept_5', 'fuselage', boom=False, braced_wing=False)
 test_concept_1 = UAV('test_concept_1', 'tractor', boom=False, braced_wing=False)
 test_concept_2 = UAV('test_concept_2', 'tractor', boom=False, braced_wing=True)
 
+# start
+plot = False
+remove_duplicates = False
+
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
 
@@ -69,7 +73,8 @@ for concept in [test_concept_1, test_concept_2]: # [concept_1, concept_2, concep
     # V-n diagram
     plt.subplot(122)
     Vn.plot_all(concept)
-    # plt.show()
+    if plot == True:
+        plt.show()
     
     # --- saving
     # save all attributes of object to csv file
@@ -86,10 +91,10 @@ for concept in [test_concept_1, test_concept_2]: # [concept_1, concept_2, concep
 df.index = members
 
 # remove row in dataframe if all values in that row are the same
-for i in df.index:
-    print(df.loc[i].values)
-    if all(element == df.loc[i].values[0] for element in df.loc[i].values):
-        df.drop(i, inplace=True)
-
+if remove_duplicates == True:
+    for i in df.index:
+        if all(element == df.loc[i].values[0] for element in df.loc[i].values):
+            df.drop(i, inplace=True)
+        
 # save dataframe to csv file
 df.to_csv('concept_comparison.csv', sep=';')
