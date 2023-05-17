@@ -13,7 +13,7 @@ concept_3 = UAV('concept_3', 'pusher', boom=False, braced_wing=False)
 concept_4 = UAV('concept_4', 'pusher', boom=False, braced_wing=False)
 concept_5 = UAV('concept_5', 'fuselage', boom=False, braced_wing=False)
 
-test_concept_1 = UAV('test_concept_1', 'tractor', boom=False, braced_wing=True)
+test_concept_1 = UAV('test_concept_1', 'tractor', boom=False, braced_wing=False)
 test_concept_2 = UAV('test_concept_2', 'tractor', boom=False, braced_wing=True)
 
 # create dataframe with members and values, to save all concepts in
