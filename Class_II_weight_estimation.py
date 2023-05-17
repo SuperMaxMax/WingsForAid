@@ -109,7 +109,6 @@ def propulsion_weight(obj):
 def weight_empty(obj):
     obj.W_w = wing_weight(obj)
     obj.W_t = tail_weight(obj)
-    obj.W_boom = tail_boom_weight(obj)
     obj.W_uc = gear_weight(obj)
     obj.W_n = nacelle_weight(obj)
     obj.W_eq = equipment_weight(obj)
@@ -118,8 +117,6 @@ def weight_empty(obj):
     obj.W_pg = propulsion_weight(obj)
 
     obj.W_OE = obj.W_w + obj.W_t + obj.W_uc + obj.W_n + obj.W_eq + obj.W_fus + obj.W_sc + obj.W_pg
-
-    print(f'boom: {obj.W_boom}')
 
     if obj.boom == True:
         obj.W_boom = tail_boom_weight(obj)
