@@ -7,16 +7,19 @@ import V_n_diagrams as Vn
 import pandas as pd
 import matplotlib.pyplot as plt
 
-concept_1 = UAV('concept_1', 'tractor', boom=True)
-concept_2 = UAV('concept_2', 'tractor', boom=False)
-concept_3 = UAV('concept_3', 'pusher', boom=False)
-concept_4 = UAV('concept_4', 'pusher', boom=False)
-concept_5 = UAV('concept_5', 'fuselage', boom=False)
+concept_1 = UAV('concept_1', 'tractor', boom=True, braced_wing=False)
+concept_2 = UAV('concept_2', 'tractor', boom=False, braced_wing=False)
+concept_3 = UAV('concept_3', 'pusher', boom=False, braced_wing=False)
+concept_4 = UAV('concept_4', 'pusher', boom=False, braced_wing=False)
+concept_5 = UAV('concept_5', 'fuselage', boom=False, braced_wing=False)
+
+test_concept_1 = UAV('test_concept_1', 'tractor', boom=False, braced_wing=True)
+test_concept_2 = UAV('test_concept_2', 'tractor', boom=False, braced_wing=True)
 
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
 
-for concept in [concept_1]: # [concept_1, concept_2, concept_3, concept_4, concept_5]:
+for concept in [test_concept_1, test_concept_2]: # [concept_1, concept_2, concept_3, concept_4, concept_5]:
     # iteration
     n = 1
     it = True
