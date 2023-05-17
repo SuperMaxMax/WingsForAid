@@ -13,7 +13,7 @@ class UAV:
         self.A                   = 8             # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.b                   = 11            # Wing span [m]
-        self.MGC                 = self.Sw / self.b #Mean geometric chord [m]
+        self.MGC                 = self.Sw / self.b # Mean geometric chord [m]
         self.braced_wing         = False         # True if wing is braced
 
         self.s_tail              = 2             # Tail surface area [m]
@@ -23,7 +23,7 @@ class UAV:
         self.W_boom              = 20            # Boom weight [kg]
         self.l_f_boom            = 2             # Boom length [m]
 
-        self.xc_OEW_p            = 0.2          # Center of gravity of OEW as a fraction of the fuselage length [-]
+        self.xc_OEW_p            = 0.2           # Center of gravity of OEW as a fraction of the fuselage length [-]
 
         self.pos_main_carriage   = "fuselage"    # Position of main carriage: "fuselage" or "wing"
         self.main_gear_type      = "fixed"       # Type of main gear: "fixed" or "retractable"
@@ -31,7 +31,7 @@ class UAV:
 
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
-        self.CLa                 = 4.2          # Lift curve slope [] | CHANGE TO ACTUAL VALUE
+        self.CLa                 = 4.2           # Lift curve slope [] | CHANGE TO ACTUAL VALUE
 
         # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
         # but this means that CL_max_clean, CL_max_TO and CL_max_land must always be stored in an array. For an array with length 1
@@ -59,7 +59,7 @@ class UAV:
         self.cruise_frac         = self.W1W_TO*self.W2W1*self.W3W2*self.W4W3*0.85   # Assume halfway through the cruise with cruise fuel fraction 0.3
 
         "-Propulsive properties"
-        self.engine_pos          = engine_pos     # Engine position
+        self.engine_pos          = engine_pos    # Engine position
         self.P_TO                = 62            # Power at take-off [hp]
 
         self.prop_eff            = 0.82          # Propulsive efficiency [-]
@@ -87,13 +87,11 @@ class UAV:
         self.n_ult               = 3.8 * 1.5     # Ultimate load factor [-]
 
         "-Speeds"
-        self.V_s_min             = 50*(1.852/3.6)    # Dropping speed [m/s]
-        self.V_cruise            = 116.81720335635501*(1.852/3.6)   # Cruise speed [m/s]
-        # self.V_TO_max            = 1.1*self.V_s_max  # Maximum take off speed [m/s]
-        # self.V_TO_min            = 1.1*self.V_s_min  # Minimum take off speed [m/s]
-        self.V_climb             = 70*(1.852/3.6)    # Climb speed [m/s]
-        self.V_D                 = 163.544084698897*0.514444      # Dive speed [m/s]
-        self.V_B                 = 42.22453478127882 # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
+        self.V_s_min             = 50*(1.852/3.6)       # Dropping speed [m/s]
+        self.V_cruise            = 116.82*(1.852/3.6)   # Cruise speed [m/s]
+        self.V_climb             = 70*(1.852/3.6)       # Climb speed [m/s]
+        self.V_D                 = 163.54*0.514444      # Dive speed [m/s]
+        self.V_B                 = 42.22                # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
 
         "-Atmospheric properties"
         self.rho0                = 1.225         # [kg/m^3]
