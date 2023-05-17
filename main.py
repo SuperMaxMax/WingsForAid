@@ -20,10 +20,11 @@ test_concept_2 = UAV('test_concept_2', 'tractor', boom=False, braced_wing=True)
 df = pd.DataFrame()
 
 for concept in [test_concept_1, test_concept_2]: # [concept_1, concept_2, concept_3, concept_4, concept_5]:
-    # iteration
+    # --- iteration
     n = 1
     it = True
     W_TO_c2_old = 750
+
     while it:
         # class 1
         print(f"- Iteration number: {n}, concept: {concept.name} - \n")
@@ -59,7 +60,7 @@ for concept in [test_concept_1, test_concept_2]: # [concept_1, concept_2, concep
             W_TO_c2_old = W_TO_c2
             n += 1
 
-    # Plotting of concept
+    # --- plotting of concept
     # cg calculation
     plt.figure(1)
     plt.subplot(121)
@@ -68,8 +69,9 @@ for concept in [test_concept_1, test_concept_2]: # [concept_1, concept_2, concep
     # V-n diagram
     plt.subplot(122)
     Vn.plot_all(concept)
-    plt.show()
+    # plt.show()
     
+    # --- saving
     # save all attributes of object to csv file
     members = [attr for attr in dir(concept) if not callable(getattr(concept, attr)) and not attr.startswith("__")]
     values = [getattr(concept, member) for member in members]
@@ -83,5 +85,11 @@ for concept in [test_concept_1, test_concept_2]: # [concept_1, concept_2, concep
 # set index of dataframe
 df.index = members
 
+# remove row in dataframe if all values in that row are the same
+for i in df.index:
+    print(df.loc[i].values)
+    if all(element == df.loc[i].values[0] for element in df.loc[i].values):
+        df.drop(i, inplace=True)
+
 # save dataframe to csv file
-df.to_csv('output.csv', sep=';')
+df.to_csv('concept_comparison.csv', sep=';')
