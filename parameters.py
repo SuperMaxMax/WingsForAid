@@ -10,11 +10,12 @@ class UAV:
 
         "-Aircraft geometry"
         self.Sw                  = 13            # Surface area [m2] # Sw,b and MGC to be removed -> then V_n diagrams should be created after iteration instead of separate
-        self.A                   = 8             # Aspect ratio [-]
+        self.A                   = 10            # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.b                   = 11            # Wing span [m]
         self.MGC                 = self.Sw / self.b #Mean geometric chord [m]
         self.braced_wing         = False         # True if wing is braced
+        self.kq                  = 0.95          # Volume factor used to calculate wetted area of the wing
 
         self.s_tail              = 2             # Tail surface area [m]
         self.l_t                 = 3.5           # Tail arm [m]
