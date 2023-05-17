@@ -144,8 +144,10 @@ def geometry_determination(obj, plot=False):
     obj.w_out = 1.40
     obj.w_in  = 1.20
     obj.l_f   = cumulative_box_length + length_between_boxes + engine_length + engine_fairing + l_tc + d_engine_boxes
-    obj.S_G   = obj.l_f*np.pi*obj.d_eff + 2*np.pi*(obj.d_eff/2)**2
-
+    if obj.boom:
+        obj.S_G = 19.77
+    else:
+        obj.S_G = 22.98
     # --- Wing parameters
     Weight_TO = obj.W_TO*obj.g0                                 # find the take off weight in newtons
     WS_values = design_points[0:12:2]                           # take the S/W values
