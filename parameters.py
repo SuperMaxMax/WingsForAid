@@ -27,6 +27,7 @@ class UAV:
         self.main_gear_type      = "fixed"       # Type of main gear: "fixed" or "retractable"
         self.nose_gear_type      = "fixed"       # Type of nose gear: "fixed" or "retractable"
 
+        self.mass_penalty_struts  = 7
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
         self.CLa                 = 4.2           # Lift curve slope [] | CHANGE TO ACTUAL VALUE
