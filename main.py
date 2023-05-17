@@ -7,23 +7,25 @@ import V_n_diagrams as Vn
 import pandas as pd
 import matplotlib.pyplot as plt
 
-concept_1 = UAV('concept_1', 'tractor', boom=True, braced_wing=False)
-concept_2 = UAV('concept_2', 'tractor', boom=False, braced_wing=False)
-concept_3 = UAV('concept_3', 'pusher', boom=False, braced_wing=False)
-concept_4 = UAV('concept_4', 'pusher', boom=False, braced_wing=False)
-concept_5 = UAV('concept_5', 'fuselage', boom=False, braced_wing=False)
-
-test_concept_1 = UAV('test_concept_1', 'tractor', boom=False, braced_wing=False)
-test_concept_2 = UAV('test_concept_2', 'tractor', boom=False, braced_wing=True)
+CON_1 = UAV('CON_1', 'tractor', boom=True, braced_wing=False)
+CON_1_braced = UAV('CON_1_braced', 'tractor', boom=True, braced_wing=True)
+CON_2 = UAV('CON_2', 'tractor', boom=False, braced_wing=False)
+CON_2_braced = UAV('CON_2_braced', 'tractor', boom=False, braced_wing=True)
+CON_3 = UAV('CON_3', 'pusher', boom=False, braced_wing=False)
+CON_3_braced = UAV('CON_3_braced', 'pusher', boom=False, braced_wing=True)
+CON_4 = UAV('CON_4', 'pusher', boom=False, braced_wing=False)
+CON_4_braced = UAV('CON_4_braced', 'pusher', boom=False, braced_wing=True)
+CON_5 = UAV('CON_5', 'fuselage', boom=False, braced_wing=False)
+CON_5_braced = UAV('CON_5_braced', 'fuselage', boom=False, braced_wing=True)
 
 # start
 plot = False
-remove_duplicates = False
+remove_duplicates = True
 
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
 
-for concept in [test_concept_1, test_concept_2]: # [concept_1, concept_2, concept_3, concept_4, concept_5]:
+for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, CON_4, CON_4_braced, CON_5, CON_5_braced]:
     # --- iteration
     n = 1
     it = True
@@ -33,29 +35,19 @@ for concept in [test_concept_1, test_concept_2]: # [concept_1, concept_2, concep
         # class 1
         print(f"- Iteration number: {n}, concept: {concept.name} - \n")
         c1.run(concept)
-        print("After class 1 iteration:")
-        print(f"Mff: {concept.Mff}, L/D: {concept.L_D}, W_TO: {concept.W_TO}, W_OE: {concept.W_OE}, W_F: {concept.W_F}")
         W_TO_c1 = concept.W_TO
         
         # geometry determination
         geo.geometry_determination(concept)
-        print("After geometry determination:")
-        print(f"b: {concept.b} Sw: {concept.Sw} S_G: {concept.S_G}")
 
         # class 2
         c2.weight_empty(concept)
-        print("After class 2 iteration:")
-        print(f"W_OE: {concept.W_OE}, W_TO: {concept.W_TO}")
         W_TO_c2 = concept.W_TO
 
         # update load factor
         concept.n_ult = Vn.max_n(concept)*1.5
 
-        print("")
-        print("-------------------------------------------------")
-        print("")
-
-        # iterate between class 1 and class 2
+        # check if change is small enough
         change = (W_TO_c2 - W_TO_c2_old)/W_TO_c2_old
 
         if abs(change) < 0.00001:
