@@ -180,8 +180,6 @@ def plot_gust(obj):
     plt.text(10, max_n(obj) + 0.3 , s = "max n", ha='center', va='top', color = 'red', fontsize = 12)
 
     
-    plt.show()
-
 
 
 def VC_lim_low(obj):
@@ -208,14 +206,13 @@ def VB_lim_low(obj): #Cant be greater than VC
     return V_S * n_c**0.5 #[m/s]
 
 
-print(VC_lim_low(concept))
-print(VD_lim_low(concept))
-print(VA_lim_low(concept))
-print(VB_lim_low(concept))
+def plot_all(obj):
+    plot_Vn(obj)
+    plot_gust(obj)
+    plt.show()
 
 
 #print(guessV_B(concept))
-concept.n_ult = max_n(concept)
+concept.n_ult = max_n(concept) * 1.5
+plot_all(concept)
 
-plot_Vn(concept)
-plot_gust(concept)
