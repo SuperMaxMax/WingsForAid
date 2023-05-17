@@ -53,6 +53,7 @@ def cg_calc(obj):
     # X_LEMAC and xc_OEW
     xc_OEW = obj.xc_OEW_p*obj.MAC_length
     X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
+    obj.X_LEMAC = X_LEMAC
 
     # Final CG
     W_OEW = W_wing_gr+W_fus_gr
