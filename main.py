@@ -6,6 +6,7 @@ import geometry_determination as geo
 import V_n_diagrams as Vn
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 CON_1 = UAV('CON_1', 'tractor', boom=True, braced_wing=False)
 CON_1_braced = UAV('CON_1_braced', 'tractor', boom=True, braced_wing=True)
@@ -20,7 +21,7 @@ CON_5_braced = UAV('CON_5_braced', 'fuselage', boom=False, braced_wing=True)
 
 # start
 plot = False
-remove_duplicates = True
+remove_duplicates = False
 
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
@@ -60,7 +61,7 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
     # cg calculation
     plt.figure(1)
     plt.subplot(121)
-    c2cg.cg_calc(concept)
+    c2cg.cg_calc(concept, plot=False)
 
     # V-n diagram
     plt.subplot(122)
@@ -73,8 +74,9 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
     members = [attr for attr in dir(concept) if not callable(getattr(concept, attr)) and not attr.startswith("__")]
     values = [getattr(concept, member) for member in members]
 
-    # round values
-    values = [round(value, 3) if isinstance(value, float) else value for value in values]
+    # remove brackets and round values
+    values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
+    values = [round(value, 4) if isinstance(value, float) else value for value in values]
 
     # add to dataframe
     df[concept.name] = values
