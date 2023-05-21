@@ -83,6 +83,9 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
 # set index of dataframe
 df.index = members
 
+# export dataframe of current design to csv file
+df['CON_1_braced'].to_csv('output.csv', sep=';')
+
 # remove row in dataframe if all values in that row are the same
 if remove_duplicates == True:
     for i in df.index:
