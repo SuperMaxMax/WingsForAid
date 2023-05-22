@@ -18,8 +18,8 @@ DET_CON_4 = UAV('DET_CON_4', 'pusher', boom=True, braced_wing=False)
 DET_CON_4_braced = UAV('DET_CON_4_braced', 'pusher', boom=True, braced_wing=True)
 DET_CON_5 = UAV('DET_CON_5', 'fuselage', boom=False, braced_wing=False)
 DET_CON_5_braced = UAV('DET_CON_5_braced', 'fuselage', boom=False, braced_wing=True)
-DET_CON_6 = UAV('DET_CON_5', 'fuselage', boom=True, braced_wing=False)
-DET_CON_6_braced = UAV('DET_CON_5_braced', 'fuselage', boom=True, braced_wing=True)
+DET_CON_6 = UAV('DET_CON_6', 'fuselage', boom=True, braced_wing=False)
+DET_CON_6_braced = UAV('DET_CON_6_braced', 'fuselage', boom=True, braced_wing=True)
 
 # start
 plot = False
