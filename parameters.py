@@ -29,7 +29,7 @@ class UAV:
 
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
-        self.CLa                 = 4.2           # Lift curve slope [] | CHANGE TO ACTUAL VALUE
+        self.CLa                 = 4.4           # Lift curve slope [] | CHANGE TO ACTUAL VALUE
         self.Drag_increase       = 1.0           # This is used for the calculations of the strut drag if applicable
 
         # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
@@ -83,7 +83,7 @@ class UAV:
         
         self.LDG_dist            = 750           # Landing distance [m]
 
-        self.n_ult               = 3.8 * 1.5     # Ultimate load factor [-]
+        self.n_ult               = 4.4 * 1.5     # Ultimate load factor [-]
 
         "-Speeds"
         self.V_s_min             = 50*(1.852/3.6)       # Dropping speed [m/s]
