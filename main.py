@@ -28,7 +28,7 @@ remove_duplicates = False
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
 
-for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, CON_4, CON_4_braced, CON_5, CON_5_braced]:
+for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, CON_4, CON_4_braced, CON_5, CON_5_braced, CON_6, CON_6_braced]:
     # --- iteration
     n = 1
     it = True
