@@ -34,7 +34,6 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
 
     while it:
         # class 1
-        print(f"- Iteration number: {n}, concept: {concept.name} - \n")
         c1.run(concept)
         
         # geometry determination
@@ -57,6 +56,7 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
             n += 1
 
     # --- plotting of concept
+    print(f"{concept.name} done in {n} iterations \n")
     # cg calculation
     plt.figure(1)
     plt.subplot(121)
