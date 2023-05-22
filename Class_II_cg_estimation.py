@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from numpy import dot
 
 def cg_calc(obj):
     # --- Wing group
@@ -70,58 +71,51 @@ def cg_calc(obj):
         dist_front = 0.4
     elif obj.engine_pos == 'fuselage':
         dist_front = 0.4
-    
-    # 2 boxes in front
-    W_2box_f = 1/6*obj.W_PL
-    X_2box_f = dist_front + 0.2
-    # 4 boxes in the front
-    W_4box_f = 1/3*obj.W_PL
-    X_4box_f = dist_front + 0.5
-    # 2 boxes in back
-    W_2box_b = 1/6*obj.W_PL
-    X_2box_b = dist_front + 3.2
-    # 4 boxes in back
-    W_4box_b = 1/3*obj.W_PL
-    X_4box_b = dist_front + 2.9
-    # all boxes
-    W_allbox = obj.W_PL
-    X_allbox = dist_front + 1.7
 
-    # Calculate points to plot
+    obj.n_abrest = 2
+
+    if obj.n_abrest == 2:
+        box_configs = [[2,0,0,0,0,0], [0,2,0,0,0,0], [0,0,2,0,0,0], [0,0,0,2,0,0], [0,0,0,0,2,0], [0,0,0,0,0,2], [2,2,0,0,0,0], [0,2,2,0,0,0], [0,0,2,2,0,0], [0,0,0,2,2,0], [0,0,0,0,2,2], [2,2,2,0,0,0], [0,2,2,2,0,0], [0,0,2,2,2,0], [0,0,0,2,2,2], [2,2,2,2,0,0], [0,2,2,2,2,0], [0,0,2,2,2,2], [2,2,2,2,2,0], [0,2,2,2,2,2], [2,2,2,2,2,2]]
+        labels = ['200000', '020000', '002000', '000200', '000020', '000002', '220000', '022000', '002200', '000220', '000022', '222000', '022200', '002220', '000222', '222200', '022220', '002222', '222220', '022222', '222222']
+        box_xs = [dist_front+0.2, dist_front+0.8, dist_front+1.4, dist_front+2.0, dist_front+2.6, dist_front+3.2]   
+    elif obj.n_abrest == 3:
+        box_configs = [[3,0,0,0], [0,3,0,0], [0,0,3,0], [0,0,0,3], [3,3,0,0], [0,3,3,0], [0,0,3,3], [3,3,3,0], [0,3,3,3], [3,3,3,3]]
+        labels = ['3000', '0300', '0030', '0003', '3300', '0330', '0033', '3330', '0333', '3333']
+        box_xs = [dist_front+0.2, dist_front+0.8, dist_front+1.4, dist_front+2.0]
+
+    box_weights = [sum(i)*20 for i in box_configs]
+    box_xcg_positions = [dot(i, box_xs)/sum(i) for i in box_configs]
+    
     # OEW + fuel
     W_OEW_fuel_frac = (W_OEW + W_fuel_wi)/obj.W_TO
     X_OEW_fuel = (W_OEW*X_OEW + W_fuel_wi*X_fuel_wi)/(W_OEW + W_fuel_wi)
-    # OEW + fuel + 2 boxes in front
-    W_OEW_fuel_2box_f_frac = W_OEW_fuel_frac + W_2box_f/obj.W_TO
-    X_OEW_fuel_2box_f = (W_OEW_fuel_frac*X_OEW_fuel + W_2box_f*X_2box_f)/(W_OEW_fuel_frac + W_2box_f)
-    # OEW + fuel + 4 boxes in front
-    W_OEW_fuel_4box_f_frac = W_OEW_fuel_frac + W_4box_f/obj.W_TO
-    X_OEW_fuel_4box_f = (W_OEW_fuel_frac*X_OEW_fuel + W_4box_f*X_4box_f)/(W_OEW_fuel_frac + W_4box_f)
-    # OEW + fuel + 2 boxes in back
-    W_OEW_fuel_2box_b_frac = W_OEW_fuel_frac + W_2box_b/obj.W_TO
-    X_OEW_fuel_2box_b = (W_OEW_fuel_frac*X_OEW_fuel + W_2box_b*X_2box_b)/(W_OEW_fuel_frac + W_2box_b)
-    # OEW + fuel + 4 boxes in back
-    W_OEW_fuel_4box_b_frac = W_OEW_fuel_frac + W_4box_b/obj.W_TO
-    X_OEW_fuel_4box_b = (W_OEW_fuel_frac*X_OEW_fuel + W_4box_b*X_4box_b)/(W_OEW_fuel_frac + W_4box_b)
-    # OEW + fuel + all boxes
-    W_OEW_fuel_allbox_frac = W_OEW_fuel_frac + W_allbox/obj.W_TO
-    X_OEW_fuel_allbox = (W_OEW_fuel_frac*X_OEW_fuel + W_allbox*X_allbox)/(W_OEW_fuel_frac + W_allbox)
+
+    # OEW + fuel + box configurations
+    W_OEW_fuel_box_frac = [W_OEW_fuel_frac + i/obj.W_TO for i in box_weights]
+    X_OEW_fuel_box = [((W_OEW+W_fuel_wi)*X_OEW_fuel + i*X_box)/(W_OEW+W_fuel_wi+i) for i, X_box in zip(box_weights, box_xcg_positions)]
 
     # Plot each point
-    xs = [X_OEW, X_fuel_wi, X_2box_f, X_4box_f, X_2box_b, X_4box_b, X_allbox]
-    w_fracs = [W_OEW/obj.W_TO, W_OEW_fuel_frac, W_OEW_fuel_2box_f_frac, W_OEW_fuel_4box_f_frac, W_OEW_fuel_2box_b_frac, W_OEW_fuel_4box_b_frac, W_OEW_fuel_allbox_frac]
-    labels = ['OEW', 'OEW + Fuel', 'OEW + Fuel + 2 boxes front', 'OEW + Fuel + 4 boxes front', 'OEW + Fuel + 2 boxes back', 'OEW + Fuel + 4 boxes back', 'OEW + Fuel + all boxes']
-    # plot points with labels
-    for x, w, label in zip(xs, w_fracs, labels):
-        plt.scatter(x, w, label=label)
-    plt.xlabel('X_cg [m]')
+    Xs = [X_OEW, X_OEW_fuel] + X_OEW_fuel_box
+    Xs = (Xs-X_LEMAC)/obj.MAC_length
+    w_fracs = [W_OEW/obj.W_TO, W_OEW_fuel_frac] + W_OEW_fuel_box_frac
+    labels = ['OEW', 'OEW + Fuel'] + labels
+    for x, w, label in zip(Xs, w_fracs, labels):
+        plt.scatter(x, w)
+        plt.annotate(label, (x, w), textcoords="offset points", xytext=(0,10), ha='center', rotation=90, fontsize=9)
+            
+    # Plot lines at 0%, 10%, 40% and 100% MAC
+    plt.axvline(x=0, linestyle='--', color='red', label='0% MAC')
+    plt.axvline(x=1, linestyle=':', color='red', label='100% MAC')
+    plt.axvline(x=0.1, linestyle='--', color='blue', label='10% MAC')
+    plt.axvline(x=0.4, linestyle=':', color='blue', label='40% MAC')
+    plt.xlabel('X_cg/MAC [-]')
     plt.ylabel('Mass fraction [-]')
     plt.grid()
     plt.legend()
-    plt.title(f'Mass fraction vs X_cg for {obj.name}')
+    plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}')
 
     # Save most forward and most aft and fully loaded c.g. in object
-    obj.X_cg_fwd = min(xs)
-    obj.X_cg_aft = max(xs)
+    obj.X_cg_fwd = min(Xs)
+    obj.X_cg_aft = max(Xs)
     obj.X_cg_range = obj.X_cg_aft - obj.X_cg_fwd
-    obj.X_cg_full = X_OEW_fuel_allbox
+    obj.X_cg_full = Xs[-1]
