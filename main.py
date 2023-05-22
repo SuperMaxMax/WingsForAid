@@ -8,18 +8,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-CON_1 = UAV('CON_1', 'tractor', boom=False, braced_wing=False)
-CON_1_braced = UAV('CON_1_braced', 'tractor', boom=False, braced_wing=True)
-CON_2 = UAV('CON_2', 'tractor', boom=True, braced_wing=False)
-CON_2_braced = UAV('CON_2_braced', 'tractor', boom=True, braced_wing=True)
-CON_3 = UAV('CON_3', 'pusher', boom=False, braced_wing=False)
-CON_3_braced = UAV('CON_3_braced', 'pusher', boom=False, braced_wing=True)
-CON_4 = UAV('CON_4', 'pusher', boom=True, braced_wing=False)
-CON_4_braced = UAV('CON_4_braced', 'pusher', boom=True, braced_wing=True)
-CON_5 = UAV('CON_5', 'fuselage', boom=False, braced_wing=False)
-CON_5_braced = UAV('CON_5_braced', 'fuselage', boom=False, braced_wing=True)
-CON_6 = UAV('CON_5', 'fuselage', boom=True, braced_wing=False)
-CON_6_braced = UAV('CON_5_braced', 'fuselage', boom=True, braced_wing=True)
+DET_CON_1 = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
+DET_CON_1_braced = UAV('DET_CON_1_braced', 'tractor', boom=False, braced_wing=True)
+DET_CON_2 = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=False)
+DET_CON_2_braced = UAV('DET_CON_2_braced', 'tractor', boom=True, braced_wing=True)
+DET_CON_3 = UAV('DET_CON_3', 'pusher', boom=False, braced_wing=False)
+DET_CON_3_braced = UAV('DET_CON_3_braced', 'pusher', boom=False, braced_wing=True)
+DET_CON_4 = UAV('DET_CON_4', 'pusher', boom=True, braced_wing=False)
+DET_CON_4_braced = UAV('DET_CON_4_braced', 'pusher', boom=True, braced_wing=True)
+DET_CON_5 = UAV('DET_CON_5', 'fuselage', boom=False, braced_wing=False)
+DET_CON_5_braced = UAV('DET_CON_5_braced', 'fuselage', boom=False, braced_wing=True)
+DET_CON_6 = UAV('DET_CON_5', 'fuselage', boom=True, braced_wing=False)
+DET_CON_6_braced = UAV('DET_CON_5_braced', 'fuselage', boom=True, braced_wing=True)
 
 # start
 plot = False
@@ -28,7 +28,7 @@ remove_duplicates = False
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
 
-for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, CON_4, CON_4_braced, CON_5, CON_5_braced, CON_6, CON_6_braced]:
+for concept in [DET_CON_1, DET_CON_1_braced, DET_CON_2, DET_CON_2_braced, DET_CON_3, DET_CON_3_braced, DET_CON_4, DET_CON_4_braced, DET_CON_5, DET_CON_5_braced, DET_CON_6, DET_CON_6_braced]:
     # --- iteration
     n = 1
     it = True
@@ -86,7 +86,7 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
 df.index = members
 
 # export dataframe of current design to csv file
-df['CON_1_braced'].to_csv('output.csv', sep=';')
+df['DET_CON_1_braced'].to_csv('output.csv', sep=';')
 
 # remove row in dataframe if all values in that row are the same
 if remove_duplicates == True:
