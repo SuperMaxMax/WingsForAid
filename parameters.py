@@ -21,7 +21,7 @@ class UAV:
         self.W_boom              = 20           # Boom weight [kg]
         self.l_f_boom            = 2            # Boom length [m]
 
-        self.xc_OEW_p            = 0.2          # Center of gravity of OEW as a fraction of the fuselage length [-]
+        self.xc_OEW_p            = 0.25         # Center of gravity of OEW as a fraction of the MAC [-]
 
         self.pos_main_carriage   = "fuselag"    # Position of main carriage: "fuselage" or "wing" [-]
         self.main_gear_type      = "fixed"      # Type of main gear: "fixed" or "retractable" [-]
