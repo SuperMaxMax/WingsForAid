@@ -186,6 +186,8 @@ def plot_Vn(obj):
     plt.text(F_x, 0.3 , s = 'Vc', ha='center', va='top')
     plt.text(E_x - 3, 0.3 , s = 'Vd', ha='center', va='top')
 
+
+
     # Plot y=1
     plt.axhline(y = 1, linestyle = "--", linewidth = "1", color = "black")
 
@@ -236,8 +238,23 @@ def plot_gust(obj):
     plt.plot([V[3], V[5]], [n_peak[3], n_peak[5]], color = 'pink')             #Between F' and E'
     plt.plot([V[4], V[5]], [n_peak[4], n_peak[5]], color = 'pink')             #Between D' and E'
 
+
+    n_max = CS23_max(obj)
+    n_min = CS23_min(obj)
+
+    # Plot V_C
+    bottom, top = -1 * np.ceil(n_min * -1.2 * 2) / 2, np.ceil(n_max*1.1 * 2) / 2
+    y_range = top - bottom
+    y0_frac_VA = (abs(bottom)) / y_range
+    y1_frac_VA = (abs(bottom) + n_peak[0]) / y_range
+    
+    plt.axvline(x = V[0], ymin = y0_frac_VA, ymax = y1_frac_VA, linestyle = "--", linewidth = "1", color = "black")
+    plt.text(V[0] - 3, 0.3 , s = 'Vb', ha='center', va='top')
+
     plt.axhline(y = max_n(obj), linestyle = "--", linewidth = "1.5", color = "red")
-    plt.text(10, max_n(obj) + 0.3 , s = "max n", ha='center', va='top', color = 'red', fontsize = 12)
+    plt.text(10, max_n(obj) + 0.3 , s = "max n", ha='center', va='top', color = 'red', fontsize = 12)   
+    
+
     
 
 def plot_all(obj):
