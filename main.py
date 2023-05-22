@@ -8,16 +8,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-CON_1 = UAV('CON_1', 'tractor', boom=True, braced_wing=False)
-CON_1_braced = UAV('CON_1_braced', 'tractor', boom=True, braced_wing=True)
-CON_2 = UAV('CON_2', 'tractor', boom=False, braced_wing=False)
-CON_2_braced = UAV('CON_2_braced', 'tractor', boom=False, braced_wing=True)
+CON_1 = UAV('CON_1', 'tractor', boom=False, braced_wing=False)
+CON_1_braced = UAV('CON_1_braced', 'tractor', boom=False, braced_wing=True)
+CON_2 = UAV('CON_2', 'tractor', boom=True, braced_wing=False)
+CON_2_braced = UAV('CON_2_braced', 'tractor', boom=True, braced_wing=True)
 CON_3 = UAV('CON_3', 'pusher', boom=False, braced_wing=False)
 CON_3_braced = UAV('CON_3_braced', 'pusher', boom=False, braced_wing=True)
-CON_4 = UAV('CON_4', 'pusher', boom=False, braced_wing=False)
-CON_4_braced = UAV('CON_4_braced', 'pusher', boom=False, braced_wing=True)
+CON_4 = UAV('CON_4', 'pusher', boom=True, braced_wing=False)
+CON_4_braced = UAV('CON_4_braced', 'pusher', boom=True, braced_wing=True)
 CON_5 = UAV('CON_5', 'fuselage', boom=False, braced_wing=False)
 CON_5_braced = UAV('CON_5_braced', 'fuselage', boom=False, braced_wing=True)
+CON_6 = UAV('CON_5', 'fuselage', boom=True, braced_wing=False)
+CON_6_braced = UAV('CON_5_braced', 'fuselage', boom=True, braced_wing=True)
 
 # start
 plot = False
