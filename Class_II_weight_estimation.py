@@ -102,7 +102,6 @@ def control_surface_weight(obj):
 def propulsion_weight(obj):
     k_pg = 1.16 # tractor single propeller aircraft
     W_pg = k_pg*obj.N_e*(obj.W_e+0.109*obj.P_TO)
-
     # If number of cylinder and volume of cylinder are known use figure 4-12 Torenbeek
     return W_pg
 
