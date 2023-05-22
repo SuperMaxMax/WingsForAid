@@ -2,6 +2,89 @@ import matplotlib.pyplot as plt
 import numpy as np
 from parameters import UAV
 
+
+def VC_lim_low(obj):
+    return 33 * (obj.WS * 0.020885) ** 0.5 * 0.51444 #[m/s]
+
+def VD_lim_low(obj):
+    return 1.4 * VC_lim_low(obj)    #[m/s]
+
+def VA_lim_low(obj): #Cant be greater than VC
+    V, n_pos, n_neg = stall_req(obj)
+    V_S = np.interp(1, n_pos, V)
+
+    n = CS23_max(obj)
+
+    return V_S * n**0.5 #[m/s]
+
+def VS1(obj):
+    return ((2 * obj.WS) / (1.225 * obj.CL_max_clean )) ** 0.5
+
+
+def stall_req(obj):
+    step = 0.5
+    V_D = VD_lim_low(obj)
+    V = np.arange(0, V_D*1.1 + step, step)
+    n_pos = 0.5 * 1.225 * V**2 * obj.CL_max_land / obj.WS               #DENSITY?  #WHICH CL_max?
+    n_neg = n_pos * -1
+
+    return V, n_pos, n_neg
+
+
+def VB_lim_low(obj): #Cant be greater than VC
+
+    V = VC_lim_low(obj)              # DEFINE SPEEDS
+    u_hat_fs = 50              # [f/s]  
+    u_hat_ms = u_hat_fs * 0.3048                                  
+    rho_cruise = 0.9
+    MGC = 13 / 10
+    mu = 2 * obj.WS / (rho_cruise * obj.g0 * MGC * obj.CLa)  # Airplane mass ratio []
+
+    K = 0.88 * mu / (5.3 + mu)                              
+
+    u = K * u_hat_ms
+
+    delta_n = obj.rho0 * V * obj.CLa * u / (2 * obj.WS)
+    
+    n_c = 1 + delta_n
+
+    V, n_pos, n_neg = stall_req(obj)
+    V_S1 = VS1(obj)
+    
+    VB1 = V_S1 * n_c**0.5 #[m/s]
+    
+    V, n_pos, n_neg = stall_req(obj)
+    
+    
+          # DEFINE SPEEDS
+
+    u_hat_fs = 66              # [f/s]  
+    u_hat_ms = u_hat_fs * 0.3048                                  
+    rho_cruise = 0.9
+    MGC = 13 / 10
+    mu = 2 * obj.WS / (rho_cruise * obj.g0 * MGC * obj.CLa)  # Airplane mass ratio []
+
+    K = 0.88 * mu / (5.3 + mu)                              
+
+    u = K * u_hat_ms
+
+    delta_n = obj.rho0 * VB1 * obj.CLa * u / (2 * obj.WS)
+    
+    n_b = 1 + delta_n
+
+    y2 = n_b
+    y1 = 1
+    x2 = VB1
+    n_line = (y2-y1) / x2 * V + 1
+
+    VB2 = 0
+    for i in range(len(V)):
+        if n_line[i] - 0.1 < n_pos[i] < n_line[i] + 0.1:
+            VB2 = V[i]
+
+    return min(VB1, VB2)
+
+
 def CS23_max(obj):
     if obj.type == "normal":
         y = min(2.1 + (24000 / (obj.W_TO * 2.205 + 10000)), 3.8)
@@ -18,13 +101,8 @@ def CS23_min(obj):
 
     return y
 
-def stall_req(obj):
-    step = 0.5
-    V = np.arange(0, obj.V_D*1.1 + step, step)
-    n_pos = 0.5 * 1.225 * V**2 * obj.CL_max_land / obj.WS               #DENSITY?  #WHICH CL_max?
-    n_neg = n_pos * -1
 
-    return V, n_pos, n_neg
+
 
 def plot_Vn(obj):
     V, n_pos, n_neg = stall_req(obj)
@@ -33,9 +111,9 @@ def plot_Vn(obj):
    
     # X-Values of points. Points are from typical V-n diagram
     A_x = np.interp(n_max, n_pos, V)
-    D_x = obj.V_D
+    D_x = VD_lim_low(obj)
     E_x = D_x
-    F_x = obj.V_cruise
+    F_x = VC_lim_low(obj)
     H_x = np.interp(-n_min, n_pos, V)
 
     # V_S
@@ -108,6 +186,8 @@ def plot_Vn(obj):
     plt.text(F_x, 0.3 , s = 'Vc', ha='center', va='top')
     plt.text(E_x - 3, 0.3 , s = 'Vd', ha='center', va='top')
 
+
+
     # Plot y=1
     plt.axhline(y = 1, linestyle = "--", linewidth = "1", color = "black")
 
@@ -115,7 +195,7 @@ def plot_Vn(obj):
 
 def gust_points(obj):
     # ORDER: VB pos, VB neg, VC pos, VC, VD pos, VD neg
-    V = np.array([obj.V_B, obj.V_B, obj.V_cruise, obj.V_cruise, obj.V_D, obj.V_D]) # DEFINE SPEEDS
+    V = np.array([VB_lim_low(obj), VB_lim_low(obj), VC_lim_low(obj), VC_lim_low(obj), VD_lim_low(obj), VD_lim_low(obj)]) # DEFINE SPEEDS
     u_hat_fs = np.array([66, 66, 50, 50, 25, 25])   # [f/s]  
     u_hat_ms = u_hat_fs * 0.3048                                  
     rho_cruise = 0.9
@@ -158,38 +238,41 @@ def plot_gust(obj):
     plt.plot([V[3], V[5]], [n_peak[3], n_peak[5]], color = 'pink')             #Between F' and E'
     plt.plot([V[4], V[5]], [n_peak[4], n_peak[5]], color = 'pink')             #Between D' and E'
 
+
+    n_max = CS23_max(obj)
+    n_min = CS23_min(obj)
+
+    # Plot V_C
+    bottom, top = -1 * np.ceil(n_min * -1.2 * 2) / 2, np.ceil(n_max*1.1 * 2) / 2
+    y_range = top - bottom
+    y0_frac_VA = (abs(bottom)) / y_range
+    y1_frac_VA = (abs(bottom) + n_peak[0]) / y_range
+    
+    plt.axvline(x = V[0], ymin = y0_frac_VA, ymax = y1_frac_VA, linestyle = "--", linewidth = "1", color = "black")
+    plt.text(V[0] - 3, 0.3 , s = 'Vb', ha='center', va='top')
+
     plt.axhline(y = max_n(obj), linestyle = "--", linewidth = "1.5", color = "red")
-    plt.text(10, max_n(obj) + 0.3 , s = "max n", ha='center', va='top', color = 'red', fontsize = 12)
+    plt.text(10, max_n(obj) + 0.3 , s = "max n", ha='center', va='top', color = 'red', fontsize = 12)   
     
 
-def VC_lim_low(obj):
-    return 33 * (obj.WS * 0.020885) ** 0.5 * 0.51444 #[m/s]
-
-def VD_lim_low(obj):
-    return 1.4 * VC_lim_low(obj)    #[m/s]
-
-def VA_lim_low(obj): #Cant be greater than VC
-    V, n_pos, n_neg = stall_req(obj)
-    V_S = np.interp(1, n_pos, V)
-
-    n = CS23_max(obj)
-
-    return V_S * n**0.5 #[m/s]
-
-def VB_lim_low(obj): #Cant be greater than VC
-    V, n_peak = gust_points(obj)
-    n_c = n_peak[2]
-
-    V, n_pos, n_neg = stall_req(obj)
-    V_S = np.interp(1, n_pos, V)
-
-    return V_S * n_c**0.5 #[m/s]
+    
 
 def plot_all(obj):
+    V, n_pos, n_neg = stall_req(obj)
+   
+    V_S = np.interp(1, n_pos, V)
+
+
+    obj.V_s_min             = V_S
+    obj.V_cruise            = VC_lim_low(obj)
+    obj.V_D                 = VD_lim_low(obj)
+    obj.V_B                 = VB_lim_low(obj)
+
     plot_Vn(obj)
     plot_gust(obj)
     plt.title(f"V-n diagram for {obj.name}")
     plt.show()
+
 
 
 CON_1 = UAV('CON_1', 'tractor', boom=True, braced_wing=False)
