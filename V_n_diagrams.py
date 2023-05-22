@@ -241,10 +241,21 @@ def plot_gust(obj):
     
 
 def plot_all(obj):
+    V, n_pos, n_neg = stall_req(obj)
+   
+    V_S = np.interp(1, n_pos, V)
+
+
+    obj.V_s_min             = V_S
+    obj.V_cruise            = VC_lim_low(obj)
+    obj.V_D                 = VD_lim_low(obj)
+    obj.V_B                 = VB_lim_low(obj)
+
     plot_Vn(obj)
     plot_gust(obj)
     plt.title(f"V-n diagram for {obj.name}")
     plt.show()
+
 
 
 CON_1 = UAV('CON_1', 'tractor', boom=True, braced_wing=False)
