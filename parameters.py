@@ -2,16 +2,16 @@ import numpy as np
 class UAV:
     def __init__(self, name, engine_pos, boom, braced_wing):
         "==== Aircraft Parameters ===="
-        self.name                = name         # Name of the aircraft [-]
+        self.name                = name          # Name of the aircraft
 
         "-CS23 Type"
-        self.type                = "utility"    # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
+        self.type                = "utility"     # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
 
         "-Aircraft geometry"
         self.A                   = 10            # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.braced_wing         = braced_wing   # True if wing is braced
-        self.kq                  = 0.95          # Volume factor used to calculate wetted area of the wing
+        self.kq                  = 0.95          # Volume factor used to calculate wetted area of the wing [-]
 
         self.s_tail              = 2             # Tail surface area [m]
         self.l_t                 = 3.5           # Tail arm [m]
@@ -20,24 +20,24 @@ class UAV:
         self.W_boom              = 20            # Boom weight [kg]
         self.l_f_boom            = 2             # Boom length [m]
 
-        self.xc_OEW_p            = 0.25         # Center of gravity of OEW as a fraction of the MAC [-]
+        self.xc_OEW_p            = 0.25          # Center of gravity of OEW as a fraction of the MAC [-]
 
         self.pos_main_carriage   = "fuselage"    # Position of main carriage: "fuselage" or "wing"
         self.main_gear_type      = "fixed"       # Type of main gear: "fixed" or "retractable"
         self.nose_gear_type      = "fixed"       # Type of nose gear: "fixed" or "retractable"
 
-        self.mass_penalty_struts = 7             # The weight of the struts
+        self.mass_penalty_struts = 7             # The weight of the struts [kg]
 
         "- Fuselage geometry"
         self.side_clearance      = 0.2           # Side clearance [m], this is for both sides
-        self.top_clearance       = 0.2   
-        self.bot_clearance       = 0.1
+        self.top_clearance       = 0.2           # Top clearance [m]
+        self.bot_clearance       = 0.1           # Bottom clearance [m]
         self.structural_thickness= 0.2           # Structural thickness fuselage [m], this is for both sides
         
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
-        self.CLa                 = 4.2           # Lift curve slope [] | CHANGE TO ACTUAL VALUE
-        self.Drag_increase       = 1.0           # This is used for the calculations of the strut drag if applicable
+        self.CLa                 = 4.2           # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
+        self.Drag_increase       = 1.0           # This is used for the calculations of the strut drag if applicable [-]
 
         # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
         # but this means that CL_max_clean, CL_max_TO and CL_max_land must always be stored in an array. For an array with length 1
@@ -52,7 +52,7 @@ class UAV:
         self.W_e                 = 62.6         # Definitive weight per engine [kg]
         self.W_TO                = 700          # Take-off weight [kg]
         self.W_PL                = 240          # Payload weight [kg]
-        self.WS                  = 708.05          # Wing Loading [N/m^2]
+        self.WS                  = 708.05       # Wing Loading [N/m^2]
 
         "-Weight fractions"
         self.W1W_TO              = 0.995        # Engine startup fraction [-]
@@ -85,9 +85,9 @@ class UAV:
         "==== Mission profile/Atmospheric properties ===="
         "-Mission characteristics"
         self.n_drops             = 1             # Number of drops [-]
-        self.n_boxes             = 12            # Number of boxes [-]
-        self.n_boxes_abreast     = 2             # Number or boxes side by side [-]
-        self.n_rows              = 6
+        self.n_boxes             = 12            # Number of boxes [-] -> has to be a multiple of 2
+        self.n_boxes_abreast     = 2             # Number of boxes side by side [-]
+        self.n_rows              = self.n_boxes/self.n_boxes_abreast # Number of rows [-]
         self.R                   = 500000        # Range [m]
         self.M_res               = 0.10          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
         self.h_cruise            = 10000*0.3048  # Cruise altitude [m] | NOTES: Conversion
