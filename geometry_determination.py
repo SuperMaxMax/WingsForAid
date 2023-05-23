@@ -3,14 +3,6 @@ from    parameters import *
 import  matplotlib.pyplot as plt
 import  pandas as pd
 
-# def metertofeet(meter):
-#     feet = meter*3.2808399
-#     return feet
-
-# def dragpolar(obj):
-#     CD = obj.CD0 + (obj.CL**2/(np.pi*obj.A*obj.e))
-#     return CD
-
 def stallWS(obj, CL_max, h):
     rho = altitude_effects(obj, h)[0]
     WoS = 1/2 * rho * obj.V_s_min**2 * CL_max
@@ -138,23 +130,16 @@ def geometry_determination(obj, plot=False):
     obj.n_rows              = obj.n_boxes/obj.n_boxes_abreast   # number of rows of boxes
     cumulative_box_length   = obj.n_rows * 0.4                  # box 40x40x60, cumulative length in meter
     length_between_boxes    = (obj.n_rows-1)*0.2                # 20 cm in between boxes
-    engine_length           = 0.6651                            # engine length in cm, EASA type certificate data sheet ROTAX 912 series
-    engine_fairing          = 0.2                               # 20 cm room around the engine 
-    obj.l_n                  = engine_length + engine_fairing
-    d_engine_boxes          = 0.4                               # 40 cm, leaves room for possible fire wall
+    obj.l_n                 = obj.engine_length + obj.engine_fairing
     
     #cross sectional
     cumulative_box_width    = obj.n_boxes_abreast * 0.4
     width_between_boxes     = (obj.n_boxes_abreast-1) * 0.2
-    clearance               = 0.2                               # 0.1 m on both sides
-    structural_thickness    = 0.2                               # 0.1 m on both sides, for example a large stringer
     box_height              = 0.6
-    clearance_low           = 0.1
-    clearance_high          = 0.2
-    obj.w_out               = cumulative_box_width + width_between_boxes + clearance + structural_thickness
-    obj.h_out               = box_height + clearance_low + clearance_high + structural_thickness
-    obj.w_in                = obj.w_out - structural_thickness
-    obj.h_in                = obj.h_out - structural_thickness
+    obj.w_out               = cumulative_box_width + width_between_boxes + obj.side_clearance + obj.structural_thickness
+    obj.h_out               = box_height + obj.bot_clearance + obj.top_clearance + obj.structural_thickness
+    obj.w_in                = obj.w_out - obj.structural_thickness
+    obj.h_in                = obj.h_out - obj.structural_thickness
     obj.d_eff               = np.sqrt(obj.w_out*obj.h_out)                # from cross sectional drawing with width 1.40 m and height 1.10 m
     if obj.boom:                                                # assume one effective diameter after last box
         obj.l_tc = 0.8                                          # from drawing [m]
@@ -162,7 +147,7 @@ def geometry_determination(obj, plot=False):
         obj.l_tc = 1.75*obj.d_eff                               # Based on drawing of the aircraft.
     
     # Fuselage dimensions
-    obj.l_f   = cumulative_box_length + length_between_boxes + obj.l_n + obj.l_tc + d_engine_boxes
+    obj.l_f   = cumulative_box_length + length_between_boxes + obj.l_n + obj.l_tc + obj.d_engine_boxes
     
     #shape the nose
     nose_shape = fuselage_shape(obj.l_n, obj.w_out, 2, 1.5, 1000)
