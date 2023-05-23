@@ -208,8 +208,8 @@ def gust_points(obj):
     u_hat_fs = np.array([66, 66, 50, 50, 25, 25])   # [f/s]  
     u_hat_ms = u_hat_fs * 0.3048 
 
-    u_hat_ms = np.array([1,1,15.25,15.25,7.5,7.5])   
-    V = np.array([1,1,20.2,20.2,28.28,28.28]) # DEFINE SPEEDS
+    #u_hat_ms = np.array([1,1,15.25,15.25,7.5,7.5])   
+    #V = np.array([1,1,20.2,20.2,28.28,28.28]) # DEFINE SPEEDS
                               
     rho_cruise = 1.225
     MGC = 0.35
