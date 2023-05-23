@@ -37,7 +37,7 @@ def VB_lim_low(obj): #Cant be greater than VC
     u_hat_fs = 50              # [f/s]  
     u_hat_ms = u_hat_fs * 0.3048                                  
     rho_cruise = 0.9
-    MGC = 13 / 10
+    MGC = 0.35
     mu = 2 * obj.WS / (rho_cruise * obj.g0 * MGC * obj.CLa)  # Airplane mass ratio []
 
     K = 0.88 * mu / (5.3 + mu)                              
@@ -97,7 +97,7 @@ def CS23_max(obj):
     return y
 
 def CS23_min(obj):
-    y = -0.4 * CS23_max(obj)
+    y = -0.5 * CS23_max(obj)
 
     return y
 
@@ -207,7 +207,7 @@ def gust_points(obj):
     V = np.array([VB_lim_low(obj), VB_lim_low(obj), VC_lim_low(obj), VC_lim_low(obj), VD_lim_low(obj), VD_lim_low(obj)]) # DEFINE SPEEDS
     u_hat_fs = np.array([66, 66, 50, 50, 25, 25])   # [f/s]  
     u_hat_ms = u_hat_fs * 0.3048                                  
-    rho_cruise = 0.9
+    rho_cruise = 1.225
     MGC = 13 / 10
     mu = 2 * obj.WS / (rho_cruise * obj.g0 * MGC * obj.CLa)  # Airplane mass ratio []
 
