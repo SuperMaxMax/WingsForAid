@@ -267,7 +267,18 @@ def plot_all(obj):
     obj.V_cruise            = VC_lim_low(obj)
     obj.V_D                 = VD_lim_low(obj)
     obj.V_B                 = VB_lim_low(obj)
+    obj.V_A                 = VA_lim_low(obj)
+    print(obj.V_s_min)
+    print(obj.V_cruise)
+    print(obj.V_D)
+    print(obj.V_B)
+    print(obj.V_A)
+    print(VS1(obj))
+
 
     plot_Vn(obj)
     plot_gust(obj)
     plt.title(f"V-n diagram for {obj.name}")
+    plt.show()
+
+

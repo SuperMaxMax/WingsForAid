@@ -40,6 +40,7 @@ for concept in [DET_CON_1, DET_CON_1_braced, DET_CON_2, DET_CON_2_braced, DET_CO
         
         # geometry determination
         geo.geometry_determination(concept)
+       # concept.WS = 70.805
 
         # class 2
         c2.weight_empty(concept)
