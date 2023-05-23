@@ -28,7 +28,15 @@ def create_line(x1, y1, x2, y2, num_points):
     line = np.vstack((x, y))
     return line
 
-def geometry_determination(obj, plot=False):
+def fuselage_shape(a, b, n, m, n_points):
+    coordinates = None
+    x = np.linspace(0, a, n_points)
+    y = np.power((1 - np.power((x/a), n)), 1/m) * b
+    coordinates = np.vstack((x,y))
+    return coordinates
+
+
+def geometry_determination(obj, plot=True):
     # create empty array for capturing design points from W/P - W/S diagrams
     design_points = np.empty(0)
     for i in range(len(obj.CL_max_clean)):                  
@@ -127,27 +135,50 @@ def geometry_determination(obj, plot=False):
         plt.show()
     
     # --- Fuselage parameters
-    cumulative_box_length   = obj.n_boxes*0.4                   # box 40x40x60, cumulative length in meter
-    length_between_boxes    = ((obj.n_boxes/2)-1)*0.2           # 20 cm in between boxes
+    #longitudinal
+    obj.n_rows              = obj.n_boxes/obj.n_boxes_abreast   # number of rows of boxes
+    cumulative_box_length   = obj.n_rows * 0.4                  # box 40x40x60, cumulative length in meter
+    length_between_boxes    = (obj.n_rows-1)*0.2                # 20 cm in between boxes
     engine_length           = 0.6651                            # engine length in cm, EASA type certificate data sheet ROTAX 912 series
     engine_fairing          = 0.2                               # 20 cm room around the engine 
-    obj.d_eff               = np.sqrt(1.10*1.40)                # from cross sectional drawing with width 1.40 m and height 1.10 m
+    obj.l_n                  = engine_length + engine_fairing
     d_engine_boxes          = 0.4                               # 40 cm, leaves room for possible fire wall
+    #cross sectional
+    cumulative_box_width    = obj.n_boxes_abreast * 0.4
+    width_between_boxes     = (obj.n_boxes_abreast-1) * 0.2
+    clearance               = 0.2                               # 0.1 m on both sides
+    structural_thickness    = 0.2                               # 0.1 m on both sides, for example a large stringer
+    box_height              = 0.6
+    clearance_low           = 0.1
+    clearance_high          = 0.2
+    obj.w_out               = cumulative_box_width + width_between_boxes + clearance + structural_thickness
+    obj.h_out               = box_height + clearance_low + clearance_high + structural_thickness
+    obj.w_in                = obj.w_out - structural_thickness
+    obj.h_in                = obj.h_out - structural_thickness
+    obj.d_eff               = np.sqrt(obj.w_out*obj.h_out)                # from cross sectional drawing with width 1.40 m and height 1.10 m
     if obj.boom:                                                # assume one effective diameter after last box
-        l_tc = 0.8                                              # from drawing [m]
+        obj.l_tc = 0.8                                          # from drawing [m]
     else:                                                       
-        l_tc = 1.75*obj.d_eff                                   # Based on drawing of the aircraft.
-
+        obj.l_tc = 1.75*obj.d_eff                               # Based on drawing of the aircraft.
     # Fuselage dimensions
-    obj.h_out = 1.10                                            # meter, from cross sectional drawing
-    obj.h_in  = 0.90
-    obj.w_out = 1.40
-    obj.w_in  = 1.20
-    obj.l_f   = cumulative_box_length + length_between_boxes + engine_length + engine_fairing + l_tc + d_engine_boxes
+    obj.l_f   = cumulative_box_length + length_between_boxes + obj.l_ + obj.l_tc + d_engine_boxes
+    #shape the nose
+    nose_shape = fuselage_shape(obj.l_n, obj.w_out, 2, 1.5, 1000)
+    ab_line    = create_line(0.0, 0.0, obj.l_n, obj.w_out, 1000)
+    difference = (nose_shape - ab_line)[0] + (nose_shape - ab_line)[1]
+    S_point    = (nose_shape[0][np.argmin(difference)], nose_shape[1][np.argmin(difference)])
+    P_point    = S_point[0]
+    #find circumference
+    dx         = np.diff(nose_shape[0])
+    dy         = np.diff(nose_shape[1])
+    distances  = np.sqrt(dx**2 + dy**2)
+    circumference = np.sum(distances)
+    
     if obj.boom:
-        obj.S_G = 19.77
-    else:
-        obj.S_G = 22.98
+        obj.S_G = 19.77                                         # m^2, from Torenbeek                                   
+    else:           
+        obj.S_G = 22.98                                         # m^2, from Torenbeek
+    
     # --- Wing parameters
     Weight_TO = obj.W_TO*obj.g0                                 # find the take off weight in newtons
     WS_values = design_points[0:12:2]                           # take the S/W values
@@ -224,6 +255,7 @@ def geometry_determination(obj, plot=False):
     obj.dihedral = np.full(np.shape(obj.Sw), 1)                                  # degree, high wing value, same slides as above.
 
     obj.Qw_wing = ((obj.kq*obj.t_c)/(np.sqrt(1+obj.taper)))*obj.Sw*np.sqrt((obj.Sw/obj.A))
+    obj.Sw_wetted = 2*obj.Sw
 
     if obj.braced_wing:
         obj.CD0  /= obj.Drag_increase
@@ -237,9 +269,8 @@ def geometry_determination(obj, plot=False):
         A_strut  = l_strut**2/S_strut
         interference_penalty = 2
         Qw_strut = 2*((kq_strut*tc_strut)/(np.sqrt(1+strut_taper)))*S_strut*np.sqrt(S_strut/A_strut)*interference_penalty
-        obj.Drag_increase = 1 + Qw_strut/obj.Qw_wing
+        Sstrut_wetted = l_strut*c_strut*2*0.95
+        obj.Drag_increase = 1 + Sstrut_wetted/obj.Sw_wetted
         obj.CD0  *= obj.Drag_increase                                                                         #kg, estimate using length and density of AL2024 t3
     else:
         obj.Drag_increase = 1
-    
-    
