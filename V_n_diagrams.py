@@ -206,7 +206,11 @@ def gust_points(obj):
     # ORDER: VB pos, VB neg, VC pos, VC, VD pos, VD neg
     V = np.array([VB_lim_low(obj), VB_lim_low(obj), VC_lim_low(obj), VC_lim_low(obj), VD_lim_low(obj), VD_lim_low(obj)]) # DEFINE SPEEDS
     u_hat_fs = np.array([66, 66, 50, 50, 25, 25])   # [f/s]  
-    u_hat_ms = u_hat_fs * 0.3048                                  
+    u_hat_ms = u_hat_fs * 0.3048 
+
+    u_hat_ms = np.array([1,1,15.25,15.25,7.5,7.5])   
+    V = np.array([1,1,20.2,20.2,28.28,28.28]) # DEFINE SPEEDS
+                              
     rho_cruise = 1.225
     MGC = 0.35
     mu = 2 * obj.WS / (rho_cruise * obj.g0 * MGC * obj.CLa)  # Airplane mass ratio []
@@ -237,6 +241,7 @@ def plot_gust(obj):
     for i in range(len(V)):
         plt.plot(V[i], n_peak[i], 'o', color = 'pink')
         plt.text(V[i], n_peak[i] + 0.35 , s = labels[i], ha='center', va='top')
+        print(labels[i], V[i], n_peak[i])
 
     # Plotting straight lines
     plt.plot([0, V[0]], [1, n_peak[0]], color = 'pink')                        #Between 1 and B'
@@ -292,6 +297,6 @@ def plot_all(obj):
 
 
 concept = UAV('Validate', 'tractor', boom=False, braced_wing=False)
-#concept.WS = 70.805
+concept.WS = 70.805
 
 plot_all(concept)
