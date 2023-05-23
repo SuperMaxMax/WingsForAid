@@ -197,7 +197,7 @@ class Cessna_172:
         self.V_cruise            = 122*(1.852/3.6)      # Cruise speed [m/s]
         self.V_climb             = 76*(1.852/3.6)       # Climb speed [m/s]
         self.V_D                 = 175*0.514444         # Dive speed [m/s]
-        self.V_B                 = 42.22                # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
+        self.V_B                 = 127*0.514444         # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
 
         "-Atmospheric properties"
         self.rho0                = 1.225        # [kg/m^3]
