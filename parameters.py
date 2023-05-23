@@ -2,10 +2,10 @@ import numpy as np
 class UAV:
     def __init__(self, name, engine_pos, boom, braced_wing):
         "==== Aircraft Parameters ===="
-        self.name                = name          # Name of the aircraft [-]
+        self.name                = name         # Name of the aircraft [-]
 
         "-CS23 Type"
-        self.type                = "utility"     # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility                   
+        self.type                = "utility"    # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
 
         "-Aircraft geometry"
         self.A                   = 10            # Aspect ratio [-]
@@ -20,7 +20,7 @@ class UAV:
         self.W_boom              = 20            # Boom weight [kg]
         self.l_f_boom            = 2             # Boom length [m]
 
-        self.xc_OEW_p            = 0.25          # Center of gravity of OEW as a fraction of the MAC [-]
+        self.xc_OEW_p            = 0.25         # Center of gravity of OEW as a fraction of the MAC [-]
 
         self.pos_main_carriage   = "fuselage"    # Position of main carriage: "fuselage" or "wing"
         self.main_gear_type      = "fixed"       # Type of main gear: "fixed" or "retractable"
@@ -42,17 +42,17 @@ class UAV:
         # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
         # but this means that CL_max_clean, CL_max_TO and CL_max_land must always be stored in an array. For an array with length 1
         # the code just runs once
-        self.CL_max_clean        = np.array([1.3])              # Maximum lift coefficient [-] | Range: 1.3 - 1.9
-        self.CL_max_TO           = np.array([1.3])              # Maximum lift coefficient at take-off [-]
+        self.CL_max_clean        = np.array([1.5])              # Maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.CL_max_TO           = np.array([1.5])              # Maximum lift coefficient at take-off [-]
         self.CL_max_land         = np.array([1.9])              # Maximum lift coefficient at landing [-]
         self.CL_TO               = self.CL_max_TO / (1.1**2)    # [-]
         self.CL_LDG              = self.CL_max_land / (1.1**2)  # [-]
 
         "-Weights"
-        self.W_e                 = 62.6          # Definitive weight per engine [kg]
-        self.W_TO                = 700           # Take-off weight [kg]
-        self.W_PL                = 240           # Payload weight [kg]
-        self.WS                  = 600           # Wing Loading [N/m^2]
+        self.W_e                 = 62.6         # Definitive weight per engine [kg]
+        self.W_TO                = 700          # Take-off weight [kg]
+        self.W_PL                = 240          # Payload weight [kg]
+        self.WS                  = 708.05          # Wing Loading [N/m^2]
 
         "-Weight fractions"
         self.W1W_TO              = 0.995        # Engine startup fraction [-]
@@ -116,7 +116,7 @@ class UAV:
         self.lin_par2            = 42.049       # [-]
 
 class Cessna_172:
-    def __init__(self, engine_pos, boom, braced_wing):
+    def __init__(self, engine_pos, braced_wing):
         "==== Aircraft Parameters ===="
         self.name                = "Cessna 172"         # Name of the aircraft [-]
 
@@ -140,21 +140,20 @@ class Cessna_172:
 
         "-Aerodynamic properties"
         self.CD0                 = 0.027        # Zero lift coefficient [-]
-        self.CLa                 = 4.2          # Lift curve slope [-] | change to actual value (follows from aero analysis later)
+        self.CLa                 = 5.143          # Lift curve slope [-] | change to actual value (follows from aero analysis later)
         self.Drag_increase       = 1.0          # This is used for the calculations of the strut drag if applicable [-]
 
         self.CL_max_clean        = np.array([1.6])              # Maximum lift coefficient [-], range: 1.3 - 1.9 | CL_max_clean, CL_max_TO and CL_max_land must always be stored in an array
         self.CL_max_TO           = np.array([1.6])              # Maximum lift coefficient at take-off [-]       | Multiple values can be in the arrays
-        self.CL_max_land         = np.array([1.6])              # Maximum lift coefficient at landing [-]
+        self.CL_max_land         = np.array([2.3])              # Maximum lift coefficient at landing [-]
         self.CL_TO               = self.CL_max_TO / (1.1**2)    # [-]
         self.CL_LDG              = self.CL_max_land / (1.1**2)  # [-]
 
         "-Weights"
-        self.W_e                 = 62.6         # Definitive weight per engine [kg]
-        self.W_TO                = 700          # Take-off weight [kg]
-        self.W_PL                = 240          # Payload weight [kg]
-        self.WS                  = 600          # Wing Loading [N/m^2]
-        self.WS                  = 70.805          # Wing Loading [N/m^2]
+        self.W_e                 = 124.74       # Definitive weight per engine [kg]
+        self.W_TO                = 1088.62      # Take-off weight [kg]
+        self.W_PL                = 415.99       # Payload weight [kg]
+        self.WS                  = 658.99       # Wing Loading [N/m^2]
 
         "-Weight fractions"
         self.W1W_TO              = 0.995        # Engine startup fraction [-]
@@ -167,37 +166,37 @@ class Cessna_172:
 
         "-Propulsive properties"
         self.engine_pos          = engine_pos   # Engine position [-]
-        self.P_TO                = 80           # Power at take-off [hp]
+        #max power is 160 hp for cessna 172p
 
-        self.prop_eff            = 0.82         # Propulsive efficiency [-]
+        self.prop_eff            = 0.8         # Propulsive efficiency [-]
         self.eta_p               = self.prop_eff# Propulsive efficiency [-]
         if engine_pos == "pusher":
             self.prop_eff        *= 0.92        # Propulsive efficiency [-]
             self.eta_p           *= 0.92        # Propulsive efficiency [-]
 
-        self.power_setting       = 0.9          # Power setting in cruise [-]
+        self.power_setting       = 0.7          # Power setting in cruise [-]
 
-        self.c_p                 = 72E-9        # Specific fuel consumption [kg/J]
+        self.c_p                 = 7.266E-6     # Specific fuel consumption [kg/J]
         self.N_e                 = 1            # Number of engines [-]
 
         "==== Mission profile/Atmospheric properties ===="
         "-Mission characteristics"
-        self.n_drops             = 1            # Number of drops [-]
+        self.n_drops             = 0            # Number of drops [-]
         self.n_boxes             = 12           # Number of boxes [-]
         self.R                   = 500000       # Range [m]
         self.M_res               = 0.10         # Fraction of remaining fuel at the end of flight/reserve fuel [-]
         self.h_cruise            = 10000*0.3048 # Cruise altitude [m] | NOTES: Conversion
         self.h_TO                = 0            # Take-off Height [m]
         
-        self.LDG_dist            = 750          # Landing distance [m]
+        self.LDG_dist            = 420          # Landing distance [m]
 
         self.n_ult               = 3.8 * 1.5    # Ultimate load factor [-]
 
         "-Speeds"
         self.V_s_min             = 50*(1.852/3.6)       # Dropping speed [m/s]
-        self.V_cruise            = 116.82*(1.852/3.6)   # Cruise speed [m/s]
-        self.V_climb             = 70*(1.852/3.6)       # Climb speed [m/s]
-        self.V_D                 = 163.54*0.514444      # Dive speed [m/s]
+        self.V_cruise            = 122*(1.852/3.6)      # Cruise speed [m/s]
+        self.V_climb             = 76*(1.852/3.6)       # Climb speed [m/s]
+        self.V_D                 = 175*0.514444         # Dive speed [m/s]
         self.V_B                 = 42.22                # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
 
         "-Atmospheric properties"
