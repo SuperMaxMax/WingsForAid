@@ -86,7 +86,7 @@ for concept in [DET_CON_1, DET_CON_1_braced, DET_CON_2, DET_CON_2_braced, DET_CO
 df.index = members
 
 # export dataframe of current design to csv file
-df['DET_CON_1_braced'].to_csv('output.csv', sep=';')
+df['DET_CON_2_braced'].to_csv('DET_CON_2_braced.csv', sep=';')
 
 # remove row in dataframe if all values in that row are the same
 if remove_duplicates == True:
