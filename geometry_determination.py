@@ -171,6 +171,8 @@ def geometry_determination(obj, plot=False):
     Weight_TO = obj.W_TO*obj.g0                                 # find the take off weight in newtons
     WS_values = design_points[0:12:2]                           # take the S/W values
     WP_values = design_points[1:13:2]                           # take the P/W values
+    obj.WS    = WS_values
+    obj.WP    = WP_values
     
     # find surface area
     obj.Sw = Weight_TO/WS_values
