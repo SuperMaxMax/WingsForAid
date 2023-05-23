@@ -188,7 +188,7 @@ def geometry_determination(obj, plot=True):
     obj.Sw = Weight_TO/WS_values
     
     # find power value                 
-    obj.P_values = Weight_TO/WP_values*0.00134102209            #convert to horsepower
+    obj.power = (Weight_TO/WP_values)*0.00134102209/obj.prop_eff #convert to horsepower
     
     # wingspan
     obj.b = np.sqrt(obj.A*obj.Sw)
