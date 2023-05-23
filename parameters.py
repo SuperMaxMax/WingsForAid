@@ -52,7 +52,7 @@ class UAV:
         self.W_e                 = 62.6         # Definitive weight per engine [kg]
         self.W_TO                = 700          # Take-off weight [kg]
         self.W_PL                = 240          # Payload weight [kg]
-        self.WS                  = 708.05          # Wing Loading [N/m^2]
+        self.WS                  = 708.05       # Wing Loading [N/m^2]
 
         "-Weight fractions"
         self.W1W_TO              = 0.995        # Engine startup fraction [-]
@@ -117,7 +117,7 @@ class UAV:
         self.lin_par2            = 42.049       # [-]
 
 class Cessna_172:
-    def __init__(self, engine_pos, braced_wing):
+    def __init__(self, engine_pos, braced_wing, boom):
         "==== Aircraft Parameters ===="
         self.name                = "Cessna 172"         # Name of the aircraft [-]
 
@@ -129,7 +129,7 @@ class Cessna_172:
         self.e                   = 0.8          # Oswald factor [-]
         self.braced_wing         = braced_wing  # True if wing is braced [-]
         self.kq                  = 0.95         # Volume factor used to calculate wetted area of the wing [-]
-
+        self.boom                = boom
         self.s_tail              = 2.83         # Tail surface area [m^2]
         self.l_t                 = 4.14         # Tail arm [m]
 
@@ -167,7 +167,7 @@ class Cessna_172:
 
         "-Propulsive properties"
         self.engine_pos          = engine_pos   # Engine position [-]
-        #max power is 160 hp for cessna 172p
+        self.power               = 160          # hp
 
         self.prop_eff            = 0.8         # Propulsive efficiency [-]
         self.eta_p               = self.prop_eff# Propulsive efficiency [-]
@@ -177,15 +177,15 @@ class Cessna_172:
 
         self.power_setting       = 0.7          # Power setting in cruise [-]
 
-        self.c_p                 = 7.266E-6     # Specific fuel consumption [kg/J]
+        self.c_p                 = 7.266E-8     # Specific fuel consumption [kg/J]
         self.N_e                 = 1            # Number of engines [-]
 
         "==== Mission profile/Atmospheric properties ===="
         "-Mission characteristics"
         self.n_drops             = 0            # Number of drops [-]
-        self.n_boxes             = 12           # Number of boxes [-]
-        self.R                   = 500000       # Range [m]
-        self.M_res               = 0.10         # Fraction of remaining fuel at the end of flight/reserve fuel [-]
+        self.n_boxes             = 0            # Number of boxes [-]
+        self.R                   = 1185000      # Range [m]
+        self.M_res               = 0.07         # Fraction of remaining fuel at the end of flight/reserve fuel [-]
         self.h_cruise            = 10000*0.3048 # Cruise altitude [m] | NOTES: Conversion
         self.h_TO                = 0            # Take-off Height [m]
         
@@ -209,5 +209,5 @@ class Cessna_172:
 
         "==== Miscellaneous ===="
         "MTOW vs OEW GA, "
-        self.lin_par1            = 0.5249       # [-]
-        self.lin_par2            = 42.049       # [-]
+        self.lin_par1            = 0.5522       # [-]
+        self.lin_par2            = 39.162       # [-]

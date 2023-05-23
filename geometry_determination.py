@@ -19,7 +19,7 @@ def stallWS(obj, CL_max, h):
 def altitude_effects(obj, h):
     rho     = obj.rho0*(1 + ((obj.Lambda*h)/obj.T0))**(-((obj.g0/(obj.R_gas*obj.Lambda))+1))
     sigma   = rho/obj.rho0
-    BHP     = obj.P_TO*(sigma)**(3/4)
+    BHP     = obj.power*(sigma)**(3/4)
     return rho, sigma, BHP
 
 def create_line(x1, y1, x2, y2, num_points):
@@ -102,6 +102,7 @@ def geometry_determination(obj, plot=False):
         design_point = (WS_designpoint, WP_designpoint)
         design_points = np.append(design_points, design_point)
 
+
         # plotting
         if plot:
             lab = "Take-off, CL TO = " + str(np.round(CL_TO, decimals=2))
@@ -152,9 +153,12 @@ def geometry_determination(obj, plot=False):
     Weight_TO = obj.W_TO*obj.g0                                 # find the take off weight in newtons
     WS_values = design_points[0:12:2]                           # take the S/W values
     WP_values = design_points[1:13:2]                           # take the P/W values
+    obj.WS    = WS_values[0]
+    obj.WP    = WP_values[0]
     
     # find surface area
     obj.Sw = Weight_TO/WS_values
+    
     
     # find power value                 
     obj.P_values = Weight_TO/WP_values*0.00134102209            #convert to horsepower
@@ -195,7 +199,7 @@ def geometry_determination(obj, plot=False):
         min = np.min(mask)
         index = np.where(mask == min)
         obj.y_mac = hc[1][index][0]
-        tolerance = 0.000005
+        tolerance = 0.01
         obj.x_lemac = LE[0][np.where(np.abs(LE[1]-obj.y_mac)<=tolerance)][0]
         x_temac = TE[0][np.where(np.abs(TE[1]-obj.y_mac)<=tolerance)][0]
         MAC = np.array([np.linspace(x_temac, obj.x_lemac, 1000), np.full(1000, obj.y_mac)])

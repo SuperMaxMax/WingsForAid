@@ -1,4 +1,4 @@
-from parameters import UAV
+from parameters import UAV, Cessna_172
 import Class_I_weight_estimation as c1
 import Class_II_weight_estimation as c2
 import Class_II_cg_estimation as c2cg
@@ -8,18 +8,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-DET_CON_1 = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
-DET_CON_1_braced = UAV('DET_CON_1_braced', 'tractor', boom=False, braced_wing=True)
-DET_CON_2 = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=False)
-DET_CON_2_braced = UAV('DET_CON_2_braced', 'tractor', boom=True, braced_wing=True)
-DET_CON_3 = UAV('DET_CON_3', 'pusher', boom=False, braced_wing=False)
-DET_CON_3_braced = UAV('DET_CON_3_braced', 'pusher', boom=False, braced_wing=True)
-DET_CON_4 = UAV('DET_CON_4', 'pusher', boom=True, braced_wing=False)
-DET_CON_4_braced = UAV('DET_CON_4_braced', 'pusher', boom=True, braced_wing=True)
-DET_CON_5 = UAV('DET_CON_5', 'fuselage', boom=False, braced_wing=False)
-DET_CON_5_braced = UAV('DET_CON_5_braced', 'fuselage', boom=False, braced_wing=True)
-DET_CON_6 = UAV('DET_CON_6', 'fuselage', boom=True, braced_wing=False)
-DET_CON_6_braced = UAV('DET_CON_6_braced', 'fuselage', boom=True, braced_wing=True)
+# DET_CON_1 = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
+# DET_CON_1_braced = UAV('DET_CON_1_braced', 'tractor', boom=False, braced_wing=True)
+# DET_CON_2 = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=False)
+# DET_CON_2_braced = UAV('DET_CON_2_braced', 'tractor', boom=True, braced_wing=True)
+# DET_CON_3 = UAV('DET_CON_3', 'pusher', boom=False, braced_wing=False)
+# DET_CON_3_braced = UAV('DET_CON_3_braced', 'pusher', boom=False, braced_wing=True)
+# DET_CON_4 = UAV('DET_CON_4', 'pusher', boom=True, braced_wing=False)
+# DET_CON_4_braced = UAV('DET_CON_4_braced', 'pusher', boom=True, braced_wing=True)
+# DET_CON_5 = UAV('DET_CON_5', 'fuselage', boom=False, braced_wing=False)
+# DET_CON_5_braced = UAV('DET_CON_5_braced', 'fuselage', boom=False, braced_wing=True)
+# DET_CON_6 = UAV('DET_CON_6', 'fuselage', boom=True, braced_wing=False)
+# DET_CON_6_braced = UAV('DET_CON_6_braced', 'fuselage', boom=True, braced_wing=True)
+
+Cessna = Cessna_172('tractor', braced_wing=True, boom=False)
 
 # start
 plot = False
@@ -28,7 +30,7 @@ remove_duplicates = False
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
 
-for concept in [DET_CON_1, DET_CON_1_braced, DET_CON_2, DET_CON_2_braced, DET_CON_3, DET_CON_3_braced, DET_CON_4, DET_CON_4_braced, DET_CON_5, DET_CON_5_braced, DET_CON_6, DET_CON_6_braced]:
+for concept in [Cessna]:
     # --- iteration
     n = 1
     it = True
@@ -37,17 +39,21 @@ for concept in [DET_CON_1, DET_CON_1_braced, DET_CON_2, DET_CON_2_braced, DET_CO
     while it:
         # class 1
         c1.run(concept)
+        print(f"Class I estimation {n}: MTOW [kg] = {concept.W_TO}")
         
         # geometry determination
         geo.geometry_determination(concept)
-        concept.WS = 70.805
+        #concept.WS = 70.805
 
         # class 2
         c2.weight_empty(concept)
         W_TO_c2 = concept.W_TO
+        print(f"Class II estimation {n}: MTOW [kg] = {concept.W_TO} kg")
+        print(f"Fuel weight: {concept.W_F} kg")
+        print(f"Operative empty weight: {concept.W_OE} kg")
 
         # update load factor
-        concept.n_ult = Vn.max_n(concept)*1.5
+        # concept.n_ult = Vn.max_n(concept)*1.5
 
         # check if change is small enough
         change = (W_TO_c2 - W_TO_c2_old)/W_TO_c2_old
