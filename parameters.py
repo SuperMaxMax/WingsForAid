@@ -66,6 +66,7 @@ class UAV:
         "-Propulsive properties"
         self.engine_pos          = engine_pos   # Engine position [-]
         self.engine_length       = 0.6651       # Engine length [m] - EASA type certificate data sheet ROTAX 912 series
+        self.engine_cg           = 0.327        # Engine cg [m] - for ROTAX 912is engine
         self.engine_fairing      = 0.2          # Engine fairing length [m]
         self.d_engine_boxes      = 0.4          # Distance between engine boxes [m], leaves room for possible firewall
         self.power               = 80           # Power at take-off [hp]
