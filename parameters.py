@@ -153,7 +153,7 @@ class Cessna_172:
         "-Weights"
         self.W_e                 = 124.74       # Definitive weight per engine [kg]
         self.W_TO                = 1088.62      # Take-off weight [kg]
-        self.W_PL                = 415.99       # Payload weight [kg]
+        self.W_PL                = 294.87       # Payload weight [kg]
         self.WS                  = 658.99       # Wing Loading [N/m^2]
 
         "-Weight fractions"

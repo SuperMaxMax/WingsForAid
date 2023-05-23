@@ -148,7 +148,7 @@ def geometry_determination(obj, plot=False):
     if obj.boom:
         obj.S_G = 19.77
     else:
-        obj.S_G = 22.98
+        obj.S_G = 35.66
     # --- Wing parameters
     Weight_TO = obj.W_TO*obj.g0                                 # find the take off weight in newtons
     WS_values = design_points[0:12:2]                           # take the S/W values

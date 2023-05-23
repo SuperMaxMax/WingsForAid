@@ -93,7 +93,7 @@ for concept in [Cessna]:
 df.index = members
 
 # export dataframe of current design to csv file
-df['DET_CON_1_braced'].to_csv('output.csv', sep=';')
+df['Cessna 172'].to_csv('output.csv', sep=';')
 
 # remove row in dataframe if all values in that row are the same
 if remove_duplicates == True:
