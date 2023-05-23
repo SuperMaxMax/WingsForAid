@@ -35,8 +35,7 @@ def fuselage_shape(a, b, n, m, n_points):
     coordinates = np.vstack((x,y))
     return coordinates
 
-
-def geometry_determination(obj, plot=True):
+def geometry_determination(obj, plot=False):
     # create empty array for capturing design points from W/P - W/S diagrams
     design_points = np.empty(0)
     for i in range(len(obj.CL_max_clean)):                  
@@ -143,6 +142,7 @@ def geometry_determination(obj, plot=True):
     engine_fairing          = 0.2                               # 20 cm room around the engine 
     obj.l_n                  = engine_length + engine_fairing
     d_engine_boxes          = 0.4                               # 40 cm, leaves room for possible fire wall
+    
     #cross sectional
     cumulative_box_width    = obj.n_boxes_abreast * 0.4
     width_between_boxes     = (obj.n_boxes_abreast-1) * 0.2
@@ -160,14 +160,17 @@ def geometry_determination(obj, plot=True):
         obj.l_tc = 0.8                                          # from drawing [m]
     else:                                                       
         obj.l_tc = 1.75*obj.d_eff                               # Based on drawing of the aircraft.
+    
     # Fuselage dimensions
     obj.l_f   = cumulative_box_length + length_between_boxes + obj.l_n + obj.l_tc + d_engine_boxes
+    
     #shape the nose
     nose_shape = fuselage_shape(obj.l_n, obj.w_out, 2, 1.5, 1000)
     ab_line    = create_line(0.0, 0.0, obj.l_n, obj.w_out, 1000)
     difference = (nose_shape - ab_line)[0] + (nose_shape - ab_line)[1]
     S_point    = (nose_shape[0][np.argmin(difference)], nose_shape[1][np.argmin(difference)])
     P_point    = S_point[0]
+    
     #find circumference
     dx         = np.diff(nose_shape[0])
     dy         = np.diff(nose_shape[1])
@@ -248,8 +251,7 @@ def geometry_determination(obj, plot=True):
             plt.plot(MAC[0], MAC[1], color='black')
             plt.gca().set_aspect('equal', adjustable = 'box')
             plt.xlabel("y [m]")
-            plt.show()
-        
+            plt.show()     
             
     obj.t_c = np.full(np.shape(obj.Sw), 0.12)                                    # thickness over chord. 0.18 ADSEE 1, Lecture 6, Slide 22; no supercritical airfoils considered
     obj.dihedral = np.full(np.shape(obj.Sw), 1)                                  # degree, high wing value, same slides as above.

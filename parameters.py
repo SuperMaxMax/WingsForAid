@@ -2,11 +2,10 @@ import numpy as np
 class UAV:
     def __init__(self, name, engine_pos, boom, braced_wing):
         "==== Aircraft Parameters ===="
-        self.name                = name         # Name of the aircraft [-]
+        self.name                = name          # Name of the aircraft [-]
 
         "-CS23 Type"
-        self.type                = "utility"      # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
-        self.type                = "utility"    # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
+        self.type                = "utility"     # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility                   
 
         "-Aircraft geometry"
         self.A                   = 10            # Aspect ratio [-]
@@ -21,7 +20,7 @@ class UAV:
         self.W_boom              = 20            # Boom weight [kg]
         self.l_f_boom            = 2             # Boom length [m]
 
-        self.xc_OEW_p            = 0.25         # Center of gravity of OEW as a fraction of the MAC [-]
+        self.xc_OEW_p            = 0.25          # Center of gravity of OEW as a fraction of the MAC [-]
 
         self.pos_main_carriage   = "fuselage"    # Position of main carriage: "fuselage" or "wing"
         self.main_gear_type      = "fixed"       # Type of main gear: "fixed" or "retractable"
@@ -58,8 +57,6 @@ class UAV:
         self.cruise_frac         = self.W1W_TO*self.W2W1*self.W3W2*self.W4W3*0.85   # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
 
         "-Propulsive properties"
-        self.engine_pos          = engine_pos    # Engine position
-        self.P_TO                = 80            # Power at take-off [hp]
         self.engine_pos          = engine_pos   # Engine position [-]
         self.power               = 80           # Power at take-off [hp]
 
