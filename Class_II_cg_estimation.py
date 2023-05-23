@@ -20,10 +20,10 @@ def cg_calc(obj):
     prop_correction = 0.06                      # correction for propeller weight
     if obj.engine_pos == 'tractor':
         fus_cg = 0.48 * obj.l_f                 # educated guess
-        engine_cg = 0.327 - prop_correction     # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
+        engine_cg = obj.engine_cg - prop_correction     # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
     elif obj.engine_pos == 'pusher':
         fus_cg = 0.52 * obj.l_f                 # educated guess
-        engine_cg = obj.l_f - (0.6651-0.327) + prop_correction # based on Rotax 912is
+        engine_cg = obj.l_f - (obj.engine_length-obj.engine_cg) + prop_correction # based on Rotax 912is
     elif obj.engine_pos == 'fuselage':
         fus_cg = 0.5 * obj.l_f                  # educated guess
         engine_cg = 0.8 * obj.l_f               # educated guess
@@ -66,7 +66,7 @@ def cg_calc(obj):
 
     # Payload
     if obj.engine_pos == 'tractor':
-        dist_front = 0.6651 + 0.6  # [m]
+        dist_front = obj.engine_length + 0.6  # [m]
     elif obj.engine_pos == 'pusher':
         dist_front = 0.4
     elif obj.engine_pos == 'fuselage':
