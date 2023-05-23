@@ -65,7 +65,7 @@ def gear_weight(obj):
     return W_uc
 
 def nacelle_weight(obj):
-    W_n = 1.134 * obj.P_TO**0.5 # Take off power in hp
+    W_n = 1.134 * obj.power**0.5 # Take off power in hp
 
     return W_n
 
@@ -101,7 +101,7 @@ def control_surface_weight(obj):
 
 def propulsion_weight(obj):
     k_pg = 1.16 # tractor single propeller aircraft
-    W_pg = k_pg*obj.N_e*(obj.W_e+0.109*obj.P_TO)
+    W_pg = k_pg*obj.N_e*(obj.W_e+0.109*obj.power)
     # If number of cylinder and volume of cylinder are known use figure 4-12 Torenbeek
     return W_pg
 
