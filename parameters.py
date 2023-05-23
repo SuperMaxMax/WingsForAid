@@ -27,6 +27,13 @@ class UAV:
         self.nose_gear_type      = "fixed"       # Type of nose gear: "fixed" or "retractable"
 
         self.mass_penalty_struts = 7             # The weight of the struts
+
+        "- Fuselage geometry"
+        self.side_clearance      = 0.2           # Side clearance [m], this is for both sides
+        self.top_clearance       = 0.2   
+        self.bot_clearance       = 0.1
+        self.structural_thickness= 0.2           # Structural thickness fuselage [m], this is for both sides
+        
         "-Aerodynamic properties"
         self.CD0                 = 0.027         # Zero lift coefficient [-]
         self.CLa                 = 4.2           # Lift curve slope [] | CHANGE TO ACTUAL VALUE
@@ -58,6 +65,9 @@ class UAV:
 
         "-Propulsive properties"
         self.engine_pos          = engine_pos   # Engine position [-]
+        self.engine_length       = 0.6651       # Engine length [m] - EASA type certificate data sheet ROTAX 912 series
+        self.engine_fairing      = 0.2          # Engine fairing length [m]
+        self.d_engine_boxes      = 0.4          # Distance between engine boxes [m], leaves room for possible firewall
         self.power               = 80           # Power at take-off [hp]
 
         self.prop_eff            = 0.82         # Propulsive efficiency [-]
