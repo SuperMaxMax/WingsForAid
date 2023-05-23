@@ -19,8 +19,8 @@ def stallWS(obj, CL_max, h):
 def altitude_effects(obj, h):
     rho     = obj.rho0*(1 + ((obj.Lambda*h)/obj.T0))**(-((obj.g0/(obj.R_gas*obj.Lambda))+1))
     sigma   = rho/obj.rho0
-    BHP     = obj.P_TO*(sigma)**(3/4)
-    return rho, sigma, BHP
+    power     = obj.power*(sigma)**(3/4)
+    return rho, sigma, power
 
 def create_line(x1, y1, x2, y2, num_points):
     x = np.linspace(x1, x2, num_points)
@@ -47,10 +47,10 @@ def geometry_determination(obj, plot=True):
         CL_LDG          = obj.CL_LDG[i]
         
         # find atmospheric properties and power at altitude according to ISA
-        rho_TO, sigma_TO, BHP_TO = altitude_effects(obj, obj.h_TO)
+        rho_TO, sigma_TO, power_TO = altitude_effects(obj, obj.h_TO)
         obj.rho_TO = rho_TO
         obj.sigma_TO = sigma_TO
-        obj.BHP_TO = BHP_TO
+        obj.power = power_TO
         
         # define a W/S and W/P array to make graphs later on
         WS  = np.arange(100.0, 2201.0, 1.0)
@@ -161,7 +161,7 @@ def geometry_determination(obj, plot=True):
     else:                                                       
         obj.l_tc = 1.75*obj.d_eff                               # Based on drawing of the aircraft.
     # Fuselage dimensions
-    obj.l_f   = cumulative_box_length + length_between_boxes + obj.l_ + obj.l_tc + d_engine_boxes
+    obj.l_f   = cumulative_box_length + length_between_boxes + obj.l_n + obj.l_tc + d_engine_boxes
     #shape the nose
     nose_shape = fuselage_shape(obj.l_n, obj.w_out, 2, 1.5, 1000)
     ab_line    = create_line(0.0, 0.0, obj.l_n, obj.w_out, 1000)
