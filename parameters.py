@@ -23,7 +23,7 @@ class UAV:
 
         self.xc_OEW_p            = 0.25         # Center of gravity of OEW as a fraction of the MAC [-]
 
-        self.pos_main_carriage   = "fuselag"    # Position of main carriage: "fuselage" or "wing" [-]
+        self.pos_main_carriage   = "fuselage"    # Position of main carriage: "fuselage" or "wing" [-]
         self.main_gear_type      = "fixed"      # Type of main gear: "fixed" or "retractable" [-]
         self.nose_gear_type      = "fixed"      # Type of nose gear: "fixed" or "retractable" [-]
 
