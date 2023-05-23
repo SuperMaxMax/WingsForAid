@@ -243,7 +243,7 @@ def geometry_determination(obj, plot=False):
     obj.t_c = np.full(np.shape(obj.Sw), 0.12)                                    # thickness over chord. 0.18 ADSEE 1, Lecture 6, Slide 22; no supercritical airfoils considered
     obj.dihedral = np.full(np.shape(obj.Sw), 1)                                  # degree, high wing value, same slides as above.
 
-    obj.Qw_wing = ((obj.kq*obj.t_c)/(np.sqrt(1+obj.taper)))*obj.Sw*np.sqrt((obj.Sw/obj.A))
+    # obj.Qw_wing = ((obj.kq*obj.t_c)/(np.sqrt(1+obj.taper)))*obj.Sw*np.sqrt((obj.Sw/obj.A))
     obj.Sw_wetted = 2*obj.Sw
 
     if obj.braced_wing:
@@ -257,7 +257,7 @@ def geometry_determination(obj, plot=False):
         S_strut  = c_strut * l_strut
         A_strut  = l_strut**2/S_strut
         interference_penalty = 2
-        Qw_strut = 2*((kq_strut*tc_strut)/(np.sqrt(1+strut_taper)))*S_strut*np.sqrt(S_strut/A_strut)*interference_penalty
+        # Qw_strut = 2*((kq_strut*tc_strut)/(np.sqrt(1+strut_taper)))*S_strut*np.sqrt(S_strut/A_strut)*interference_penalty
         Sstrut_wetted = l_strut*c_strut*2*0.95
         obj.Drag_increase = 1 + Sstrut_wetted/obj.Sw_wetted
         obj.CD0  *= obj.Drag_increase                                                                         #kg, estimate using length and density of AL2024 t3
