@@ -89,7 +89,7 @@ def CS23_max(obj):
     if obj.type == "normal":
         y = min(2.1 + (24000 / (obj.W_TO * 2.205 + 10000)), 3.8)
     elif obj.type == "utility":
-        y = 4.4
+        y = 3.8
     else:
         print("Aircraft not properly defined in parameters. Don't take results seriously!")
         y = 0
@@ -137,18 +137,27 @@ def plot_Vn(obj):
     # Plotting points:
     plt.plot(A_x, n_max, 'ko')      #A
     plt.text(A_x, n_max + 0.35 , s = 'A', ha='center', va='top')
+    print('B', A_x, n_max)
 
     plt.plot(D_x, n_max, 'ko')      #D
     plt.text(D_x, n_max + 0.35 , s = 'D', ha='center', va='top')
+    print('F', D_x, n_max)
+
 
     plt.plot(E_x, 0, 'ko')          #E
     plt.text(E_x + 2,  0 + 0.35 , s = 'E', ha='center', va='top')
+    print('G', E_x, 0)
+
 
     plt.plot(F_x, n_min, 'ko')      #F
     plt.text(F_x, n_min - 0.15 , s = 'F', ha='center', va='top')
+    #print('F', F_x, n_min)
+
 
     plt.plot(H_x, n_min, 'ko')      #H
     plt.text(H_x, n_min - 0.15 , s = 'H', ha='center', va='top')
+    print('J', H_x, n_min)
+
 
     # Plotting straight lines
     plt.plot([A_x, D_x], [n_max, n_max], color = 'black')   # Between A and D
@@ -268,12 +277,12 @@ def plot_all(obj):
     obj.V_D                 = VD_lim_low(obj)
     obj.V_B                 = VB_lim_low(obj)
     obj.V_A                 = VA_lim_low(obj)
-    print(obj.V_s_min)
-    print(obj.V_cruise)
-    print(obj.V_D)
-    print(obj.V_B)
-    print(obj.V_A)
-    print(VS1(obj))
+    print("VS", obj.V_s_min)
+    print("VC", obj.V_cruise)
+    print("VD", obj.V_D)
+    print("VB", obj.V_B)
+    print("VA", obj.V_A)
+    print("VS1", VS1(obj))
 
 
     plot_Vn(obj)
@@ -282,3 +291,7 @@ def plot_all(obj):
     plt.show()
 
 
+concept = UAV('Validate', 'tractor', boom=False, braced_wing=False)
+#concept.WS = 70.805
+
+plot_all(concept)
