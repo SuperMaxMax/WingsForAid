@@ -7,7 +7,7 @@ def VC_lim_low(obj):
     return 33 * (obj.WS * 0.020885) ** 0.5 * 0.51444 #[m/s]
 
 def VD_lim_low(obj):
-    return 1.4 * VC_lim_low(obj)    #[m/s]
+    return 1.5 * VC_lim_low(obj)    #[m/s]
 
 def VA_lim_low(obj): #Cant be greater than VC
     V, n_pos, n_neg = stall_req(obj)
