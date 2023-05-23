@@ -141,8 +141,8 @@ def plot_Vn(obj):
     plt.plot(D_x, n_max, 'ko')      #D
     plt.text(D_x, n_max + 0.35 , s = 'D', ha='center', va='top')
 
-    plt.plot(E_x, 0, 'ko')          #E
-    plt.text(E_x + 2,  0 + 0.35 , s = 'E', ha='center', va='top')
+    plt.plot(E_x, n_min, 'ko')          #E
+    plt.text(E_x + 2,  n_min + 0.35 , s = 'E', ha='center', va='top')
 
     plt.plot(F_x, n_min, 'ko')      #F
     plt.text(F_x, n_min - 0.15 , s = 'F', ha='center', va='top')
@@ -152,8 +152,8 @@ def plot_Vn(obj):
 
     # Plotting straight lines
     plt.plot([A_x, D_x], [n_max, n_max], color = 'black')   # Between A and D
-    plt.plot([D_x, E_x], [n_max, 0], color = 'black')       # Between D and E
-    plt.plot([E_x, F_x], [0, n_min], color = 'black')       # Between E and F
+    plt.plot([D_x, E_x], [n_max, n_min], color = 'black')       # Between D and E
+    plt.plot([E_x, F_x], [n_min, n_min], color = 'black')       # Between E and F
     plt.plot([F_x, H_x], [n_min, n_min], color = 'black')   # Between F and H
 
 
@@ -227,7 +227,13 @@ def plot_gust(obj):
 
     for i in range(len(V)):
         plt.plot(V[i], n_peak[i], 'o', color = 'pink')
-        plt.text(V[i], n_peak[i] + 0.35 , s = labels[i], ha='center', va='top')
+        if labels[i]!="F'" and labels[i]!="D'" and labels[i]!="E'" and labels[i]!="B'":
+            plt.text(V[i], n_peak[i] + 0.35 , s = labels[i], ha='center', va='top')
+        elif labels[i]=="B'":
+            plt.text(V[i]-3, n_peak[i] + 0.35 , s = labels[i], ha='center', va='top')
+        else:
+            plt.text(V[i]+3, n_peak[i] + 0.35 , s = labels[i], ha='center', va='top')
+        
 
     # Plotting straight lines
     plt.plot([0, V[0]], [1, n_peak[0]], color = 'pink')                        #Between 1 and B'
@@ -271,5 +277,7 @@ def plot_all(obj):
     plot_Vn(obj)
     plot_gust(obj)
     plt.title(f"V-n diagram for {obj.name}")
+    plt.show()
 
-
+concept = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
+plot_all(concept)
