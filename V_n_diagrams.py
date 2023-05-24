@@ -277,7 +277,7 @@ def plot_all(obj):
     plot_Vn(obj)
     plot_gust(obj)
     plt.title(f"V-n diagram for {obj.name}")
-    plt.show()
+#     plt.show()
 
-concept = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
-plot_all(concept)
+# concept = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
+# plot_all(concept)
