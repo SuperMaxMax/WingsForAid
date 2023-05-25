@@ -140,14 +140,13 @@ class UAV:
         self.omega_prop   = 237             # rad/s, based on 5500 rpm max continuous power and 2.43 gearbox ratio
         self.prop_radius  = 0.8255          # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
         
+        "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
+        self.CS_eta = 0.95                  # airfoil efficiency factor [-]
+        self.CS_            #           
 
-<<<<<<< Updated upstream
-
-        "Control and stability parameters"
+        "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
         self.something = 1 # add units
 
-        "Operations parameters"
-        self.something = 1 # add units
 class airport:
     def __init__(self, name):
         self.name       = name
@@ -164,11 +163,3 @@ class atmosphere:
         self.p0     = 101325    # Pa 
         self.gamma  = 1.4
 
-=======
-        "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
-        self.CS_eta = 0.95                  # airfoil efficiency factor [-]
-        self.CS_            #           
-
-        "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
-        self.something = 1 # add units
->>>>>>> Stashed changes
