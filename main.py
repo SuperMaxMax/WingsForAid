@@ -1,64 +1,6 @@
-# from parameters import UAV
-# import Class_I_weight_estimation as c1
-# import Class_II_weight_estimation as c2
-# import Class_II_cg_estimation as c2cg
-# import geometry_determination as geo
-# import V_n_diagrams as Vn
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# import numpy as np
+from aerodynamics.example import print_name, overwrite_value
+from parameters import UAV
 
-# DET_CON_2_braced = UAV('DET_CON_2_braced')
-
-# # start
-# plot = False
-# remove_duplicates = False
-
-# # create dataframe with members and values, to save all concepts in
-# df = pd.DataFrame()
-
-# for concept in [DET_CON_2_braced]: #[DET_CON_1, DET_CON_1_braced, DET_CON_2, DET_CON_2_braced, DET_CON_3, DET_CON_3_braced, DET_CON_4, DET_CON_4_braced, DET_CON_5, DET_CON_5_braced, DET_CON_6, DET_CON_6_braced]:
-#     # --- iteration
-#     n = 1
-#     it = True
-#     W_TO_c2_old = 750
-
-#     while it:
-#         # class 1
-#         c1.run(concept)
-        
-#         # geometry determination
-#         geo.geometry_determination(concept)
-
-#         # class 2
-#         c2.weight_empty(concept)
-#         W_TO_c2 = concept.W_TO
-
-#         # update load factor
-#         concept.n_ult = Vn.max_n(concept)*1.5
-
-#         # check if change is small enough
-#         change = (W_TO_c2 - W_TO_c2_old)/W_TO_c2_old
-
-#         if abs(change) < 0.00001:
-#             it = False
-#         else:
-#             W_TO_c2_old = W_TO_c2
-#             n += 1
-
-#     # --- plotting of concept
-#     print(f"{concept.name} done in {n} iterations \n")
-#     # cg calculation
-#     plt.figure(1)
-#     plt.subplot(121)
-#     c2cg.cg_calc(concept)
-
-#     # V-n diagram
-#     plt.subplot(122)
-#     Vn.plot_all(concept)
-#     if plot == True:
-#         plt.show()
-    
 #     # --- saving
 #     # save all attributes of object to csv file
 #     members = [attr for attr in dir(concept) if not callable(getattr(concept, attr)) and not attr.startswith("__")]
