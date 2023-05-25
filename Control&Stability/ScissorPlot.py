@@ -255,7 +255,7 @@ ax2.yaxis.set_label_coords(-0.05, 0.95)
 ax2.xaxis.set_label_coords(1.03, -0.00)
 ax2.grid()
 
-fig1.savefig("ref_scissorplot")
-fig2.savefig("new_scissorplot")
+# fig1.savefig("ref_scissorplot")
+# fig2.savefig("new_scissorplot")
 
 plt.show()

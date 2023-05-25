@@ -210,8 +210,8 @@ def loading_diagram(aircraft_dict,plotting=False):
         plt.xlabel(r'CG location $\tilde{x_{cg}}$[mac]')
         plt.ylabel('Mass [kg]')
         plt.legend()
-        name = ac_name + '_loading diagram'
-        plt.savefig(name+'.pdf')
+        # name = ac_name + '_loading diagram'
+        # plt.savefig(name+'.pdf')
         plt.show()
 
     return max_xcg_mac, min_xcg_mac
