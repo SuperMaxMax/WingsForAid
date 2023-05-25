@@ -97,7 +97,7 @@ def cg_calc(obj):
     Xs = (Xs-X_LEMAC)/obj.MAC_length
     w_fracs = [W_OEW/obj.W_TO, W_OEW_fuel_frac] + W_OEW_fuel_box_frac
     labels = ['OEW', 'OEW + Fuel'] + labels
-    plt.rcParams.update({'font.size': 14})
+    # plt.rcParams.update({'font.size': 14})
     for x, w, label, i in zip(Xs, w_fracs, labels, range(len(Xs))):
         plt.scatter(x, w)
         if i < 2:
