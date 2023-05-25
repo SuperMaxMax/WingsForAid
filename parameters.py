@@ -127,20 +127,21 @@ class UAV:
         self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
         self.y_mac = 2.3182                 # Spanwise location of the MAC [m]
 
-        "Structural parameters"
+        "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
         self.something = 1 # add units
         self.y_mac = 2                      # Spanwise location of the MAC [m]
 
-        "Aerodynamic parameters"
+        "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
         self.something = 1 # add units
 
-        "Flight Performance parameters"
+        "Flight Performance parameters"     # NOTE: Add identifier "FP_" before variable names
         self.screenheight = 50*0.3048       # screen height of 50 ft (CS23)
         self.rpm_maxcont  = 5500            # rpm
         self.omega_prop   = 237             # rad/s, based on 5500 rpm max continuous power and 2.43 gearbox ratio
         self.prop_radius  = 0.8255          # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
         
 
+<<<<<<< Updated upstream
 
         "Control and stability parameters"
         self.something = 1 # add units
@@ -163,3 +164,11 @@ class atmosphere:
         self.p0     = 101325    # Pa 
         self.gamma  = 1.4
 
+=======
+        "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
+        self.CS_eta = 0.95                  # airfoil efficiency factor [-]
+        self.CS_            #           
+
+        "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
+        self.something = 1 # add units
+>>>>>>> Stashed changes

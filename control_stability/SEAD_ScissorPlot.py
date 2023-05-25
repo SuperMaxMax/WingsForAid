@@ -118,14 +118,14 @@ def Scissorplot(AR, b_nac, l_nac):
     # Lift rate coefficients Cruise
     CruiseCLa_h = LiftRateCoefficient(Mcruise, A_h, Lambda_05ch)  # Lift rate coefficient horizontal tail [1/rad]
     print("CruiseCLa_h", CruiseCLa_h)
-    CruiseCLa_w = LiftRateCoefficient(Mcruise, A, Lambda_025c)  # Lift rate coefficient wing [1/rad]
+    CruiseCLa_w = LiftRateCoefficient(Mcruise, A, Lambda_05c)  # Lift rate coefficient wing [1/rad]
     print("CruiseCLa_w:", CruiseCLa_w)
 
     CruiseCLa_Ah = TaillessLiftRateCoefficient(CruiseCLa_w, b_f, b, S_net, S)  # lift rate coefficient aircraft without tail [1/rad]
     print("CruiseCLa_Ah:", CruiseCLa_Ah)
 
     # Lift rate coefficients Approach
-    ApproachCLa_w = LiftRateCoefficient(Mmin, A, Lambda_025c)
+    ApproachCLa_w = LiftRateCoefficient(Mmin, A, Lambda_05c)
     print("ApproachCLa_w:", ApproachCLa_w)
     
     ApproachCLa_Ah = TaillessLiftRateCoefficient(ApproachCLa_w, b_f, b, S_net, S)
