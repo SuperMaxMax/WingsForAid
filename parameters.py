@@ -133,7 +133,8 @@ class UAV:
         self.something = 1 # add units
 
         "Flight Performance parameters"
-        self.something = 1 # add units
+        self.screenheight = 50*0.3048       # screen height of 50 ft (CS23)
+        
 
         "Control and stability parameters"
         self.something = 1 # add units
