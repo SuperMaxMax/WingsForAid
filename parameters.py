@@ -12,7 +12,8 @@ class UAV:
         self.CL_max_land = 1.9              # Maximum lift coefficient at landing [-]
         self.CLa = 4.2                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         self.Drag_increase = 1.0126         # This is used for the calculations of the strut drag if applicable [-]
-        self.LDG_dist = 750                 # Landing distance [m]
+        self.RFL = 750.0                    # Required field length [m]
+        self.LDG_dist = 750.0               # Landing distance [m]
         self.L_D = 14.1804                  # Lift to drag ratio [-]
         self.Lambda = -0.0065
         self.MAC_length = 1.0161            # Mean aerodynamic chord [m]
@@ -64,6 +65,7 @@ class UAV:
         self.boom                = True     # Boom, true if boom tail is implemented
         self.bot_clearance = 0.1            # Bottom clearance [m]
         self.braced_wing         = True     # True if wing is braced
+        self.boxweight = 23.0               # weight of a single box [kg]
         self.c_p = 72E-9                    # Specific fuel consumption [kg/J]
         self.climb_rate = 2.9889 
         self.cos_lambda_c04 = 1 
@@ -78,7 +80,7 @@ class UAV:
         self.engine_pos = 'tractor'         # Engine position: "tractor" or "pusher" or "fuselage"
         self.eta_p = 0.82                   # Propulsive efficiency [-]
         self.g0 = 9.8066                    # Gravitational acceleration [m/s^2]
-        self.h_TO = 0                       # Take-off altitude [m]
+        self.h_TO = 0                       # Take-off altitude, airport altitude [m]
         self.h_cruise = 3048.0              # Cruise altitude [m]
         self.h_in = 0.9                     # Inner fuselage height [m]
         self.h_out = 1.1                    # Outer fuselage height [m]
@@ -97,7 +99,7 @@ class UAV:
         self.n_boxes = 12                   # [-]
         self.n_boxes_abreast = 2            # [-]
         self.n_drops = 1                    # [-]
-        self.n_rows = 6.0                   # [-]
+        self.n_rows = 6                     # [-]
         self.n_ult = 6.6                    # Ultimate load factor [-]
         self.name = name                    # Name of the aircraft
         self.nose_gear_type = 'fixed'       # Type of nose gear: "fixed" or "retractable"
@@ -134,10 +136,30 @@ class UAV:
 
         "Flight Performance parameters"
         self.screenheight = 50*0.3048       # screen height of 50 ft (CS23)
+        self.rpm_maxcont  = 5500            # rpm
+        self.omega_prop   = 237             # rad/s, based on 5500 rpm max continuous power and 2.43 gearbox ratio
+        self.prop_radius  = 0.8255          # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
         
+
 
         "Control and stability parameters"
         self.something = 1 # add units
 
         "Operations parameters"
         self.something = 1 # add units
+class airport:
+    def __init__(self, name):
+        self.name       = name
+        self.mu_ground  = 0.35                  #buildingspeed.org
+        self.rwyslope   = 1.0                   #runway slope in degrees --> CONVERT TO RADIANS
+
+class atmosphere:
+    def __init__(self):
+        self.rho0   = 1.225     # kg/m^3
+        self.lambd  = -0.0065   # troposphere, deg K/m
+        self.T0     = 273.15    # K
+        self.g      = 9.80665   # m/s^2
+        self.R      = 287.05    
+        self.p0     = 101325    # Pa 
+        self.gamma  = 1.4
+
