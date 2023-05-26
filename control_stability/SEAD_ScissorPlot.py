@@ -180,6 +180,7 @@ def Scissorplot(AR, b_nac, l_nac):
 
     # Moment contribution of fuselage
     CL0_w = 0.454 * (95 * 0.51444 * np.cos(Lambda_025c * np.pi / 180)) ** 2 / (95 * 0.51444) ** 2 # CL0 of wing, ADSEE L1 slide 61
+
     print("CL0_w", CL0_w)
     
     CL0_tot = CL0_w + 1.067171  # CL0 of wing and flaps, constant is contribution of flaps (see excel)
