@@ -162,7 +162,29 @@ class UAV:
         self.Sh_S = 0.3
 
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
-        self.something = 1 # add units
+        self.n_drops = 1  # [-]
+        self.n_boxes = 12  # [-]
+        self.hatchDT = 1  # [s]
+        self.hatchDTdev = 0.5  # [s]
+        self.boxDX = 0.5  # [m]
+        self.boxDY = 0.5  # [m]
+        self.boxDZ = 0  # [m]
+
+        self.OP_theta_app = 0  # [deg]       # approach
+        self.OP_V_app = 100  # [m/s]
+
+        self.OP_V_drop = 100  # [m/s]       # drop
+        self.OP_Dn_drop = 1  # [g0]
+        self.OP_theta_drop = 0  # [deg]
+        self.OP_Vbox_LDG = 1  # [m/s]
+        self.OP_amax_box = 1  # [m/s2]
+        self.OP_accuracyX = 25  # [m]
+        self.OP_accuracyY = 25  # [m]
+
+        self.OP_hmin = 15  # [m]              # requirements
+        self.OP_V_crosswind = 25  # [m/s]
+        self.OP_V_tailwind = 25  # m/s]
+        self.OP_V_headwind = 25  # [m/s]
 
 class airport:
     def __init__(self, name):
