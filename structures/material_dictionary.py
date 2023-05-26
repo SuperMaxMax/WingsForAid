@@ -2,13 +2,8 @@ import pandas as pd
 import copy
 import numpy as np
 
-# import excel file with material properties
-material_excel = pd.read_excel('material_properties.xlsx', sheet_name='Sheet2', header=0, index_col=0)
-
-def rank_material(material_excel, weights):
-    material_ranking = copy.deepcopy(material_excel)
-    print(material_ranking.columns)
-    
+def rank_material(weights):
+    material_ranking = copy.deepcopy(material_df)
 
     ascending_tf = [True, True, True, True, False, False, False]
     for i, property in enumerate(material_ranking.columns):
@@ -17,22 +12,22 @@ def rank_material(material_excel, weights):
 
     material_ranking['Ranking'] = material_ranking.apply(lambda row: sum(row * weights), axis=1)
     material_ranking.sort_values(by=['Ranking'], inplace=True)
-    material_ranking.drop(material_ranking.columns[6:], axis=1, inplace=True)
+    material_ranking.drop(material_ranking.columns[:7], axis=1, inplace=True)
+    
+    return list(material_ranking.index)
 
-    print(material_ranking)
+# import excel file with material properties
+material_df = pd.read_excel('material_properties.xlsx', sheet_name='Sheet2', header=0, index_col=0)
 
+# create dictionary for each material containing all properties
+material = {}
+for i in range(len(material_df)):
+    material[material_df.index[i]] = material_df.iloc[i]
 
 test = [1, 0, 0, 0, 0, 0, 0]
 
-rank_material(material_excel, test)
-# # example of how to print a property
-# print(material['6061 T6']['Density'])
-
-# # all materials in dictionary
-# print(material.keys())
-
-# # all properties of a material
-# print(material['6061 T6'].keys())
+print(material["Al-6061-T6"]['density'])
+print(rank_material(test))
 
 
 

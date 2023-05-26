@@ -150,19 +150,40 @@ class UAV:
         self.CS_mu1 = 0.24
         self.CS_mu2 = 0.78
         self.CS_mu3 = 0.525
-        self.CS_dClmax = 1.3
         self.CS_x_ac_w = 0.25               # location of wing ac, divided by MAC [-] - SEAD L7, S34   
-        self.CS_l_h = 4.5                   # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
-        self.CS_Cm_0_airfoil = -0.053       # TODO: Update value - Moment coefficient of airfoil [-]
+        self.CS_l_h = 6.5                   # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.CS_Cm_0_airfoil = -0.083       # TODO: Update value - Moment coefficient of airfoil [-]
         
         self.Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
-        self.A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+        self.A_h = 6                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
         self.dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
         self.Sh_S = 0.3
 
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
-        self.something = 1 # add units
+        self.n_drops = 1  # [-]
+        self.n_boxes = 12  # [-]
+        self.hatchDT = 1  # [s]
+        self.hatchDTdev = 0.5  # [s]
+        self.boxDX = 0.5  # [m]
+        self.boxDY = 0.5  # [m]
+        self.boxDZ = 0  # [m]
+
+        self.OP_theta_app = 0  # [deg]       # approach
+        self.OP_V_app = 100  # [m/s]
+
+        self.OP_V_drop = 100  # [m/s]       # drop
+        self.OP_Dn_drop = 1  # [g0]
+        self.OP_theta_drop = 0  # [deg]
+        self.OP_Vbox_LDG = 1  # [m/s]
+        self.OP_amax_box = 1  # [m/s2]
+        self.OP_accuracyX = 25  # [m]
+        self.OP_accuracyY = 25  # [m]
+
+        self.OP_hmin = 15  # [m]              # requirements
+        self.OP_V_crosswind = 25  # [m/s]
+        self.OP_V_tailwind = 25  # m/s]
+        self.OP_V_headwind = 25  # [m/s]
 
 class airport:
     def __init__(self, name):
