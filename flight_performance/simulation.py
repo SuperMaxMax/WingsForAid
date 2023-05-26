@@ -76,8 +76,6 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
         plt.ylabel("Climb angle")
         plt.legend()
         plt.show()
-        plt.plot(alt_range, atm_obj.rho, color='red')
-        plt.show()
     print("----------------------------------------------------------------------------")
     print(f"The max Rate of Climb is {ROC[ROC==np.max(ROC)]} [m/s] at altitude {alt_range[ROC==np.max(ROC)][0]} [m]")
     print(f"The max climb angle is {Gamma[Gamma==np.max(Gamma)]} [deg] at altitude {alt_range[Gamma==np.max(Gamma)][0]} [m]")
@@ -87,18 +85,19 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
 
 def flightceiling(ac_obj, atm_obj, W_F, plot=True):
     W = takeoffweight(ac_obj, W_F)*atm_obj.g
+    alt_range = (0, ac_obj.th_ceil)
     atm_parameters_vectorized = np.vectorize(lambda h: atm_parameters(atm_obj, h))
-    alt_range = np.arange(0, ac_obj.th_ceil, 0.5)
+    alt_range = np.arange(0, ac_obj.ceiling, 0.5)
     atm_obj.p, atm_obj.T, atm_obj.rho, atm_obj.a = atm_parameters_vectorized(alt_range)
     stall_limit = np.empty(0)
-    thr_lim_lo  = np.empty(0)
+    thr_lim_lo = np.empty(0)
     thr_lim_hi  = np.empty(0)
     for i in range(len(alt_range)):
-        rho = atm_obj.rho[i]
+        p, T, rho, a = atm_obj.p[i], atm_obj.T[i], atm_obj.rho[i], atm_obj.a[i]
         V_s = np.sqrt(2*W/(rho*ac_obj.Sw*ac_obj.CL_max_clean))
         P_a = ac_obj.power * ac_obj.prop_eff * 745.699872 * (rho/atm_obj.rho0)**(3/4)
-        V_max = np.arange(110, 250, 0.5)*0.5144
-        V_min = np.arange(40, 180, 0.5)*0.5144
+        V_max = np.arange(150, 250, 0.5)*0.5144
+        V_min = np.arange(50, 150, 0.5)*0.5144
         CL_hi = 2*W/(rho*ac_obj.Sw*V_max**2)
         CL_lo = 2*W/(rho*ac_obj.Sw*V_min**2)
         CD_hi = ac_obj.CD0 + CL_hi**2/(np.pi*ac_obj.A*ac_obj.e)
@@ -114,17 +113,15 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True):
         thr_lim_hi = np.append(thr_lim_hi, V_max)
         thr_lim_lo = np.append(thr_lim_lo, V_min)
     if plot:
-        plt.plot(thr_lim_hi, alt_range, color= 'green')
-        plt.plot(stall_limit, alt_range, color='green')
-        # plt.plot(thr_lim_lo, alt_range, color= 'green')
-        # plt.plot(atm_obj.rho, alt_range, color='red')
+        plt.plot(thr_lim_hi, alt_range, color='green')
+        plt.plot(stall_limit[stall_limit >= thr_lim_lo], alt_range[stall_limit >= thr_lim_lo], color='green')
+        plt.plot(thr_lim_lo[thr_lim_lo >= V_s], alt_range[thr_lim_lo >= V_s], color = 'green')
         plt.xlabel("Airspeed [m/s]")
         plt.ylabel("Altitude [m]")
         plt.show()
     return
+
 a = flightceiling(aircraft, atm, 60)
-
-
 
 
 
