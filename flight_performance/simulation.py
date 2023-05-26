@@ -64,6 +64,7 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
         W -= dWF
         ROC= np.append(ROC, roc)
         Gamma = np.append(Gamma, gamma)
+    
     end_time = time.time()
     if plot:
         plt.plot(alt_range, ROC, label=f"Climb power: {P_climb*100}%")
@@ -85,19 +86,18 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
 
 def flightceiling(ac_obj, atm_obj, W_F, plot=True):
     W = takeoffweight(ac_obj, W_F)*atm_obj.g
-    alt_range = (0, ac_obj.th_ceil)
     atm_parameters_vectorized = np.vectorize(lambda h: atm_parameters(atm_obj, h))
-    alt_range = np.arange(0, ac_obj.ceiling, 0.5)
+    alt_range = np.arange(0, ac_obj.th_ceil, 0.5)
     atm_obj.p, atm_obj.T, atm_obj.rho, atm_obj.a = atm_parameters_vectorized(alt_range)
     stall_limit = np.empty(0)
     thr_lim_lo = np.empty(0)
     thr_lim_hi  = np.empty(0)
     for i in range(len(alt_range)):
-        p, T, rho, a = atm_obj.p[i], atm_obj.T[i], atm_obj.rho[i], atm_obj.a[i]
+        rho = atm_obj.rho[i]
         V_s = np.sqrt(2*W/(rho*ac_obj.Sw*ac_obj.CL_max_clean))
         P_a = ac_obj.power * ac_obj.prop_eff * 745.699872 * (rho/atm_obj.rho0)**(3/4)
-        V_max = np.arange(150, 250, 0.5)*0.5144
-        V_min = np.arange(50, 150, 0.5)*0.5144
+        V_max = np.arange(110, 200, 0.5)*0.5144
+        V_min = np.arange(40, 130, 0.5)*0.5144
         CL_hi = 2*W/(rho*ac_obj.Sw*V_max**2)
         CL_lo = 2*W/(rho*ac_obj.Sw*V_min**2)
         CD_hi = ac_obj.CD0 + CL_hi**2/(np.pi*ac_obj.A*ac_obj.e)
@@ -114,33 +114,14 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True):
         thr_lim_lo = np.append(thr_lim_lo, V_min)
     if plot:
         plt.plot(thr_lim_hi, alt_range, color='green')
-        plt.plot(stall_limit[stall_limit >= thr_lim_lo], alt_range[stall_limit >= thr_lim_lo], color='green')
-        plt.plot(thr_lim_lo[thr_lim_lo >= V_s], alt_range[thr_lim_lo >= V_s], color = 'green')
+        plt.plot(stall_limit, alt_range, color='green')
+        #plt.plot(thr_lim_lo, alt_range, color = 'green')
         plt.xlabel("Airspeed [m/s]")
         plt.ylabel("Altitude [m]")
         plt.show()
     return
 
 a = flightceiling(aircraft, atm, 60)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # ---------------- Assumptions for take-off equations of motion -----------------
 # Wind is included by take it into account in the speed: V_eff = V - V_wind
@@ -188,4 +169,17 @@ dic_constants = {'runway slope': np.arange(0, 10), 'runway altitude': 0, 'wing s
     ,'propeller efficiency': 0.5}
 
 TO_eom(aircraft, airfield, atm, dic_constants)
+
+def turnperformance(ac_obj, atm_obj, phi, V, W, h, heading_change):
+    rho = atm_parameters(atm_obj, h)[3] 
+    phi *= np.pi/180
+    R_turn = V**2/(atm_obj.g * np.tan(phi))
+    n_turn = 1/np.cos(phi)
+    CL = 2*W/(rho*V**2*ac_obj.Sw)
+    CD = ac_obj.CD0 + CL**2/(np.pi*ac_obj.A*ac_obj.e)
+    CL_CD = CL/CD
+    Pr = n_turn*CL_CD*W*V
+    turn_time = (2*np.pi*(heading_change/360)*R_turn)/V
+    return R_turn, n_turn, Pr, turn_time
+
 
