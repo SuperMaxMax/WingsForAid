@@ -88,8 +88,12 @@ import numpy as np
 
 def tau(df):
     f = np.array(tau_init(df))
+    print(f)
     g = np.array(tau_add(df))
-    return f + g
+    for i in range(len(f)):
+        f[i] = f[i] + g[i]
+    print(g)  #  f.add(g, fill_value=0)
+    return f
 
 
 
@@ -110,4 +114,4 @@ def eta(df):     # Weights based on mission profile
 
 
 
-
+print(tau(df))
