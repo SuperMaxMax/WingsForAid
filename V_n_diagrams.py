@@ -279,5 +279,6 @@ def plot_all(obj):
     plt.title(f"V-n diagram for {obj.name}")
     plt.show()
 
-concept = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
+concept = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=True)
 plot_all(concept)
+print(VC_lim_low(concept))
