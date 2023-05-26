@@ -32,8 +32,8 @@ class UAV:
         self.V_B = 45.0                     # [m/s]
         self.V_D = 90.7328                  # [m/s]
         self.V_climb = 36.0111              # [m/s]
-        self.V_cruise = 60.4885             # [m/s]
-        self.V_s_min = 22.8537              # [m/s]
+        self.V_cruise = 60.4885             # Cruise velocity [m/s]
+        self.V_s_min = 22.8537              # Minimum stall velocity [m/s]
         self.W10W9 = 0.993                  # Descent fraction [-]
         self.W1W_TO = 0.995                 # Engine startup fraction [-]
         self.W2W1 = 0.997                   # Taxi fraction [-]
@@ -58,7 +58,7 @@ class UAV:
         self.WfinalW10 = 0.993              # Landing, taxi & shut-down fraction [-]
         self.X_LEMAC = 2.276                # Leading edge mean aerodynamic chord [m]
         self.X_cg_aft = 0.5335              # Aft cg location CG/MAC [-]
-        self.X_cg_full = 0.4115             # Full cg location CG/MAC [-]
+        self.X_cg_full = 0.4115             # MTOW cg location CG/MAC [-]
         self.X_cg_fwd = 0.1704              # Forward cg location CG/MAC [-]
         self.X_cg_range = 0.363             # Range of cg location CG/MAC [-]
         self.b = 10.8219                    # Wing span [m]
@@ -132,7 +132,7 @@ class UAV:
         self.y_mac = 2                      # Spanwise location of the MAC [m]
 
         "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
-        self.something = 1 # add units
+        self.AE_Cl0 = 0.4                   # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
 
         "Flight Performance parameters"     # NOTE: Add identifier "FP_" before variable names
         self.screenheight = 50*0.3048       # screen height of 50 ft (CS23)
@@ -145,7 +145,19 @@ class UAV:
         
         "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
         self.CS_eta = 0.95                  # airfoil efficiency factor [-]
-        # self.CS_                            # I commented this out because it was producing an error - Ties            
+        self.CS_mu1 = 0.24
+        self.CS_mu2 = 0.78
+        self.CS_mu3 = 0.525
+        self.CS_dClmax = 1.7028171
+        self.CS_x_ac_w = 0.25               # location of wing ac, divided by MAC [-] - SEAD L7, S34   
+        self.CS_l_h = 4.5                   # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.CS_Cm_0_airfoil = -0.053       # TODO: Update value - Moment coefficient of airfoil [-]
+        
+        self.Vh_V   = 0.95                  # [-] Ratio between velocity at tail and wing. NOTE: This is a guestimate
+        self.A_h = 4                        # [-] Aspect ratio horizontal tail. NOTE: This is a guestimate  
+        self.lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane NOTE: This is a guestimate  
+        self.dEpsilondA   = 0.02            # [-] Downwash NOTE: check this value. This is a pure guess
+        self.Sh_S         = 0.3
 
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
         self.something = 1 # add units
@@ -162,7 +174,7 @@ class atmosphere:
         self.lambd  = -0.0065   # troposphere, deg K/m
         self.T0     = 273.15    # K
         self.g      = 9.80665   # m/s^2
-        self.R      = 287.05    
+        self.R_gas  = 287.05    
         self.p0     = 101325    # Pa 
         self.gamma  = 1.4
 

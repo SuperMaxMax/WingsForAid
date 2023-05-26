@@ -16,10 +16,25 @@ df = pd.DataFrame([[5,4,2,8],
                   [2,1,2,5]])
 
 
-def workable_df(df):    # Reshape dataframe to workable values for tau,
+def tau_df(df):    # Reshape dataframe to workable values for tau,
                         # combining parameters that need to be combined and 
                         # inverting parameters where a maximum is desired.
+                        # Assign weights if necessary
     return
+
+def eta_df(df):     # Weights based on mission profile
+    cruise_weight   =
+    loiter_weight   =
+    ascend_weight   =
+    descend_weight  =
+    cruise_par      =
+    loiter_par      =
+    ascend_par      =
+    descend_par     =
+
+    eta = cruise_weight * cruise_par + loiter_weight * loiter_par + ascend_weight * ascend_par + descend_weight * descend_par
+
+    return eta
 
 
 def tau(df):        #Input must 
@@ -39,4 +54,5 @@ print(tau(df))
 
 
 def eta(df):
+    
     return
