@@ -16,7 +16,9 @@ df = pd.DataFrame([[5,4,2,8],
                   [2,1,2,5]])
 
 
-def workable_df(df):    #Reshape dataframe to workable values
+def workable_df(df):    # Reshape dataframe to workable values for tau,
+                        # combining parameters that need to be combined and 
+                        # inverting parameters where a maximum is desired.
     return
 
 
@@ -34,5 +36,7 @@ def tau(df):        #Input must
     return taulist
 
 print(tau(df))
+
+
 def eta(df):
     return
