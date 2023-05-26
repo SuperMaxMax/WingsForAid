@@ -56,7 +56,7 @@ if plot:
 
 # Create loading diagrams
 Bz = -1/aircraft.wing_strut_location*(quad(spanwise_wing_loading_ty, 0, aircraft.b/2)[0]-spanwise_flap_weight()*((aircraft.b/2*0.6)**2/2)+spanwise_aileron_weight()*aircraft.b/2*0.4*(0.8*aircraft.b/2)-spanwise_fuel_weight()*aircraft.b/2*aircraft.b/4-spanwise_wing_weight()*aircraft.b/2*aircraft.b/4-aircraft.W_wl*aircraft.g0*aircraft.b/2)
-# Az = -Bz + quad(spanewise)
+Az = -(Bz+quad(spanwise_wing_loading, 0, aircraft.b/2)[0] - spanwise_flap_weight()*(aircraft.b/2*0.6) - spanwise_aileron_weight()*(aircraft.b/2*0.4) - spanwise_fuel_weight()*(aircraft.b/2) - spanwise_wing_weight()*(aircraft.b/2) - aircraft.W_wl*aircraft.g0)
 print(Bz)
 
 # first: make fuel and structure as function of span _> then Az 
