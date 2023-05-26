@@ -11,13 +11,13 @@ atm      = atmosphere()
 
 def Mach_calculation(aircraft, V, h):
     atm.T =  atm.T0 - atm.lambd * h
-    atm.speed_of_sound = (atm.gamma * atm.R_gas * atm.T) ** 0.5
+    atm.speed_of_sound = (atm.gamma * atm.R * atm.T) ** 0.5
     Mach = V / atm.speed_of_sound
     return Mach
 
 
 #################################################################################################################
-"Determine coefficients"
+"Determine Scissorplot Coefficients"
 #################################################################################################################
 
 def LiftRateCoefficient(aircraft, Mach, A, lambda_co2):  # lift rate coefficient tail/wing
@@ -69,6 +69,16 @@ def Aerodynamic_centre_determination(aircraft):
     aircraft.x_ac_cruise        = aircraft.x_ac_wf_cruise + aircraft.dx_ac_n_cruise
     aircraft.x_ac_approach      = aircraft.x_ac_wf_approach + aircraft.dx_ac_n_approach
 
+#################################################################################################################
+"FIXME: Determine Control Surface Coefficients"
+#################################################################################################################
+CS_cf                           = 0.3 # flap chord [m] TODO: update value
+CS_c_prime                      = 1 # wing chord length when flaps are extended [m] TODO: update value
+CS_Swf                          = 0.5 * aircraft.Sw # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) TODO: update value
+CS_dClmax                       = 1.3 # Additional airfoil lift due to single slotted flap ( ADSEE-II, L3 S36) NOTE: check if correct
+CS_lambda_hinge                 = 0.02 # hinge line sweep angle [rad] TODO: update value
+
+# TODO: Continue here, around ADSEE-II L3 S34
 
 #################################################################################################################
 "Controlability and Stability Curves"
@@ -88,8 +98,8 @@ def controlability_curve(aircraft): #TODO: change constants here
     #Calculation of Cm_ac starting here
     Cm_ac_w = aircraft.CS_Cm_0_airfoil * (aircraft.A * (np.cos(aircraft.lambda_co4))**2 / (aircraft.A + 2 * np.cos(aircraft.lambda_co4)))
 
-    # TODO: Bram continue 
-    dCm_ac_f = aircraft.CS_mu2 * ((-aircraft.CS_mu1) * aircraft.CS_dClmax * 1.06426 - (CL_Ah + aircraft.CS_dClmax * (1 - 42.47695 / aircraft.Sw)) * (1/8) * 1.06426 * (1.06426 - 1)) + 0.7 * (aircraft.A / (1 + 2 / aircraft.A)) * aircraft.CS_mu3 * aircraft.CS_dClmax * np.tan(aircraft.lambda_co4)
+    # FIXME: Everything beyond this point is not yet checked, therefore errors will be present
+    dCm_ac_f = aircraft.CS_mu2 * ((-aircraft.CS_mu1) * CS_dClmax * 1.06426 - (CL_Ah + CS_dClmax * (1 - 42.47695 / aircraft.Sw)) * (1/8) * 1.06426 * (1.06426 - 1)) + 0.7 * (aircraft.A / (1 + 2 / aircraft.A)) * aircraft.CS_mu3 * CS_dClmax * np.tan(aircraft.lambda_co4)
 
     CL0_w = aircraft.AE_Cl0 * (np.cos(aircraft.lambda_co4)) ** 2 # CL0 of wing, ADSEE-II L1 slide 61
     CL0_tot = CL0_w + 1.067171 # TODO: Change flap constant - CL0 of wing with full flaps, constant is contribution of flaps
@@ -109,7 +119,6 @@ def stability_curve(aircraft):
 
     StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.dEpsilondA) * (aircraft.CS_l_h/aircraft.MAC_length) * aircraft.Vh_V ** 2)
     StabilityMargin             = 0.05
-    print(aircraft.x_ac_cruise)
     StabilitySh_S_margin        = StabilityFrac * xcgRange - StabilityFrac * (aircraft.x_ac_cruise - StabilityMargin)
     StabilitySh_S               = StabilityFrac * xcgRange - StabilityFrac * aircraft.x_ac_cruise
 
