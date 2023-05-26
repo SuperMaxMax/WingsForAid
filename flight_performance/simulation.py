@@ -1,5 +1,6 @@
 import sys
 import os.path
+import matplotlib.pyplot as plt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 # Start your import below this
@@ -22,10 +23,10 @@ def takeoffweight(obj, W_F):
     return TOW
 
 def atm_parameters(obj, h):
-    T    = obj.T0 + obj.lambd * h
-    rho  = obj.rho0*np.power((T/obj.T0), (-((obj.g / (obj.lambd * obj.R))+1)))
-    p    = obj.p0*np.power((T/obj.T0), (-(obj.g / (obj.lambd * obj.R))))
-    a    = np.sqrt(obj.gamma*obj.R*T)
+    T    = (atm.T0 +15) + atm.lambd * h
+    rho  = atm.rho0*np.power((T/obj.T0), (-((atm.g / (atm.lambd * atm.R))+1)))
+    p    = atm.p0*np.power((T/obj.T0), (-(atm.g / (atm.lambd * atm.R))))
+    a    = np.sqrt(atm.gamma*obj.R*T)
     return p, T, rho, a
 
 def dragpolar(ac_obj, CL):
@@ -53,7 +54,7 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
         Pr = D*V
         Pa = ac_obj.power * P_climb * ac_obj.prop_eff * 745.699872 * (rho/atm_obj.rho0)**(3/4)      # Convert to Watts
         roc= (Pa - Pr)/W                                                                            # Climb angle in degrees
-        gamma = (roc/V)*(180/np.pi)                                                                
+        gamma = (roc/V)*(180/np.pi)
         FMF= ac_obj.SFC * ac_obj.power * P_climb * 745.699872
         if i != 0:
             dt = (alt_range[i]-alt_range[i-1]) / (roc)
@@ -80,7 +81,7 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
     print(f"The max climb angle is {Gamma[Gamma==np.max(Gamma)]} [deg] at altitude {alt_range[Gamma==np.max(Gamma)][0]} [m]")
     print("----------------------------------------------------------------------------")
     print(f"This calculation took {end_time-start_time} seconds")
-    return 
+    return
 
 def flightceiling(ac_obj, atm_obj, W_F, plot=True):
     W = takeoffweight(ac_obj, W_F)*atm_obj.g
@@ -121,12 +122,6 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True):
     return
 
 a = flightceiling(aircraft, atm, 60)
-        
-        
-        
-
-            
-        
 
 
 
@@ -139,4 +134,58 @@ a = flightceiling(aircraft, atm, 60)
 
 
 
+
+
+
+
+
+
+
+
+# ---------------- Assumptions for take-off equations of motion -----------------
+# Wind is included by take it into account in the speed: V_eff = V - V_wind
+# Runway slope is not zero
+# The present of rain is taken into account in the friction coefficient with the ground, mu
+# delta_rw = runway slope
+# D_g = force due to the ground friction, with
+# Thrust and lift are taken as average values
+
+def TO_eom(obj, ap, atmos, constants):
+
+    p, T, rho, a = atm_parameters(obj, constants['runway altitude'])
+    V_min = np.sqrt((constants['weight']*np.cos(np.radians(constants['runway slope'])))/constants['wing surface area'] * 2/rho * 1/obj.CL_max_TO) # - constants['wind speed']
+    print(V_min)
+    V_LOF = 1.05 * V_min
+    V_avg = V_LOF / np.sqrt(2)
+
+    # Perpendicular to the runway:
+    L_avg = obj.CL_TO * 0.5 * rho * ((V_avg)**2) * constants['wing surface area']  # obj.CL_TO instead of 0.8
+    N = constants['weight'] * np.cos(np.radians(constants['runway slope'])) - L_avg
+    print(L_avg)
+
+    # Parallel to the runway:
+    D_g = ap.mu_ground * N
+    C_D = obj.CD0 + obj.CL_TO**2 / (np.pi * obj.A * obj.e)  # obj.CD0 instead of 0.03 and obj.CL_TO instead of 0.8
+    D = C_D * 0.5 * rho * V_avg**2 * constants['wing surface area']
+    T_avg = constants['propeller power'] * constants['propeller efficiency'] / (V_avg)  # Form "Aircraft performance and design" page 457
+    acc = atmos.g / constants['weight'] * (T_avg - D - D_g - constants['weight']*np.sin(np.radians(constants['runway slope'])))
+    print(T_avg)
+
+    # lift off distance:
+    s_LO = V_LOF**2 / (2 * acc)
+    print(s_LO)
+
+    # plot lift off distance to runway slope:
+    plt.plot(constants['runway slope'], s_LO)
+    plt.show()
+
+
+# ---------------- Run the plotting -----------------
+# dictionary with constants:
+hp_to_watt = 745.699872
+dic_constants = {'runway slope': np.arange(0, 10), 'runway altitude': 0, 'wing surface area': 11, 'weight':
+    takeoffweight(aircraft, 300)*atm.g, 'wind speed': 10, 'propeller power': aircraft.power*hp_to_watt # 80*hp_to_watt, much lower than 115000!,
+    ,'propeller efficiency': 0.5}
+
+TO_eom(aircraft, airfield, atm, dic_constants)
 
