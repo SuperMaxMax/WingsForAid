@@ -191,7 +191,8 @@ def Scissorplot(AR, b_nac, l_nac):
 
     Cm_ac = Cm_ac_w + dCm_ac_f + dCm_ac_fus # NOTE, L8 slide 19
     print("Cm_ac:", Cm_ac)
-
+    print(CL_h)
+    print(CL_Ah)
     ControlFrac = 1 / ((CL_h / CL_Ah) * (l_h / c) * Vh_V ** 2)
     ControlSh_S = ControlFrac * (xcgRange + Cm_ac / CL_Ah - Approach_x_ac)
     return xcgRange, StabilitySh_S_margin, StabilitySh_S, ControlSh_S
