@@ -5,9 +5,11 @@ sys.path.append("..")
 from parameters import UAV
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 from scipy.integrate import quad
 from scipy.optimize import minimize
 from math import tan, atan, cos
+from material_dictionary import material, rank_material
 
 def plot_loading_diagram(Ay, Az, By, Bz, load_case):
     plt.figure()
@@ -96,7 +98,12 @@ aircraft.wing_strut_location = 0.437277492*aircraft.b/2                         
 aircraft.strut_angle = atan(1.1/(aircraft.wing_strut_location-aircraft.w_out/2))    # [rad]
 aircraft.l_strut = aircraft.wing_strut_location/np.cos(aircraft.strut_angle)        # [m]
 aircraft.W_wl = 0.5                                                                 # [kg] for 1 winglet
-plot = True
+plot = False
+
+# Material choice for strut weight
+prop_weights_strut = [0.1, 0.5, 0.05, 2, 0.05 ,0.05, 0.05]
+possible_materials = rank_material(prop_weights_strut)[:5]
+ms = pd.DataFrame(index=possible_materials, columns=['Case 1', 'Case 2'])
 
 for i in range(2):
     if i == 0:
@@ -113,31 +120,31 @@ for i in range(2):
     P_truss = np.sqrt(By**2+Bz**2)
     P_truss *= aircraft.ST_SF
 
-    # Calculate strut weight
-    sigma_yield = 683*10**6 # [Pa]
-    mat_density = 2850      # [kg/m^3]
-    E = 73.1*10**9          # [Pa]
-
-    a = 0.0125       # semi_minor of ellipse [m]
-    b = 2*a          # semi_major of ellipse [m]
-
-    if load_case == 1:
-        A_min = P_truss / sigma_yield
-        m = A_min*mat_density*aircraft.l_strut
-        print(f"Strut weight for full wing loading and no fuel is {round(m,3)} kg")
-    else:
-        I_min = P_truss * aircraft.l_strut**2 / (np.pi**2 * E)
-        t = 4*I_min/(np.pi*a**3 * (1+(3*b/a)))  # thickness of strut sheet [m]
-        A = np.pi*(a+b)*t
-        I_check = np.pi*a**3*t*(1+(3*b/a))/4
-        m = A*mat_density*aircraft.l_strut
-        print(f"Strut weight for no wing loading and full fuel is {round(m,3)} kg")
-        print(f"I_check is {I_check}")
-
     # Plot force diagram
     if plot:
         plot_loading_diagram(Az, Bz, By, Ay, load_case)
 
+    for mat in possible_materials:
+        sigma_yield = material[mat]['yield stress']*10**6   # [Pa]
+        mat_density = material[mat]['density']              # [kg/m^3]
+        E = material[mat]['E']*10**9                        # [Pa]
+
+        a = 0.0125       # semi_minor of ellipse [m]
+        b = 2*a          # semi_major of ellipse [m]
+
+        if load_case == 1:
+            A_min = P_truss / sigma_yield
+            m = A_min*mat_density*aircraft.l_strut
+            ms.loc[mat, 'Case 1'] = m
+        else:
+            I_min = P_truss * aircraft.l_strut**2 / (np.pi**2 * E)
+            t = 4*I_min/(np.pi*a**3 * (1+(3*b/a)))  # thickness of strut sheet [m]
+            A = np.pi*(a+b)*t
+            I_check = np.pi*a**3*t*(1+(3*b/a))/4
+            m = A*mat_density*aircraft.l_strut
+            ms.loc[mat, 'Case 2'] = m
+
+print(ms)
 
 
 
