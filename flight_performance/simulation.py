@@ -121,7 +121,7 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True):
         plt.show()
     return
 
-a = flightceiling(aircraft, atm, 60)
+# a = flightceiling(aircraft, atm, 60)
 
 # ---------------- Assumptions for take-off equations of motion -----------------
 # Wind is included by take it into account in the speed: V_eff = V - V_wind
@@ -133,42 +133,69 @@ a = flightceiling(aircraft, atm, 60)
 
 def TO_eom(obj, ap, atmos, constants):
 
-    p, T, rho, a = atm_parameters(obj, constants['runway altitude'])
-    V_min = np.sqrt((constants['weight']*np.cos(np.radians(constants['runway slope'])))/constants['wing surface area'] * 2/rho * 1/obj.CL_max_TO) # - constants['wind speed']
-    print(V_min)
+    print(type(constants['runway slope']))
+    p, T, rho, a = atm_parameters(obj, constants['airport altitude'])
+    V_min = np.sqrt((constants['weight']*np.cos(np.radians(constants['runway slope'])))/constants['wing surface area'] * 2/rho * 1/obj.CL_max_TO) - constants['wind speed']
     V_LOF = 1.05 * V_min
     V_avg = V_LOF / np.sqrt(2)
 
     # Perpendicular to the runway:
-    L_avg = obj.CL_TO * 0.5 * rho * ((V_avg)**2) * constants['wing surface area']  # obj.CL_TO instead of 0.8
+    L_avg = obj.CL_TO * 0.5 * rho * ((V_avg)**2) * constants['wing surface area']
     N = constants['weight'] * np.cos(np.radians(constants['runway slope'])) - L_avg
-    print(L_avg)
 
     # Parallel to the runway:
     D_g = ap.mu_ground * N
-    C_D = obj.CD0 + obj.CL_TO**2 / (np.pi * obj.A * obj.e)  # obj.CD0 instead of 0.03 and obj.CL_TO instead of 0.8
+    C_D = obj.CD0 + obj.CL_TO**2 / (np.pi * obj.A * obj.e)
     D = C_D * 0.5 * rho * V_avg**2 * constants['wing surface area']
     T_avg = constants['propeller power'] * constants['propeller efficiency'] / (V_avg)  # Form "Aircraft performance and design" page 457
     acc = atmos.g / constants['weight'] * (T_avg - D - D_g - constants['weight']*np.sin(np.radians(constants['runway slope'])))
-    print(T_avg)
 
     # lift off distance:
     s_LO = V_LOF**2 / (2 * acc)
-    print(s_LO)
-
     # plot lift off distance to runway slope:
-    plt.plot(constants['runway slope'], s_LO)
-    plt.show()
+    return s_LO
 
 
 # ---------------- Run the plotting -----------------
 # dictionary with constants:
 hp_to_watt = 745.699872
-dic_constants = {'runway slope': np.arange(0, 10), 'runway altitude': 0, 'wing surface area': 11, 'weight':
-    takeoffweight(aircraft, 300)*atm.g, 'wind speed': 10, 'propeller power': aircraft.power*hp_to_watt # 80*hp_to_watt, much lower than 115000!,
-    ,'propeller efficiency': 0.5}
+# Plot for constant wind and different runway slopes, fixed runway slope with different wind speed with and against
+dic_constants = {'runway slope': np.arange(0, 10),
+    'airport altitude': 0, 'wing surface area': 11, 'weight': takeoffweight(aircraft, 200)*atm.g,
+    'wind speed': 0, 'propeller power': aircraft.power*hp_to_watt, 'propeller efficiency': aircraft.eta_p}
 
-TO_eom(aircraft, airfield, atm, dic_constants)
+figure, axis = plt.subplots(2, 2)
+
+axis[0, 0].plot(dic_constants['runway slope'], TO_eom(aircraft, airfield, atm, dic_constants))
+axis[0, 0].set_title('runway slope vs runway length')
+axis[0, 0].set_xlabel('runway slope[deg]')
+axis[0, 0].set_ylabel('runway length [m]')
+
+dic_constants['runway slope'] = 0
+dic_constants['wind speed'] = np.arange(0, 10)
+
+axis[1, 0].plot(dic_constants['wind speed'], TO_eom(aircraft, airfield, atm, dic_constants), color='red')
+axis[1, 0].set_title('headwind vs runway length')
+axis[1, 0].set_xlabel('headwind speed [m/sec]')
+axis[1, 0].set_ylabel('runway length [m]')
+
+dic_constants['wind speed'] = np.arange(0, -10, -1)
+
+axis[1, 1].plot(dic_constants['wind speed'], TO_eom(aircraft, airfield, atm, dic_constants), color='green')
+axis[1, 1].set_title('tailwind vs runway length')
+axis[1, 1].set_xlabel('tailwind speed [m/sec]')
+axis[1, 1].set_ylabel('runway length [m]')
+
+dic_constants['wind speed'] = 0
+dic_constants['airport altitude'] = np.arange(0,500)
+
+axis[0, 1].plot(dic_constants['airport altitude'], TO_eom(aircraft, airfield, atm, dic_constants), color='black')
+axis[0, 1].set_title('airport altitude vs runway length')
+axis[0, 1].set_xlabel('airport altitude [m]')
+axis[0, 1].set_ylabel('runway length [m]')
+
+plt.subplots_adjust(hspace=0.6)
+plt.show()
 
 def turnperformance(ac_obj, atm_obj, phi, V, W, h, heading_change):
     rho = atm_parameters(atm_obj, h)[3] 
