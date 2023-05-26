@@ -17,7 +17,7 @@ def Mach_calculation(aircraft, V, h):
 
 
 #################################################################################################################
-"Determine coefficients"
+"Determine Scissorplot Coefficients"
 #################################################################################################################
 
 def LiftRateCoefficient(aircraft, Mach, A, lambda_co2):  # lift rate coefficient tail/wing
@@ -69,6 +69,11 @@ def Aerodynamic_centre_determination(aircraft):
     aircraft.x_ac_cruise        = aircraft.x_ac_wf_cruise + aircraft.dx_ac_n_cruise
     aircraft.x_ac_approach      = aircraft.x_ac_wf_approach + aircraft.dx_ac_n_approach
 
+#################################################################################################################
+"Determine Control Surface Coefficients"
+#################################################################################################################
+CS_cf = 0.3 # flap chord [m] TODO: update value
+CS_c_prime = 1 # wing chord length when flaps are extended [m] TODO: update value
 
 #################################################################################################################
 "Controlability and Stability Curves"
@@ -88,7 +93,7 @@ def controlability_curve(aircraft): #TODO: change constants here
     #Calculation of Cm_ac starting here
     Cm_ac_w = aircraft.CS_Cm_0_airfoil * (aircraft.A * (np.cos(aircraft.lambda_co4))**2 / (aircraft.A + 2 * np.cos(aircraft.lambda_co4)))
 
-    # TODO: Bram continue 
+    # FIXME: Everything beyond this point is not yet checked, therefore errors will be present
     dCm_ac_f = aircraft.CS_mu2 * ((-aircraft.CS_mu1) * aircraft.CS_dClmax * 1.06426 - (CL_Ah + aircraft.CS_dClmax * (1 - 42.47695 / aircraft.Sw)) * (1/8) * 1.06426 * (1.06426 - 1)) + 0.7 * (aircraft.A / (1 + 2 / aircraft.A)) * aircraft.CS_mu3 * aircraft.CS_dClmax * np.tan(aircraft.lambda_co4)
 
     CL0_w = aircraft.AE_Cl0 * (np.cos(aircraft.lambda_co4)) ** 2 # CL0 of wing, ADSEE-II L1 slide 61
