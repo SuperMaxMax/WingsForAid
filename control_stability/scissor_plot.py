@@ -86,8 +86,9 @@ def controlability_curve(aircraft): #TODO: change constants here
     CL_Ah = aircraft.W_TO * aircraft.g0 / (0.5 * aircraft.rho0 * (1.3 * aircraft.V_s_min)**2 * aircraft.Sw)
 
     #Calculation of Cm_ac starting here
-    Cm_ac_w = -0.073 * (aircraft.A * (np.cos(aircraft.lambda_co4))**2 / (aircraft.A + 2 * np.cos(aircraft.lambda_co4)))
+    Cm_ac_w = aircraft.CS_Cm_0_airfoil * (aircraft.A * (np.cos(aircraft.lambda_co4))**2 / (aircraft.A + 2 * np.cos(aircraft.lambda_co4)))
 
+    # TODO: Bram continue 
     dCm_ac_f = aircraft.CS_mu2 * ((-aircraft.CS_mu1) * aircraft.CS_dClmax * 1.06426 - (CL_Ah + aircraft.CS_dClmax * (1 - 42.47695 / aircraft.Sw)) * (1/8) * 1.06426 * (1.06426 - 1)) + 0.7 * (aircraft.A / (1 + 2 / aircraft.A)) * aircraft.CS_mu3 * aircraft.CS_dClmax * np.tan(aircraft.lambda_co4)
 
     CL0_w = aircraft.AE_Cl0 * (np.cos(aircraft.lambda_co4)) ** 2 # CL0 of wing, ADSEE-II L1 slide 61
@@ -105,10 +106,10 @@ def controlability_curve(aircraft): #TODO: change constants here
 def stability_curve(aircraft):
     xcgRange                    = np.arange(0, 1.005, 0.005)
     # Making stability line
-    print(aircraft.CLa_h_cruise)
-    print(aircraft.CLa_Ah_cruise)
+
     StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.dEpsilondA) * (aircraft.CS_l_h/aircraft.MAC_length) * aircraft.Vh_V ** 2)
     StabilityMargin             = 0.05
+    print(aircraft.x_ac_cruise)
     StabilitySh_S_margin        = StabilityFrac * xcgRange - StabilityFrac * (aircraft.x_ac_cruise - StabilityMargin)
     StabilitySh_S               = StabilityFrac * xcgRange - StabilityFrac * aircraft.x_ac_cruise
 
@@ -132,7 +133,16 @@ def plot_scissor_plot(aircraft):
     ax1.plot(xcgRange, ControlSh_s, color = 'blue',
          path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
 
+    plt.xlabel("x/c [-]")
+    plt.ylabel("S_h/S [-]")
+
     ax1.grid()
+
+    x_cg_limit = [aircraft.X_cg_fwd, aircraft.X_cg_aft]
+    S_h_S_array = [aircraft.Sh_S, aircraft.Sh_S]
+
+    ax1.plot(x_cg_limit, S_h_S_array, color = 'orange')
+
 
     # fig1.savefig("scissorplot")
 
