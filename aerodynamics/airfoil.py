@@ -84,13 +84,14 @@ def tau_add(df):
 
     return add
 
-
+import numpy as np
 
 def tau(df):
-    tau = tau_init(df) + tau_add(df)
-    return tau
+    f = np.array(tau_init(df))
+    g = np.array(tau_add(df))
+    return f + g
 
-tau(df)
+
 
 def eta(df):     # Weights based on mission profile
     cruise_weight   = 0.475
