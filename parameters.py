@@ -139,10 +139,13 @@ class UAV:
         self.rpm_maxcont  = 5500            # rpm
         self.omega_prop   = 237             # rad/s, based on 5500 rpm max continuous power and 2.43 gearbox ratio
         self.prop_radius  = 0.8255          # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
+        self.ceiling      = 18000*0.3048    # [m] 18000 ft service ceiling
+        self.th_ceil      = 30000*0.3048
+        self.SFC          = 7.91666667E-8   # kg/J specific fuel consumption
         
         "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
         self.CS_eta = 0.95                  # airfoil efficiency factor [-]
-        self.CS_            #           
+        # self.CS_                            # I commented this out because it was producing an error - Ties            
 
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
         self.something = 1 # add units
