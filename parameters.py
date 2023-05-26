@@ -130,6 +130,7 @@ class UAV:
         "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
         self.something = 1 # add units
         self.y_mac = 2                      # Spanwise location of the MAC [m]
+        self.ST_SF = 1.5
 
         "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
         self.AE_Cl0 = 0.4                   # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
