@@ -108,7 +108,7 @@ class UAV:
         self.power_setting = 0.9            # Power setting in cruise [-]
         self.prop_eff = 0.82                # Propulsive efficiency [-]
         self.rho0 = 1.225                   # Air density at sea level [kg/m^3]
-        self.rho_TO = 1.225                 # Take-off air density [kg/m^3]
+        self.rho_TO = 1.225                 # Take-off air density if airport is at sea level [kg/m^3]
         self.rho_cruise = 0.9046            # Cruise air density [kg/m^3]
         self.rootchord = 1.546              # Root chord [m]
         self.s_tail = 2                     # Tail surface area [m]
@@ -142,20 +142,20 @@ class UAV:
         self.ceiling      = 18000*0.3048    # [m] 18000 ft service ceiling
         self.th_ceil      = 30000*0.3048
         self.SFC          = 7.91666667E-8   # kg/J specific fuel consumption
-        
+
         "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
         self.CS_eta = 0.95                  # airfoil efficiency factor [-]
         self.CS_mu1 = 0.24
         self.CS_mu2 = 0.78
         self.CS_mu3 = 0.525
         self.CS_dClmax = 1.7028171
-        self.CS_x_ac_w = 0.25               # location of wing ac, divided by MAC [-] - SEAD L7, S34   
+        self.CS_x_ac_w = 0.25               # location of wing ac, divided by MAC [-] - SEAD L7, S34
         self.CS_l_h = 4.5                   # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.CS_Cm_0_airfoil = -0.053       # TODO: Update value - Moment coefficient of airfoil [-]
-        
+
         self.Vh_V   = 0.95                  # [-] Ratio between velocity at tail and wing. NOTE: This is a guestimate
-        self.A_h = 4                        # [-] Aspect ratio horizontal tail. NOTE: This is a guestimate  
-        self.lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane NOTE: This is a guestimate  
+        self.A_h = 4                        # [-] Aspect ratio horizontal tail. NOTE: This is a guestimate
+        self.lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane NOTE: This is a guestimate
         self.dEpsilondA   = 0.02            # [-] Downwash NOTE: check this value. This is a pure guess
         self.Sh_S         = 0.3
 
@@ -165,7 +165,7 @@ class UAV:
 class airport:
     def __init__(self, name):
         self.name       = name
-        self.mu_ground  = 0.35                  #buildingspeed.org
+        self.mu_ground  = 0.05                  #buildingspeed.org
         self.rwyslope   = 1.0                   #runway slope in degrees --> CONVERT TO RADIANS
 
 class atmosphere:
