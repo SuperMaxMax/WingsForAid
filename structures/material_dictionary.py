@@ -24,10 +24,5 @@ material = {}
 for i in range(len(material_df)):
     material[material_df.index[i]] = material_df.iloc[i]
 
-test = [1, 0, 0, 0, 0, 0, 0]
-
-print(material["Al-6061-T6"]['density'])
-print(rank_material(test))
-
 
 
