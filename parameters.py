@@ -174,7 +174,7 @@ class atmosphere:
         self.lambd  = -0.0065   # troposphere, deg K/m
         self.T0     = 273.15    # K
         self.g      = 9.80665   # m/s^2
-        self.R_gas  = 287.05    
+        self.R      = 287.05    
         self.p0     = 101325    # Pa 
         self.gamma  = 1.4
 
