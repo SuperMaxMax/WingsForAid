@@ -37,8 +37,6 @@ def eta_df(df):     # Weights based on mission profile
     return eta
 
 
-
-
 def tau(df):        #Input must 
     max_df = df.max()
     taulist = []
@@ -56,5 +54,5 @@ print(tau(df))
 
 
 def eta(df):
-
+    
     return
