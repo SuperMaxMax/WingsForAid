@@ -97,9 +97,14 @@ def cg_calc(obj):
     Xs = (Xs-X_LEMAC)/obj.MAC_length
     w_fracs = [W_OEW/obj.W_TO, W_OEW_fuel_frac] + W_OEW_fuel_box_frac
     labels = ['OEW', 'OEW + Fuel'] + labels
-    for x, w, label in zip(Xs, w_fracs, labels):
+    # plt.rcParams.update({'font.size': 14})
+    for x, w, label, i in zip(Xs, w_fracs, labels, range(len(Xs))):
         plt.scatter(x, w)
-        plt.annotate(label, (x, w), textcoords="offset points", xytext=(0,10), ha='center', rotation=90, fontsize=9)
+        if i < 2:
+            rotation_t = 0
+        else:
+            rotation_t = 90
+        plt.annotate(label, (x, w), textcoords="offset points", xytext=(0,10), ha='center', rotation=rotation_t)
             
     # Plot lines at 0%, 10%, 40% and 100% MAC
     plt.axvline(x=0, linestyle='--', color='red', label='0% MAC')
@@ -110,7 +115,7 @@ def cg_calc(obj):
     plt.ylabel('Mass fraction [-]')
     plt.grid()
     plt.legend()
-    plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}')
+    plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
 
     # Save most forward and most aft and fully loaded c.g. in object
     obj.X_cg_fwd = min(Xs)
