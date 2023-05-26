@@ -12,7 +12,7 @@ from math import tan, atan, cos
 def plot_loading_diagram(Ay, Az, By, Bz, load_case):
     plt.figure()
     y = np.linspace(0, aircraft.b/2, 1000)
-    # add all forces
+    # add all forces with hatch pattern
     plt.plot(y, [-spanwise_wing_weight(y)]*1000, label='Wing weight')
     plt.plot(y, [-spanwise_flap_weight()]*1000, label='Flap weight')
     plt.plot(y, [-spanwise_aileron_weight()]*1000, label='Aileron weight')
@@ -92,8 +92,9 @@ def spanwise_fuel_weight_ty(y):
 aircraft = UAV('aircraft')
 
 # Strut_location
-aircraft.wing_strut_location = 0.437277*aircraft.b/2                                # [m] | based on statistical data, value is now based on half span running from middle fuselage
+aircraft.wing_strut_location = 0.437277492*aircraft.b/2                                # [m] | based on statistical data, value is now based on half span running from middle fuselage
 aircraft.strut_angle = atan(1.1/(aircraft.wing_strut_location-aircraft.w_out/2))    # [rad]
+aircraft.l_strut = aircraft.wing_strut_location/np.cos(aircraft.strut_angle)        # [m]
 aircraft.W_wl = 0.5                                                                 # [kg] for 1 winglet
 plot = True
 
@@ -108,18 +109,30 @@ for i in range(2):
     Az = (Bz+quad(spanwise_wing_loading, 0, aircraft.b/2)[0]*load_case - spanwise_flap_weight()*(aircraft.b/2*0.6) - spanwise_aileron_weight()*(aircraft.b/2*0.4) - quad(spanwise_fuel_weight, 0, aircraft.b/2)[0]*abs(load_case-1) - quad(spanwise_wing_weight, 0 ,aircraft.b/2)[0] - aircraft.W_wl*aircraft.g0)
     By = Bz/tan(aircraft.strut_angle)
     Ay = -By
+    
+    P_truss = np.sqrt(By**2+Bz**2)
+    P_truss *= aircraft.ST_SF
 
     # Calculate strut weight
     sigma_yield = 683*10**6 # [Pa]
     mat_density = 2850      # [kg/m^3]
     E = 73.1*10**9          # [Pa]
-    m_strut_t = aircraft.wing_strut_location/cos(aircraft.strut_angle)*(np.sqrt(By**2+Bz**2)/sigma_yield*mat_density)
-    m_strut_c = (aircraft.wing_strut_location/cos(aircraft.strut_angle))**2*np.sqrt(np.sqrt(By**2+Bz**2)/(np.pi**2*E))*mat_density
+
+    a = 0.0125       # semi_minor of ellipse [m]
+    b = 2*a          # semi_major of ellipse [m]
 
     if load_case == 1:
-        print(f"Strut weight for full wing loading and no fuel is {round(m_strut_t,2)} kg")
+        A_min = P_truss / sigma_yield
+        m = A_min*mat_density*aircraft.l_strut
+        print(f"Strut weight for full wing loading and no fuel is {round(m,3)} kg")
     else:
-        print(f"Strut weight for no wing loading and full fuel is {round(m_strut_c,2)} kg")
+        I_min = P_truss * aircraft.l_strut**2 / (np.pi**2 * E)
+        t = 4*I_min/(np.pi*a**3 * (1+(3*b/a)))  # thickness of strut sheet [m]
+        A = np.pi*(a+b)*t
+        I_check = np.pi*a**3*t*(1+(3*b/a))/4
+        m = A*mat_density*aircraft.l_strut
+        print(f"Strut weight for no wing loading and full fuel is {round(m,3)} kg")
+        print(f"I_check is {I_check}")
 
     # Plot force diagram
     if plot:
