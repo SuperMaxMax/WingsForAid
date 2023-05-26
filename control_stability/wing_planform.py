@@ -1,6 +1,13 @@
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.integrate import quad    
 import math
+import sys
+
+sys.path.append('..')
+
+from parameters import UAV
+ac = UAV("aircraft")
 
 # Adjust font size
 plt.rcParams.update({'font.size': 22})
@@ -9,18 +16,18 @@ line_width = 3
 # --------------------------------------------- Parameters ---------------------------------------------
 
 # Parameters
-AR = 9                                          # [-]
-S = 68.53                                       # [m^2]
-c4_sweep = 25.97                                # [deg]
+AR = ac.A                                          # [-]
+S = ac.Sw                                       # [m^2]
+c4_sweep = ac.lambda_co4 * 180 / np.pi          # [deg]
 
 # For aileron
-y1_a = 8.08                                     # [m]
-y2_a = 11.3                                     # [m]
+y1_a = 1                                     # [m]
+y2_a = 3                                     # [m]
 c_a = 0.2                                       # [c]
 
 # For flaps
 y1_f = 2                                        # [m]
-y2_f = 6.29                                     # [m]
+y2_f = 4                                     # [m]
 c_f = 0.25                                      # [c]
 
 # Spars
@@ -124,6 +131,8 @@ print("---------------------------------------------------")
 
 # Make plot
 plt.figure()
+plt.xlim(-span/2 - 2, span/2 + 2)
+plt.ylim()
 
 # Quarter chord line left side
 plt.plot((0,-span/2),(q_c_r,q_c_t), label="Quarter Chord line", linewidth=line_width)
@@ -171,6 +180,6 @@ plt.gca().set_aspect('equal', adjustable='box')
 plt.title("Wing planform")
 plt.xlabel("Spanwise position")
 plt.ylabel("Longitudinal position")
-plt.legend()
+plt.legend(loc = "lower right", fontsize = "xx-small")
 plt.grid()
 plt.show()
