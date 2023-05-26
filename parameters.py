@@ -52,7 +52,7 @@ class UAV:
         self.W_e                 = 62.6         # Definitive weight per engine [kg]
         self.W_TO                = 700          # Take-off weight [kg]
         self.W_PL                = 240          # Payload weight [kg]
-        self.WS                  = 708.05       # Wing Loading [N/m^2]
+        self.WS                  = 600       # Wing Loading [N/m^2]
 
         "-Weight fractions"
         self.W1W_TO              = 0.995        # Engine startup fraction [-]
