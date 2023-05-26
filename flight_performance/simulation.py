@@ -136,7 +136,7 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True):
 def TO_eom(obj, ap, atmos, constants):
 
     print(type(constants['runway slope']))
-    p, T, rho, a = atm_parameters(obj, constants['runway altitude'])
+    p, T, rho, a = atm_parameters(obj, constants['airport altitude'])
     V_min = np.sqrt((constants['weight']*np.cos(np.radians(constants['runway slope'])))/constants['wing surface area'] * 2/rho * 1/obj.CL_max_TO) - constants['wind speed']
     V_LOF = 1.05 * V_min
     V_avg = V_LOF / np.sqrt(2)
@@ -154,7 +154,6 @@ def TO_eom(obj, ap, atmos, constants):
 
     # lift off distance:
     s_LO = V_LOF**2 / (2 * acc)
-    print(s_LO)
     # plot lift off distance to runway slope:
     return s_LO
 
@@ -163,40 +162,40 @@ def TO_eom(obj, ap, atmos, constants):
 # dictionary with constants:
 hp_to_watt = 745.699872
 # Plot for constant wind and different runway slopes, fixed runway slope with different wind speed with and against
-dic_constants = {'runway slope': 0, 'runway altitude': 0, 'wing surface area': 11, 'weight':
-    takeoffweight(aircraft, 200)*atm.g, 'wind speed': np.arange(0,10), 'propeller power': aircraft.power*hp_to_watt # 80*hp_to_watt, much lower than 115000!,
-    ,'propeller efficiency': aircraft.eta_p}
+dic_constants = {'runway slope': np.arange(0, 10),
+    'airport altitude': 0, 'wing surface area': 11, 'weight': takeoffweight(aircraft, 200)*atm.g,
+    'wind speed': 0, 'propeller power': aircraft.power*hp_to_watt, 'propeller efficiency': aircraft.eta_p}
 
 figure, axis = plt.subplots(2, 2)
 
-s_LO = TO_eom(aircraft, airfield, atm, {'runway slope': np.array([0,1, 2,3,4,5,6,7,8,9,10]),
-    'runway altitude': 0, 'wing surface area': 11, 'weight': takeoffweight(aircraft, 200)*atm.g,
-    'wind speed': 0, 'propeller power': aircraft.power*hp_to_watt, 'propeller efficiency': aircraft.eta_p})
-axis[0, 0].plot(np.array([0,1, 2,3,4,5,6,7,8,9,10]), s_LO)
+axis[0, 0].plot(dic_constants['runway slope'], TO_eom(aircraft, airfield, atm, dic_constants))
 axis[0, 0].set_title('runway slope vs runway length')
 axis[0, 0].set_xlabel('runway slope[deg]')
 axis[0, 0].set_ylabel('runway length [m]')
 
-axis[1, 0].plot(np.arange(0, 10), TO_eom(aircraft, airfield, atm, {'runway slope': 0, 'runway altitude': 0,
-    'wing surface area': 11, 'weight': takeoffweight(aircraft, 200)*atm.g, 'wind speed': np.arange(0, 10),
-    'propeller power': aircraft.power*hp_to_watt, 'propeller efficiency': aircraft.eta_p}), color='red')
+dic_constants['runway slope'] = 0
+dic_constants['wind speed'] = np.arange(0, 10)
+
+axis[1, 0].plot(dic_constants['wind speed'], TO_eom(aircraft, airfield, atm, dic_constants), color='red')
 axis[1, 0].set_title('headwind vs runway length')
 axis[1, 0].set_xlabel('headwind speed [m/sec]')
 axis[1, 0].set_ylabel('runway length [m]')
 
-axis[1, 1].plot(np.arange(-10, 0), TO_eom(aircraft, airfield, atm, {'runway slope': 0, 'runway altitude': 0,
-    'wing surface area': 11, 'weight': takeoffweight(aircraft, 200)*atm.g, 'wind speed': np.arange(-10, 0),
-    'propeller power': aircraft.power*hp_to_watt, 'propeller efficiency': aircraft.eta_p}), color='green')
+dic_constants['wind speed'] = np.arange(0, -10, -1)
+
+axis[1, 1].plot(dic_constants['wind speed'], TO_eom(aircraft, airfield, atm, dic_constants), color='green')
 axis[1, 1].set_title('tailwind vs runway length')
 axis[1, 1].set_xlabel('tailwind speed [m/sec]')
 axis[1, 1].set_ylabel('runway length [m]')
 
-axis[0, 1].plot(np.arange(0,500), TO_eom(aircraft, airfield, atm, {'runway slope': 0,
-    'runway altitude': np.arange(0,500), 'wing surface area': 11, 'weight': takeoffweight(aircraft, 200)*atm.g,
-    'wind speed': 0, 'propeller power': aircraft.power*hp_to_watt, 'propeller efficiency': aircraft.eta_p}), color='black')
+dic_constants['wind speed'] = 0
+dic_constants['airport altitude'] = np.arange(0,500)
+
+axis[0, 1].plot(dic_constants['airport altitude'], TO_eom(aircraft, airfield, atm, dic_constants), color='black')
 axis[0, 1].set_title('airport altitude vs runway length')
 axis[0, 1].set_xlabel('airport altitude [m]')
 axis[0, 1].set_ylabel('runway length [m]')
 
+plt.subplots_adjust(hspace=0.6)
 plt.show()
 
