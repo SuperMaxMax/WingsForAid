@@ -39,7 +39,7 @@ def tau_df(df):    # Reshape dataframe to workable values for tau,
     return
 
 
-def tau(df):        #Input must 
+def tau_init(df):        #Input must 
     df.drop("cd0", axis = 1)
     df.drop("cl0", axis = 1)
     df.drop("cl_alpha", axis = 1)
@@ -63,7 +63,6 @@ def tau(df):        #Input must
         taulist.append(tau)
     return taulist
 
-print(tau(df))
 
 def tau_add(df):
     cd0_min = df["cd0"].min()
@@ -87,7 +86,11 @@ def tau_add(df):
 
 
 
-tau_add(df)
+def tau(df):
+    tau = tau_init(df) + tau_add(df)
+    return tau
+
+tau(df)
 
 def eta(df):     # Weights based on mission profile
     cruise_weight   = 0.475
