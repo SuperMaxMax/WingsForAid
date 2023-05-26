@@ -22,13 +22,18 @@ def tau_df(df):    # Reshape dataframe to workable values for tau,
                         # Assign weights if necessary
     return
 
-def eta_df(df):    # Defines mission profile
+def eta_df(df):     # Weights based on mission profile
     cruise_weight   =
     loiter_weight   =
     ascend_weight   =
     descend_weight  =
+    cruise_par      =
+    loiter_par      =
+    ascend_par      =
+    descend_par     =
 
-    eta = cruise_weight * 1 + loiter_weight * 1 + ascend_weight * 1 + descend_weight * 1
+    eta = cruise_weight * cruise_par + loiter_weight * loiter_par + ascend_weight * ascend_par + descend_weight * descend_par
+
     return eta
 
 
