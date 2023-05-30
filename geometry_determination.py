@@ -106,12 +106,13 @@ def geometry_determination(obj, plot=False):
             lab = "Take-off, CL TO = " + str(np.round(CL_TO, decimals=2))
             plt.plot(WP_TO[1], WP_TO[0], label=lab)
             if plot_stall_WS:
-                plt.plot(WS_stall[0], WS_stall[1])
+                plt.plot(WS_stall[0], WS_stall[1], label="Stall requirement")
+
             if plot_both_WS:
                 plt.plot(WS_landing[0], WS_landing[1])
                 plt.plot(WS_stall[0], WS_stall[1])
             if plot_LDG_WS:
-                plt.plot(WS_landing[0], WS_landing[1])
+                plt.plot(WS_landing[0], WS_landing[1], label="Landing requirement")
             plt.plot(WP_cruise[1], WP_cruise[0], label="Cruise requirement")
             plt.plot(WP_Climb[1], WP_Climb[0], label="Climb requirement")
             if design_point is not None:
@@ -122,7 +123,8 @@ def geometry_determination(obj, plot=False):
         plt.xlim((300, 1000))
         plt.ylabel("W/P [N/W]")
         plt.ylim((0, 0.7))
-        # plt.legend(loc='upper right')
+        plt.grid()
+        plt.legend(loc='upper right')
         plt.show()
     
     # --- Fuselage parameters

@@ -37,14 +37,14 @@ for concept in [DET_CON_1, DET_CON_1_braced, DET_CON_2, DET_CON_2_braced, DET_CO
     while it:
         # class 1
         c1.run(concept)
-        
+        print(f"After c1:{concept.W_TO}")
         # geometry determination
         geo.geometry_determination(concept)
 
         # class 2
         c2.weight_empty(concept)
         W_TO_c2 = concept.W_TO
-
+        print(f"After c2:{W_TO_c2}")
         # update load factor
         concept.n_ult = Vn.max_n(concept)*1.5
 
@@ -60,13 +60,16 @@ for concept in [DET_CON_1, DET_CON_1_braced, DET_CON_2, DET_CON_2_braced, DET_CO
     # --- plotting of concept
     print(f"{concept.name} done in {n} iterations \n")
     # cg calculation
-    plt.figure(1)
-    plt.subplot(121)
-    c2cg.cg_calc(concept)
+    #plt.figure(1)
+    #plt.subplot(121)
+    #c2cg.cg_calc(concept)
 
     # V-n diagram
-    plt.subplot(122)
-    Vn.plot_all(concept)
+    #plt.subplot(122)
+    #Vn.plot_all(concept)
+
+    geo.geometry_determination(concept, plot=True)
+
     if plot == True:
         plt.show()
     

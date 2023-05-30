@@ -18,7 +18,7 @@ def VA_lim_low(obj): #Cant be greater than VC
     return V_S * n**0.5 #[m/s]
 
 def VS1(obj):
-    return ((2 * obj.WS) / (1.225 * obj.CL_max_clean )) ** 0.5
+    return ((2 * obj.WS) / (1.225 * obj.CL_max_clean[0] )) ** 0.5
 
 
 def stall_req(obj):
@@ -131,8 +131,8 @@ def plot_Vn(obj):
     
     # X-axis:
     plt.axhline(y = 0, color = "black", linewidth = '0.7')
-    plt.ylabel("Load factor (n)")
-    plt.xlabel("Airspeed (V) [m/s]")
+    plt.ylabel("Load factor (n)", fontsize=12)
+    plt.xlabel("Airspeed (V) [m/s]", fontsize=12)
 
     # Plotting points:
     plt.plot(A_x, n_max, 'ko')      #A
@@ -277,6 +277,7 @@ def plot_all(obj):
     plot_Vn(obj)
     plot_gust(obj)
     plt.title(f"V-n diagram for {obj.name}")
+<<<<<<< Updated upstream
 #     plt.show()
 
 concept = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=True)
@@ -284,3 +285,14 @@ plot_all(concept)
 print(VC_lim_low(concept))
 # concept = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
 # plot_all(concept)
+=======
+    #plt.show()
+
+
+DET_CON_2_braced = UAV('DET_CON_2_braced', 'tractor', boom=True, braced_wing=True)
+
+plot_all(DET_CON_2_braced)
+plt.show()
+
+
+>>>>>>> Stashed changes
