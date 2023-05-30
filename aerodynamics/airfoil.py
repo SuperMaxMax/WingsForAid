@@ -11,9 +11,11 @@
 
 import pandas as pd
 
-df = pd.DataFrame([[5,4,2,8, 2, 3, 2],
-                    [2,1,8,2, 2, 3, 2],
-                    [2,1,2,5, 2, 3, 2]], columns = ["cd0", "cm0", "C", "D", "cl0", "cl_alpha", "cm_alpha" ])
+df = pd.read_csv("airfoil_data_XFLR5.csv")
+
+#df = pd.DataFrame([[5,4,2,8, 2, 3, 2],
+                    #[2,1,8,2, 2, 3, 2],
+                    #[2,1,2,5, 2, 3, 2]], columns = ["cd0", "cm0", "C", "D", "cl0", "cl_alpha", "cm_alpha" ])
 
 # print(df)
 # def invert(df, parameter):
@@ -88,7 +90,7 @@ import numpy as np
 
 def tau(df):
     f = np.array(tau_init(df))
-    print(f)
+    f = np.transpose(f)[0]
     g = np.array(tau_add(df))
     for i in range(len(f)):
         f[i] = f[i] + g[i]
@@ -112,6 +114,5 @@ def eta(df):     # Weights based on mission profile
 
     return eta
 
-
-
-print(tau(df))
+print("tau = ", tau(df))
+print("eta = ", eta(df))
