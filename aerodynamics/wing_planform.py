@@ -88,21 +88,35 @@ def plot_lift_distr():
     alpha_0 = -1.5 *  np.pi / 180 #iw(airfoil)[2]
     b = (AR * S)**0.5
     MAC = S/b                               #Change to iteration between Croot and MAC
+    
+    N = 5
+    a_2d = 2 * np.pi
+    A = 2 * np.pi
+
+
     Croot = (1.5*(1+Lambda)*MAC)/(1+Lambda+Lambda**2)
-    theta = np.linspace(0, 90 * np.pi / 180, N, endpoint = False) #Change to get gooed amount of sections
-    alpha = np.linspace(i_w, i_w + alpha_twist, N, endpoint = False)
+    theta = np.linspace(90 * np.pi / 180, 0, N, endpoint = False)[::-1] #Change to get gooed amount of sections
+    alpha = np.linspace(i_w + alpha_twist, i_w, N, endpoint = False)[::-1]
     z = (b/2) * np.cos(theta)
     c = Croot * (1 - (1-Lambda) * np.cos(theta))
     mu = (c * a_2d) / (4 * b)
     #solve Ansin(ntheta)
     LHS = mu * (alpha - alpha_0)
-    B = np.array((N,N))
-    for i in range(1, N):
-        for j in range(1, i):
-            B[i,j] = np.sin((2*j - 1) * theta[i]) * (1 + (mu[i] * (2 * j - 1)) / np.sin(theta[i]))
-
+    B = np.zeros((N,N))
+    print(theta)
+    for i in range(0,N):
+        print("i:", i)
+        for j in range(0, N):
+            print("j:", j)
+            print("theta:", theta)
+            print( ((4 * A / a_2d) + (j+1) / np.sin(theta[i])) * np.sin((j+1)* theta[i]))
+            B[i,j] = ((4 * A / a_2d) + (j+1) / np.sin(theta[i])) * np.sin((j+1)* theta[i])
+          #  B[i,j] = np.sin((2*j - 1) * theta[i]) * (1 + (mu[i] * (2 * j - 1)) / np.sin(theta[i]))
+            
+    print(np.linalg.solve(B,np.array([1,1,1,1,1])))
     print(B)
-        
+
+
     C_L_i = (4 * b)/c * 0#Ansin(ntheta)
     #C_L_wing = 
     plt.plot(z, C_L_i)
