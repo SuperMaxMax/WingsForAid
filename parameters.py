@@ -178,16 +178,23 @@ class UAV:
         self.CS_mu2 = 0.78
         self.CS_mu3 = 0.525
         self.CS_x_ac_w = 0.3              # location of wing ac, divided by MAC [-] - SEAD L7, S34   
-        self.CS_l_h = 4.5                   # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.CS_Cm_0_airfoil = -0.083       # TODO: Update value - Moment coefficient of airfoil [-]
         self.CS_n_blades = 3                   # [-] number of propeller blades NOTE: Depends on chosen propeller
         self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
 
-        self.Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
-        self.A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
-        self.lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
-        self.dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.Sh_S = 0.40
+        # Horizontal tailplane
+        self.CS_l_h = 4.5                   # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.CS_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
+        self.CS_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+        self.CS_lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
+        self.CS_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
+        self.CS_Sh_S = 0.40                    # [-] Ratio between horizontal tailplane surface area and surface area wing
+
+        # Vertical tailplane
+        self.CS_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
+        self.CS_A_v = None                     # [-] Aspect ratio vertical tail
+        self.CS_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane 
+        self.CS_Sv_S = None                    # [-] Ratio between vertical tailplane surface area and surface area wing
 
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
         self.n_drops = 1  # [-]
