@@ -9,7 +9,7 @@ from parameters import UAV, atmosphere
 aircraft = UAV('aircraft')
 atm      = atmosphere()
 
-def Mach_calculation(aircraft, V, h):
+def Mach_calculation(atm, V, h):
     atm.T =  atm.T0 - atm.lambd * h
     atm.speed_of_sound = (atm.gamma * atm.R * atm.T) ** 0.5
     Mach = V / atm.speed_of_sound
@@ -25,19 +25,23 @@ def LiftRateCoefficient(aircraft, Mach, A, lambda_co2):  # lift rate coefficient
     Equation from SEAD Lecture 7, slide 41"""
     aircraft.CS_beta = np.sqrt(1 - Mach ** 2)
     CLa = 2 * np.pi * A / (2 + np.sqrt(4 + ((A * aircraft.CS_beta / aircraft.CS_eta)** 2) * (1 + np.tan(lambda_co2) ** 2  / aircraft.CS_beta ** 2)))
+    aircraft.CLa = CLa
     return CLa
 
 def TaillessLiftRateCoefficient(aircraft, CLa): 
     """Lift rate coefficient of aircraft without tail
     Equation from SEAD Lecture 7, slide 42"""
-    CLa_Ah = CLa * (1 + 2.15 * aircraft.w_out / aircraft.b) * aircraft.Sw / aircraft.Sw + (np.pi * aircraft.w_out ** 2) / (2 * aircraft.Sw)
+    CLa_Ah = aircraft.AE_cl_alpha * (1 + 2.15 * aircraft.w_out / aircraft.b) * aircraft.Sw / aircraft.Sw + (np.pi * aircraft.w_out ** 2) / (2 * aircraft.Sw)
+
     return CLa_Ah
 
 
 def nacelle_influence(aircraft, CLa_Ah):
     """a.c. shift due to nacelles
     Equation from SEAD Lecture 7, slide 38"""
-    dx_ac_n = (-4) * (aircraft.w_out ** 2 * (aircraft.X_LEMAC + 0.25 * aircraft.MAC_length)) / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)   
+    #dx_ac_n = (-4) * (aircraft.w_out ** 2 * (aircraft.X_LEMAC + 0.25 * aircraft.MAC_length)) / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)   
+    l_p = aircraft.X_LEMAC + 0.25 * aircraft.MAC_length
+    dx_ac_n = -0.05 * aircraft.CS_n_blades * aircraft.CS_D_prop**2 * l_p / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)
     return dx_ac_n
 
 
@@ -49,8 +53,8 @@ def WingFuselageAC(aircraft, CLa_Ah):
     return x_ac_wf
 
 def Aerodynamic_centre_determination(aircraft):
-    aircraft.Mcruise            = Mach_calculation(aircraft, aircraft.V_cruise, aircraft.h_cruise)
-    aircraft.Mmin               = Mach_calculation(aircraft, aircraft.V_s_min, aircraft.h_TO)
+    aircraft.Mcruise            = Mach_calculation(atm, aircraft.V_cruise, aircraft.h_cruise)
+    aircraft.Mmin               = Mach_calculation(atm, aircraft.V_s_min, aircraft.h_TO)
     
     aircraft.CLa_h_cruise       = LiftRateCoefficient(aircraft, aircraft.Mcruise, aircraft.A_h, aircraft.lambda_co2_h)
 
@@ -68,6 +72,10 @@ def Aerodynamic_centre_determination(aircraft):
 
     aircraft.x_ac_cruise        = aircraft.x_ac_wf_cruise + aircraft.dx_ac_n_cruise
     aircraft.x_ac_approach      = aircraft.x_ac_wf_approach + aircraft.dx_ac_n_approach
+    print(f"x_ac_wf_cruise = {aircraft.x_ac_wf_cruise}")
+    print(f"x_ac_wf_approach = {aircraft.x_ac_wf_approach}")
+    print(f"x_ac_cruise = {aircraft.x_ac_cruise}")
+    print(f"x_ac_approach = {aircraft.x_ac_approach}")
 
 #################################################################################################################
 "FIXME: Determine Control Surface Coefficients"
@@ -96,7 +104,7 @@ def controlability_curve(aircraft): #TODO: change constants here
     CL_Ah = aircraft.W_TO * aircraft.g0 / (0.5 * aircraft.rho0 * (1.3 * aircraft.V_s_min)**2 * aircraft.Sw)
 
     #Calculation of Cm_ac starting here
-    Cm_ac_w = aircraft.CS_Cm_0_airfoil * (aircraft.A * (np.cos(aircraft.lambda_co4))**2 / (aircraft.A + 2 * np.cos(aircraft.lambda_co4)))
+    Cm_ac_w = aircraft.AE_cm0 * (aircraft.A * (np.cos(aircraft.lambda_co4))**2 / (aircraft.A + 2 * np.cos(aircraft.lambda_co4)))
 
     # FIXME: Everything beyond this point is not yet checked, therefore errors will be present
     dCm_ac_f = aircraft.CS_mu2 * ((-aircraft.CS_mu1) * CS_dClmax * 1.06426 - (CL_Ah + CS_dClmax * (1 - 42.47695 / aircraft.Sw)) * (1/8) * 1.06426 * (1.06426 - 1)) + 0.7 * (aircraft.A / (1 + 2 / aircraft.A)) * aircraft.CS_mu3 * CS_dClmax * np.tan(aircraft.lambda_co4)
