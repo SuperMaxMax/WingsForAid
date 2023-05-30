@@ -2,7 +2,7 @@ import numpy as np
 class UAV:
     def __init__(self, name):
         "=== Class I / Class II parameters ==="
-        self.A = 10                         # Aspect ratio [-]
+        self.A = 8                         # Aspect ratio [-]
         self.BHP_cruise = 76.3436
         self.CD0 = 0.0273                   # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
@@ -18,7 +18,7 @@ class UAV:
         self.Lambda = -0.0065
         self.MAC_length = 1.0161            # Mean aerodynamic chord [m]
         self.MGC = 1.0822                   # Mean geometric chord [m]
-        self.M_res = 0.1 
+        self.M_res = 0.075 
         self.Mff = 0.9254                   # Fuel fraction [-]
         self.N_e = 1                        # Number of engines [-]
         self.R = 500000                     # Range [m]
@@ -44,7 +44,7 @@ class UAV:
         self.W_F = 59.8091                  # Fuel weight [kg]
         self.W_OE = 429.1354                # Operational empty weight [kg]
         self.W_PL = 240                     # Payload weight [kg]
-        self.W_TO = 728.9445                # Take-off weight [kg]
+        self.W_TO = 752                    # Take-off weight [kg]
         self.W_boom = 20                    # Boom weight [kg]
         self.W_e = 62.6                     # Definitive weight per engine [kg]
         self.W_eq = 58.075                  # Equipment weight [kg]
@@ -73,7 +73,7 @@ class UAV:
         self.d_eff = 1.241                  # Effective diameter [m]
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
         self.dihedral = 1
-        self.e                   = 0.7      # Oswald factor [-]
+        self.e = 0.7                        # Oswald factor [-]
         self.engine_cg = 0.327              # Engine cg location [m]
         self.engine_fairing = 0.2           # Engine fairing length [m]
         self.engine_length = 0.6651         # Engine length [m]
@@ -106,7 +106,7 @@ class UAV:
         self.pos_main_carriage = 'fuselage' # Position of main carriage: "fuselage" or "wing"
         self.power = 95.8347                # Power at takeoff [hp]
         self.power_setting = 0.9            # Power setting in cruise [-]
-        self.prop_eff = 0.82                # Propulsive efficiency [-]
+        self.prop_eff = 0.7                 # Propulsive efficiency [-]
         self.rho0 = 1.225                   # Air density at sea level [kg/m^3]
         self.rho_TO = 1.225                 # Take-off air density if airport is at sea level [kg/m^3]
         self.rho_cruise = 0.9046            # Cruise air density [kg/m^3]
@@ -170,6 +170,9 @@ class UAV:
         self.ceiling      = 18000*0.3048    # [m] 18000 ft service ceiling
         self.th_ceil      = 30000*0.3048
         self.SFC          = 7.91666667E-8   # kg/J specific fuel consumption
+        self.fuelcapacity = 100             # L
+        self.fueldensity  = 0.7429          # kg/L
+
 
         "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
         self.CS_eta = 0.95                  # airfoil efficiency factor [-]
