@@ -226,7 +226,7 @@ def plot_gust(obj):
     labels = ["B'","G'","C'","F'","D'","E'"]
 
     for i in range(len(V)):
-        plt.plot(V[i], n_peak[i], 'o', color = 'pink')
+        plt.plot(V[i], n_peak[i], 'o', color = 'crimson')
         if labels[i]!="F'" and labels[i]!="D'" and labels[i]!="E'" and labels[i]!="B'":
             plt.text(V[i], n_peak[i] + 0.35 , s = labels[i], ha='center', va='top')
         elif labels[i]=="B'":
@@ -236,13 +236,13 @@ def plot_gust(obj):
         
 
     # Plotting straight lines
-    plt.plot([0, V[0]], [1, n_peak[0]], color = 'pink')                        #Between 1 and B'
-    plt.plot([0, V[1]], [1, n_peak[1]], color = 'pink')                        #Between 1 and G'
-    plt.plot([V[0], V[2]], [n_peak[0], n_peak[2]], color = 'pink')             #Between B' and C'
-    plt.plot([V[1], V[3]], [n_peak[1], n_peak[3]], color = 'pink')             #Between G' and F'
-    plt.plot([V[2], V[4]], [n_peak[2], n_peak[4]], color = 'pink')             #Between C' and D'
-    plt.plot([V[3], V[5]], [n_peak[3], n_peak[5]], color = 'pink')             #Between F' and E'
-    plt.plot([V[4], V[5]], [n_peak[4], n_peak[5]], color = 'pink')             #Between D' and E'
+    plt.plot([0, V[0]], [1, n_peak[0]], color = 'crimson')                        #Between 1 and B'
+    plt.plot([0, V[1]], [1, n_peak[1]], color = 'crimson')                        #Between 1 and G'
+    plt.plot([V[0], V[2]], [n_peak[0], n_peak[2]], color = 'crimson')             #Between B' and C'
+    plt.plot([V[1], V[3]], [n_peak[1], n_peak[3]], color = 'crimson')             #Between G' and F'
+    plt.plot([V[2], V[4]], [n_peak[2], n_peak[4]], color = 'crimson')             #Between C' and D'
+    plt.plot([V[3], V[5]], [n_peak[3], n_peak[5]], color = 'crimson')             #Between F' and E'
+    plt.plot([V[4], V[5]], [n_peak[4], n_peak[5]], color = 'crimson')             #Between D' and E'
 
 
     n_max = CS23_max(obj)
@@ -277,7 +277,6 @@ def plot_all(obj):
     plot_Vn(obj)
     plot_gust(obj)
     plt.title(f"V-n diagram for {obj.name}")
-<<<<<<< Updated upstream
 #     plt.show()
 
 concept = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=True)
@@ -285,7 +284,6 @@ plot_all(concept)
 print(VC_lim_low(concept))
 # concept = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
 # plot_all(concept)
-=======
     #plt.show()
 
 
@@ -295,4 +293,3 @@ plot_all(DET_CON_2_braced)
 plt.show()
 
 
->>>>>>> Stashed changes
