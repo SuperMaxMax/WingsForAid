@@ -153,14 +153,14 @@ if True:
     # simulation param
     dt_sim = 1/10E3 # [s] between frames
     IT_max = 10E4
-    plot_traj = True
+    plot_traj = False
     plot_scatter = True
     plot_sensitivity = False
-    N_divisions = 2
+    N_divisions = 3 # careful with this one, it scales with ((N+1)!)^2
 
     # global parameters
     AC.n_drops = 1  # [-]
-    AC.n_boxes = 2  # [-]
+    AC.n_boxes = 1  # [-]
 
     # drop parameters
     AC.OP_app_V = 25  #[m/s]            # approach
@@ -177,155 +177,168 @@ if True:
     atm.V_tailwind = -atm.V_headwind  # m/s]
     AC.PL_per_box = 20 # [kg]
 
-    # Compute drop scatter results
-    DropResults = {
-        "impact DX [m]": [],
-        "impact DY [m]": [],
-        "impact velocity [m/s]": [],
-        "impact deceleration [g]": [],
-        "max acceleration [g]": [],
-        "max velocity [m/s]": [],
-        "time to land [s]": []
-    }
-
-    VarResults = {
-        "mean DX [m]": [],
-        "mean DY [m]": [],
-        "deviation DX [m]": [],
-        "deviation DY [m]": [],
-        "worst-case impact velocity": [],
-        "worst-case acceleration": []
-    }
-
     # Generate drop maneuver variations
-    Parameters = {
-        "approach speed": [],
-        "approach load factor": [],
-        "drop angle": []
+    Maneuver = {
+        "approach speed": subdivide([20, AC.V_s_min], N_divisions), # add actual minimum stall speed
+        "approach load factor": subdivide([0, 3], N_divisions),
+        "drop angle": subdivide([-45, 45], N_divisions)
     }
 
-    # calc AC traj s.t. h_min == 15m
-    Dh = 0
-    if AC.OP_drop_angle != 0:
-        R = AC.OP_app_V/AC.OP_app_Dn # approach pull radius
-        Dh = R * np.abs(np.sin(AC.OP_drop_angle))
-    AC.pos = [0, 0, H_min+Dh]
-
-    # Generate disturbance variations
-
-    Disturbances = {
-        "payload mass [kg]": subdivide([0, AC.PL_per_box], N_divisions),
-        "crosswind [m/s]": subdivide([-atm.V_crosswind, atm.V_crosswind], N_divisions),
-        "headwind [m/s]": subdivide([-atm.V_headwind, atm.V_headwind], N_divisions)
-        #"drop time [s]": subdivide([0,XXXXXXXX],2)
-    }
-
-    allNames = sorted(Disturbances)
-    combinations = list(it.product(*(Disturbances[Name] for Name in allNames)))
-    print("\n=================\n", len(combinations), "disturbance combinations")
+    allNames = sorted(Maneuver)
+    combinations = list(it.product(*(Maneuver[Name] for Name in allNames)))
+    print("\n================= =================\n", len(combinations), "maneuvers combinations\n")
     print(combinations)
 
-    for disturbance_case in combinations:
-        print("disturbance case ", str(disturbance_case))
-        atm.V_crosswind = disturbance_case[0]  # [m/s]
-        atm.V_headwind = disturbance_case[1]  # [m/s]
-        atm.V_tailwind = -atm.V_headwind  # m/s]
-        AC.PL_mass = disturbance_case[2] # [kg]
+    for maneuver_case in combinations:
+        print("maneuvers case ", str(maneuver_case))
+        AC.OP_app_V = maneuver_case[0]
+        AC.OP_drop_Dn = maneuver_case[1]
+        AC.OP_drop_angle = maneuver_case[2]
 
-        # get drop state for (each) box with drop order and box layout
-        box_number = 1
-        while box_number <= AC.n_boxes:
+        VarResults = {
+            "mean DX [m]": [],
+            "mean DY [m]": [],
+            "deviation DX [m]": [],
+            "deviation DY [m]": [],
+            "worst-case impact velocity": [],
+            "worst-case acceleration": []
+        }
 
-            box = BOX(box_number, AC)
-            box.mass += AC.PL_mass # payload
+        # calc AC traj s.t. h_min == 15m
+        Dh = 0
+        if AC.OP_drop_angle != 0:
+            R = AC.OP_app_V/AC.OP_app_Dn # approach pull radius
+            Dh = R * np.abs(np.sin(AC.OP_drop_angle))
+        AC.pos = [0, 0, H_min+Dh]
 
-            # get trajectory of (each) box from initial state & CD(t)
-            N = 0
-            while box.Pos[-1] > 0 and N < IT_max: #until touchdown
-                box.update(dt_sim, atm)
-                N += 1
+        # Generate disturbance variations
 
-            # get ground impact deceleration
-            box.crumple_size = 0.5 # [m]
-            V_impact = box.LogState[1][-1][-1]
-            a = V_impact**2/box.crumple_size
+        DropResults = {
+            "impact DX [m]": [],
+            "impact DY [m]": [],
+            "impact velocity [m/s]": [],
+            "impact deceleration [g]": [],
+            "max acceleration [g]": [],
+            "max velocity [m/s]": [],
+            "time to land [s]": []
+        }
 
-            # store results
-            if N + 1 == IT_max: print("SIMULATION ABORTED")
-            else:
-                DropResults["impact DX [m]"].append(box.LogState[0][0][-1])
-                DropResults["impact DY [m]"].append(box.LogState[0][1][-1])
-                DropResults["impact velocity [m/s]"].append(box.LogState[1][2][-1])
-                DropResults["impact deceleration [g]"].append(a / atm.g)
-                DropResults["max acceleration [g]"].append(np.max(box.LogState[2][-1])/atm.g)
-                DropResults["max velocity [m/s]"].append(np.max(box.LogState[1][-1]))
-                DropResults["time to land [s]"].append(box.LogState[-1][-1])
+        Disturbances = {
+            "payload mass [kg]": subdivide([10, AC.PL_per_box], N_divisions),
+            "crosswind [m/s]": subdivide([-atm.V_crosswind, atm.V_crosswind], N_divisions),
+            "headwind [m/s]": subdivide([-atm.V_headwind, atm.V_headwind], N_divisions)
+            #"drop time [s]": subdivide([0,XXXXXXXX],2)
+        }
 
-            # show DropResults
-            if plot_traj == box_number:
-                # print results
-                print("\ndisturbance case ", str(disturbance_case), "box ", str(box_number), ":")
-                for var in DropResults:
-                    print(var, DropResults[var][-1])
+        allNames = sorted(Disturbances)
+        combinations = list(it.product(*(Disturbances[Name] for Name in allNames)))
+        print("\n=================\n", len(combinations), "disturbance combinations\n")
+        print(combinations)
 
-                # plot
-                plt.suptitle("Box drop")
+        for disturbance_case in combinations:
+            print("disturbance case ", str(disturbance_case))
+            atm.V_crosswind = disturbance_case[0]  # [m/s]
+            atm.V_headwind = disturbance_case[1]  # [m/s]
+            atm.V_tailwind = -atm.V_headwind  # m/s]
+            AC.PL_mass = disturbance_case[2] # [kg]
 
-                plt.subplot(231)
-                plt.plot(box.LogState[0][0], box.LogState[0][1])
-                plt.title("trajectory XY")
+            # get drop state for (each) box with drop order and box layout
+            box_number = 1
+            while box_number <= AC.n_boxes:
 
-                plt.subplot(232)
-                plt.plot(box.LogState[0][0], box.LogState[0][2])
-                plt.title("trajectory XZ")
+                box = BOX(box_number, AC)
+                box.mass += AC.PL_mass # payload
 
-                plt.subplot(233)
-                plt.plot(box.LogState[0][1], box.LogState[0][2])
-                plt.title("trajectory YZ")
+                # get trajectory of (each) box from initial state & CD(t)
+                N = 0
+                while box.Pos[-1] > 0 and N < IT_max: #until touchdown
+                    box.update(dt_sim, atm)
+                    N += 1
 
-                plt.subplot(234)
-                plt.plot(box.LogState[-1], box.LogState[0][-1])
-                plt.title("height over time")
+                # get ground impact deceleration
+                box.crumple_size = 0.5 # [m]
+                V_impact = box.LogState[1][-1][-1]
+                a = V_impact**2/box.crumple_size
 
-                plt.subplot(235)
-                plt.plot(box.LogState[-1], box.LogState[1][-1])
-                plt.title("speed vs time")
+                # store results
+                if N + 1 == IT_max: print("SIMULATION ABORTED")
+                else:
+                    DropResults["impact DX [m]"].append(box.LogState[0][0][-1])
+                    DropResults["impact DY [m]"].append(box.LogState[0][1][-1])
+                    DropResults["impact velocity [m/s]"].append(box.LogState[1][2][-1])
+                    DropResults["impact deceleration [g]"].append(a / atm.g)
+                    DropResults["max acceleration [g]"].append(np.max(box.LogState[2][-1])/atm.g)
+                    DropResults["max velocity [m/s]"].append(np.max(box.LogState[1][-1]))
+                    DropResults["time to land [s]"].append(box.LogState[-1][-1])
 
-                plt.subplot(236)
-                plt.plot(box.LogState[-1], box.LogState[2][-1])
-                plt.title("acceleration vs time")
+                # show DropResults
+                if plot_traj == box_number:
+                    # print results
+                    print("\ndisturbance case ", str(disturbance_case), "box ", str(box_number), ":")
+                    for var in DropResults:
+                        print(var, DropResults[var][-1])
 
-                plt.show()
+                    # plot
+                    plt.suptitle("Box drop")
 
-            # iterate
-            box_number += 1
+                    plt.subplot(231)
+                    plt.plot(box.LogState[0][0], box.LogState[0][1])
+                    plt.title("trajectory XY")
+
+                    plt.subplot(232)
+                    plt.plot(box.LogState[0][0], box.LogState[0][2])
+                    plt.title("trajectory XZ")
+
+                    plt.subplot(233)
+                    plt.plot(box.LogState[0][1], box.LogState[0][2])
+                    plt.title("trajectory YZ")
+
+                    plt.subplot(234)
+                    plt.plot(box.LogState[-1], box.LogState[0][-1])
+                    plt.title("height over time")
+
+                    plt.subplot(235)
+                    plt.plot(box.LogState[-1], box.LogState[1][-1])
+                    plt.title("speed vs time")
+
+                    plt.subplot(236)
+                    plt.plot(box.LogState[-1], box.LogState[2][-1])
+                    plt.title("acceleration vs time")
+
+                    plt.show()
+
+                # iterate
+                box_number += 1
 
 
-    # process results
-    VarResults["mean DX [m]"].append(
-        np.mean(DropResults["impact DX [m]"]))
-    VarResults["mean DY [m]"].append(
-        np.mean(DropResults["impact DY [m]"]))
-    VarResults["deviation DX [m]"].append(
-        abs(max(DropResults["impact DX [m]"])-min(DropResults["impact DX [m]"])))
-    VarResults["deviation DY [m]"].append(
-        abs(max(DropResults["impact DY [m]"]) - min(DropResults["impact DY [m]"])))
-    VarResults["worst-case impact velocity"].append(
-        max(DropResults["impact velocity [m/s]"]))
-    VarResults["worst-case acceleration"].append(
-        max(DropResults["impact deceleration [g]"])) # ignore ground impact accel as indicated by impact speed already
+        # process results
+        VarResults["mean DX [m]"].append(
+            np.mean(DropResults["impact DX [m]"]))
+        VarResults["mean DY [m]"].append(
+            np.mean(DropResults["impact DY [m]"]))
+        VarResults["deviation DX [m]"].append(
+            abs(max(DropResults["impact DX [m]"])-min(DropResults["impact DX [m]"])))
+        VarResults["deviation DY [m]"].append(
+            abs(max(DropResults["impact DY [m]"]) - min(DropResults["impact DY [m]"])))
+        VarResults["worst-case impact velocity"].append(
+            max(DropResults["impact velocity [m/s]"]))
+        VarResults["worst-case acceleration"].append(
+            max(DropResults["impact deceleration [g]"])) # ignore ground impact accel as indicated by impact speed already
 
-    # show VarResult
-    if plot_scatter:
-        # print results
-        print("\ndrop case with", len(combinations), "combinations and", AC.n_boxes, "boxes :")
-        for var in VarResults:
-            print(var, VarResults[var][-1])
+        # show VarResult
+        if plot_scatter:
+            # print results
+            print("\ndrop case with", len(combinations), "combinations and", AC.n_boxes, "boxes :")
+            for var in VarResults:
+                print(var, VarResults[var][-1])
 
-        # plot
-        cmap = plt.get_cmap('hot')
-        plt.scatter(DropResults["impact DX [m]"]-VarResults["mean DX [m]"][-1],
-                    DropResults["impact DY [m]"]-VarResults["mean DY [m]"][-1],
-                    c=DropResults["impact velocity [m/s]"], ec='k', cmap=cmap)
-        plt.title("landing spots")
-        plt.show()
+            # landing scatter
+            cmap = plt.get_cmap('hot')
+            plt.scatter(DropResults["impact DX [m]"]-VarResults["mean DX [m]"][-1],
+                        DropResults["impact DY [m]"]-VarResults["mean DY [m]"][-1],
+                        c=DropResults["impact velocity [m/s]"], ec='k', cmap=cmap)
+            plt.title("landing spots")
+            plt.show()
+
+            # plot disturbance effects TODO
+

@@ -135,9 +135,9 @@ class UAV:
         "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
         
         "-NACA4415"
-        airfoil = "4415"
+        self.airfoil = "4415"
 
-        if airfoil == "4415":
+        if self.airfoil == "4415":
             self.AE_Cl0 = 0.457                   # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
             self.AE_clcd_max = 163.5
             self.AE_clcd32_max = 170.1
@@ -149,7 +149,7 @@ class UAV:
             self.AE_cm_alpha = 0.00748
             self.AE_cm0 = -0.0941
 
-        if airfoil == "clarky":
+        if self.airfoil == "clarky":
             self.AE_clcd_max = 154.7
             self.AE_clcd32_max = 150.9
             self.AE_clcd12_max = 161.7
