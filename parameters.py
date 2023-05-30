@@ -133,7 +133,21 @@ class UAV:
         self.ST_SF = 1.5
 
         "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
-        self.AE_Cl0 = 0.4                   # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
+        
+        "-NACA4415"
+        airfoil = "4415"
+        if airfoil == "4415":
+            self.AE_Cl0 = 0.457                   # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
+            self.AE_clcd_max = 163.5
+            self.AE_clcd32_max = 170.1
+            self.AE_clcd12_max = 165.7
+            self.AE_cl_max = 1.735
+            self.AE_alpha_s = 18.0 * np.pi / 180
+            self.AE_cd0 = 0.00595
+            self.AE_cl_alpha = 0.103 * 180 / np.pi
+            self.AE_cm_alpha = 0.00748
+            self.AE_cm0 = -0.0941
+
 
         "Flight Performance parameters"     # NOTE: Add identifier "FP_" before variable names
         self.screenheight = 50*0.3048       # screen height of 50 ft (CS23)
