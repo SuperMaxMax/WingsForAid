@@ -11,7 +11,7 @@
 
 import pandas as pd
 
-#df = pd.read_csv("airfoil_data_XFLR5.csv")
+df = pd.read_csv("aerodynamics/airfoil_data_XFLR5.csv")
 
 # df = pd.DataFrame([[5,4,2,8, 2, 3, 2, 4, 9, 14],
 #                     [2,1,8,2, 2, 3, 2, 4,9, 14 ],
@@ -116,3 +116,11 @@ def eta(df):     # Weights based on mission profile
 
 print("tau = ", tau(df))
 print("eta = ", eta(df))
+
+print(tau(df).max())
+tau = tau(df) / tau(df).max()
+eta = eta(df) / eta(df).max()
+
+print(tau)
+print(eta)
+print(tau + eta)
