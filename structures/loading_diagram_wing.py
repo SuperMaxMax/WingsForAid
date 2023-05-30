@@ -9,7 +9,7 @@ import pandas as pd
 from scipy.integrate import quad
 from scipy.optimize import minimize
 from math import tan, atan, cos
-from material_dictionary import material, rank_material
+from material_dictionary import material, material_df, rank_material
 
 def plot_loading_diagram(Ay, Az, By, Bz, load_case):
     plt.figure()
@@ -101,8 +101,12 @@ aircraft.W_wl = 0.5                                                             
 plot = False
 
 # Material choice for strut weight
-prop_weights_strut = [0.1, 0.5, 0.05, 2, 0.05 ,0.05, 0.05]
-possible_materials = rank_material(prop_weights_strut)[:5]
+# add column for material index: sqrt(E)/rho
+material_df['sqrt(E)/rho'] = np.sqrt(material_df['E'])/material_df['density']
+# density, raw cost, eco cost, co2, yield stress, E, Kc, sqrt(E)/rho
+prop_weights_strut = [0, 0.1, 0, 0, 0.05 , 0, 0.05, 0.8]
+# False -> the higher the value the better
+possible_materials = rank_material(prop_weights_strut, [False])[:5]
 ms = pd.DataFrame(index=possible_materials, columns=['Case 1', 'Case 2'])
 
 for i in range(2):
