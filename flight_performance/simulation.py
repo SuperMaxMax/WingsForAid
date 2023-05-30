@@ -192,7 +192,7 @@ dic_constants = {'runway slope': np.arange(0, 10),
     'airport altitude': 0, 'wing surface area': 11, 'weight': takeoffweight(aircraft, 200)*atm.g,
     'wind speed': 0, 'propeller power': aircraft.power*hp_to_watt, 'propeller efficiency': aircraft.eta_p}
 
-plt_to = True
+plt_to = False
 if plt_to:
     figure, axis = plt.subplots(2, 2)
 
@@ -259,13 +259,12 @@ def LA_eom(obj, ap, atmos, constants):
 #    acc = atmos.g / constants['weight'] * (T_avg - D_avg - D_g - constants['weight']*np.sin(np.radians(constants['runway slope'])))
 #    s_land = -V_avg**2 / acc
 
-    V_avg_sq = 0.845 * (np.sqrt(constants['weight'] / constants['wing surface area'] * 2 / rho * 1 / obj.CL_max_TO) -
+    V_avg_sq = 0.72 * (np.sqrt(constants['weight'] / constants['wing surface area'] * 2 / rho * 1 / obj.CL_max_land) -
                           constants['wind speed']) ** 2
 
     A = - constants['wing surface area'] / (np.pi * obj.A * obj.e) * V_avg_sq * rho / 2 * atmos.g / constants['weight']
     B = ap.mu_ground * constants['wing surface area'] * V_avg_sq * rho / 2 * atmos.g / constants['weight']
-    C = (constants['propeller power'] * constants['propeller efficiency'] / np.sqrt(V_avg_sq) - ap.mu_ground *
-         constants['weight'] * np.cos(np.radians(constants['runway slope'])) - obj.CD0 * rho / 2 * V_avg_sq
+    C = (800- ap.mu_ground * constants['weight'] * np.cos(np.radians(constants['runway slope'])) - obj.CD0 * rho / 2 * V_avg_sq
          * constants['wing surface area'] - constants['weight'] * np.sin(np.radians(constants['runway slope']))) \
         * atmos.g / constants['weight'] + V_avg_sq / 750
 
@@ -282,6 +281,7 @@ if plt_land:
 
     figure, axis = plt.subplots(2, 2)
 
+    dic_constants['weight'] = aircraft.W_OE * atm.g
     dic_constants['runway slope'] = np.arange(0, 10)
     dic_constants['airport altitude'] = 0
     CL_LA_1, CL_LA_2 = LA_eom(aircraft, airfield, atm, dic_constants)
@@ -325,7 +325,6 @@ if plt_land:
     plt.subplots_adjust(wspace=0.5)
     plt.suptitle('Landing')
     plt.show()
-    print(CL_LA_1, CL_TO_1)
 
 # ------------------------------------------------------------------------------
 
