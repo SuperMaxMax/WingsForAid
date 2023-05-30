@@ -16,30 +16,27 @@ line_width = 3
 # --------------------------------------------- Parameters ---------------------------------------------
 
 # Parameters
-AR = ac.A                                          # [-]
-S = ac.Sw                                       # [m^2]
-c4_sweep = ac.lambda_co4 * 180 / np.pi          # [deg]
+AR = ac.A                                    # [-]
+S = ac.Sw                                    # [m^2]
+c4_sweep = ac.lambda_co4                     # [rad]
+span = ac.b                                  # [m]
+taper_ratio = ac.taper                       # [-]
+c_r = ac.rootchord                           # [m]
+c_t = ac.tipchord                            # [m]
 
 # For aileron
-y1_a = 1                                     # [m]
-y2_a = 3                                     # [m]
-c_a = 0.2                                       # [c]
+y1_a = 0.7 * span/2                          # Start of aileron - [m]
+y2_a = 0.95 * span/2                         # End of aileron - [m]
+c_a = 0.2                                    # aileron chord - [c]
 
 # For flaps
-y1_f = 2                                        # [m]
-y2_f = 4                                     # [m]
-c_f = 0.25                                      # [c]
+y1_f = 0.1 * span/2                          # Start of flaps - [m]
+y2_f = 0.65 * span/2                         # End of flaps - [m]
+c_f = 0.25                                   # flap chord - [c]
 
 # Spars
-f_spar = 0.2                                    # [c]
-a_spar = 0.75                                   # [c]
-
-# Convert parameters / calculate if necessary
-span = math.sqrt(AR*S)                          # [m]
-taper_ratio = 0.2*(2-c4_sweep*(math.pi/180))    # [-] 
-c_r = (2*S)/((1+taper_ratio)*span)              # [m]
-c_t = taper_ratio*c_r                           # [m]
-c4_sweep /= (180/math.pi)                       # [rad]
+f_spar = 0.15                                 # front spar location - [c]
+a_spar = 0.55                                # aft spar location - [c]
 
 # -------------------------------------------- Calculations --------------------------------------------
 

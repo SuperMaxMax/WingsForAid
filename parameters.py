@@ -2,7 +2,7 @@ import numpy as np
 class UAV:
     def __init__(self, name):
         "=== Class I / Class II parameters ==="
-        self.A = 10                         # Aspect ratio [-]
+        self.A = 8                         # Aspect ratio [-]
         self.BHP_cruise = 76.3436
         self.CD0 = 0.0273                   # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
@@ -18,7 +18,7 @@ class UAV:
         self.Lambda = -0.0065
         self.MAC_length = 1.0161            # Mean aerodynamic chord [m]
         self.MGC = 1.0822                   # Mean geometric chord [m]
-        self.M_res = 0.1 
+        self.M_res = 0.075 
         self.Mff = 0.9254                   # Fuel fraction [-]
         self.N_e = 1                        # Number of engines [-]
         self.R = 500000                     # Range [m]
@@ -44,7 +44,7 @@ class UAV:
         self.W_F = 59.8091                  # Fuel weight [kg]
         self.W_OE = 429.1354                # Operational empty weight [kg]
         self.W_PL = 240                     # Payload weight [kg]
-        self.W_TO = 728.9445                # Take-off weight [kg]
+        self.W_TO = 752                    # Take-off weight [kg]
         self.W_boom = 20                    # Boom weight [kg]
         self.W_e = 62.6                     # Definitive weight per engine [kg]
         self.W_eq = 58.075                  # Equipment weight [kg]
@@ -73,7 +73,7 @@ class UAV:
         self.d_eff = 1.241                  # Effective diameter [m]
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
         self.dihedral = 1
-        self.e                   = 0.7      # Oswald factor [-]
+        self.e = 0.7                        # Oswald factor [-]
         self.engine_cg = 0.327              # Engine cg location [m]
         self.engine_fairing = 0.2           # Engine fairing length [m]
         self.engine_length = 0.6651         # Engine length [m]
@@ -106,7 +106,7 @@ class UAV:
         self.pos_main_carriage = 'fuselage' # Position of main carriage: "fuselage" or "wing"
         self.power = 95.8347                # Power at takeoff [hp]
         self.power_setting = 0.9            # Power setting in cruise [-]
-        self.prop_eff = 0.82                # Propulsive efficiency [-]
+        self.prop_eff = 0.7                 # Propulsive efficiency [-]
         self.rho0 = 1.225                   # Air density at sea level [kg/m^3]
         self.rho_TO = 1.225                 # Take-off air density if airport is at sea level [kg/m^3]
         self.rho_cruise = 0.9046            # Cruise air density [kg/m^3]
@@ -135,8 +135,9 @@ class UAV:
         "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
         
         "-NACA4415"
-        airfoil = "4415"
-        if airfoil == "4415":
+        self.airfoil = "4415"
+
+        if self.airfoil == "4415":
             self.AE_Cl0 = 0.457                   # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
             self.AE_clcd_max = 163.5
             self.AE_clcd32_max = 170.1
@@ -144,9 +145,21 @@ class UAV:
             self.AE_cl_max = 1.735
             self.AE_alpha_s = 18.0 * np.pi / 180
             self.AE_cd0 = 0.00595
-            self.AE_cl_alpha = 0.103 * 180 / np.pi
+            self.AE_cl_alpha = 0.103 * 180 / np.pi # 1 / rad
             self.AE_cm_alpha = 0.00748
             self.AE_cm0 = -0.0941
+
+        if self.airfoil == "clarky":
+            self.AE_clcd_max = 154.7
+            self.AE_clcd32_max = 150.9
+            self.AE_clcd12_max = 161.7
+            self.AE_cl_max = 1.786
+            self.AE_alpha_s = 16.5 * np.pi / 180
+            self.AE_cd0 = 0.00604
+            self.AE_Cl0 = 0.404                  
+            self.AE_cl_alpha = 0.113 * 180 / np.pi
+            self.AE_cm_alpha = 0.00627
+            self.AE_cm0 = -0.0844
 
 
         "Flight Performance parameters"     # NOTE: Add identifier "FP_" before variable names
@@ -157,6 +170,9 @@ class UAV:
         self.ceiling      = 18000*0.3048    # [m] 18000 ft service ceiling
         self.th_ceil      = 30000*0.3048
         self.SFC          = 7.91666667E-8   # kg/J specific fuel consumption
+        self.fuelcapacity = 100             # L
+        self.fueldensity  = 0.7429          # kg/L
+
 
         "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
         self.CS_eta = 0.95                  # airfoil efficiency factor [-]
@@ -164,15 +180,24 @@ class UAV:
         self.CS_mu1 = 0.24
         self.CS_mu2 = 0.78
         self.CS_mu3 = 0.525
-        self.CS_x_ac_w = 0.25               # location of wing ac, divided by MAC [-] - SEAD L7, S34   
-        self.CS_l_h = 6.5                   # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.CS_x_ac_w = 0.3              # location of wing ac, divided by MAC [-] - SEAD L7, S34   
         self.CS_Cm_0_airfoil = -0.083       # TODO: Update value - Moment coefficient of airfoil [-]
-        
-        self.Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
-        self.A_h = 6                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
-        self.lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
-        self.dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.Sh_S = 0.3
+        self.CS_n_blades = 3                   # [-] number of propeller blades NOTE: Depends on chosen propeller
+        self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
+
+        # Horizontal tailplane
+        self.CS_l_h = 4.5                   # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.CS_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
+        self.CS_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+        self.CS_lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
+        self.CS_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
+        self.CS_Sh_S = 0.40                    # [-] Ratio between horizontal tailplane surface area and surface area wing
+
+        # Vertical tailplane
+        self.CS_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
+        self.CS_A_v = None                     # [-] Aspect ratio vertical tail
+        self.CS_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane 
+        self.CS_Sv_S = None                    # [-] Ratio between vertical tailplane surface area and surface area wing
 
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
         self.n_drops = 1  # [-]
@@ -202,7 +227,7 @@ class UAV:
 class airport:
     def __init__(self, name):
         self.name       = name
-        self.mu_ground  = 0.05                  #buildingspeed.org
+        self.mu_ground  = 0.4                  #buildingspeed.org
         self.rwyslope   = 1.0                   #runway slope in degrees --> CONVERT TO RADIANS
 
 class atmosphere:

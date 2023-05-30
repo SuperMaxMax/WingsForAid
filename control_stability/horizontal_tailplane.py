@@ -77,11 +77,16 @@ def Aerodynamic_centre_determination(aircraft):
     aircraft.x_ac_cruise        = aircraft.x_ac_wf_cruise + aircraft.dx_ac_n_cruise
     aircraft.x_ac_approach      = aircraft.x_ac_wf_approach + aircraft.dx_ac_n_approach
 
+def C_m_alpha_calculation(aircraft, x_cg):
+    aircraft.C_N_h_alpha = 2 * np.pi * aircraft.A_h/(aircraft.A_h + 2)
+
+    aircraft.C_m_alpha = aircraft.AE_cl_alpha * (x_cg - aircraft.CS_x_ac_w) - aircraft.C_N_h_alpha * (1 - aircraft.CS_dEpsilondA) * (aircraft.CS_Vh_V)**2 * aircraft.CS_Sh_S * aircraft.CS_l_h/aircraft.MAC_length
+
 #################################################################################################################
 "FIXME: Determine Control Surface Coefficients"
 #################################################################################################################
 # Using data from Torenbeek aroung page 533
-flaptype = 'singleslotted'              # Can be 'singleslotted' or 'fowler'
+flaptype = 'fowler'              # Can be 'singleslotted' or 'fowler'
 
 if flaptype == 'singleslotted':
     CS_deltaf_TO                   = 20  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S14)
@@ -89,8 +94,10 @@ if flaptype == 'singleslotted':
     CS_fc_c                        = 0.25  # flap chord length / wing chord length [-] NOTE: This influences aft spar position TODO: update value
     CS_dc_cf_TO                    = 0.2  # increase in chord length / flap chord length [-]
     CS_dc_cf_LD                    = 0.3  # increase in chord length / flap chord length [-]
-    CS_c_prime                     = 1  # wing chord length when flaps are extended [m] TODO: update value
-    CS_dClmax                      = 1.3  # Additional airfoil lift due to single slotted flap (ADSEE-II, L3 S36)
+    CS_cprime_c_TO = 1 + CS_dc_cf_TO * CS_fc_c # wing chord length with take-off extended flaps / chord [-]
+    CS_cprime_c_LD = 1 + CS_dc_cf_LD * CS_fc_c # wing chord length with landing extended flaps / chord [-]
+    CS_dClmax_TO = 1.3 * 0.7  # Additional airfoil lift at take-off due to single slotted flap (ADSEE-II, L3 S36)
+    CS_dClmax_LD = 1.3  # Additional airfoil lift at landing due to single slotted flap
 
 if flaptype == 'fowler':
     CS_deltaf_TO                   = 15  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S15)
@@ -98,13 +105,19 @@ if flaptype == 'fowler':
     CS_fc_c                        = 0.35  # flap chord length / wing chord length [-] NOTE: This influences aft spar position TODO: update value
     CS_dc_cf_TO                    = 0.48  # increase in chord length / flap chord length [-]
     CS_dc_cf_LD                    = 0.625  # increase in chord length / flap chord length [-]
-    CS_c_prime                     = 1  # wing chord length when flaps are extended [m] TODO: update value
-    CS_dClmax                      = 1.3 # Additional airfoil lift due to fowler flap (ADSEE-II, L3 S36)
+    CS_cprime_c_TO = 1 + CS_dc_cf_TO * CS_fc_c # wing chord length with take-off extended flaps / chord [-]
+    CS_cprime_c_LD = 1 + CS_dc_cf_LD * CS_fc_c # wing chord length with landing extended flaps / chord [-]
+    CS_dClmax_TO = 1.3 * 0.7 * CS_cprime_c_TO  # Additional airfoil lift at take-off due to fowler flap (ADSEE-II, L3 S36)
+    CS_dClmax_LD = 1.3 * CS_cprime_c_LD  # Additional airfoil lift at landing due to fowler flap
 
 CS_Swf                          = 0.5 * aircraft.Sw # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) TODO: update value
 CS_lambda_hinge                 = 0.02 # hinge line sweep angle, likely parallel to aft spar [rad] TODO: update value
-CS_dCLmax = 0.9 * CS_dClmax * (CS_Swf/aircraft.Sw) * np.cos(CS_lambda_hinge)  # Increase in CL due to flap extension
-# NOTE: Above equation can be rewritten to calculate Swf for a given delta CLmax 
+CS_dCLmax_TO = 0.9 * CS_dClmax_TO * (CS_Swf/aircraft.Sw) * np.cos(CS_lambda_hinge)  # Increase in CL due to flap extension at take-off
+CS_dCLmax_LD = 0.9 * CS_dClmax_LD * (CS_Swf/aircraft.Sw) * np.cos(CS_lambda_hinge)  # Increase in CL due to flap extension at landing
+print(CS_dCLmax_LD, CS_dCLmax_TO)
+# NOTE: Above equation can be rewritten to calculate Swf for a given delta CLmax
+
+# FIXME: Changing flaptype does not change dCLmax_... output
 
 #################################################################################################################
 "Controlability and Stability Curves"
@@ -132,7 +145,7 @@ def controlability_curve(aircraft, xcgRange): #TODO: change constants here
 
     Cm_ac = Cm_ac_w + dCm_ac_f + dCm_ac_fus
 
-    ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.CS_l_h / aircraft.MAC_length) * aircraft.Vh_V ** 2)
+    ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.CS_l_h / aircraft.MAC_length) * aircraft.CS_Vh_V ** 2)
     ControlSh_S = ControlFrac * (xcgRange + Cm_ac / CL_Ah - aircraft.x_ac_approach)
 
     return ControlSh_S
@@ -194,8 +207,7 @@ def plot_scissor_plot(aircraft):
     plt.show()
     
 
-def run(aircraft):
+def hor_run(aircraft):
     Aerodynamic_centre_determination(aircraft)
     plot_scissor_plot(aircraft)
-
-run(aircraft)
+    C_m_alpha_calculation(aircraft, aircraft.X_cg_full)
