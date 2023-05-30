@@ -177,17 +177,17 @@ class UAV:
         self.CS_mu1 = 0.24
         self.CS_mu2 = 0.78
         self.CS_mu3 = 0.525
-        self.CS_x_ac_w = 0.25               # location of wing ac, divided by MAC [-] - SEAD L7, S34   
+        self.CS_x_ac_w = 0.3              # location of wing ac, divided by MAC [-] - SEAD L7, S34   
         self.CS_l_h = 4.5                   # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.CS_Cm_0_airfoil = -0.083       # TODO: Update value - Moment coefficient of airfoil [-]
         self.CS_n_blades = 3                   # [-] number of propeller blades NOTE: Depends on chosen propeller
         self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
 
         self.Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
-        self.A_h = 6                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+        self.A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
         self.dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.Sh_S = 0.10
+        self.Sh_S = 0.40
 
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
         self.n_drops = 1  # [-]
@@ -217,7 +217,7 @@ class UAV:
 class airport:
     def __init__(self, name):
         self.name       = name
-        self.mu_ground  = 0.05                  #buildingspeed.org
+        self.mu_ground  = 0.4                  #buildingspeed.org
         self.rwyslope   = 1.0                   #runway slope in degrees --> CONVERT TO RADIANS
 
 class atmosphere:

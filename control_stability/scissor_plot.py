@@ -72,19 +72,18 @@ def Aerodynamic_centre_determination(aircraft):
 
     aircraft.x_ac_cruise        = aircraft.x_ac_wf_cruise + aircraft.dx_ac_n_cruise
     aircraft.x_ac_approach      = aircraft.x_ac_wf_approach + aircraft.dx_ac_n_approach
-    print(f"x_ac_wf_cruise = {aircraft.x_ac_wf_cruise}")
-    print(f"x_ac_wf_approach = {aircraft.x_ac_wf_approach}")
-    print(f"x_ac_cruise = {aircraft.x_ac_cruise}")
-    print(f"x_ac_approach = {aircraft.x_ac_approach}")
 
 #################################################################################################################
 "FIXME: Determine Control Surface Coefficients"
 #################################################################################################################
-CS_cf                           = 0.3 # flap chord [m] TODO: update value
+CS_cf                           = 0.25 * aircraft.MAC_length # flap chord [m] NOTE: This influences aft spar position TODO: update value
+CS_deltac = 0
 CS_c_prime                      = 1 # wing chord length when flaps are extended [m] TODO: update value
 CS_Swf                          = 0.5 * aircraft.Sw # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) TODO: update value
 CS_dClmax                       = 1.3 # Additional airfoil lift due to single slotted flap ( ADSEE-II, L3 S36) NOTE: check if correct
-CS_lambda_hinge                 = 0.02 # hinge line sweep angle [rad] TODO: update value
+CS_lambda_hinge                 = 0.02 # hinge line sweep angle, likely parallel to aft spar [rad] TODO: update value
+CS_dCLmax = 0.9 * CS_dClmax * (CS_Swf/aircraft.Sw) * np.cos(CS_lambda_hinge)  # Increase in CL due to flap extension
+# NOTE: Above equation can be rewritten to calculate Swf for a given delta CLmax 
 
 # TODO: Continue here, around ADSEE-II L3 S34
 
@@ -92,13 +91,11 @@ CS_lambda_hinge                 = 0.02 # hinge line sweep angle [rad] TODO: upda
 "Controlability and Stability Curves"
 ################################################################################################################
 
-def controlability_curve(aircraft): #TODO: change constants here 
+def controlability_curve(aircraft, xcgRange): #TODO: change constants here 
     """For the controllability curve, the CL_h, CL_Ah and Cm_ac of the aircraft needs to be found. 
     For CL_h: SEAD L8 S17
     For CL_Ah: L = W @ approach
     For Cm_ac: SEAD L8 S19"""
-    
-    xcgRange = np.arange(0, 1.005, 0.005)
 
     CL_h = -1
     CL_Ah = aircraft.W_TO * aircraft.g0 / (0.5 * aircraft.rho0 * (1.3 * aircraft.V_s_min)**2 * aircraft.Sw)
@@ -118,11 +115,12 @@ def controlability_curve(aircraft): #TODO: change constants here
 
     ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.CS_l_h / aircraft.MAC_length) * aircraft.Vh_V ** 2)
     ControlSh_S = ControlFrac * (xcgRange + Cm_ac / CL_Ah - aircraft.x_ac_approach)
-    return xcgRange, ControlSh_S
+
+    return ControlSh_S
 
 
-def stability_curve(aircraft):
-    xcgRange                    = np.arange(0, 1.005, 0.005)
+def stability_curve(aircraft, xcgRange):
+    
     # Making stability line
 
     StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.dEpsilondA) * (aircraft.CS_l_h/aircraft.MAC_length) * aircraft.Vh_V ** 2)
@@ -138,8 +136,9 @@ def stability_curve(aircraft):
 ##################################################################################################################
 
 def plot_scissor_plot(aircraft):
-    xcgRange, ControlSh_s = controlability_curve(aircraft)
-    StabilitySh_S, StabilitySh_S_margin, = stability_curve(aircraft)
+    xcgRange                    = np.arange(-0.1005, 1.005, 0.005)
+    ControlSh_s = controlability_curve(aircraft, xcgRange)
+    StabilitySh_S, StabilitySh_S_margin, = stability_curve(aircraft, xcgRange)
 
     fig1, ax1 = plt.subplots(figsize=(15, 8))
     ax1.plot(xcgRange, StabilitySh_S_margin, color = 'black',
@@ -150,16 +149,26 @@ def plot_scissor_plot(aircraft):
     ax1.plot(xcgRange, ControlSh_s, color = 'blue',
          path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
 
-    plt.xlabel("x/c [-]")
-    plt.ylabel("S_h/S [-]")
+    Sh_S_cont = controlability_curve(aircraft, aircraft.X_cg_fwd)
+    Sh_S_stab = stability_curve(aircraft, aircraft.X_cg_aft)[1]
 
-    ax1.grid()
+    if Sh_S_cont > Sh_S_stab:
+        aircraft.Sh_S = Sh_S_cont
+    else:
+        aircraft.Sh_S = Sh_S_stab
 
     x_cg_limit = [aircraft.X_cg_fwd, aircraft.X_cg_aft]
     S_h_S_array = [aircraft.Sh_S, aircraft.Sh_S]
 
     ax1.plot(x_cg_limit, S_h_S_array, color = 'orange')
 
+    plt.xlim([0, 1])
+    plt.ylim([0, 0.6])
+
+    plt.xlabel("x/c [-]")
+    plt.ylabel("S_h/S [-]")
+
+    ax1.grid()
 
     # fig1.savefig("scissorplot")
 
