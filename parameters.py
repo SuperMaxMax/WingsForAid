@@ -136,6 +136,7 @@ class UAV:
         
         "-NACA4415"
         airfoil = "4415"
+
         if airfoil == "4415":
             self.AE_Cl0 = 0.457                   # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
             self.AE_clcd_max = 163.5
@@ -147,6 +148,18 @@ class UAV:
             self.AE_cl_alpha = 0.103 * 180 / np.pi
             self.AE_cm_alpha = 0.00748
             self.AE_cm0 = -0.0941
+
+        if airfoil == "clarky":
+            self.AE_clcd_max = 154.7
+            self.AE_clcd32_max = 150.9
+            self.AE_clcd12_max = 161.7
+            self.AE_cl_max = 1.786
+            self.AE_alpha_s = 16.5 * np.pi / 180
+            self.AE_cd0 = 0.00604
+            self.AE_Cl0 = 0.404                  
+            self.AE_cl_alpha = 0.113 * 180 / np.pi
+            self.AE_cm_alpha = 0.00627
+            self.AE_cm0 = -0.0844
 
 
         "Flight Performance parameters"     # NOTE: Add identifier "FP_" before variable names
