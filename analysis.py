@@ -35,18 +35,23 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
     # iteration
     concept_dir = os.path.join(out_folder_path, f"{concept.name}")
     os.makedirs(concept_dir, exist_ok=True)
-    W_TO_c2_old = 750
-
+    W_TO_c2_old = 1500
+    m = 0
     for row in rows:
         row_values = row.strip().split(";")
         row_array = np.array(row_values)
 
         # var_array = np.arange(starting_value, ending value, step) * scale
         var_array = np.arange(float(row_array[1]), float(row_array[2]), float(row_array[3])) * float(row_array[4])
+        save = var_array
+        if m >= 10:
+            var_array = [np.array([i]) for i in var_array]
+            print(var_array)
+            print(row_array)
         W_TO_array = []
         W_F_array = []
         W_OE_array = []
-
+        m += 1
         n = 1
         for i in var_array:
             concept_analysis = copy.deepcopy(concept)
@@ -89,6 +94,7 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
         W_F_array = np.array(W_F_array)
         W_OE_array = np.array(W_OE_array)
 
+        var_array = save
         # save indices for highlighted part
         subset_indices = np.where((var_array >= float(row_array[5])) & (var_array <= float(row_array[6])))
         var_array_subset = var_array[subset_indices[0]]
@@ -102,31 +108,31 @@ for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, C
         # W_TO plot
         plt.subplot(1, 3, 1)
         plt.plot(var_array, W_TO_array, color="cornflowerblue")
-        plt.plot(var_array_subset, W_TO_range_subset, color="red")
-        plt.xlabel(row_array[7])
-        plt.ylabel("W_TO [kg]")
+        plt.plot(var_array_subset, W_TO_range_subset, color="red", lw="3")
+        plt.xlabel(row_array[7], fontsize=13)
+        plt.ylabel("W_TO [kg]", fontsize=13)
         plt.grid()
 
         # W_F plot
         plt.subplot(1, 3, 2)
         plt.plot(var_array, W_F_array, color="cornflowerblue")
-        plt.plot(var_array_subset, W_F_range_subset, color="red")
-        plt.xlabel(row_array[7])
-        plt.ylabel("W_F [kg]")
+        plt.plot(var_array_subset, W_F_range_subset, color="red", lw='3')
+        plt.xlabel(row_array[7], fontsize=13)
+        plt.ylabel("W_F [kg]", fontsize=13)
         plt.grid()
 
         # W_OE plot
         plt.subplot(1, 3, 3)
         plt.plot(var_array, W_OE_array, color="cornflowerblue")
-        plt.plot(var_array_subset, W_OE_range_subset, color="red")
-        plt.xlabel(row_array[7])
-        plt.ylabel("W_OE [kg]")
+        plt.plot(var_array_subset, W_OE_range_subset, color="red", lw= '3')
+        plt.xlabel(row_array[7], fontsize=13)
+        plt.ylabel("W_OE [kg]", fontsize=13)
         plt.subplots_adjust(wspace=0.2)
         plt.grid()
 
         file_name = f"figure_{row_array[0]}_{concept.name}"
         file_path = os.path.join(concept_dir, file_name)
-        plt.savefig(file_path)
+        plt.savefig(file_path, bbox_inches='tight')
 
         plt.close()
     print("\n")
