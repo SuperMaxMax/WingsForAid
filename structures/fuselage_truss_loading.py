@@ -115,7 +115,15 @@ L_CF_=np.sqrt(L_AB**2 + L_AA_**2)
 
 loads = np.array([AA_,BB_,CC_,DD_,EE_,FF_,AF,EF,BC,CD,B_C_,C_D_,CF,C_F_,AB,DE,A_B_,D_E_,AC,CE,A_C_,C_E_,A_F_,E_F_,CF_])
 lenghts = np.array([L_AA_,L_BB_,L_CC_,L_DD_,L_EE_,L_FF_,L_AF,L_EF,L_BC,L_CD,L_B_C_,L_C_D_,L_CF,L_C_F_,L_AB,L_DE,L_A_B_,L_D_E_,L_AC,L_CE,L_A_C_,L_C_E_,L_A_F_,L_E_F_,L_CF_])
+mass = np.array([])
+
+index_compression = np.where(loads<0)
+index_tension = np.where(loads>=0)
+for i in range(loads[index_tension]):
+    mass = lenghts[i]*abs(loads)/yield_stress*density
+
 
 mass = lenghts*abs(loads)/yield_stress*density #tension
 mass = lenghts**2*density*np.sqrt(abs(loads)/(E*np.pi**2)) #compression
-print(mass)
+print(index_tension)
+print(index_compression)
