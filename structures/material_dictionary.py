@@ -2,17 +2,17 @@ import pandas as pd
 import copy
 import numpy as np
 
-def rank_material(weights):
+def rank_material(weights, asc):
     material_ranking = copy.deepcopy(material_df)
 
-    ascending_tf = [True, True, True, True, False, False, False]
+    ascending_tf = [True, True, True, True, False, False, False] + asc
     for i, property in enumerate(material_ranking.columns):
         property_ranking = material_ranking[property].rank(ascending=ascending_tf[i])
         material_ranking[property] = property_ranking
 
     material_ranking['Ranking'] = material_ranking.apply(lambda row: sum(row * weights), axis=1)
     material_ranking.sort_values(by=['Ranking'], inplace=True)
-    material_ranking.drop(material_ranking.columns[:7], axis=1, inplace=True)
+    material_ranking.drop(material_ranking.columns.difference(['Ranking']), 1, inplace=True)
     
     return list(material_ranking.index)
 
