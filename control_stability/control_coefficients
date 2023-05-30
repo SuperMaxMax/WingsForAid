@@ -12,14 +12,18 @@ atm      = atmosphere()
 
 from scissor_plot import run 
 
-run(aircraft)
-
 def C_m_alpha_calculation(aircraft, x_cg):
     aircraft.C_N_h_alpha = 2 * np.pi * aircraft.A_h/(aircraft.A_h + 2)
 
     aircraft.C_m_alpha = aircraft.AE_cl_alpha * (x_cg - aircraft.CS_x_ac_w) - aircraft.C_N_h_alpha * (1 - aircraft.dEpsilondA) * (aircraft.Vh_V)**2 * aircraft.Sh_S * aircraft.CS_l_h/aircraft.MAC_length
 
-C_m_alpha_calculation(aircraft, 0.8)
-print(f"C_m_alpha: {aircraft.C_m_alpha}") 
-print(f"CLa: {aircraft.AE_cl_alpha}")
-print(f"C_N_h_alpha: {aircraft.C_N_h_alpha}")  
+
+run(aircraft)
+C_m_alpha_calculation(aircraft, 0.45)
+
+print("\n----------------Summary----------------\n")
+print(f"Sh_S: {aircraft.Sh_S}")
+print(f"C_m_alpha: {aircraft.C_m_alpha}\n")
+
+
+
