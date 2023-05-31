@@ -76,6 +76,13 @@ def iw(airfoil):
 
 iw(airfoil)
 
+def lift(coefficients, theta, b, c): #Gives lift for certain point with position theta and c
+    sum = 0
+    for i in range(len(coefficients)):
+        sum += coefficients[i]*np.sin((i+1) * theta)
+    p = 4 * b / c * sum
+    return p
+
 def plot_lift_distr():
     segments = 10
     N = segments - 1
@@ -89,35 +96,48 @@ def plot_lift_distr():
     b = (AR * S)**0.5
     MAC = S/b                               #Change to iteration between Croot and MAC
     
-    N = 5
-    a_2d = 2 * np.pi
-    A = 2 * np.pi
+    N = 3
+    a_2d = 6
+    A = 8
+    alpha_0 = -2 * np.pi / 180
 
 
     Croot = (1.5*(1+Lambda)*MAC)/(1+Lambda+Lambda**2)
+   # if 
     theta = np.linspace(90 * np.pi / 180, 0, N, endpoint = False)[::-1] #Change to get gooed amount of sections
+    #theta = np.array([np.pi/6,0, np.pi/3, 0,np.pi/2])
+  #  theta = np.array([45 * np.pi / 180, 67.5 * np.pi / 180])
     alpha = np.linspace(i_w + alpha_twist, i_w, N, endpoint = False)[::-1]
-    z = (b/2) * np.cos(theta)
+ #   z = (b/2) * np.cos(theta)
     c = Croot * (1 - (1-Lambda) * np.cos(theta))
     mu = (c * a_2d) / (4 * b)
     #solve Ansin(ntheta)
-    LHS = mu * (alpha - alpha_0)
+  #  LHS = mu * (alpha - alpha_0)
     B = np.zeros((N,N))
     print(theta)
     for i in range(0,N):
         print("i:", i)
-        for j in range(0, N):
-            print("j:", j)
+        for j in range(0,N):
+           # print("j:", j)
             print("theta:", theta)
             print( ((4 * A / a_2d) + (j+1) / np.sin(theta[i])) * np.sin((j+1)* theta[i]))
             B[i,j] = ((4 * A / a_2d) + (j+1) / np.sin(theta[i])) * np.sin((j+1)* theta[i])
           #  B[i,j] = np.sin((2*j - 1) * theta[i]) * (1 + (mu[i] * (2 * j - 1)) / np.sin(theta[i]))
             
-    print(np.linalg.solve(B,np.array([1,1,1,1,1])))
+    #print(np.linalg.solve(B,np.ones(N)))
+
+    coefficients = np.linalg.solve(B,alpha)
     print(B)
 
+    thetas = np.arange(0.0001, np.pi/2, 0.01)
+    z = (b/2) * np.cos(thetas)
 
-    C_L_i = (4 * b)/c * 0#Ansin(ntheta)
+    cs = Croot * (1 - (1-Lambda) * np.cos(thetas))
+    C_L_i = lift(coefficients, thetas, b, cs)
+    print("asdf")
+    print(z)
+    print(C_L_i)
+
     #C_L_wing = 
     plt.plot(z, C_L_i)
     plt.xlabel('semi span [m]')
