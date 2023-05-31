@@ -96,7 +96,7 @@ def plot_lift_distr():
     b = (AR * S)**0.5
     MAC = S/b                               #Change to iteration between Croot and MAC
     
-    N = 2
+    N = 3
     a_2d = 6
     A = 8
     alpha_0 = -2 * np.pi / 180
@@ -106,13 +106,13 @@ def plot_lift_distr():
    # if 
     theta = np.linspace(90 * np.pi / 180, 0, N, endpoint = False)[::-1] #Change to get gooed amount of sections
     #theta = np.array([np.pi/6,0, np.pi/3, 0,np.pi/2])
-    theta = np.array([45 * np.pi / 180, 67.5 * np.pi / 180])
+  #  theta = np.array([45 * np.pi / 180, 67.5 * np.pi / 180])
     alpha = np.linspace(i_w + alpha_twist, i_w, N, endpoint = False)[::-1]
-    z = (b/2) * np.cos(theta)
+ #   z = (b/2) * np.cos(theta)
     c = Croot * (1 - (1-Lambda) * np.cos(theta))
     mu = (c * a_2d) / (4 * b)
     #solve Ansin(ntheta)
-    LHS = mu * (alpha - alpha_0)
+  #  LHS = mu * (alpha - alpha_0)
     B = np.zeros((N,N))
     print(theta)
     for i in range(0,N):
@@ -129,9 +129,14 @@ def plot_lift_distr():
     coefficients = np.linalg.solve(B,alpha)
     print(B)
 
-    thetas = np.arange(0.0001, np.pi/2, 1000)
+    thetas = np.arange(0.0001, np.pi/2, 0.01)
+    z = (b/2) * np.cos(thetas)
+
     cs = Croot * (1 - (1-Lambda) * np.cos(thetas))
     C_L_i = lift(coefficients, thetas, b, cs)
+    print("asdf")
+    print(z)
+    print(C_L_i)
 
     #C_L_wing = 
     plt.plot(z, C_L_i)
