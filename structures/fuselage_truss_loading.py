@@ -119,11 +119,22 @@ mass = np.array([])
 
 index_compression = np.where(loads<0)
 index_tension = np.where(loads>=0)
-for i in range(loads[index_tension]):
-    mass = lenghts[i]*abs(loads)/yield_stress*density
 
+for i in index_tension:
+    mass_new = lenghts[i]*abs(loads[i])/yield_stress*density
+    #print(mass_new)
+    mass = np.append(mass, mass_new)
+#print(mass)
 
-mass = lenghts*abs(loads)/yield_stress*density #tension
-mass = lenghts**2*density*np.sqrt(abs(loads)/(E*np.pi**2)) #compression
-print(index_tension)
-print(index_compression)
+for i in index_compression:
+    mass_new = lenghts[i]**2*density*np.sqrt(abs(loads[i])/(E*np.pi**2))
+    #print(mass_new)
+    mass = np.append(mass,mass_new)
+#print(mass)
+# mass = lenghts*abs(loads)/yield_stress*density #tension
+# mass = lenghts**2*density*np.sqrt(abs(loads)/(E*np.pi**2)) #compression
+# print(index_tension)
+# print(index_compression)
+
+total_mass = sum(mass)
+print("Total modular fuselage mass",total_mass)
