@@ -2,6 +2,7 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 from matplotlib import patheffects
+from scipy.integrate import quad
 
 sys.path.append('..')
 
@@ -128,9 +129,9 @@ else:
     print(f"Swf_TO: {round(CS_dCLmax_TO / (0.9 * CS_dClmax_TO * np.cos(CS_lambda_hinge)) * 100, 3)}% Sw") 
     print(f"CS_dCLmax_LD: {round(CS_dCLmax_LD / (0.9 * CS_dClmax_LD * np.cos(CS_lambda_hinge)) * 100, 3)}% Sw")
 
-# NOTE: Above equation can be rewritten to calculate Swf for a given delta CLmax
-
-
+def Chordfunc(y): # calculate end distance of flaps
+    aircraft.rootchord - (aircraft.rootchord *(1 - aircraft.taper)/(aircraft.b / 2)) * y
+result, error = quad(Chordfunc(y), )
 #################################################################################################################
 "FIXME: Controlability and Stability Curves"
 ################################################################################################################
