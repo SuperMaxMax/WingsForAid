@@ -382,9 +382,9 @@ def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
         h_cruise = ac_obj.h_cruise
     else:
         h_cruise = h_cruise
-    Fuel_loads  = np.arange(0, ac_obj.fuelcapacity, 1.0)
+    Fuel_loads  = np.arange(0, ac_obj.fuelcapacity+1.0, 1.0)
     Reserve     = ac_obj.M_res * ac_obj.fuelcapacity * ac_obj.fueldensity
-    ZFW         = ac_obj.W_OE + Reserve + ac_obj.n_boxes * ac_obj.boxweight
+    ZFW         = ac_obj.W_OE + Reserve + ac_obj.n_boxes * ac_obj.boxweight             # ac_ojb.n_boxes must be 12 here
     maxZFW_fuel = ac_obj.W_TO - ZFW
     ZFW_maxfuel = ac_obj.W_TO - ac_obj.fuelcapacity * ac_obj.fueldensity
     PL_maxfuel  = ZFW_maxfuel - Reserve - ac_obj.W_OE
@@ -392,18 +392,74 @@ def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
     print("-------------------------------------------------------------------")
     print(f"Max ZFW: {np.round(ZFW, 2)} [kg]")
     print(f"Fuel @ max ZFW: {np.round(maxZFW_fuel, 2)} [kg] or {np.round(maxZFW_fuel/ac_obj.fueldensity, 2)} [L]")
-    print(f"ZFW @ max fuel: {np.round(ZFW_maxfuel)} [kg]. The aircraft carries {np.round(PL_maxfuel)} [kg]")
+    print(f"ZFW @ max fuel: {np.round(ZFW_maxfuel)} [kg]. The aircraft carries {np.round(PL_maxfuel)} [kg] of payload")
     print(f"The TOW @ ferry configuration is {np.round(Ferryweight)} [kg]")
     print("-------------------------------------------------------------------")
-    rho_cr = atm_parameters(atm_obj, h_cruise)
+    rho_cr  = atm_parameters(atm_obj, h_cruise)[2]
     W = ZFW
+    Range   = np.empty(0)
+    n_boxes = ac_obj.n_boxes                                                            # 12
+    W_PL    = np.empty(0)
+    TOW     = np.empty(0)  
     for i in range(len(Fuel_loads)):
-        CL_cr = 2*W/(rho_cr*V_cruise**2*ac_obj.Sw)
-        CD_cr = dragpolar
-        
+        W_pl = n_boxes * ac_obj.boxweight
+        W_f  = Fuel_loads[i] * ac_obj.fueldensity
+        W = ac_obj.W_OE + Reserve + W_f + W_pl
+        if W > ac_obj.W_TO and n_boxes > 0:
+            n_boxes -= 2
+            W_pl = n_boxes * ac_obj.boxweight
+            W = ac_obj.W_OE + Reserve + W_f + W_pl
+        TOW   = np.append(TOW, W)
+        W_PL  = np.append(W_PL, W_pl)
+        # R     = (ac_obj.prop_eff / ac_obj.SFC) * (CL_cr / CD_cr) * np.log(W/(W-(Fuel_loads[i]*ac_obj.fueldensity)))
+        Mf_used = 0.0
+        R   = 0.0
+        t   = 0.0
+        dt  = 1.0
+        while Mf_used < W_f:
+            CL_cr = 2*W*atm_obj.g/(rho_cr*V_cruise**2*ac_obj.Sw)
+            CD_cr = dragpolar(ac_obj, CL_cr)
+            P_br  = (1/ac_obj.prop_eff) * 1/2 * rho_cr * V_cruise**3 * ac_obj.Sw * CD_cr
+            Mf_used += P_br * ac_obj.SFC
+            t += dt
+            R += V_cruise * dt
+        print(f"The range with {int(n_boxes)} boxes and {np.round(W_f, 2)} [kg] ({np.round(Fuel_loads[i], 2)} [L]) of fuel is {np.round(R/1000)} [km] | Take-off weight: {np.round(W, 2)} [kg]")
+        Range = np.append(Range, R)
+    print("----------------------------------------------------------------")
+    print(f"The number of boxes on the aircraft at max fuel is {n_boxes}")
+    print("----------------------------------------------------------------")
+    for j in range(1, int(n_boxes/2 + 1)):
+        W_f   = ac_obj.fuelcapacity * ac_obj.fueldensity
+        n_boxes -= 2
+        W     = ac_obj.W_OE + Reserve + n_boxes * ac_obj.boxweight + W_f
+        TOW   = np.append(TOW, W)
+        W_PL  = np.append(W_PL, (n_boxes * ac_obj.boxweight))
+        Mf_used = 0.0
+        R   = 0.0
+        t   = 0.0
+        dt  = 1.0
+        while Mf_used < W_f:
+            CL_cr = 2*W*atm_obj.g/(rho_cr*V_cruise**2*ac_obj.Sw)
+            CD_cr = dragpolar(ac_obj, CL_cr)
+            P_br  = (1/ac_obj.prop_eff) * 1/2 * rho_cr * V_cruise**3 * ac_obj.Sw * CD_cr
+            Mf_used += P_br * ac_obj.SFC
+            t += dt
+            R += V_cruise * dt
+        # R     = (ac_obj.prop_eff / ac_obj.SFC) * (CL_cr / CD_cr) * np.log(W/(W-W_f))
+        print(f"The range with {int(n_boxes)} boxes and {np.round(W_f, 2)} [kg] ({np.round(W_f/ac_obj.fueldensity, 2)} [L]) is {np.round(R/1000)} [km] | Take-off weight: {np.round(W, 2)} [kg]")
+        Range = np.append(Range, R)
+    Range /= 1000
+    print("----------------------------------------------------------------")
+    if plot:
+        plt.plot(Range, W_PL, color = 'red', label = "Range-Payload")
+        plt.plot(Range, TOW, color = 'blue', label = "Take-off weight - Payload")
+        plt.xlabel("Range [km]")
+        plt.ylabel("Weight [kg]")
+        plt.legend()
+        plt.show()
 
 
-a = payloadrange(aircraft, atm)
+
 
 
     
