@@ -95,26 +95,66 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
 
 
 def flightceiling(ac_obj, atm_obj, W_F, plot=True):
-    W   = ac_obj.W_TO
+    W   = ac_obj.W_TO * atm_obj.g
     h   = 0.0
     Pa  = ac_obj.power * ac_obj.prop_eff * 735.49875
     CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD_opt  = dragpolar(ac_obj, CL_opt)
-    V       = np.sqrt(2*W/(atm_obj.rho0*ac_obj.Sw*CL_opt))
-    Pr      = 1/2 * atm_obj.rho0 * V**3 * ac_obj.Sw * CD_opt
-    while (Pa - Pr) > 0.0:
+    V   = np.sqrt(2*W/(atm_obj.rho0*ac_obj.Sw*CL_opt))
+    Pr  = 1/2 * atm_obj.rho0 * V**3 * ac_obj.Sw * CD_opt
+    roc = (Pa-Pr)/W
+    dt  = 10.0
+    t   = 0.0
+    Time    = np.empty(0)
+    ROC     = np.empty(0)
+    Weight  = np.empty(0)
+    Height  = np.empty(0)
+    while roc > 0.1:
         rho = atm_parameters(atm_obj, h)[2]
         V   = np.sqrt(2*W/(rho*ac_obj.Sw*CL_opt))
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
         Pa  = ac_obj.power * ac_obj.prop_eff * (rho/atm_obj.rho0)**(3/4) * 735.49875
-        ROC = (Pa - Pr)/W
-        h   += ROC * dt
-        W   = 
+        roc = (Pa - Pr)/W
+        h   += roc * dt
+        W   -= Pa * ac_obj.SFC * dt * atm_obj.g
+        t   += dt
+        Time= np.append(Time, t)
+        ROC = np.append(ROC, roc)
+        Height = np.append(Height, h)
+        Weight = np.append(Weight, W)
+    print("----------------------------------------------------------------------------")
+    print(f"The time to get to a cruising altitude of {ac_obj.h_cruise} [m] is {Time[np.abs(Height - ac_obj.h_cruise) <= 10.0][0]} [seconds]")
+    print(f"The fuel used to get to a cruising altitude of {ac_obj.h_cruise} [m] is {np.round((Weight[0]-Weight[np.abs(Height - ac_obj.h_cruise) <= 10.0][0])/atm_obj.g)} [kg]")
+    print(f"The maximum altitude is equal to {np.round(Height[-1])} [m]")
+    print("----------------------------------------------------------------------------")
+    if plot:
+        # Create a figure and three subplots
+        fig, (ax1, ax2, ax3) = plt.subplots(3, 1, sharex=True)
+        
+        ax1.plot(Time, Height, color="red")
+        ax1.set_ylabel('Altitude')
+        ax1.set_title('Altitude vs Time')
+
+        ax2.plot(Time, ROC, color='green')
+        ax2.set_ylabel('Rate of Climb')
+        ax2.set_title('Rate of Climb vs Time')
+
+        ax3.plot(Time, Weight/atm_obj.g, color='red')
+        ax3.set_xlabel('Time')
+        ax3.set_ylabel('Weight')
+        ax3.set_title('Weight vs Time')
+
+        plt.tight_layout()
+
+        plt.show()
+    
+flightceiling(aircraft, atm, 60)
         
         
         
         
-        dt  = 1.0
+        
+        
 
 
 
