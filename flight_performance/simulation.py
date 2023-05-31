@@ -23,7 +23,7 @@ def takeoffweight(obj, W_F):
     return TOW
 
 def atm_parameters(obj, h):
-    T    = (atm.T0 +15) + atm.lambd * h
+    T    = (atm.T0 + 15) + atm.lambd * h
     rho  = atm.rho0*np.power((T/obj.T0), (-((atm.g / (atm.lambd * atm.R))+1)))
     p    = atm.p0*np.power((T/obj.T0), (-(atm.g / (atm.lambd * atm.R))))
     a    = np.sqrt(atm.gamma*obj.R*T)
@@ -93,42 +93,30 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
     print(f"This calculation took {end_time-start_time} seconds")
     return
 
+
 def flightceiling(ac_obj, atm_obj, W_F, plot=True):
-    W = takeoffweight(ac_obj, W_F)*atm_obj.g
-    atm_parameters_vectorized = np.vectorize(lambda h: atm_parameters(atm_obj, h))
-    alt_range = np.arange(0, ac_obj.th_ceil, 0.5)
-    atm_obj.p, atm_obj.T, atm_obj.rho, atm_obj.a = atm_parameters_vectorized(alt_range)
-    stall_limit = np.empty(0)
-    thr_lim_lo = np.empty(0)
-    thr_lim_hi  = np.empty(0)
-    for i in range(len(alt_range)):
-        rho = atm_obj.rho[i]
-        V_s = np.sqrt(2*W/(rho*ac_obj.Sw*ac_obj.CL_max_clean))
-        P_a = ac_obj.power * ac_obj.prop_eff * 745.699872 * (rho/atm_obj.rho0)**(3/4)
-        V_max = np.arange(110, 200, 0.5)*0.5144
-        V_min = np.arange(40, 130, 0.5)*0.5144
-        CL_hi = 2*W/(rho*ac_obj.Sw*V_max**2)
-        CL_lo = 2*W/(rho*ac_obj.Sw*V_min**2)
-        CD_hi = ac_obj.CD0 + CL_hi**2/(np.pi*ac_obj.A*ac_obj.e)
-        CD_lo = ac_obj.CD0 + CL_lo**2/(np.pi*ac_obj.A*ac_obj.e)
-        Pr_hi = 1/2 * rho * ac_obj.Sw * V_max**3 * CD_hi
-        Pr_lo = 1/2 * rho * ac_obj.Sw * V_min**3 * CD_lo
-        P_a_compare = np.full(len(V_max), P_a)
-        PaPr_hi = P_a_compare - Pr_hi
-        PaPr_lo = P_a_compare - Pr_lo
-        V_max= V_max[np.argmin(np.abs(PaPr_hi))]
-        V_min= V_min[np.argmin(np.abs(PaPr_lo))]
-        stall_limit = np.append(stall_limit, V_s)
-        thr_lim_hi = np.append(thr_lim_hi, V_max)
-        thr_lim_lo = np.append(thr_lim_lo, V_min)
-    if plot:
-        plt.plot(thr_lim_hi, alt_range, color='green')
-        plt.plot(stall_limit, alt_range, color='green')
-        #plt.plot(thr_lim_lo, alt_range, color = 'green')
-        plt.xlabel("Airspeed [m/s]")
-        plt.ylabel("Altitude [m]")
-        plt.show()
-    return
+    W   = ac_obj.W_TO
+    h   = 0.0
+    Pa  = ac_obj.power * ac_obj.prop_eff * 735.49875
+    CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD_opt  = dragpolar(ac_obj, CL_opt)
+    V       = np.sqrt(2*W/(atm_obj.rho0*ac_obj.Sw*CL_opt))
+    Pr      = 1/2 * atm_obj.rho0 * V**3 * ac_obj.Sw * CD_opt
+    while (Pa - Pr) > 0.0:
+        rho = atm_parameters(atm_obj, h)[2]
+        V   = np.sqrt(2*W/(rho*ac_obj.Sw*CL_opt))
+        Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
+        Pa  = ac_obj.power * ac_obj.prop_eff * (rho/atm_obj.rho0)**(3/4) * 735.49875
+        ROC = (Pa - Pr)/W
+        h   += ROC * dt
+        #W   =
+
+
+
+
+        dt  = 1.0
+
+
 
 
 # # ---------------- Assumptions for take-off equations of motion -----------------
@@ -146,14 +134,14 @@ def TO_eom(obj, ap, atmos, constants):
 
     V_avg_sq = 0.55125 * (np.sqrt(constants['weight']/constants['wing surface area'] * 2/rho * 1/obj.CL_max_TO) -
                           constants['wind speed']) ** 2
-    
+
     A = - constants['wing surface area'] / (np.pi * obj.A * obj.e) * V_avg_sq * rho/2 * atmos.g / constants['weight']
     B = ap.mu_ground * constants['wing surface area'] * V_avg_sq * rho/2 * atmos.g / constants['weight']
-    C = (constants['propeller power'] * constants['propeller efficiency'] / np.sqrt(V_avg_sq) - ap.mu_ground * 
-         constants['weight'] *np.cos(np.radians(constants['runway slope'])) - obj.CD0 * rho/2 * V_avg_sq 
+    C = (constants['propeller power'] * constants['propeller efficiency'] / np.sqrt(V_avg_sq) - ap.mu_ground *
+         constants['weight'] *np.cos(np.radians(constants['runway slope'])) - obj.CD0 * rho/2 * V_avg_sq
          * constants['wing surface area'] - constants['weight']*np.sin(np.radians(constants['runway slope']))) \
          * atmos.g / constants['weight'] - V_avg_sq/750
-    
+
     sqrt = B**2 - 4*A*C
     C_L_TO_1 = (-B + sqrt) / (2*A)
     C_L_TO_2 = (-B - sqrt) / (2*A)
@@ -277,24 +265,81 @@ def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
         h_cruise = ac_obj.h_cruise
     else:
         h_cruise = h_cruise
-    Fuel_loads  = np.arange(0, ac_obj.fuelcapacity, 1.0)
+    Fuel_loads  = np.arange(0, ac_obj.fuelcapacity+1.0, 1.0)
     Reserve     = ac_obj.M_res * ac_obj.fuelcapacity * ac_obj.fueldensity
-    ZFW         = ac_obj.W_OE + Reserve + ac_obj.n_boxes * ac_obj.boxweight
+    ZFW         = ac_obj.W_OE + Reserve + ac_obj.n_boxes * ac_obj.boxweight             # ac_ojb.n_boxes must be 12 here
     maxZFW_fuel = ac_obj.W_TO - ZFW
     ZFW_maxfuel = ac_obj.W_TO - ac_obj.fuelcapacity * ac_obj.fueldensity
     PL_maxfuel  = ZFW_maxfuel - Reserve - ac_obj.W_OE
     Ferryweight = ac_obj.W_OE + Reserve + ac_obj.fuelcapacity * ac_obj.fueldensity
     print("-------------------------------------------------------------------")
     print(f"Max ZFW: {np.round(ZFW, 2)} [kg]")
-    print(f"Fuel @ max ZFW: {np.round(maxZFW_fuel, 2)} [kg] or {np.round(maxZFW_fuel / ac_obj.fueldensity, 2)} [L]")
-    print(f"ZFW @ max fuel: {np.round(ZFW_maxfuel)} [kg]. The aircraft carries {np.round(PL_maxfuel)} [kg]")
+    print(f"Fuel @ max ZFW: {np.round(maxZFW_fuel, 2)} [kg] or {np.round(maxZFW_fuel/ac_obj.fueldensity, 2)} [L]")
+    print(f"ZFW @ max fuel: {np.round(ZFW_maxfuel)} [kg]. The aircraft carries {np.round(PL_maxfuel)} [kg] of payload")
     print(f"The TOW @ ferry configuration is {np.round(Ferryweight)} [kg]")
     print("-------------------------------------------------------------------")
-    rho_cr = atm_parameters(atm_obj, h_cruise)
+    rho_cr  = atm_parameters(atm_obj, h_cruise)[2]
     W = ZFW
+    Range   = np.empty(0)
+    n_boxes = ac_obj.n_boxes                                                            # 12
+    W_PL    = np.empty(0)
+    TOW     = np.empty(0)
     for i in range(len(Fuel_loads)):
-        CL_cr = 2 * W / (rho_cr * V_cruise ** 2 * ac_obj.Sw)
-        CD_cr = dragpolar
+        W_pl = n_boxes * ac_obj.boxweight
+        W_f  = Fuel_loads[i] * ac_obj.fueldensity
+        W = ac_obj.W_OE + Reserve + W_f + W_pl
+        if W > ac_obj.W_TO and n_boxes > 0:
+            n_boxes -= 2
+            W_pl = n_boxes * ac_obj.boxweight
+            W = ac_obj.W_OE + Reserve + W_f + W_pl
+        TOW   = np.append(TOW, W)
+        W_PL  = np.append(W_PL, W_pl)
+        # R     = (ac_obj.prop_eff / ac_obj.SFC) * (CL_cr / CD_cr) * np.log(W/(W-(Fuel_loads[i]*ac_obj.fueldensity)))
+        Mf_used = 0.0
+        R   = 0.0
+        t   = 0.0
+        dt  = 1.0
+        while Mf_used < W_f:
+            CL_cr = 2*W*atm_obj.g/(rho_cr*V_cruise**2*ac_obj.Sw)
+            CD_cr = dragpolar(ac_obj, CL_cr)
+            P_br  = (1/ac_obj.prop_eff) * 1/2 * rho_cr * V_cruise**3 * ac_obj.Sw * CD_cr
+            Mf_used += P_br * ac_obj.SFC
+            t += dt
+            R += V_cruise * dt
+        print(f"The range with {int(n_boxes)} boxes and {np.round(W_f, 2)} [kg] ({np.round(Fuel_loads[i], 2)} [L]) of fuel is {np.round(R/1000)} [km] | Take-off weight: {np.round(W, 2)} [kg]")
+        Range = np.append(Range, R)
+    print("----------------------------------------------------------------")
+    print(f"The number of boxes on the aircraft at max fuel is {n_boxes}")
+    print("----------------------------------------------------------------")
+    for j in range(1, int(n_boxes/2 + 1)):
+        W_f   = ac_obj.fuelcapacity * ac_obj.fueldensity
+        n_boxes -= 2
+        W     = ac_obj.W_OE + Reserve + n_boxes * ac_obj.boxweight + W_f
+        TOW   = np.append(TOW, W)
+        W_PL  = np.append(W_PL, (n_boxes * ac_obj.boxweight))
+        Mf_used = 0.0
+        R   = 0.0
+        t   = 0.0
+        dt  = 1.0
+        while Mf_used < W_f:
+            CL_cr = 2*W*atm_obj.g/(rho_cr*V_cruise**2*ac_obj.Sw)
+            CD_cr = dragpolar(ac_obj, CL_cr)
+            P_br  = (1/ac_obj.prop_eff) * 1/2 * rho_cr * V_cruise**3 * ac_obj.Sw * CD_cr
+            Mf_used += P_br * ac_obj.SFC
+            t += dt
+            R += V_cruise * dt
+        # R     = (ac_obj.prop_eff / ac_obj.SFC) * (CL_cr / CD_cr) * np.log(W/(W-W_f))
+        print(f"The range with {int(n_boxes)} boxes and {np.round(W_f, 2)} [kg] ({np.round(W_f/ac_obj.fueldensity, 2)} [L]) is {np.round(R/1000)} [km] | Take-off weight: {np.round(W, 2)} [kg]")
+        Range = np.append(Range, R)
+    Range /= 1000
+    print("----------------------------------------------------------------")
+    if plot:
+        plt.plot(Range, W_PL, color = 'red', label = "Range-Payload")
+        plt.plot(Range, TOW, color = 'blue', label = "Take-off weight - Payload")
+        plt.xlabel("Range [km]")
+        plt.ylabel("Weight [kg]")
+        plt.legend()
+        plt.show()
 
 
 # -------------------------------- LANDING -----------------------------------
