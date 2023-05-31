@@ -95,17 +95,25 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
 
 
 def flightceiling(ac_obj, atm_obj, W_F, plot=True):
+    W   = ac_obj.W_TO
     h   = 0.0
+    Pa  = ac_obj.power * ac_obj.prop_eff * 735.49875
+    CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD_opt  = dragpolar(ac_obj, CL_opt)
+    V       = np.sqrt(2*W/(atm_obj.rho0*ac_obj.Sw*CL_opt))
+    Pr      = 1/2 * atm_obj.rho0 * V**3 * ac_obj.Sw * CD_opt
     while (Pa - Pr) > 0.0:
-        ROC = (Pa - Pr)/W
-        h   += ROC * dt
-        rho = atm_parameters(atm_obj, h)
-        W   = ac_obj.W_TO
-        CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
-        CD_opt  = dragpolar(ac_obj, CL_opt)
+        rho = atm_parameters(atm_obj, h)[2]
         V   = np.sqrt(2*W/(rho*ac_obj.Sw*CL_opt))
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
-        Pa  = ac_obj.power * ac_obj.prop_eff * (rho/atm_obj.rho0)**(3/4)
+        Pa  = ac_obj.power * ac_obj.prop_eff * (rho/atm_obj.rho0)**(3/4) * 735.49875
+        ROC = (Pa - Pr)/W
+        h   += ROC * dt
+        W   = 
+        
+        
+        
+        
         dt  = 1.0
 
 
