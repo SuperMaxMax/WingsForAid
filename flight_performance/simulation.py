@@ -95,41 +95,20 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
 
 
 def flightceiling(ac_obj, atm_obj, W_F, plot=True):
-    W = takeoffweight(ac_obj, W_F)*atm_obj.g
-    atm_parameters_vectorized = np.vectorize(lambda h: atm_parameters(atm_obj, h))
-    alt_range = np.arange(0, ac_obj.th_ceil, 0.5)
-    atm_obj.p, atm_obj.T, atm_obj.rho, atm_obj.a = atm_parameters_vectorized(alt_range)
-    stall_limit = np.empty(0)
-    thr_lim_lo = np.empty(0)
-    thr_lim_hi  = np.empty(0)
-    for i in range(len(alt_range)):
-        rho = atm_obj.rho[i]
-        V_s = np.sqrt(2*W/(rho*ac_obj.Sw*ac_obj.CL_max_clean))
-        P_a = ac_obj.power * ac_obj.prop_eff * 745.699872 * (rho/atm_obj.rho0)**(3/4)
-        V_max = np.arange(110, 200, 0.5)*0.5144
-        V_min = np.arange(40, 130, 0.5)*0.5144
-        CL_hi = 2*W/(rho*ac_obj.Sw*V_max**2)
-        CL_lo = 2*W/(rho*ac_obj.Sw*V_min**2)
-        CD_hi = ac_obj.CD0 + CL_hi**2/(np.pi*ac_obj.A*ac_obj.e)
-        CD_lo = ac_obj.CD0 + CL_lo**2/(np.pi*ac_obj.A*ac_obj.e)
-        Pr_hi = 1/2 * rho * ac_obj.Sw * V_max**3 * CD_hi
-        Pr_lo = 1/2 * rho * ac_obj.Sw * V_min**3 * CD_lo
-        P_a_compare = np.full(len(V_max), P_a)
-        PaPr_hi = P_a_compare - Pr_hi
-        PaPr_lo = P_a_compare - Pr_lo
-        V_max= V_max[np.argmin(np.abs(PaPr_hi))]
-        V_min= V_min[np.argmin(np.abs(PaPr_lo))]
-        stall_limit = np.append(stall_limit, V_s)
-        thr_lim_hi = np.append(thr_lim_hi, V_max)
-        thr_lim_lo = np.append(thr_lim_lo, V_min)
-    if plot:
-        plt.plot(thr_lim_hi, alt_range, color='green')
-        plt.plot(stall_limit, alt_range, color='green')
-        #plt.plot(thr_lim_lo, alt_range, color = 'green')
-        plt.xlabel("Airspeed [m/s]")
-        plt.ylabel("Altitude [m]")
-        plt.show()
-    return
+    h   = 0.0
+    while (Pa - Pr) > 0.0:
+        ROC = (Pa - Pr)/W
+        h   += ROC * dt
+        rho = atm_parameters(atm_obj, h)
+        W   = ac_obj.W_TO
+        CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+        CD_opt  = dragpolar(ac_obj, CL_opt)
+        V   = np.sqrt(2*W/(rho*ac_obj.Sw*CL_opt))
+        Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
+        Pa  = ac_obj.power * ac_obj.prop_eff * (rho/atm_obj.rho0)**(3/4)
+        dt  = 1.0
+
+
 
 
 # # ---------------- Assumptions for take-off equations of motion -----------------
@@ -337,7 +316,7 @@ def turnperformance(ac_obj, atm_obj, phi, V, W, h, heading_change):
     turn_time = (2*np.pi*(heading_change/360)*R_turn)/V
     return R_turn, n_turn, Pr, turn_time
 
-def cruiseperformance(ac_obj, atm_obj, Range=None, V_cruise=None, h_cruise=None, Payload_Range=False):
+def cruiseperformance(ac_obj, atm_obj, Range=None, V_cruise=None, h_cruise=None):
     if Range == None:
         R = ac_obj.R
     else:
@@ -457,6 +436,7 @@ def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
         plt.ylabel("Weight [kg]")
         plt.legend()
         plt.show()
+
 
 
 
