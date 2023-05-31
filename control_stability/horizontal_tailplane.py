@@ -101,7 +101,7 @@ if flaptype == 'singleslotted':
     CS_dClmax_TO = 1.3 * 0.7  # Additional airfoil lift at take-off due to single slotted flap (ADSEE-II, L3 S36)
     CS_dClmax_LD = 1.3  # Additional airfoil lift at landing due to single slotted flap
     print("single slotted flap")
-    print(f"dCLmax_TO: {CS_dClmax_TO}, dCLmax_LD: {CS_dClmax_LD}")
+    print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
 
 if flaptype == 'fowler':
     CS_deltaf_TO                   = 15  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S15)
@@ -114,7 +114,7 @@ if flaptype == 'fowler':
     CS_dClmax_TO = 1.3 * 0.7 * CS_cprime_c_TO  # Additional airfoil lift at take-off due to fowler flap (ADSEE-II, L3 S36)
     CS_dClmax_LD = 1.3 * CS_cprime_c_LD  # Additional airfoil lift at landing due to fowler flap
     print('fowler flap')
-    print(f"dCLmax_TO: {CS_dClmax_TO}, dCLmax_LD: {CS_dClmax_LD}")
+    print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
 
 calcCL = False # calculate dCLmax for a given Swf, or vice versa
 if calcCL:
@@ -125,7 +125,8 @@ if calcCL:
 else:
     CS_dCLmax_TO = float(input("\nCS_dCLmax_TO: "))
     CS_dCLmax_LD = float(input("\nCS_dCLmax_LD: "))
-    print(f"Swf_TO: {CS_dCLmax_TO / (0.9 * CS_dClmax_TO * np.cos(CS_lambda_hinge)) * 100}% Sw, CS_dCLmax_LD: {CS_dCLmax_LD / (0.9 * CS_dClmax_LD * np.cos(CS_lambda_hinge)) * 100}% Sw")
+    print(f"Swf_TO: {round(CS_dCLmax_TO / (0.9 * CS_dClmax_TO * np.cos(CS_lambda_hinge)) * 100, 3)}% Sw") 
+    print(f"CS_dCLmax_LD: {round(CS_dCLmax_LD / (0.9 * CS_dClmax_LD * np.cos(CS_lambda_hinge)) * 100, 3)}% Sw")
 
 # NOTE: Above equation can be rewritten to calculate Swf for a given delta CLmax
 
