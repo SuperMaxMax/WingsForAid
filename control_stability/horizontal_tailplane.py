@@ -134,6 +134,10 @@ else:
     print(f"Swf_TO: {round(CS_Swf_TO / aircraft.Sw * 100, 3)}% Sw") 
     print(f"Swf_LD: {round(CS_Swf_LD / aircraft.Sw * 100, 3)}% Sw")
 
+
+def Chordlength(y):
+    return aircraft.rootchord * (1 - ((1-aircraft.taper) / (aircraft.b / 2)) * y)
+
 def Flaplength(taperratio, rootchord, span, rootlocation, flappedsurface):
     """Calculate the end location of the flaps based on a starting point from the centerline
 
@@ -143,8 +147,10 @@ def Flaplength(taperratio, rootchord, span, rootlocation, flappedsurface):
     rootlocation: starting point in span direction of the wing root [m]
     flappedsurface: total area of wing that is flapped by HLDs [m^2]"""
     
-    if flappedsurface > aircraft.Sw:
-        print(f"\nUnfeasible flap size, flapped area: {flappedsurface} > wing area: {aircraft.Sw}")
+# TODO: check if for if statement below total surface should be considered, or only half. Is calculated flapped surface area for both wing halves? yes right
+    Fus_area = aircraft.Sw - 2 * quad(Chordlength, 0, aircraft.w_out/2)[0]
+    if flappedsurface > (Fus_area): # substracting area occupied by fuselage
+        print(f"\nUnfeasible flap size, flapped area: {flappedsurface} > wing area not occupied by fuselage: {round(Fus_area,5)}")
     else:
         A = (-1) * (1 - taperratio) / span
         B = 1
