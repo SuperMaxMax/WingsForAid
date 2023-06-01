@@ -86,11 +86,11 @@ def C_m_alpha_calculation(aircraft, x_cg):
 #################################################################################################################
 "FIXME: Determine Control Surface Coefficients"
 #################################################################################################################
-# Using data from Torenbeek aroung page 533
-flaptype = 'singleslotted'              # Can be 'singleslotted' or 'fowler'
-CS_Swf = 0.9 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) TODO: update value
+flaptype = 'fowler'              # Can be 'singleslotted' or 'fowler'
+CS_Swf = 0.7 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) NOTE: Used to calculate resulting dCLmax
 CS_lambda_hinge = 0.02                  # hinge line sweep angle, likely parallel to aft spar [rad] TODO: update value
 
+# Using data from Torenbeek aroung page 533
 if flaptype == 'singleslotted':
     CS_deltaf_TO                   = 20  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S14)
     CS_deltaf_LD                   = 40  # flap deflection angle at landing [deg]
@@ -101,8 +101,8 @@ if flaptype == 'singleslotted':
     CS_cprime_c_LD = 1 + CS_dc_cf_LD * CS_fc_c # wing chord length with landing extended flaps / chord [-]
     CS_dClmax_TO = 1.3 * 0.7  # Additional airfoil lift at take-off due to single slotted flap (ADSEE-II, L3 S36)
     CS_dClmax_LD = 1.3  # Additional airfoil lift at landing due to single slotted flap
-    print("single slotted flap")
-    print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
+    print("Single slotted flap")
+    print(f"\ndClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
 
 if flaptype == 'fowler':
     CS_deltaf_TO                   = 15  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S15)
@@ -110,14 +110,15 @@ if flaptype == 'fowler':
     CS_fc_c                        = 0.35  # flap chord length / wing chord length [-] (ADSEE-II, L3 S32) NOTE: This influences aft spar position
     CS_dc_cf_TO                    = 0.48  # increase in chord length / flap chord length [-] (ADSEE-II, L3 S37)
     CS_dc_cf_LD                    = 0.625  # increase in chord length / flap chord length [-]
-    CS_cprime_c_TO = 1 + CS_dc_cf_TO * CS_fc_c # wing chord length with take-off extended flaps / chord [-] (Using notes of ADSEE-II, L3 S37)
-    CS_cprime_c_LD = 1 + CS_dc_cf_LD * CS_fc_c # wing chord length with landing extended flaps / chord [-]
-    CS_dClmax_TO = 1.3 * 0.7 * CS_cprime_c_TO  # Additional airfoil lift at take-off due to fowler flap (ADSEE-II, L3 S36)
+    CS_cprime_c_TO = 1 + CS_dc_cf_TO * CS_fc_c  # wing chord length with take-off extended flaps / chord [-] (Using notes of ADSEE-II, L3 S37)
+    CS_cprime_c_LD = 1 + CS_dc_cf_LD * CS_fc_c  # wing chord length with landing extended flaps / chord [-]
+    CS_dClmax_TO = 1.3 * 0.7 * CS_cprime_c_TO   # Additional airfoil lift at take-off due to fowler flap (ADSEE-II, L3 S36)
     CS_dClmax_LD = 1.3 * CS_cprime_c_LD  # Additional airfoil lift at landing due to fowler flap
-    print('fowler flap')
-    print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
+    print('Fowler flap')
+    print(f"\ndClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
 
-calcCL = True # calculate dCLmax for a given Swf, or vice versa
+calcCL = False # calculate dCLmax for a given Swf, or vice versa
+
 if calcCL:
     CS_dCLmax_TO = 0.9 * CS_dClmax_TO * (CS_Swf/aircraft.Sw) * np.cos(CS_lambda_hinge)  # Increase in CL due to flap extension at take-off [-] (ADSEE-II, L3 S35)
     CS_dCLmax_LD = 0.9 * CS_dClmax_LD * (CS_Swf/aircraft.Sw) * np.cos(CS_lambda_hinge)  # Increase in CL due to flap extension at landing [-]
@@ -138,36 +139,41 @@ else:
 def Chordlength(y):
     return aircraft.rootchord * (1 - ((1-aircraft.taper) / (aircraft.b / 2)) * y)
 
-def Flaplength(taperratio, rootchord, span, rootlocation, flappedsurface):
-    """Calculate the end location of the flaps based on a starting point from the centerline
+def Flaplength(taperratio, rootchord, span, HLDroot, flappedsurface):
+    """Calculate the end location of the flaps based on a starting point measured from the root chord
 
     taperratio: taper ratio of the wing [m]
     rootchord: chord length of the wing root [m]
     span: total span of the wing [m]
-    rootlocation: starting point in span direction of the wing root [m]
+    HLDroot: starting point in span direction of the HLD [m]
     flappedsurface: total area of wing that is flapped by HLDs [m^2]"""
     
-# TODO: check if for if statement below total surface should be considered, or only half. Is calculated flapped surface area for both wing halves? yes right
-    Fus_area = aircraft.Sw - 2 * quad(Chordlength, 0, aircraft.w_out/2)[0]
-    if flappedsurface > (Fus_area): # substracting area occupied by fuselage
-        print(f"\nUnfeasible flap size, flapped area: {flappedsurface} > wing area not occupied by fuselage: {round(Fus_area,5)}")
+    AvailableArea = aircraft.Sw - 2 * quad(Chordlength, 0, HLDroot)[0]
+    
+    if flappedsurface > (AvailableArea):
+        print(f"\nUnfeasible flap size, flapped area: {flappedsurface} > wing area not occupied by fuselage: {round(AvailableArea,5)}")
     else:
         A = (-1) * (1 - taperratio) / span
         B = 1
-        C = (-1) * ((flappedsurface/2) / rootchord + rootlocation - ((1-taperratio)/span) * (rootlocation ** 2))
+        C = (-1) * ((flappedsurface/2) / rootchord + HLDroot - ((1-taperratio)/span) * (HLDroot ** 2))
 
-        print("y_span1", (-B + np.sqrt(B**2 - 4 * A * C)) / (2 * A))
-        print("y_span2", (-B - np.sqrt(B**2 - 4 * A * C)) / (2 * A))
         y1 = (-B + np.sqrt(B**2 - 4 * A * C)) / (2 * A)
-        y2 = (-B - np.sqrt(B**2 - 4 * A * C)) / (2 * A)
-        # results = (y1,y2)
-        # return results
+        # y2 = (-B - np.sqrt(B**2 - 4 * A * C)) / (2 * A)
+        print(f"\nFlap ends at {round(y1, 4)} [m] and starts at {round(HLDroot, 4)} [m] --> flap length: {round(y1 - HLDroot, 4)} [m]")
+        print(f"Total flapped area: {round(flappedsurface, 4)} [m^2]")
 
-# if CS_Swf > aircraft.Sw:
-#     print(f"Unfeasible flap size, flapped area: {CS_Swf} > wing area: {aircraft.Sw}")
-# else:
-Flaplength(aircraft.taper, aircraft.rootchord, aircraft.b, aircraft.w_out / 2, CS_Swf)
-    
+        return y1
+       
+CS_yend_f = Flaplength(aircraft.taper, aircraft.rootchord, aircraft.b, aircraft.w_out / 2, CS_Swf)
+
+# Aileron calculations
+# aileron max up = max down = 15 deg
+CS_ystart_a = CS_yend_f
+CS_yend_a = aircraft.b / 2 - CS_ystart_a - 0.1 # to allow some spacing near wingtip
+
+# Look at step by step plan for aileron from adsee 2 L3 S57
+Cl_delta_a = 1#TODO: continue here
+Cl_delta_P = 1#TODO
 
 #################################################################################################################
 "FIXME: Controlability and Stability Curves"
