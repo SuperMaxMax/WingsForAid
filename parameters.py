@@ -2,7 +2,7 @@ import numpy as np
 class UAV:
     def __init__(self, name):
         "=== Class I / Class II parameters ==="
-        self.A = 8                         # Aspect ratio [-]
+        self.A = 7.75                         # Aspect ratio [-]
         self.BHP_cruise = 76.3436
         self.CD0 =  0.00595                    # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
@@ -126,6 +126,7 @@ class UAV:
         self.x_lemac = 0.2871               # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
         self.y_mac = 2.3182                 # Spanwise location of the MAC [m]
+        self.i_w = 0.42 * np.pi / 180       # Incidence angle of wing wrt fuselage [rad]
 
         "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
         self.something = 1 # add units
@@ -138,17 +139,17 @@ class UAV:
         self.airfoil = "4415"
 
         if self.airfoil == "4415":
-            self.AE_Cl0 = 0.457                   # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
-            self.AE_clcd_max = 163.5
-            self.AE_clcd32_max = 170.1
-            self.AE_clcd12_max = 165.7
-            self.AE_cl_max = 1.735
-            self.AE_alpha_s = 18.0 * np.pi / 180
-            self.AE_cd0 = 0.00595
-            self.AE_cl_alpha = 0.103 * 180 / np.pi # 1 / rad
-            self.AE_cm_alpha = 0.00748
-            self.AE_cm0 = -0.0941
-            self.AE_alpha0 = -self.AE_Cl0 / self.AE_cl_alpha 
+            self.AE_Cl0 = 0.457                                 # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
+            self.AE_clcd_max = 163.5                            # Maximum clcd
+            self.AE_clcd32_max = 170.1                          # Maximum clcd**(3/2)
+            self.AE_clcd12_max = 165.7                          # 
+            self.AE_cl_max = 1.735                              # Maximum cl_max
+            self.AE_alpha_s = 18.0 * np.pi / 180                # Stall angle of attack
+            self.AE_cd0 = 0.00595                               # Drag coefficient at zero lift
+            self.AE_cl_alpha = 0.103 * 180 / np.pi              # Lift curve slope [1 / rad]    
+            self.AE_cm_alpha = 0.00748                          # Moment coefficient derivative [1/rad]
+            self.AE_cm0 = -0.0941                               # Moment coefficient at zero AoA
+            self.AE_alpha0 = -self.AE_Cl0 / self.AE_cl_alpha    # Angle of attack at zero lift
 
         if self.airfoil == "clarky":
             self.AE_clcd_max = 154.7

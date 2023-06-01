@@ -76,15 +76,15 @@ def iw(airfoil):
     
     return Iw, cl_alpha, alpha_zero_lift
 
-iw(airfoil)
+#iw(airfoil)
 
 def plot_lift_distr(object):
     variable = "Lambda"      #Lambda, AR or Twist
     plot_mode = "Normalized"         #"Normalized" for normalized plots
     if variable == "Lambda":    
-        variable_list2 = [0.2,0.4,0.6,0.8,1]
+        variable_list2 = [0.4]
     elif variable == "AR":  
-        variable_list2 = [5,6,7,8,9]
+        variable_list2 = [7,7.25,7.5,7.75,8]
     elif variable == "Twist":
         variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
 
@@ -95,18 +95,18 @@ def plot_lift_distr(object):
         if variable == "AR":
             AR = parameter
         else:
-            AR = 7.5
+            AR = 7.75
         if variable == "Lambda":
             Lambda = parameter
         else:
-            Lambda = 1
+            Lambda = 0.4
         if variable == "Twist":
             alpha_twist = parameter
         else:
-            alpha_twist = 0 * np.pi / 180
+            alpha_twist = 1 * np.pi / 180
 
 
-        i_w = 0.5 * np.pi / 180 #iw(airfoil)[0]
+        i_w = 0.42 * np.pi / 180 #iw(airfoil)[0]
         a_2d = object.AE_cl_alpha       #iw(airfoil)[1]
         alpha_0 = object.AE_alpha0 #iw(airfoil)[2]
         b = (AR * S)**0.5
@@ -170,14 +170,14 @@ def plot_lift_distr(object):
             delta += (i+1) * (A[i] / A[0])**2
         
         span_eff = 1 / (1 + delta)
-        print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'wing twist = ', alpha_twist, 'indidence = ', i_w)
-        print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing)
-
+        print('=====================================================================')
+        print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
+        print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_req, "CD_i = ", CD_induced)
         #print(C_L_wing**2 / (AR* np.pi * CD_induced))
 
-        print("CL_wing", C_L_wing)
-        print("CL required for cruis", C_L_req)
-        print("CDi_wing", CD_induced)
+        #print("CL_wing", C_L_wing)
+        #print("CL required for cruis", C_L_req)
+        #print("CDi_wing", CD_induced)
 
 
     #Find integral current distribution
@@ -195,7 +195,7 @@ def plot_lift_distr(object):
     plt.xlabel('semi span [m]')
     plt.ylabel('C_L')
     plt.legend()
-    plt.show()
+    #plt.show()
     
 plot_lift_distr(aircraft)
     
