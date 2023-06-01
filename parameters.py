@@ -148,6 +148,7 @@ class UAV:
             self.AE_cl_alpha = 0.103 * 180 / np.pi # 1 / rad
             self.AE_cm_alpha = 0.00748
             self.AE_cm0 = -0.0941
+            self.AE_alpha0 = -self.AE_Cl0 / self.AE_cl_alpha 
 
         if self.airfoil == "clarky":
             self.AE_clcd_max = 154.7
@@ -160,6 +161,7 @@ class UAV:
             self.AE_cl_alpha = 0.113 * 180 / np.pi
             self.AE_cm_alpha = 0.00627
             self.AE_cm0 = -0.0844
+            self.AE_alpha0 = -self.AE_Cl0 / self.AE_cl_alpha 
 
 
         "Flight Performance parameters"     # NOTE: Add identifier "FP_" before variable names
