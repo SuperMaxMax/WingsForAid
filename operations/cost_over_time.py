@@ -7,9 +7,9 @@ import math as m
 
 class costs:
     def __init__(self):
-        self.timemax    = 100    # years
+        self.timemax    = 10    # years
         self.startAC    = 40    # aircraft
-        self.ACextramin = 30     # aircraft per year
+        self.ACextramin = 10     # aircraft per year
         self.ACextramax = 31    # aircraft per year
         self.dead       = 5.85688845510E-04 # chance of crach/sortie/ac
         self.Smaint     = 4.961363E-02  # chance of small maintenance/sortie/ac
@@ -28,12 +28,16 @@ class costs:
         self.payl_box   = 20    # kg of payload per box
         self.box_w      = 3     # weight of box in kg
         self.boxes      = 12    # amount of boxes per sortie
-        self.kgprice    = 4   # euros per kg
+        self.kgprice    = 1.6   # euros per kg
 
         self.sortie_pd  = 3.4148976
         self.days_perop = 28
         self.ops_year   = 4     # amount of operations (non-simulanious per year)
         #so if you have this as 4, and 2 simult. possible, that is 8 ops per year
+
+        self.maint_p_ac = 0.001928697   # increase in costs/kg per aircraft (excl manufacturing)
+        self.cost_40ac  = 1.085631948   # cost but only OSP (excl manufacturing)
+
 
 
 # Per 30 ac at GB 27 are expected to be operational at any time on average
@@ -47,16 +51,33 @@ def op(tot_ac):
             deadac = tot_ac * c.dead *c.sortie_pd * c.days_perop
             # maint = ac_at_ops * c.Lmaint + ac_at_ops * c.Smaint
             # ac_ops_end  = ac_at_ops - m.ceil(deadac)
-            print(deadac)
+            # print(deadac)
             return deadac #,rev
 
 def rev(ops_year):
      sorties_p_op = c.sortie_pd * c.days_perop
      rev_p_op = c.kgprice * c.payl_box * c.boxes * sorties_p_op
-     print(rev_p_op)
      rev_tot = rev_p_op *  ops_year
-     print(rev_tot)
      return rev_tot
+
+def maint(ac_tot):
+    
+    o = c.cost_40ac + c.maint_p_ac * (ac_tot - 40)
+    return o
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def calc(extra_ac):
     init_cost = c.cost_ac * c.startAC
@@ -70,22 +91,27 @@ def calc(extra_ac):
 
     for i in range(c.timemax):
         ac.append(tot_ac)
-        if tot_ac < 100:
+
+        if tot_ac < 60:
             ops_parallel = 1
-        else:
+        elif 60 <= tot_ac < 120:
              ops_parallel = 2
+        elif 120 <= tot_ac < 180:
+             ops_parallel = 4
+        else:
+             ops_parallel = 5
 
         ops_series = min((tot_ac // 15),2)
         ops_year = ops_parallel * ops_series
         ac_at_ops = c.acperop * ops_year
 
-        deadac = op(ac_at_ops)
-        print(deadac)
+        # deadac = op(ac_at_ops)
+        # print(deadac)
         reven = rev(ops_year)
 
         revenue.append(reven)
 
-        tot_ac = tot_ac - deadac
+        # tot_ac = tot_ac - deadac
         # ac_togo = c.maxac - tot_ac
 
         if tot_ac < c.maxac:
@@ -96,15 +122,18 @@ def calc(extra_ac):
         
         costtime.append(sum(totalcost))
         totalrev.append(sum(revenue))
+        
     return(costtime, totalrev,ac)
 
 total = []
+x = [10,20,30,40,50]
 if plot:
-    for i in range(c.ACextramin,(c.ACextramax+1)):
+    for i in x:
+    # for i in range(c.ACextramin,(c.ACextramax+1)):
 
         costovertime, revovertime, actot = calc(i) 
-        # plt.plot(range(c.timemax),actot,label='aircraft')
-        plt.plot(range(c.timemax+1),costovertime, label=i)
+        # plt.plot(range(c.timemax),actot,label=i)
+        # plt.plot(range(c.timemax+1),costovertime, label=i)
         plt.plot(range(c.timemax+1),revovertime, label = 'revenue')
         for j in range(len(revovertime)):
             total.append(( revovertime[j] + costovertime[j] ))
