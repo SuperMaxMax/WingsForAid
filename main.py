@@ -25,7 +25,7 @@ for concept in [DET_CON_2_braced]:
 
     while it:
         # class 1
-        c1.run(concept)
+        c1.run(concept, 1, 12)
         print(f"After c1:{concept.W_TO}")
         # geometry determination
         geo.geometry_determination(concept)

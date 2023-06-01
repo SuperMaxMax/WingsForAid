@@ -64,29 +64,23 @@ def weight_fuel(obj):
 
     return W_F
 
-def run(obj):
-    obj.W_F = weight_fuel(obj)                                  # perform calculation of fuel weight
-    obj.W_OE = weight_empty_operational(obj)                    # perform calculation of operational empty weight
-    obj.W_TO = weight_take_off(obj.W_OE, obj.W_F, obj.W_PL)     # combines weights to find total weight
-
-def profile(obj, n_drops, n_boxes, furthest_drop = None, dropregion = None, print=False):
+def profile(obj, n_drops, n_boxes, furthest_drop = None, dropregion = None, Print=False):
     if furthest_drop == None:
-        furthest_drop = obj.R
+        furthest_drop = obj.R / 2
     else:
-        furthest_drop = furthest_drop
-    OEW = weight_empty_operational(obj)
+        furthest_drop = furthest_drop*1000 #convert to meters
     if n_boxes%2 != 0:
         print("The amount of boxes you entered is not a multiple of two. Please restate the amount of boxes")
         n_boxes = int(input("Amount of boxes (multiple of 2): "))
     if int(n_boxes / n_drops) < 2:
         print("The boxes have to be dropped in (multiple) pairs, please restate the amount of drops")
         n_drops = int(input("Amount of drops: "))
-    furthest_drop *= 1000 #convert to meters)
+    
     # n_drops is the amount of drops that are to be performed in the sortie
     # furthest drop is the dropzone located furthest away from the groundbase
     # dropregion is a circle in which the dropzones lie. This is centered around the furthest dropping point
     L_D = sqrt(pi * obj.A * obj.e / (4 * obj.CD0))
-    W_TO= OEW + obj.W_F + n_boxes * obj.boxweight
+    W_TO= obj.W_TO
     if n_drops == 1:
         W4W3 = obj.W4W3**2
         R = 2 * furthest_drop                               # Fly to dropzone and back, hence 2 times furthest drop
@@ -100,6 +94,7 @@ def profile(obj, n_drops, n_boxes, furthest_drop = None, dropregion = None, prin
         Mff_back = W4W3 * Mff_cruise_back * obj.W10W9 * obj.WfinalW10
         Mf_used_back = (1-Mff_back) * W_back
         Mf_used = Mf_used_there + Mf_used_back
+        obj.Mff = (W_TO - Mf_used)/W_TO
     else:
         if dropregion == None:
             Mf_used = 0.0
@@ -125,6 +120,7 @@ def profile(obj, n_drops, n_boxes, furthest_drop = None, dropregion = None, prin
             Mff_back = (W4W3**climbfraction_power) * Mff_cruise_back * obj.W10W9 * obj.WfinalW10
             Mf_used_back = (1-Mff_back)*W
             Mf_used += Mf_used_back
+            obj.Mff = (W_TO - Mf_used)/W_TO
         else:
             dropregion *= 1000
             interdropdist   = dropregion/n_drops
@@ -154,13 +150,18 @@ def profile(obj, n_drops, n_boxes, furthest_drop = None, dropregion = None, prin
             Mff_back = (W4W3**climbfraction_power) * Mff_cruise_back * obj.W10W9 * obj.WfinalW10
             Mf_used_back = (1-Mff_back)*W
             Mf_used += Mf_used_back
-    if print:
-        print(f"Number of drops: {n_drops} | Number of boxes: {n_boxes} | Furthest drop: {furthest_drop/1000} [km] | Fuel used: {Mf_used} [kg]")
+            obj.Mff = (W_TO - Mf_used)/W_TO
+    if Print:
+        print(f"Number of drops: {n_drops} | Number of boxes: {n_boxes} | Furthest drop: {furthest_drop/1000} [km] | Fuel used: {Mf_used} [kg] | Mff: {obj.Mff}")
     return Mf_used
 
-n_drops = np.arange(1, 7, 1)
-furthest_drop = np.arange(50, 300, 50)
-dropregion = np.arange(0, 175, 25)
+def run(obj, n_drops, n_boxes, furthest_drop = None, dropregion = None):
+    obj.W_OE = weight_empty_operational(obj)                    # perform calculation of operational empty weight
+    obj.W_F  = profile(obj, n_drops, n_boxes, furthest_drop, dropregion)                          # perform calculation of fuel weight
+    obj.W_TO = weight_take_off(obj.W_OE, obj.W_F, obj.W_PL)     # combines weights to find total weight
+    print(f"Take-off Weight: {obj.W_TO} [kg] | OEW: {obj.W_OE} [kg] | Fuel used: {obj.W_F} [kg]")
+
+
 
 
 
