@@ -151,6 +151,97 @@ def subdivide(range,N):
             i += 1
     return var
 
+def drop_maneuver(Dcase, Mcase, DU, box, plot_traj):
+
+    # calc AC traj s.t. h_min == 15m
+    Dh = 0
+    if AC.OP_drop_angle != 0:
+        R = AC.OP_app_V / AC.OP_app_Dn  # approach pull radius
+        Dh = R * np.abs(np.sin(AC.OP_drop_angle))
+    AC.pos = [0, 0, H_min + Dh]
+
+    # disturb drop time
+    if time_dev_drop != 0:
+        AC.OP_drop_angle += (atm.g / AC.OP_app_Dn) * (AC.OP_app_Dn - 1) * time_dev_drop
+        AC.pos = np.array([0, 0, H_min + Dh])
+        + np.array(
+            [np.cos(AC.OP_drop_angle), np.sin(AC.OP_drop_angle), 0]
+        ) * AC.OP_app_V * time_dev_drop
+
+    # get drop state for (each) box with drop order and box layout
+    box_number = 1
+    while box_number <= AC.n_boxes:
+
+        # initialise box pos & vel
+        box = BOX(box_number, AC)
+        box.mass += AC.PL_mass  # payload
+
+        # disturb box timings
+        box.DT_brake += time_dev_brake
+        box.DT_flaps += time_dev_flap
+
+        # get trajectory of (each) box from initial state & CD(t)
+        N = 0
+        while box.Pos[-1] > 0 and N < IT_max:  # until touchdown
+            box.update(dt_sim, atm)
+            N += 1
+
+        # get ground impact deceleration
+        box.crumple_size = 0.5  # [m]
+        V_impact = box.LogState[1][-1][-1]
+        a = V_impact ** 2 / box.crumple_size
+
+        # store results
+        if N + 1 == IT_max:
+            print("SIMULATION ABORTED")
+        else:
+            DropResults["impact DX [m]"].append(box.LogState[0][0][-1])
+            DropResults["impact DY [m]"].append(box.LogState[0][1][-1])
+            DropResults["impact velocity [m/s]"].append(box.LogState[1][2][-1])
+            DropResults["impact deceleration [g]"].append(a / atm.g)
+            DropResults["max acceleration [g]"].append(np.max(box.LogState[2][-1]) / atm.g)
+            DropResults["max velocity [m/s]"].append(np.max(box.LogState[1][-1]))
+            DropResults["time to land [s]"].append(box.LogState[-1][-1])
+
+        # show DropResults
+        if plot_traj == box_number:
+            # print results
+            print("\ndisturbance case ", str(disturbance_case), "box ", str(box_number), ":")
+            for var in DropResults:
+                print(var, DropResults[var][-1])
+
+            # plot
+            plt.suptitle("Box drop")
+
+            plt.subplot(231)
+            plt.plot(box.LogState[0][0], box.LogState[0][1])
+            plt.title("trajectory XY")
+
+            plt.subplot(232)
+            plt.plot(box.LogState[0][0], box.LogState[0][2])
+            plt.title("trajectory XZ")
+
+            plt.subplot(233)
+            plt.plot(box.LogState[0][1], box.LogState[0][2])
+            plt.title("trajectory YZ")
+
+            plt.subplot(234)
+            plt.plot(box.LogState[-1], box.LogState[0][-1])
+            plt.title("height over time")
+
+            plt.subplot(235)
+            plt.plot(box.LogState[-1], box.LogState[1][-1])
+            plt.title("speed vs time")
+
+            plt.subplot(236)
+            plt.plot(box.LogState[-1], box.LogState[2][-1])
+            plt.title("acceleration vs time")
+
+            plt.show()
+
+        # iterate
+        box_number += 1
+
 if True:
     AC = UAV('aircraft')
     print(AC.__dict__)
