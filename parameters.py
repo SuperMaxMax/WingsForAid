@@ -16,7 +16,7 @@ class UAV:
         self.LDG_dist = 750.0               # Landing distance [m]
         self.L_D = 14.1804                  # Lift to drag ratio [-]
         self.Lambda = -0.0065
-        self.MAC_length = 1.0161            # Mean aerodynamic chord [m]
+        self.MAC_length = 1.3045447021067196            # Mean aerodynamic chord [m]
         self.MGC = 1.0822                   # Mean geometric chord [m]
         self.M_res = 0.075 
         self.Mff = 0.9254                   # Fuel fraction [-]
@@ -125,8 +125,8 @@ class UAV:
         self.w_out = 1.4                    # Outer fuselage width [m]
         self.x_lemac = 0.2871               # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
-        self.y_mac = 2.3182                 # Spanwise location of the MAC [m]
-        self.i_w = 0.42 * np.pi / 180       # Incidence angle of wing wrt fuselage [rad]
+        self.y_mac = 2.04                 # Spanwise location of the MAC [m]
+        self.i_w = 0.19 * np.pi / 180       # Incidence angle of wing wrt fuselage [rad]
 
         "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
         self.something = 1 # add units

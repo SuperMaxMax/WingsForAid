@@ -103,15 +103,18 @@ def plot_lift_distr(object):
         if variable == "Twist":
             alpha_twist = parameter
         else:
-            alpha_twist = 1 * np.pi / 180
+            alpha_twist = 0 * np.pi / 180
 
 
-        i_w = 0.42 * np.pi / 180 #iw(airfoil)[0]
+        i_w = 0.19 * np.pi / 180 #iw(airfoil)[0]
         a_2d = object.AE_cl_alpha       #iw(airfoil)[1]
         alpha_0 = object.AE_alpha0 #iw(airfoil)[2]
         b = (AR * S)**0.5
-        MAC = S/b                               #Change to iteration between Croot and MAC
-        Croot = (1.5*(1+Lambda)*MAC)/(1+Lambda+Lambda**2)
+        Croot = 2/(1+Lambda) * S/b
+        MAC = Croot * 2 / 3 * ((1 + Lambda + Lambda**2)/(1+Lambda))                             #Change to iteration between Croot and MAC
+      #  MAC = S / b
+      #  Croot =  (1.5*(1+Lambda)*MAC)/(1+Lambda+Lambda**2)
+        print(MAC)
         theta = np.linspace(np.pi/(2*N), np.pi/2, N, endpoint = True) #Change to get gooed amount of sections
         alpha = np.linspace(i_w+alpha_twist, i_w, N, endpoint = False)
         z = (b/2) * np.cos(theta)
