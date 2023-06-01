@@ -23,7 +23,7 @@ def takeoffweight(obj, W_F):
     return TOW
 
 def atm_parameters(obj, h):
-    T    = (atm.T0 + 15) + atm.lambd * h
+    T    = atm.T0 + atm.lambd * h
     rho  = atm.rho0*np.power((T/obj.T0), (-((atm.g / (atm.lambd * atm.R))+1)))
     p    = atm.p0*np.power((T/obj.T0), (-(atm.g / (atm.lambd * atm.R))))
     a    = np.sqrt(atm.gamma*obj.R*T)
@@ -93,7 +93,6 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
     print(f"This calculation took {end_time-start_time} seconds")
     return
 
-
 def flightceiling(ac_obj, atm_obj, W_F, plot=True):
     W   = ac_obj.W_TO * atm_obj.g
     h   = 0.0
@@ -115,6 +114,7 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True):
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
         Pa  = ac_obj.power * ac_obj.prop_eff * (rho/atm_obj.rho0)**(3/4) * 735.49875
         roc = (Pa - Pr)/W
+        print(f"Altitude: {np.round(h, 2)} [m] | Power required: {np.round(Pr, 2)} [W] | Power available: {np.round(Pa, 2)} [W] | Rate of Climb: {np.round(roc, 2)} [m/s] | Velocity: {np.round(V, 2)} [m/s]")
         h   += roc * dt
         W   -= Pa * ac_obj.SFC * dt * atm_obj.g
         t   += dt
@@ -147,18 +147,9 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True):
         plt.tight_layout()
 
         plt.show()
-    
-flightceiling(aircraft, atm, 60)
-        
-        
-        
-        
-        
-        
 
-
-
-
+flightceiling(aircraft, atm, 60, plot=False)
+            
 # # ---------------- Assumptions for take-off equations of motion -----------------
 # # Wind is included by take it into account in the speed: V_eff = V - V_wind
 # # Runway slope is not zero
@@ -245,17 +236,59 @@ if plt_to:
 
 # ------------------------------------------------------------------------
 
-def turnperformance(ac_obj, atm_obj, phi, V, W, h, heading_change):
-    rho = atm_parameters(atm_obj, h)[3] 
-    phi *= np.pi/180
-    R_turn = V**2/(atm_obj.g * np.tan(phi))
-    n_turn = 1/np.cos(phi)
-    CL = 2*W/(rho*V**2*ac_obj.Sw)
-    CD = ac_obj.CD0 + CL**2/(np.pi*ac_obj.A*ac_obj.e)
-    CL_CD = CL/CD
-    Pr = n_turn*CL_CD*W*V
-    turn_time = (2*np.pi*(heading_change/360)*R_turn)/V
-    return R_turn, n_turn, Pr, turn_time
+def turnperformance(ac_obj, atm_obj, W = None, h = None, V = None):
+    if V == None:
+        V = ac_obj.V_cruise
+    else:
+        V = V
+    if W == None:
+        W = ac_obj.W_TO * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2 * ac_obj.W4W3
+    else:
+        W = W
+    if h == None:
+        h = ac_obj.h_cruise
+    else:
+        h = h
+    rho = atm_parameters(atm_obj, h)[2]
+    # Standard turns
+    standard_rates  = np.array([ac_obj.turnrate_half, ac_obj.turnrate_1, ac_obj.turnrate_2]) * (np.pi/180)  # Convert to rad
+    turnradius_std  = V/standard_rates                                                                      # Radius of standard turns
+    bankangle_std   = np.arctan(V**2/(atm_obj.g * turnradius_std))                                          # Required bank angles
+    n_stdrates      = 1/np.cos(bankangle_std)                                                               # Associated load factors
+    T_turn_std      = 360/(standard_rates * 180/np.pi)                                                      # Turning time
+    print("-------------------------------------------------------------------------")
+    print(f"Standard rate 1/2: V = {np.round(V, 2)} [m/s] | Turnradius = {np.round(turnradius_std[0], 2)} [m] | Bank angle = {np.round(bankangle_std[0]*180/np.pi, 2)} [deg] | Load factor = {np.round(n_stdrates[0], 2)} | Turning time = {np.round(T_turn_std[0], 2)} [s]")
+    print(f"Standard rate 1  : V = {np.round(V, 2)} [m/s] | Turnradius = {np.round(turnradius_std[1], 2)} [m] | Bank angle = {np.round(bankangle_std[1]*180/np.pi, 2)} [deg] | Load factor = {np.round(n_stdrates[1], 2)} | Turning time = {np.round(T_turn_std[1], 2)} [s]")
+    print(f"Standard rate 2  : V = {np.round(V, 2)} [m/s] | Turnradius = {np.round(turnradius_std[2], 2)} [m] | Bank angle = {np.round(bankangle_std[2]*180/np.pi, 2)} [deg] | Load factor = {np.round(n_stdrates[2], 2)} | Turning time = {np.round(T_turn_std[2], 2)} [s]")
+    print("-------------------------------------------------------------------------")
+    # Steepest turn (drag limited)
+    Pa = ac_obj.power * ac_obj.prop_eff * (rho/atm_obj.rho0)**(3/4) * 735.49875                             # Power available in Watts at altitude
+    print(f"Power available {Pa}")
+    bankangle_steep = 0
+    n_steep  = 1/np.cos(bankangle_steep)
+    CL_steep = 2*n_steep*W*atm_obj.g/(rho*V**2*ac_obj.Sw)
+    CD_steep = dragpolar(ac_obj, CL_steep)
+    Pr = 1/2 * rho * V**3 * ac_obj.Sw * CD_steep
+    print(f"Power required {Pr}")
+    while Pa > Pr:
+        bankangle_steep += np.pi/180                                  # Increase bankangle with 1 deg (expressed in rad) every calculation
+        n_steep = 1/(np.cos(bankangle_steep))
+        CL_steep = 2*n_steep*W*atm_obj.g/(rho*V**2*ac_obj.Sw)
+        if CL_steep > ac_obj.CL_max_clean:
+            bankangle_steep -= np.pi/180
+            n_steep = 1/(np.cos(bankangle_steep))
+            print(f"The maximum bank angle is stall limited")
+            break
+        CD_steep = dragpolar(ac_obj, CL_steep)
+        Pr = 1/2 * rho * V**3 * ac_obj.Sw * CD_steep
+    print(f"The maximum bank angle at TAS = {np.round(V, 2)} [m/s], ALT = {np.round(h, 2)} [m] and Weight = {np.round(W, 2)} [kg] is {np.round(bankangle_steep*180/np.pi, 2)} [deg]")
+    print("-------------------------------------------------------------------------")
+    # Minimum turn radius
+    R_min = V**2/(atm_obj.g*np.sqrt(n_steep**2 -1))
+    print(f"The minimum turn radius at TAS = {np.round(V, 2)} [m/s], ALT = {np.round(h, 2)} [m] and Weight = {np.round(W, 2)} [kg] is {np.round(R_min, 2)} [m]")
+    print("-------------------------------------------------------------------------")
+    return 
+#turnperformance(aircraft, atm, V = 58.85)
 
 # -----------------------------------------------------------------
 
@@ -294,7 +327,6 @@ def cruiseperformance(ac_obj, atm_obj, Range=None, V_cruise=None, h_cruise=None,
     print(f"The fuel used during the cruise is {np.round(W_cr - W)} [kilograms] ({np.round(((W_cr-W)/0.7429), 2)} [L] @ {ac_obj.fueldensity} [kg/m^3])")
     print("---------------------------------------------------")
     return None
-
 
 def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
     if V_cruise == None:

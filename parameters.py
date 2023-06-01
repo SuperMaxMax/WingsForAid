@@ -162,16 +162,19 @@ class UAV:
             self.AE_cm0 = -0.0844
 
 
-        "Flight Performance parameters"     # NOTE: Add identifier "FP_" before variable names
-        self.screenheight = 50*0.3048       # screen height of 50 ft (CS23)
-        self.rpm_maxcont  = 5500            # rpm
-        self.omega_prop   = 237             # rad/s, based on 5500 rpm max continuous power and 2.43 gearbox ratio
-        self.prop_radius  = 0.8255          # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
-        self.ceiling      = 18000*0.3048    # [m] 18000 ft service ceiling
-        self.th_ceil      = 30000*0.3048
-        self.SFC          = 7.91666667E-8   # kg/J specific fuel consumption
-        self.fuelcapacity = 100             # L
-        self.fueldensity  = 0.7429          # kg/L
+        "Flight Performance parameters"         # NOTE: Add identifier "FP_" before variable names
+        self.screenheight   = 50*0.3048         # screen height of 50 ft (CS23)
+        self.rpm_maxcont    = 5500              # rpm
+        self.omega_prop     = 237               # rad/s, based on 5500 rpm max continuous power and 2.43 gearbox ratio
+        self.prop_radius    = 0.8255            # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
+        self.ceiling        = 18000*0.3048      # [m] 18000 ft service ceiling
+        self.th_ceil        = 30000*0.3048
+        self.SFC            = 7.91666667E-8     # kg/J specific fuel consumption
+        self.fuelcapacity   = 100               # L
+        self.fueldensity    = 0.7429            # kg/L
+        self.turnrate_half  = 1.5               # deg/s
+        self.turnrate_1     = 3.0               # deg/s
+        self.turnrate_2     = 6.0               # deg/s
 
 
         "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
