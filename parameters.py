@@ -227,9 +227,10 @@ class UAV:
         self.OP_accuracyY = 25  # [m]
 
         self.OP_hmin = 15  # [m]              # requirements
-        self.OP_V_crosswind = 25  # [m/s]
-        self.OP_V_tailwind = 25  # m/s]
-        self.OP_V_headwind = 25  # [m/s]
+        self.OP_V_crosswind = 10  # [m/s]
+        self.OP_V_tailwind = 15  # m/s]
+        self.OP_V_headwind = 15  # [m/s]
+        self.OP_V_wind = 15  # [m/s]
 
 class airport:
     def __init__(self, name):
