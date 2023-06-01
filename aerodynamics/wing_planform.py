@@ -198,7 +198,7 @@ def plot_lift_distr(object):
     plt.xlabel('semi span [m]')
     plt.ylabel('C_L')
     plt.legend()
-    #plt.show()
+    plt.show()
     
 plot_lift_distr(aircraft)
     
