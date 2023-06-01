@@ -24,27 +24,37 @@ for concept in [DET_CON_2_braced]:
     W_TO_c2_old = 750
 
     while it:
+        print(f"W_TO_c2_old at beginning of iteration {W_TO_c2_old}")
         # class 1
-        c1.run(concept, 1, 12)
+        c1.run(concept, 3, 12, 250, 50)
+        print(f"W_TO_c2_old after class 1 {W_TO_c2_old}")
         print(f"After c1:{concept.W_TO}")
         # geometry determination
         geo.geometry_determination(concept)
+        # print(f"W_TO_c2_old after geometry determination {W_TO_c2_old}")
 
         # class 2
         c2.weight_empty(concept)
         W_TO_c2 = concept.W_TO
         print(f"After c2:{W_TO_c2}")
+        # print(f"W_TO_c2_old after c2 {W_TO_c2_old}")
         # update load factor
         concept.n_ult = Vn.max_n(concept)*1.5
+        # print(f"W_TO_c2_old after Vn {W_TO_c2_old}")
 
         # check if change is small enough
         change = (W_TO_c2 - W_TO_c2_old)/W_TO_c2_old
 
-        if abs(change) < 0.00001:
+        if np.abs(change) < 0.001:
             it = False
         else:
-            W_TO_c2_old = W_TO_c2
             n += 1
+            W_TO_c2_old = W_TO_c2
+        
+        
+        # print(f"W_TO_c2_old after full iteration {W_TO_c2_old}")
+            
+        
 
     # --- plotting of concept
     print(f"{concept.name} done in {n} iterations \n")
