@@ -226,4 +226,4 @@ def fuel_volume(airfoil, Croot, Lambda, b):
     V = V * 1000 #in liters
     return V 
 
-#print(fuel_volume(airfoil, 1.2, 0.6, 10.11))
+print(fuel_volume(airfoil, aircraft.rootchord, 0.4, aircraft.b))

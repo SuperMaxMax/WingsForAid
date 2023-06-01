@@ -61,7 +61,7 @@ class UAV:
         self.X_cg_full = 0.4115             # MTOW cg location CG/MAC [-]
         self.X_cg_fwd = 0.1704              # Forward cg location CG/MAC [-]
         self.X_cg_range = 0.363             # Range of cg location CG/MAC [-]
-        self.b = 10.8219                    # Wing span [m]
+        self.b = 9.526939435096667                    # Wing span [m]
         self.boom                = True     # Boom, true if boom tail is implemented
         self.bot_clearance = 0.1            # Bottom clearance [m]
         self.braced_wing         = True     # True if wing is braced
@@ -72,7 +72,7 @@ class UAV:
         self.cruise_frac = 0.8348           # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
         self.d_eff = 1.241                  # Effective diameter [m]
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
-        self.dihedral = 1
+        self.dihedral = 0
         self.e = 0.7                        # Oswald factor [-]
         self.engine_cg = 0.327              # Engine cg location [m]
         self.engine_fairing = 0.2           # Engine fairing length [m]
@@ -90,7 +90,7 @@ class UAV:
         self.l_n = 0.8651                   # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
-        self.lambda_co2 = -0.0428           # Half chord sweep angle [rad]
+   # Calculate yourself:     self.lambda_co2 = -0.0428           # Half chord sweep angle [rad]
         self.lambda_co4 = 0.0               # Quarter chord sweep angle [rad]
         self.lin_par1 = 0.5249              # [-]
         self.lin_par2 = 42.049              # [-]
@@ -110,7 +110,6 @@ class UAV:
         self.rho0 = 1.225                   # Air density at sea level [kg/m^3]
         self.rho_TO = 1.225                 # Take-off air density if airport is at sea level [kg/m^3]
         self.rho_cruise = 0.9046            # Cruise air density [kg/m^3]
-        self.rootchord = 1.546              # Root chord [m]
         self.s_tail = 2                     # Tail surface area [m]
         self.side_clearance = 0.2           # Side clearance [m], this is for both sides
         self.sigma_TO = 1.0
@@ -118,7 +117,9 @@ class UAV:
         self.structural_thickness = 0.2     # Structural thickness fuselage [m], this is for both sides
         self.t_c = 0.12                     # Thickness to chord ratio [-]
         self.taper = 0.4                    # Taper ratio [-]
-        self.tipchord = 0.6184              # Tip chord [m]
+        self.rootchord = 2/(1+self.taper) * self.Sw/self.b             # Root chord [m]
+
+        self.tipchord = self.rootchord*self.taper             # Tip chord [m]
         self.top_clearance = 0.2            # Top clearance [m]
         self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility    
         self.w_in = 1.2                     # Inner fuselage width [m]
