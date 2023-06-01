@@ -10,16 +10,8 @@ import matplotlib.pyplot as plt
 import os
 import copy
 
-CON_1 = UAV('CON_1', 'tractor', boom=True, braced_wing=False)
+
 CON_1_braced = UAV('CON_1_braced', 'tractor', boom=True, braced_wing=True)
-CON_2 = UAV('CON_2', 'tractor', boom=False, braced_wing=False)
-CON_2_braced = UAV('CON_2_braced', 'tractor', boom=False, braced_wing=True)
-CON_3 = UAV('CON_3', 'pusher', boom=False, braced_wing=False)
-CON_3_braced = UAV('CON_3_braced', 'pusher', boom=False, braced_wing=True)
-CON_4 = UAV('CON_4', 'pusher', boom=False, braced_wing=False)
-CON_4_braced = UAV('CON_4_braced', 'pusher', boom=False, braced_wing=True)
-CON_5 = UAV('CON_5', 'fuselage', boom=False, braced_wing=False)
-CON_5_braced = UAV('CON_5_braced', 'fuselage', boom=False, braced_wing=True)
 
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
@@ -30,7 +22,7 @@ os.makedirs(out_folder_path, exist_ok=True)
 with open("plotting_data.csv", 'r') as data:
     rows = data.readlines()
 
-for concept in [CON_1, CON_1_braced, CON_2, CON_2_braced, CON_3, CON_3_braced, CON_4, CON_4_braced, CON_5, CON_5_braced]:
+for concept in [CON_1_braced]:
     print(concept.name)
     # iteration
     concept_dir = os.path.join(out_folder_path, f"{concept.name}")

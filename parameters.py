@@ -53,6 +53,7 @@ class UAV:
         self.W_TO                = 700          # Take-off weight [kg]
         self.W_PL                = 240          # Payload weight [kg]
         self.WS                  = 600       # Wing Loading [N/m^2]
+        self.W_F                 = 60
 
         "-Weight fractions"
         self.W1W_TO              = 0.995        # Engine startup fraction [-]
@@ -79,7 +80,7 @@ class UAV:
 
         self.power_setting       = 0.9          # Power setting in cruise [-]
 
-        self.c_p                 = 72E-9        # Specific fuel consumption [kg/J]
+        self.c_p                 = 77E-9        # Specific fuel consumption [kg/J]
         self.N_e                 = 1            # Number of engines [-]
 
         "==== Mission profile/Atmospheric properties ===="
@@ -87,6 +88,7 @@ class UAV:
         self.n_drops             = 1             # Number of drops [-]
         self.n_boxes             = 12            # Number of boxes [-] -> has to be a multiple of 2
         self.n_boxes_abreast     = 2             # Number of boxes side by side [-]
+        self.boxweight           = 23            # kg
         self.n_rows              = self.n_boxes/self.n_boxes_abreast # Number of rows [-]
         self.R                   = 500000        # Range [m]
         self.M_res               = 0.10          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
