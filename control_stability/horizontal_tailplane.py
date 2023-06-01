@@ -88,7 +88,7 @@ def C_m_alpha_calculation(aircraft, x_cg):
 #################################################################################################################
 # Using data from Torenbeek aroung page 533
 flaptype = 'singleslotted'              # Can be 'singleslotted' or 'fowler'
-CS_Swf = 0.5 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) TODO: update value
+CS_Swf = 0.9 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) TODO: update value
 CS_lambda_hinge = 0.02                  # hinge line sweep angle, likely parallel to aft spar [rad] TODO: update value
 
 if flaptype == 'singleslotted':
@@ -117,7 +117,7 @@ if flaptype == 'fowler':
     print('fowler flap')
     print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
 
-calcCL = False # calculate dCLmax for a given Swf, or vice versa
+calcCL = True # calculate dCLmax for a given Swf, or vice versa
 if calcCL:
     CS_dCLmax_TO = 0.9 * CS_dClmax_TO * (CS_Swf/aircraft.Sw) * np.cos(CS_lambda_hinge)  # Increase in CL due to flap extension at take-off [-] (ADSEE-II, L3 S35)
     CS_dCLmax_LD = 0.9 * CS_dClmax_LD * (CS_Swf/aircraft.Sw) * np.cos(CS_lambda_hinge)  # Increase in CL due to flap extension at landing [-]
@@ -125,13 +125,50 @@ if calcCL:
 
 else:
     CS_dCLmax_TO = float(input("\nCS_dCLmax_TO: "))
-    CS_dCLmax_LD = float(input("\nCS_dCLmax_LD: "))
-    print(f"Swf_TO: {round(CS_dCLmax_TO / (0.9 * CS_dClmax_TO * np.cos(CS_lambda_hinge)) * 100, 3)}% Sw") 
-    print(f"CS_dCLmax_LD: {round(CS_dCLmax_LD / (0.9 * CS_dClmax_LD * np.cos(CS_lambda_hinge)) * 100, 3)}% Sw")
+    CS_dCLmax_LD = float(input("CS_dCLmax_LD: "))
+    CS_Swf_TO = CS_dCLmax_TO / (0.9 * CS_dClmax_TO * np.cos(CS_lambda_hinge)) * aircraft.Sw
+    CS_Swf_LD = CS_dCLmax_LD / (0.9 * CS_dClmax_LD * np.cos(CS_lambda_hinge)) * aircraft.Sw
+    
+    CS_Swf = max(CS_Swf_TO, CS_Swf_LD) # most constraining case becomes required flapped area
+    
+    print(f"Swf_TO: {round(CS_Swf_TO / aircraft.Sw * 100, 3)}% Sw") 
+    print(f"Swf_LD: {round(CS_Swf_LD / aircraft.Sw * 100, 3)}% Sw")
 
-def Chordfunc(y): # calculate end distance of flaps
-    aircraft.rootchord - (aircraft.rootchord *(1 - aircraft.taper)/(aircraft.b / 2)) * y
-result, error = quad(Chordfunc(y), )
+
+def Chordlength(y):
+    return aircraft.rootchord * (1 - ((1-aircraft.taper) / (aircraft.b / 2)) * y)
+
+def Flaplength(taperratio, rootchord, span, rootlocation, flappedsurface):
+    """Calculate the end location of the flaps based on a starting point from the centerline
+
+    taperratio: taper ratio of the wing [m]
+    rootchord: chord length of the wing root [m]
+    span: total span of the wing [m]
+    rootlocation: starting point in span direction of the wing root [m]
+    flappedsurface: total area of wing that is flapped by HLDs [m^2]"""
+    
+# TODO: check if for if statement below total surface should be considered, or only half. Is calculated flapped surface area for both wing halves? yes right
+    Fus_area = aircraft.Sw - 2 * quad(Chordlength, 0, aircraft.w_out/2)[0]
+    if flappedsurface > (Fus_area): # substracting area occupied by fuselage
+        print(f"\nUnfeasible flap size, flapped area: {flappedsurface} > wing area not occupied by fuselage: {round(Fus_area,5)}")
+    else:
+        A = (-1) * (1 - taperratio) / span
+        B = 1
+        C = (-1) * ((flappedsurface/2) / rootchord + rootlocation - ((1-taperratio)/span) * (rootlocation ** 2))
+
+        print("y_span1", (-B + np.sqrt(B**2 - 4 * A * C)) / (2 * A))
+        print("y_span2", (-B - np.sqrt(B**2 - 4 * A * C)) / (2 * A))
+        y1 = (-B + np.sqrt(B**2 - 4 * A * C)) / (2 * A)
+        y2 = (-B - np.sqrt(B**2 - 4 * A * C)) / (2 * A)
+        # results = (y1,y2)
+        # return results
+
+# if CS_Swf > aircraft.Sw:
+#     print(f"Unfeasible flap size, flapped area: {CS_Swf} > wing area: {aircraft.Sw}")
+# else:
+Flaplength(aircraft.taper, aircraft.rootchord, aircraft.b, aircraft.w_out / 2, CS_Swf)
+    
+
 #################################################################################################################
 "FIXME: Controlability and Stability Curves"
 ################################################################################################################
