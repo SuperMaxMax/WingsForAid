@@ -204,6 +204,7 @@ class UAV:
         self.n_boxes = 12  # [-]
         self.hatchDT = 1  # [s]
         self.hatchDTdev = 0.5  # [s]
+        self.OP_V_boxlim = 100/3.6 # [m/s] box drop max speed
         self.boxDX = 0.5  # [m]
         self.boxDY = 0.5  # [m]
         self.boxDZ = 0  # [m]
