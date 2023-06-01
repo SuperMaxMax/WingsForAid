@@ -8,18 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-DET_CON_1 = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
-DET_CON_1_braced = UAV('DET_CON_1_braced', 'tractor', boom=False, braced_wing=True)
-DET_CON_2 = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=False)
 DET_CON_2_braced = UAV('DET_CON_2_braced', 'tractor', boom=True, braced_wing=True)
-DET_CON_3 = UAV('DET_CON_3', 'pusher', boom=False, braced_wing=False)
-DET_CON_3_braced = UAV('DET_CON_3_braced', 'pusher', boom=False, braced_wing=True)
-DET_CON_4 = UAV('DET_CON_4', 'pusher', boom=True, braced_wing=False)
-DET_CON_4_braced = UAV('DET_CON_4_braced', 'pusher', boom=True, braced_wing=True)
-DET_CON_5 = UAV('DET_CON_5', 'fuselage', boom=False, braced_wing=False)
-DET_CON_5_braced = UAV('DET_CON_5_braced', 'fuselage', boom=False, braced_wing=True)
-DET_CON_6 = UAV('DET_CON_6', 'fuselage', boom=True, braced_wing=False)
-DET_CON_6_braced = UAV('DET_CON_6_braced', 'fuselage', boom=True, braced_wing=True)
 
 # start
 plot = False
@@ -28,7 +17,7 @@ remove_duplicates = False
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
 
-for concept in [DET_CON_1, DET_CON_1_braced, DET_CON_2, DET_CON_2_braced, DET_CON_3, DET_CON_3_braced, DET_CON_4, DET_CON_4_braced, DET_CON_5, DET_CON_5_braced, DET_CON_6, DET_CON_6_braced]:
+for concept in [DET_CON_2_braced]:
     # --- iteration
     n = 1
     it = True
