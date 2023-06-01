@@ -1,6 +1,6 @@
 import sys
 import os.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 import numpy as np
 from parameters import UAV
@@ -78,7 +78,7 @@ def iw(airfoil):
 iw(airfoil)
 
 def plot_lift_distr():
-    segments = 4
+    segments = 10
     N = segments - 1
     S = 25 #aircraft.Sw
     AR = 2*np.pi
@@ -104,8 +104,8 @@ def plot_lift_distr():
         for j in range(N):
             RHS[i,j] = np.sin((2*j + 1) * theta[i]) * (1 + (mu[i] * (2 * j + 1)) / np.sin(theta[i]))
 
-    #print(LHS)
-    print(RHS)
+    print(LHS)
+    print(RHS/mu)
     A = np.linalg.solve(RHS, LHS)
     print(A)
 
@@ -120,7 +120,8 @@ def plot_lift_distr():
 
     #C_L_wing = 
 
-    plt.plot(y_s, CL1)
+    plt.plot(y_s, CL1, marker = "s")
+    plt.grid()
     plt.xlabel('semi span [m]')
     plt.ylabel('C_L')
     plt.show()
