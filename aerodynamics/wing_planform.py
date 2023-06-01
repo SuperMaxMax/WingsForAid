@@ -89,13 +89,13 @@ def plot_lift_distr(object):
         variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
 
     for parameter in variable_list2:
-        segments = 30
+        segments = 10
         N = segments - 1
         S = object.Sw #aircraft.Sw
         if variable == "AR":
             AR = parameter
         else:
-            AR = 7
+            AR = 7.5
         if variable == "Lambda":
             Lambda = parameter
         else:
@@ -106,7 +106,7 @@ def plot_lift_distr(object):
             alpha_twist = 0 * np.pi / 180
 
 
-        i_w = 2 * np.pi / 180 #iw(airfoil)[0]
+        i_w = 0.5 * np.pi / 180 #iw(airfoil)[0]
         a_2d = object.AE_cl_alpha       #iw(airfoil)[1]
         alpha_0 = object.AE_alpha0 #iw(airfoil)[2]
         b = (AR * S)**0.5
@@ -148,9 +148,37 @@ def plot_lift_distr(object):
     
         label = variable + "= " + str(parameter)
         plt.plot(y_s, CL1, marker = "s", label = label)
-    
+
+        ##Wing Lift Coefficient
         C_L_wing = np.pi * AR * A[0]
-        print("cl", C_L_wing)
+        V_c = aircraft.V_cruise
+        rho_c = aircraft.rho_cruise
+        W_TO = aircraft.W_TO * 9.80665
+        C_L_req = 2*W_TO/(rho_c * (V_c**2) * S)
+        
+
+        ##Wing INDUCED DRAG
+        cdi_sum = 0
+        for i in range(len(A)):
+            cdi_sum += (i+1) * A[i]**2
+
+        CD_induced = np.pi * AR *  cdi_sum #(Wing) 
+
+        #Span efficiency factor
+        delta = 0
+        for i in range(1,len(A)):
+            delta += (i+1) * (A[i] / A[0])**2
+        
+        span_eff = 1 / (1 + delta)
+        print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'wing twist = ', alpha_twist, 'indidence = ', i_w)
+        print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing)
+
+        #print(C_L_wing**2 / (AR* np.pi * CD_induced))
+
+        print("CL_wing", C_L_wing)
+        print("CL required for cruis", C_L_req)
+        print("CDi_wing", CD_induced)
+
 
     #Find integral current distribution
     area_lift_dist = -integrate.simps(CL1, y_s)
