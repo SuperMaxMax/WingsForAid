@@ -4,7 +4,7 @@ class UAV:
         "=== Class I / Class II parameters ==="
         self.A = 8                         # Aspect ratio [-]
         self.BHP_cruise = 76.3436
-        self.CD0 = 0.0273                   # Zero lift coefficient [-]
+        self.CD0 =  0.00595                    # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
         self.CL_TO = 1.2397                 # [-]
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
