@@ -7,6 +7,7 @@ from parameters import UAV
 import pandas as pd
 import csv
 import matplotlib.pyplot as plt
+from scipy import integrate
 
 aircraft = UAV('aircraft')
 
@@ -77,56 +78,98 @@ def iw(airfoil):
 
 iw(airfoil)
 
-def plot_lift_distr():
-    segments = 10
-    N = segments - 1
-    S = 25 #aircraft.Sw
-    AR = 2*np.pi
-    Lambda = 1
-    alpha_twist = -1 * np.pi / 180
-    i_w = 2 * np.pi / 180 #iw(airfoil)[0]
-    a_2d = 2*np.pi       #iw(airfoil)[1]
-    alpha_0 = -1.5 *  np.pi / 180 #iw(airfoil)[2]
-    b = (AR * S)**0.5
-    MAC = S/b                               #Change to iteration between Croot and MAC
-    Croot = (1.5*(1+Lambda)*MAC)/(1+Lambda+Lambda**2)
-    theta = np.linspace(np.pi/(2*N), np.pi/2, N, endpoint = True) #Change to get gooed amount of sections
-    alpha = np.linspace(i_w+alpha_twist, i_w, N, endpoint = False)
-    z = (b/2) * np.cos(theta)
-    c = Croot * (1 - (1-Lambda) * np.cos(theta))
-    mu = (c * a_2d) / (4 * b)
+def plot_lift_distr(object):
+    variable = "Lambda"      #Lambda, AR or Twist
+    plot_mode = "Normalized"         #"Normalized" for normalized plots
+    if variable == "Lambda":    
+        variable_list2 = [0.2,0.4,0.6,0.8,1]
+    elif variable == "AR":  
+        variable_list2 = [5,6,7,8,9]
+    elif variable == "Twist":
+        variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
 
-    #solve Ansin(ntheta)
-    LHS = mu * (alpha - alpha_0)
+    for parameter in variable_list2:
+        segments = 30
+        N = segments - 1
+        S = object.Sw #aircraft.Sw
+        if variable == "AR":
+            AR = parameter
+        else:
+            AR = 7
+        if variable == "Lambda":
+            Lambda = parameter
+        else:
+            Lambda = 1
+        if variable == "Twist":
+            alpha_twist = parameter
+        else:
+            alpha_twist = 0 * np.pi / 180
 
-    RHS = np.zeros((N,N))
-    for i in range(N):
-        for j in range(N):
-            RHS[i,j] = np.sin((2*j + 1) * theta[i]) * (1 + (mu[i] * (2 * j + 1)) / np.sin(theta[i]))
 
-    print(LHS)
-    print(RHS/mu)
-    A = np.linalg.solve(RHS, LHS)
-    print(A)
+        i_w = 2 * np.pi / 180 #iw(airfoil)[0]
+        a_2d = object.AE_cl_alpha       #iw(airfoil)[1]
+        alpha_0 = object.AE_alpha0 #iw(airfoil)[2]
+        b = (AR * S)**0.5
+        MAC = S/b                               #Change to iteration between Croot and MAC
+        Croot = (1.5*(1+Lambda)*MAC)/(1+Lambda+Lambda**2)
+        theta = np.linspace(np.pi/(2*N), np.pi/2, N, endpoint = True) #Change to get gooed amount of sections
+        alpha = np.linspace(i_w+alpha_twist, i_w, N, endpoint = False)
+        z = (b/2) * np.cos(theta)
+        c = Croot * (1 - (1-Lambda) * np.cos(theta))
+        mu = (c * a_2d) / (4 * b)
 
-    sum = np.zeros(N)
-    for i in range(N):
-        for j in range(N):
-            sum[i] += A[j] * np.sin((2 * j + 1) * theta[i])
+        #solve Ansin(ntheta)
+        LHS = mu * (alpha - alpha_0)
 
-    CL = 4 * b * sum / c
-    CL1 = np.insert(CL, 0, 0)
-    y_s = np.insert(z, 0, b / 2)
+        RHS = np.zeros((N,N))
+        for i in range(N):
+            for j in range(N):
+                RHS[i,j] = np.sin((2*j + 1) * theta[i]) * (1 + (mu[i] * (2 * j + 1)) / np.sin(theta[i]))
 
-    #C_L_wing = 
+        #print(LHS)
+        #print(RHS/mu)
+        A = np.linalg.solve(RHS, LHS)
+        #print(A)
 
-    plt.plot(y_s, CL1, marker = "s")
+        sum = np.zeros(N)
+        for i in range(N):
+            for j in range(N):
+                sum[i] += A[j] * np.sin((2 * j + 1) * theta[i])
+
+
+        CL = 4 * b * sum / c
+        CL1 = np.insert(CL, 0, 0)
+        y_s = np.insert(z, 0, b / 2)
+
+        if plot_mode == "Normalized":
+            CL1 = CL1/max(CL1)
+            y_s = y_s / (b/2)
+            
+    
+        label = variable + "= " + str(parameter)
+        plt.plot(y_s, CL1, marker = "s", label = label)
+    
+        C_L_wing = np.pi * AR * A[0]
+        print("cl", C_L_wing)
+
+    #Find integral current distribution
+    area_lift_dist = -integrate.simps(CL1, y_s)
+    
+
+    #Elliptical lift distribution
+    y = np.linspace(0, b/2, 50, endpoint = True)
+    #Cli_elliptical = (b/2) * np.sqrt(1-(((np.pi * b * y)/(8 * area_lift_dist))**2))
+    Cli_elliptical = (8*area_lift_dist)/(np.pi*b) * np.sqrt(1-(2*y/b)**2)
+ #   plt.plot(y, Cli_elliptical, label = "Elliptical")
+
+    #General plot
     plt.grid()
     plt.xlabel('semi span [m]')
     plt.ylabel('C_L')
+    plt.legend()
     plt.show()
     
-plot_lift_distr()
+plot_lift_distr(aircraft)
     
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
