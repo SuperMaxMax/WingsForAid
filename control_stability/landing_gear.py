@@ -1,6 +1,8 @@
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
+from matplotlib import patheffects
+import sympy as sp 
 
 sys.path.append('.')
 
@@ -55,8 +57,8 @@ def longitudinal_position_landing_gear(aircraft, x_point, ypoint):
     x_front_max = x_front_max_fwd
     x_front_min = x_front_min_aft
 
-    line_1 = ax.plot([x_front_max, x_front_max], [-0.2, 0.2], color='blue')[0]
-    line_2 = ax.plot([x_front_min, x_front_min], [-0.2, 0.2], color='blue')[0]
+    line_1 = ax.plot([x_front_max, x_front_max], [-0.5, 0.5], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
+    line_2 = ax.plot([x_front_min, x_front_min], [-0.5, 0.5], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])[0]
     
     
 
@@ -68,9 +70,9 @@ def lateral_position_landing_gear(aircraft):
         line_3.remove()
 
     d = aircraft.position_landing_back[0] - aircraft.position_landing_fwd[0]
-    print(aircraft.position_landing_fwd[1])
+
     angle_alpha = np.arctan(aircraft.position_landing_back[1] / d)
-    print(angle_alpha)
+
     c = (aircraft.x_cg_position_aft - aircraft.position_landing_fwd[0]) * np.sin(angle_alpha)
     angle_psi = 55 * (np.pi / 180)  # rad
     Z_position_cg = np.tan(angle_psi) * c
@@ -79,20 +81,45 @@ def lateral_position_landing_gear(aircraft):
     # pitch angle limit
     angle_theta_max = 15 * (np.pi/180)
     x_cg_aft_limit = aircraft.x_cg_position_aft + Z_position_cg * np.tan(angle_theta_max)
-    line_3 = ax.plot([x_cg_aft_limit, x_cg_aft_limit], [-0.2, 0.2], color='blue')[0]
-    plt.draw()
+    line_3 = ax.plot([x_cg_aft_limit, x_cg_aft_limit], [-0.5, 0.5], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
 
+    # II - Limit for the main leg position for give N to attain stability against turnover
+    d_wheel = 0.3
+    n_y = 0.5
+    k_sg = 1
+    e_s = 1/3 * d_wheel
+    track_width = 2 * aircraft.position_landing_back[1]
 
-def height_landing_gear(aircraft):
-    pass
+    r = n_y * Z_position_cg * (1 + 4 * k_sg * e_s * Z_position_cg/ track_width)
 
+    # x, y = sp.symbols('x y')
+    
+    # # Definieer de vergelijking van de cirkel
+    # circle_eq = (x - aircraft.x_cg_position_fwd)**2 + (y - 0)**2 - r**2
 
-def run(aircraft):
-    longitudinal_position_landing_gear(aircraft)
-    lateral_position_landing_gear(aircraft)
-    height_landing_gear(aircraft)
+    # # Bepaal de afgeleide van de cirkelvergelijking
+    # dy_dx = sp.diff(circle_eq, y) / sp.diff(circle_eq, x)
+    # m = y/(x-aircraft.position_landing_fwd[0])
+    # # Bepaal de helling van de raaklijnen in het punt B
+    # sp.solve(m-dydx=0, )
+    # print(m)
+    # # Bepaal de vergelijkingen van de raaklijnen n1 en n2
+    # y_1_range = []
+    # y_2_range = []
 
+    # x_range = np.arange(aircraft.position_landing_fwd[0]-0.1, aircraft.position_landing_back[0]+0.3, 0.02)
+    # for i in x_range:
+    #     y_1 = aircraft.position_landing_fwd[1] - m * (i - aircraft.position_landing_fwd[0])
+    #     y_2 = aircraft.position_landing_fwd[1] + m * (i - aircraft.position_landing_fwd[0])
+    #     y_1_range.append(y_1)
+    #     y_2_range.append(y_2)
 
+    # ax.plot(x_range, y_1_range, linewidth = '0.8', color='red')
+    # #ax.plot(x_range, y_2_range, linewidth='0.8', color= 'red')
+    # plt.draw()
+
+##########################################################################################################
+"""Clicking of position of forward and backward undercarriage"""
 def on_click(event):
     global left_click_point
     global right_click_point
@@ -106,9 +133,10 @@ def on_click(event):
             else:
                 # Update the position of the left-click point
                 left_click_point.set_offsets([[event.xdata, event.ydata]])
+            aircraft.position_landing_back = [event.xdata, event.ydata]
             longitudinal_position_landing_gear(aircraft, event.xdata, event.ydata)
             lateral_position_landing_gear(aircraft)
-            aircraft.position_landing_back = [event.xdata, event.ydata]
+            
             # Call the lateral_position_landing_gear function to update Z_position_cg
             
 
@@ -122,36 +150,58 @@ def on_click(event):
                 right_click_point.set_offsets([[event.xdata, 0]])
 
             # Call the lateral_position_landing_gear function to update Z_position_cg
-            lateral_position_landing_gear(aircraft)
-            aircraft.position_landing_fwd = [event.xdata, event.ydata]
+            aircraft.position_landing_fwd = [event.xdata, 0]
 
+            lateral_position_landing_gear(aircraft)
         # Redraw the plot
         plt.draw()
 
+def on_key(event):
+    if event.key == 'enter':
+        # Print the values
+        print(f"Position Landing Fwd: {aircraft.position_landing_fwd}")
+        print(f"Position Landing Back: {aircraft.position_landing_back}")
+        print(f"Z_cg_position: {Z_position_cg}")       
 
+##########################################################################################################
+"""Plotting"""
 # Enable interactive mode
 plt.ion()
 
 # Create a figure and an axis
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(8, 8))
 
 # Create a scatter plot with a single point
 point = ax.scatter([0], [0])
 
 # Connect the 'button_press_event' to the 'on_click' function
 cid = fig.canvas.mpl_connect('button_press_event', on_click)
+cid = fig.canvas.mpl_connect('key_press_event', on_key)
 
 # Set the plot limits
-x_cg_point = ax.scatter([aircraft.x_cg_position_aft], [0], color='black', label='c.g. aft')
-x_cg_point = ax.scatter([aircraft.x_cg_position_fwd], [0], color='black', label='c.g. fwd')
-ax.plot([-1.5+aircraft.x_cg_position_fwd, 1.5+aircraft.x_cg_position_fwd], [aircraft.w_out/2, aircraft.w_out/2], color='grey', linewidth=0.5)
-ax.plot([-1.5+aircraft.x_cg_position_fwd, 1.5+aircraft.x_cg_position_fwd], [-aircraft.w_out/2, -aircraft.w_out/2], color='grey', linewidth=0.5)
-ax.set_xlim(0, aircraft.l_f)
-ax.set_ylim(-aircraft.b/2 - 0.5, aircraft.b/2 + 0.5)
+x_cg_point = ax.scatter([aircraft.x_cg_position_aft], [0], color='black', label='2: c.g. aft')
+x_cg_point = ax.scatter([aircraft.x_cg_position_fwd], [0], color='black', label='1: c.g. fwd')
+ax.plot([-2+aircraft.x_cg_position_fwd, 1.5+aircraft.x_cg_position_fwd], [aircraft.w_out/2, aircraft.w_out/2], color='0.25', linewidth=0.8)
+ax.plot([-2+aircraft.x_cg_position_fwd, 1.5+aircraft.x_cg_position_fwd], [-aircraft.w_out/2, -aircraft.w_out/2], color='0.25', linewidth=0.8)
+
+ax.plot([0, -2+aircraft.x_cg_position_fwd], [0, aircraft.w_out/2], color='0.25', linewidth=0.8)
+ax.plot([0, -2+aircraft.x_cg_position_fwd], [0, -aircraft.w_out/2], color='0.25', linewidth=0.8)
+
+ax.set_xlim(-0.3, aircraft.l_f-2)
+ax.set_ylim(-aircraft.b/4, aircraft.b/4)
 ax.axhline(0, color='blue', linestyle='dotted')
 
 parameter_text = ax.text(0.95, 0.95, f'Max Z_position c.g.: {Z_position_cg:.2f} [m]',
                          transform=ax.transAxes, ha='right', va='top')
+
+plt.text(aircraft.x_cg_position_aft+0.03, 0.2, 2, fontsize=8, va='center')
+plt.text(aircraft.x_cg_position_fwd+0.03, 0.2, 1, fontsize=8, va='center')
+
+plt.grid()
+plt.legend(loc="upper left")
+plt.xlabel("x-position")
+plt.ylabel("y_position")
+
 
 # Show the plot
 plt.show(block=True)
