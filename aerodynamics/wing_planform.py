@@ -1,6 +1,6 @@
 import sys
 import os.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), os.path.pardir)))
 
 import numpy as np
 from parameters import UAV
@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 aircraft = UAV('aircraft')
 
 airfoil = aircraft.airfoil 
+
 
 def iw(airfoil):
     ### FIND CL optimal ###
@@ -88,7 +89,7 @@ def plot_lift_distr():
     N = segments - 1
     S = 25 #aircraft.Sw
     AR = 8
-    Lambda = 0.6
+    Lambda = 1
     alpha_twist = -1 * np.pi / 180
     i_w = 2 * np.pi / 180 #iw(airfoil)[0]
     a_2d = 6.3          #iw(airfoil)[1]
