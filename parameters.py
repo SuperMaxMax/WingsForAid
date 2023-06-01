@@ -27,7 +27,7 @@ class UAV:
         self.Sw = 11.7113                   # Wing area [m^2]
         self.Sw_wetted = 23.4226            # Wetted area of the wing [m^2]
         self.T0 = 288.15                    # Sea level temperature [K]
-        self.TOP_req = 250                  # v
+        self.TOP_req = 250 
         self.V_A = 47.9382                  # [m/s]
         self.V_B = 45.0                     # [m/s]
         self.V_D = 90.7328                  # [m/s]
