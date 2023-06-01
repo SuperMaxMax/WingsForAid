@@ -79,13 +79,14 @@ iw(airfoil)
 
 def plot_lift_distr():
     segments = 10
+    segments = 10
     N = segments - 1
     S = 25 #aircraft.Sw
-    AR = 2*np.pi
-    Lambda = 1
+    AR = 8
+    Lambda = 0.6
     alpha_twist = -1 * np.pi / 180
     i_w = 2 * np.pi / 180 #iw(airfoil)[0]
-    a_2d = 2*np.pi       #iw(airfoil)[1]
+    a_2d = 6.3      #iw(airfoil)[1]
     alpha_0 = -1.5 *  np.pi / 180 #iw(airfoil)[2]
     b = (AR * S)**0.5
     MAC = S/b                               #Change to iteration between Croot and MAC
@@ -121,7 +122,8 @@ def plot_lift_distr():
     #C_L_wing = 
 
     plt.plot(y_s, CL1, marker = "s")
-    plt.grid()
+    plt.grid(, marker = "s")
+    plt.plot()
     plt.xlabel('semi span [m]')
     plt.ylabel('C_L')
     plt.show()
