@@ -27,7 +27,8 @@ def fuselage_shape(a, b, n, m, n_points):
     coordinates = np.vstack((x,y))
     return coordinates
 
-def geometry_determination(obj, plot=False):
+def geometry_determination(obj, plot=False, high_WS = False):
+    print("check")
     # create empty array for capturing design points from W/P - W/S diagrams
     design_points = np.empty(0)
     for i in range(len(obj.CL_max_clean)):                  
@@ -99,8 +100,14 @@ def geometry_determination(obj, plot=False):
         WP_values = np.array([WP_TO[0][index], WP_Climb[0][index], WP_cruise[0][index]])
         WP_designpoint = np.min(WP_values)
         design_point = (WS_designpoint, WP_designpoint)
+        print(f"Normal design point: W/S = {design_point[0]} | W/P = {design_point[1]}")
         design_points = np.append(design_points, design_point)
-
+        # high_design_point 
+        dx_climbcruise = np.abs(WP_Climb[1]-WP_cruise[1])
+        dy_climbcruise = np.abs(WP_Climb[0]-WP_cruise[0])
+        diffs_climbcruise = dx_climbcruise + dy_climbcruise
+        design_point_high = (WP_Climb[1][np.argmin(diffs_climbcruise)], WP_Climb[0][np.argmin(diffs_climbcruise)])
+        print(f"High design point: W/S = {design_point_high[0]} | W/P = {design_point_high[1]}")
         # plotting
         if plot:
             lab = "Take-off, CL TO = " + str(np.round(CL_TO, decimals=2))
@@ -117,6 +124,8 @@ def geometry_determination(obj, plot=False):
             plt.plot(WP_Climb[1], WP_Climb[0], label="Climb requirement")
             if design_point is not None:
                 plt.plot(design_point[0], design_point[1], 'ro', label='Design Point')
+                plt.plot(design_point_high[0], design_point_high[1], 'ro', label='High Design Point')
+                plt.plot(788.51, 0.148859, 'ro', label='High Design Point')
     
     if plot:
         plt.xlabel("W/S [N/m^2]")
@@ -173,9 +182,11 @@ def geometry_determination(obj, plot=False):
     Weight_TO = obj.W_TO*obj.g0                                 # find the take off weight in newtons
     WS_values = design_points[0:12:2]                           # take the S/W values
     WP_values = design_points[1:13:2]                           # take the P/W values
-    obj.WS    = WS_values[0]                                    # it does [0] to prevent warnings -> if running multiple CLs, it will take the first one !!!
-    obj.WP    = WP_values[0]                                    # it does [0] to prevent warnings -> if running multiple Cls, it will take the first one !!!
-    
+    obj.WS    = 788.51   #WS_values[0]                                    # it does [0] to prevent warnings -> if running multiple CLs, it will take the first one !!!
+    obj.WP    = 0.148859 #WP_values[0]                                    # it does [0] to prevent warnings -> if running multiple Cls, it will take the first one !!!
+    if high_WS:
+        obj.WS = 788.51
+        obj.WP = 0.148859
     # find surface area
     obj.Sw = Weight_TO/WS_values
     
@@ -265,3 +276,5 @@ def geometry_determination(obj, plot=False):
         obj.CD0  *= obj.Drag_increase                                                                         #kg, estimate using length and density of AL2024 t3
     else:
         obj.Drag_increase = 1
+    return
+
