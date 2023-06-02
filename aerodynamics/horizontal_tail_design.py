@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import csv
 import matplotlib.pyplot as plt
-from scipy import integrate
+from scipy import integrate, optimize
 
 from parameters import UAV
 aircraft = UAV('aircraft')
@@ -25,7 +25,6 @@ def required_lift():
     S = aircraft.Sw
     h0 = aircraft.MAC_ac
     MAC = aircraft.MAC_length
-    x_LEMAC = aircraft.X_LEMAC
     xcg_fwrd = aircraft.X_cg_fwd
     xcg_aft = aircraft.X_cg_aft
 
@@ -64,7 +63,7 @@ def required_lift():
     
     return C_L_h
 
-def airfoil_select(C_L_h):
+def airfoil_select(C_L_h, change):
     #airfoil data
     #NACA0006, 0009, 0012
     #data from https://digital.library.unt.edu/ark:/67531/metadc65459/m2/1/high_res_d/19930090937.pdf except alpha stall
@@ -80,62 +79,74 @@ def airfoil_select(C_L_h):
     dataframe = {'C_l_0': list_Cl0, "Cdmin": list_Cd_min, "Cm0": list_Cm_0, "alpha_0": list_alpha_0, "alpha_s": list_alpha_s, "C_l_max": list_Cl_max, "C_l_alpha": list_Cl_alpha, "t/c": list_tc}
     df = pd.DataFrame(data=dataframe, index=["0006", "0009", "0012"]) #NACA
 
+    airfoils = ["0006", "0009", "0012"] #NACA
+
     if abs(C_L_h) < 0.1:
-        airfoil = "0006" #NACA
+        if change == 0 or change == -1:
+            airfoil = airfoils[0]
+        elif change == 1:
+            airfoil = airfoils[0+change]
     elif abs(C_L_h) < 0.2:
-        airfoil = "0009" #NACA
+        airfoil = airfoils[1+change]
     else:
         if abs(C_L_h) > 0.5:
             print("Required lift coefficient of horizontal too high something must be changed in the design to limit it. Currently C_L_h = ", C_L_h)
         else:
-            airfoil = "0012" #NACA
+            airfoil = airfoils[2+change]
     
     return df.loc[[airfoil]]
-print(airfoil_select(required_lift()))
+#print(airfoil_select(required_lift()))
 
 
-def plot_lift_distr(object):
-    variable = "AR"      #Lambda, AR or Twist
+def plot_lift_distr(i_w):
+    variable = "Lambda"      #Lambda, AR or Twist
     plot_mode = "Normalize"         #"Normalized" for normalized plots
     if variable == "Lambda":    
-        variable_list2 = [0.4, 0.6, 0.8, 1]
+        variable_list2 = [0.6]
     elif variable == "AR":  
-        variable_list2 = [4,4.5,5,5.5,6]
+        variable_list2 = [5.1666666]
     elif variable == "Twist":
         variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
-
+    
+    airfoildata_temp = airfoil_select(required_lift(), 0)
+    a_stall = airfoildata_temp['alpha_s'].tolist()[0] * np.pi /180
+    
     for parameter in variable_list2:
-        airfoildata = airfoil_select(required_lift())
+        if abs(i_w/a_stall) > 0.1333: #2degree out of 15 is 0.13333
+            change = 1
+        elif abs(i_w/a_stall) < 0.06666: #1degree out of 15 is 0.06666
+            change = -1
+        else: 
+            change = 0
         
-        segments = 10
+        airfoildata = airfoil_select(required_lift(), change)
+
+        segments = 100
         N = segments - 1
-        S = object.Sw * object.CS_Sh_S  #tail.S
+        S = aircraft.Sw * aircraft.CS_Sh_S  #tail.S
         if variable == "AR":
             AR = parameter
         else:
-            AR = 7.75
+            AR = 5.1666666
         if variable == "Lambda":
             Lambda = parameter
         else:
-            Lambda = 0.4
+            Lambda = 0.6
         if variable == "Twist":
             alpha_twist = parameter
         else:
             alpha_twist = 0 * np.pi / 180
-
-        C_L_h = required_lift()
         
-        a_2d = airfoildata['C_l_alpha']      #AIRFOIL PARAMETER
-        i_w = C_L_h / a_2d                   #AIRFOIL PARAMETER
-        alpha_0 = airfoildata['alpha_0']     #AIRFOIL PARAMETER
+        C_L_h = required_lift()
+        i_w = i_w[0]
+        a_2d = airfoildata['C_l_alpha'].tolist()[0]         #AIRFOIL PARAMETER                                  
+        alpha_0 = airfoildata['alpha_0'].tolist()[0]        #AIRFOIL PARAMETER
+        
         b = (AR * S)**0.5
-
         Croot = 2/(1+Lambda) * S/b
-        MAC = Croot * 2 / 3 * ((1 + Lambda + Lambda**2)/(1+Lambda))                             #Change to iteration between Croot and MAC
-      #  MAC = S / b
-      #  Croot =  (1.5*(1+Lambda)*MAC)/(1+Lambda+Lambda**2)
-        print(MAC)
-        theta = np.linspace(np.pi/(2*N), np.pi/2, N, endpoint = True) #Change to get gooed amount of sections
+        MAC = Croot * 2 / 3 * ((1 + Lambda + Lambda**2)/(1+Lambda))
+
+        theta = np.linspace(np.pi/(2*N), np.pi/2, N, endpoint = True) 
         alpha = np.linspace(i_w+alpha_twist, i_w, N, endpoint = False)
         z = (b/2) * np.cos(theta)
         c = Croot * (1 - (1-Lambda) * np.cos(theta))
@@ -143,17 +154,11 @@ def plot_lift_distr(object):
 
         #solve Ansin(ntheta)
         LHS = mu * (alpha - alpha_0)
-
         RHS = np.zeros((N,N))
         for i in range(N):
             for j in range(N):
                 RHS[i,j] = np.sin((2*j + 1) * theta[i]) * (1 + (mu[i] * (2 * j + 1)) / np.sin(theta[i]))
-
-        #print(LHS)
-        #print(RHS/mu)
         A = np.linalg.solve(RHS, LHS)
-        #print(A)
-
         sum = np.zeros(N)
         for i in range(N):
             for j in range(N):
@@ -163,7 +168,6 @@ def plot_lift_distr(object):
         CL = 4 * b * sum / c
         CL1 = np.insert(CL, 0, 0)
         y_s = np.insert(z, 0, b / 2)
-
         if plot_mode == "Normalized":
             CL1 = CL1/max(CL1)
             y_s = y_s / (b/2)
@@ -174,50 +178,48 @@ def plot_lift_distr(object):
 
         ##Wing Lift Coefficient
         C_L_wing = np.pi * AR * A[0]
-        V_c = aircraft.V_cruise
-        rho_c = aircraft.rho_cruise
-        W_TO = aircraft.W_TO * 9.80665
-        C_L_req = 2*W_TO/(rho_c * (V_c**2) * S)
         
-
         ##Wing INDUCED DRAG
         cdi_sum = 0
         for i in range(len(A)):
             cdi_sum += (i+1) * A[i]**2
-
         CD_induced = np.pi * AR *  cdi_sum #(Wing) 
 
         #Span efficiency factor
         delta = 0
         for i in range(1,len(A)):
             delta += (i+1) * (A[i] / A[0])**2
-        
         span_eff = 1 / (1 + delta)
-        print('=====================================================================')
-        print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
-        print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_req, "CD_i = ", CD_induced)
-        #print(C_L_wing**2 / (AR* np.pi * CD_induced))
 
-        #print("CL_wing", C_L_wing)
-        #print("CL required for cruis", C_L_req)
-        #print("CDi_wing", CD_induced)
-
+        #print('=====================================================================')
+        #print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
+        #print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
+        print(i_w*180/np.pi, C_L_wing - C_L_h, airfoildata.index.tolist())
 
     #Find integral current distribution
     area_lift_dist = -integrate.simps(CL1, y_s)
-    
 
     #Elliptical lift distribution
     y = np.linspace(0, b/2, 50, endpoint = True)
     #Cli_elliptical = (b/2) * np.sqrt(1-(((np.pi * b * y)/(8 * area_lift_dist))**2))
     Cli_elliptical = (8*area_lift_dist)/(np.pi*b) * np.sqrt(1-(2*y/b)**2)
- #   plt.plot(y, Cli_elliptical, label = "Elliptical")
+    #plt.plot(y, Cli_elliptical, label = "Elliptical")
 
     #General plot
     plt.grid()
     plt.xlabel('semi span [m]')
     plt.ylabel('C_L')
     plt.legend()
-    plt.show()
+    #plt.show()
     
- plot_lift_distr(aircraft)
+    
+    return abs(C_L_wing - C_L_h)
+    
+#plot_lift_distr()
+
+airfoildata = airfoil_select(required_lift(), 0)
+C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
+initial_guess = 1000 #required_lift()/C_l_alpha
+
+i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x'][0]
+print(i_w_optimal)
