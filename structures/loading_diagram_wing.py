@@ -12,19 +12,18 @@ from scipy.optimize import minimize
 from math import tan, atan, cos
 from material_dictionary import material, material_df, rank_material
 
-def plot_diagrams(Ay, Az, By, Bz, load_case):
+def plot_diagrams(Ay, Az, By, Bz, load_case, normal, shear, moment, torque):
     # Make diagram
     fig = plt.figure(constrained_layout=True)
-    gs = fig.add_gridspec(3, 2)
+    gs = fig.add_gridspec(4, 2)
     f_ax1 = fig.add_subplot(gs[:, 0])
-    y = np.linspace(0, ac.b/2, 1000)
 
     # Plot forces
-    f_ax1.plot(y, [-spanwise_wing_weight(y)]*1000, label='Wing weight')
-    f_ax1.plot(y, -spanwise_flap_weight(), label='Flap weight')
-    f_ax1.plot(y, -spanwise_aileron_weight(), label='Aileron weight')
-    f_ax1.plot(y, [-spanwise_fuel_weight(y)*abs(load_case-1)]*1000, label='Fuel weight')
-    f_ax1.plot(y, spanwise_wing_loading(y)*load_case, label='Wing loading')
+    f_ax1.plot(y_span, -spanwise_wing_weight(y_span), label='Wing weight')
+    f_ax1.plot(y_span, -spanwise_flap_weight(), label='Flap weight')
+    f_ax1.plot(y_span, -spanwise_aileron_weight(), label='Aileron weight')
+    f_ax1.plot(y_span, -spanwise_fuel_weight(y_span)*abs(load_case-1), label='Fuel weight')
+    f_ax1.plot(y_span, spanwise_wing_loading(y_span)*load_case, label='Wing loading')
     # set axis limits such that all vector arrows are visible, vector are scaled based on axis limits
     if load_case == 1:
         f_ax1.set_title('Spanwise force diagram for full wing loading, no fuel')
@@ -70,41 +69,42 @@ def plot_diagrams(Ay, Az, By, Bz, load_case):
     f_ax1.legend()
     f_ax1.grid()
 
-    # Calculate normal, shear and bending moment
-    normal = []
-    shear = []
-    for j, i in enumerate(y_span):
-        normal.append(By*(1-np.heaviside(i-ac.wing_strut_location, 1)))
-        if load_case == 1:
-            shear.append(quad(spanwise_func_1, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.wing_strut_location, 1)) - ac.W_wl*ac.g0) # + smth for reaction force? # CHECK SIGNS
-        else:
-            shear.append(quad(spanwise_func_2, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.wing_strut_location, 1)) - ac.W_wl*ac.g0) # + smth for reaction force? # CHECK SIGNS
-    # get the bending moment by integrating the shear along the length
-    moment = cumulative_trapezoid(shear, y_span, initial=0)
-
-    # Plot normal, shear and bending moment
+    # Plot normal, shear, bending moment and torque
     f_ax2 = fig.add_subplot(gs[0, 1])
     f_ax2.plot(y_span, normal, 'g')
+    f_ax2.fill_between(y_span, normal, 0, color='g', alpha=0.2, hatch='//')
     f_ax2.set_ylabel('Normal force [N]')
     f_ax2.grid()
     
     f_ax3 = fig.add_subplot(gs[1, 1])
     f_ax3.plot(y_span, shear, 'b')
+    f_ax3.fill_between(y_span, shear, 0, color='b', alpha=0.2, hatch='//')
     f_ax3.set_ylabel('Shear force [N]')
     f_ax3.grid()
 
     f_ax4 = fig.add_subplot(gs[2, 1])
     f_ax4.plot(y_span, moment, 'r')
-    f_ax4.set_xlabel('Spanwise location [m]')
+    f_ax4.fill_between(y_span, moment, 0, color='r', alpha=0.2, hatch='//')
     f_ax4.set_ylabel('Bending moment [Nm]')
+    f_ax4.grid()
+
+    f_ax4 = fig.add_subplot(gs[3, 1])
+    f_ax4.plot(y_span, torque, color='purple')
+    f_ax4.fill_between(y_span, torque, 0, color='purple', alpha=0.2, hatch='//')
+    f_ax4.set_xlabel('Spanwise location [m]')
+    f_ax4.set_ylabel('Torque [Nm]')
     f_ax4.grid()
 
     # Show
     plt.show()
 
+def chord(y):
+    return ac.rootchord-((ac.rootchord-ac.tipchord)/(ac.b/2))*y
+
 def spanwise_wing_weight(y):
     # N/m
-    return (ac.W_w/ac.b)*ac.g0
+    avg_chord = ac.tipchord+(ac.rootchord-ac.tipchord)/2
+    return ((ac.W_w/ac.b)*ac.g0)*(chord(y)/avg_chord)
 
 def spanwise_wing_weight_ty(y):
     # N/m
@@ -113,7 +113,7 @@ def spanwise_wing_weight_ty(y):
 def spanwise_wing_loading(y):
     # put if for worst case scenarios
     gamma_0 = (ac.W_TO-ac.W_F)*ac.g0*(4/np.pi)*(1/ac.rho_cruise)*(1/ac.V_cruise)*(1/ac.b)
-    return ac.rho_cruise*ac.V_cruise*gamma_0*np.sqrt(1-(2*y/ac.b)**2)
+    return ac.rho_cruise*ac.V_cruise*gamma_0*np.sqrt(1-(2*y/ac.b)**2) # when inputting XFLR -> check for matching coordinate systems
 
 def spanwise_wing_loading_ty(y):
     # put if for worst case scenarios
@@ -139,7 +139,8 @@ def spanwise_aileron_weight_ty():
 
 def spanwise_fuel_weight(y):
     # N/m
-    return ac.W_F/ac.b*ac.g0
+    avg_chord = ac.tipchord+(ac.rootchord-ac.tipchord)/2
+    return (ac.W_F/ac.b*ac.g0)*(chord(y)/avg_chord)
 
 def spanwise_fuel_weight_ty(y):
     # N/m
@@ -180,15 +181,45 @@ for i in range(2):
     else:
         load_case = 0
 
-    # Calculate reaction forces # CHECK SIGNS
+    # Calculate reaction forces # important -> signs of the forces are with z is positive upwards and y is positive in spanwise direction (this is different from global coordinate system)
     Bz = -1/ac.wing_strut_location*(quad(spanwise_wing_loading_ty, 0, ac.b/2)[0]*load_case-trapezoid(spanwise_flap_weight_ty(), y_span)-trapezoid(spanwise_aileron_weight_ty(), y_span)-quad(spanwise_fuel_weight_ty, 0, ac.b/2)[0]*abs(load_case-1)-quad(spanwise_wing_weight_ty, 0 , ac.b/2)[0]-ac.W_wl*ac.g0*ac.b/2)
     Az = -(Bz+quad(spanwise_wing_loading, 0, ac.b/2)[0]*load_case - trapezoid(spanwise_flap_weight(), y_span) - trapezoid(spanwise_aileron_weight(), y_span) - quad(spanwise_fuel_weight, 0, ac.b/2)[0]*abs(load_case-1) - quad(spanwise_wing_weight, 0 ,ac.b/2)[0] - ac.W_wl*ac.g0)
     By = Bz/tan(ac.strut_angle)
     Ay = -By
 
+    # Calculate normal, shear, moment and torque
+    normal = []
+    shear = []
+    torque = []
+    
+    # flexural axis assumption
+    flex_ax = 0.25+0.45*(0.75-0.25) # chord from leading edge
+
+    # define moment arms
+    cop = 0.25                      # chord from leading edge
+    ma_wing_loading = (flex_ax-cop)*chord(y_span) # moment arm wing loading
+    torque_wing_loading = ma_wing_loading*spanwise_wing_loading(y_span) # torque wing loading
+    pos_flap = 0.75+0.45*(1-0.75)
+    ma_flap = (flex_ax-pos_flap)*chord(y_span)
+    torque_flap = ma_flap*-spanwise_flap_weight()
+    pos_ail = 0.75+0.45*(1-0.75)
+    ma_ail = (flex_ax-pos_ail)*chord(y_span)
+    torque_ail = ma_ail*-spanwise_aileron_weight()
+
+    for j, i in enumerate(y_span):
+        normal.append(By*(1-np.heaviside(i-ac.wing_strut_location, 1)))
+        if load_case == 1:
+            shear.append(-(quad(spanwise_func_1, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.wing_strut_location, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
+            torque.append(trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
+        else:
+            shear.append(-(quad(spanwise_func_2, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.wing_strut_location, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
+            torque.append(trapezoid(torque_flap[j:]+torque_ail[j:], y_span[j:]))
+    # get the bending moment by integrating the shear along the length
+    moment = cumulative_trapezoid(shear, y_span, initial=0)
+
     # Plot diagrams
     if plot:
-        plot_diagrams(Ay, Az, By, Bz, load_case)
+        plot_diagrams(Ay, Az, By, Bz, load_case, normal, shear, moment, torque)
 
     # Calculate truss weight
     P_truss = np.sqrt(By**2+Bz**2)
@@ -215,7 +246,3 @@ for i in range(2):
             ms.loc[mat, 'Case 2'] = m
 
 print(ms)
-
-
-
-
