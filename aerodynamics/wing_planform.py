@@ -200,8 +200,10 @@ def plot_lift_distr(object):
     plt.ylabel('C_L')
     plt.legend()
     plt.show()
+
+    return AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, i_w #DONT CHANGE ORDER OR DO IT IN MAIN AS WELL
     
-plot_lift_distr(aircraft)
+#plot_lift_distr(aircraft)
     
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
@@ -227,4 +229,4 @@ def fuel_volume(airfoil, Croot, Lambda, b):
     V = V * 1000 #in liters
     return V 
 
-print(fuel_volume(airfoil, aircraft.rootchord, 0.4, aircraft.b))
+#print(fuel_volume(airfoil, aircraft.rootchord, 0.4, aircraft.b))
