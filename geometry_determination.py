@@ -158,7 +158,6 @@ def geometry_determination(obj, plot=False):
     
     # find surface area
     obj.Sw = Weight_TO/WS_values
-    print(obj.Sw)
     
     
     # find power value                 
