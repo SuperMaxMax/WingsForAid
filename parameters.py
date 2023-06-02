@@ -189,7 +189,7 @@ class UAV:
         self.CS_mu1 = 0.24
         self.CS_mu2 = 0.78
         self.CS_mu3 = 0.525
-        self.CS_x_ac_w = 0.3              # location of wing ac, divided by MAC [-] - SEAD L7, S34   
+        self.CS_x_ac_w = 0.24              # location of wing ac, divided by MAC [-] - SEAD L7, S34   
         self.CS_Cm_0_airfoil = -0.083       # TODO: Update value - Moment coefficient of airfoil [-]
         self.CS_n_blades = 3                   # [-] number of propeller blades NOTE: Depends on chosen propeller
         self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
