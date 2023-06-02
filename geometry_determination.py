@@ -190,49 +190,47 @@ def geometry_determination(obj, plot=False, high_WS = False):
     obj.rootchord = (2*obj.Sw)/((1+obj.taper)*obj.b)
     obj.tipchord = obj.taper*obj.rootchord
 
-    for i in range(len(obj.Sw)):
-        # define important points on the wing planform (corners, quarther and half chord points)
-        points = np.array([[0, obj.rootchord[i]/4, obj.tipchord[i]/4, 0, -obj.tipchord[i]/4, -3*obj.tipchord[i]/4, -3*obj.rootchord[i]/4, -obj.rootchord[i]/4],
-                           [0, 0, obj.b[i]/2, obj.b[i]/2, obj.b[i]/2, obj.b[i]/2, 0, 0]])
-        LE = create_line(points[0][1], points[1][1], points[0][2], points[1][2], 1000)      # leading edge
-        ct = create_line(points[0][2], points[1][2], points[0][4], points[1][4], 1000)      # tip chord
-        TE = create_line(points[0][4], points[1][4], points[0][6], points[1][6], 1000)      # trailing edge
-        cr = create_line(points[0][6], points[1][6], points[0][1], points[1][1], 1000)      # root chord
-        qc = create_line(points[0][0], points[1][0], points[0][3], points[1][3], 1000)      # quarter chord line
-        hc = create_line(points[0][-1], points[1][-1], points[0][4], points[1][4], 1000)    # half chord line
-        
-        # points used to create MAC
-        point_tip = (points[0][2]+obj.rootchord[i], points[1][2])
-        point_root= (points[0][6]-obj.tipchord[i], points[1][6])
-        constr_line = create_line(point_root[0], point_root[1], point_tip[0], point_tip[1], 1000)
-        mask = np.abs(constr_line - hc)
-        mask = mask[0] + mask[1]
-        min = np.min(mask)
-        index = np.where(mask == min)
-        obj.y_mac = hc[1][index][0]
-        tolerance = 0.01
-        obj.x_lemac = LE[0][np.where(np.abs(LE[1]-obj.y_mac)<=tolerance)][0]
-        x_temac = TE[0][np.where(np.abs(TE[1]-obj.y_mac)<=tolerance)][0]
-        MAC = np.array([np.linspace(x_temac, obj.x_lemac, 1000), np.full(1000, obj.y_mac)])
-        obj.MAC_length = obj.x_lemac-x_temac
-        
-        # half chord sweep angle
-        tan_lambda_co2 = (points[0][-1]-points[0][4])/(points[1][4]-points[1][-1])
-        obj.lambda_co2 = np.arctan(tan_lambda_co2)
+    points = np.array([[0, obj.rootchord/4, obj.tipchord/4, 0, -obj.tipchord/4, -3*obj.tipchord/4, -3*obj.rootchord/4, -obj.rootchord/4],
+                        [0, 0, obj.b/2, obj.b/2, obj.b/2, obj.b/2, 0, 0]])
+    LE = create_line(points[0][1], points[1][1], points[0][2], points[1][2], 1000)      # leading edge
+    ct = create_line(points[0][2], points[1][2], points[0][4], points[1][4], 1000)      # tip chord
+    TE = create_line(points[0][4], points[1][4], points[0][6], points[1][6], 1000)      # trailing edge
+    cr = create_line(points[0][6], points[1][6], points[0][1], points[1][1], 1000)      # root chord
+    qc = create_line(points[0][0], points[1][0], points[0][3], points[1][3], 1000)      # quarter chord line
+    hc = create_line(points[0][-1], points[1][-1], points[0][4], points[1][4], 1000)    # half chord line
+    
+    # points used to create MAC
+    point_tip = (points[0][2]+obj.rootchord[i], points[1][2])
+    point_root= (points[0][6]-obj.tipchord[i], points[1][6])
+    constr_line = create_line(point_root[0], point_root[1], point_tip[0], point_tip[1], 1000)
+    mask = np.abs(constr_line - hc)
+    mask = mask[0] + mask[1]
+    min = np.min(mask)
+    index = np.where(mask == min)
+    obj.y_mac = hc[1][index][0]
+    tolerance = 0.01
+    obj.x_lemac = LE[0][np.where(np.abs(LE[1]-obj.y_mac)<=tolerance)][0]
+    x_temac = TE[0][np.where(np.abs(TE[1]-obj.y_mac)<=tolerance)][0]
+    MAC = np.array([np.linspace(x_temac, obj.x_lemac, 1000), np.full(1000, obj.y_mac)])
+    obj.MAC_length = obj.x_lemac-x_temac
+    
+    # half chord sweep angle
+    tan_lambda_co2 = (points[0][-1]-points[0][4])/(points[1][4]-points[1][-1])
+    obj.lambda_co2 = np.arctan(tan_lambda_co2)
 
-        # plot the wings
-        if plot:
-            plt.plot(LE[0], LE[1], color='black')
-            plt.plot(ct[0], ct[1], color='black')
-            plt.plot(TE[0], TE[1], color='black')
-            plt.plot(cr[0], cr[1], color='black')
-            plt.plot(qc[0], qc[1], color='black')
-            plt.plot(hc[0], hc[1], color='black')
-            # plt.plot(constr_line[0], constr_line[1], color='red')
-            plt.plot(MAC[0], MAC[1], color='black')
-            plt.gca().set_aspect('equal', adjustable = 'box')
-            plt.xlabel("y [m]")
-            plt.show()
+    # plot the wings
+    if plot:
+        plt.plot(LE[0], LE[1], color='black')
+        plt.plot(ct[0], ct[1], color='black')
+        plt.plot(TE[0], TE[1], color='black')
+        plt.plot(cr[0], cr[1], color='black')
+        plt.plot(qc[0], qc[1], color='black')
+        plt.plot(hc[0], hc[1], color='black')
+        # plt.plot(constr_line[0], constr_line[1], color='red')
+        plt.plot(MAC[0], MAC[1], color='black')
+        plt.gca().set_aspect('equal', adjustable = 'box')
+        plt.xlabel("y [m]")
+        plt.show()
         
             
     obj.t_c = np.full(np.shape(obj.Sw), 0.12)                                    # thickness over chord. 0.18 ADSEE 1, Lecture 6, Slide 22; no supercritical airfoils considered
