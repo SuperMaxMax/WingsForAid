@@ -22,12 +22,11 @@ for concept in [DET_CON_2_braced]:
     n = 1
     it = True
     W_TO_c2_old = 750
+    
 
     while it:
-        print(f"W_TO_c2_old at beginning of iteration {W_TO_c2_old}")
         # class 1
-        c1.run(concept, 3, 12, 250, 50)
-        print(f"W_TO_c2_old after class 1 {W_TO_c2_old}")
+        c1.run(concept, 3, 12, 250)
         print(f"After c1:{concept.W_TO}")
         # geometry determination
         geo.geometry_determination(concept)
@@ -50,6 +49,7 @@ for concept in [DET_CON_2_braced]:
         else:
             n += 1
             W_TO_c2_old = W_TO_c2
+        
         
         
         # print(f"W_TO_c2_old after full iteration {W_TO_c2_old}")
