@@ -174,7 +174,7 @@ def geometry_determination(obj, plot=False, high_WS = False):
     obj.P_values = Weight_TO/WP_values*0.00134102209            #convert to horsepower
     
     # wingspan
-    obj.b = np.sqrt(obj.A*obj.Sw)
+    obj.b = np.sqrt(obj.A*obj.Sw)[0]
     print(obj.b)
     
 
@@ -188,8 +188,8 @@ def geometry_determination(obj, plot=False, high_WS = False):
     obj.taper = 0.2*(2-obj.lambda_co4)
     
     # root and tipchord
-    obj.rootchord = (2*obj.Sw)/((1+obj.taper)*obj.b)
-    obj.tipchord = obj.taper*obj.rootchord
+    obj.rootchord = (2*obj.Sw)/((1+obj.taper)*obj.b)[0]
+    obj.tipchord = obj.taper*obj.rootchord[0]
     print(obj.rootchord, obj.tipchord)
 
     points = np.array([[0, obj.rootchord/4, obj.tipchord/4, 0, -obj.tipchord/4, -3*obj.tipchord/4, -3*obj.rootchord/4, -obj.rootchord/4],
