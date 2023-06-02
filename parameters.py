@@ -184,7 +184,7 @@ class Cessna_172:
         "-Mission characteristics"
         self.n_drops             = 0            # Number of drops [-]
         self.n_boxes             = 0            # Number of boxes [-]
-        self.R                   = 1185000      # Range [m]
+        self.R                   = 500000       # Range [m]
         self.M_res               = 0.07         # Fraction of remaining fuel at the end of flight/reserve fuel [-]
         self.h_cruise            = 10000*0.3048 # Cruise altitude [m] | NOTES: Conversion
         self.h_TO                = 0            # Take-off Height [m]
