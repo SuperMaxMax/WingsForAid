@@ -3,7 +3,7 @@ import sys
 import matplotlib.pyplot as plt
 from matplotlib import patheffects
 
-sys.path.append('..')
+sys.path.append('.')
 
 from parameters import UAV, atmosphere
 aircraft = UAV('aircraft')
@@ -60,7 +60,7 @@ def Aerodynamic_centre_determination(aircraft):
     aircraft.Mcruise            = Mach_calculation(atm, aircraft.V_cruise, aircraft.h_cruise)
     aircraft.Mmin               = Mach_calculation(atm, aircraft.V_s_min, aircraft.h_TO)
     
-    aircraft.CLa_h_cruise       = LiftRateCoefficient(aircraft, aircraft.Mcruise, aircraft.A_h, aircraft.lambda_co2_h)
+    aircraft.CLa_h_cruise       = LiftRateCoefficient(aircraft, aircraft.Mcruise, aircraft.CS_A_h, aircraft.CS_lambda_co2_h)
 
     aircraft.CLa_w_cruise       = LiftRateCoefficient(aircraft, aircraft.Mcruise, aircraft.A, aircraft.lambda_co2)
     aircraft.CLa_w_approach     = LiftRateCoefficient(aircraft, aircraft.Mmin, aircraft.A, aircraft.lambda_co2)
@@ -132,7 +132,7 @@ def controlability_curve(aircraft, xcgRange): #TODO: change constants here
 
     Cm_ac = Cm_ac_w + dCm_ac_f + dCm_ac_fus
 
-    ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.CS_l_h / aircraft.MAC_length) * aircraft.Vh_V ** 2)
+    ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.CS_l_h / aircraft.MAC_length) * aircraft.CS_Vh_V ** 2)
     ControlSh_S = ControlFrac * (xcgRange + Cm_ac / CL_Ah - aircraft.x_ac_approach)
 
     return ControlSh_S
@@ -142,7 +142,7 @@ def stability_curve(aircraft, xcgRange):
     
     # Making stability line
 
-    StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.dEpsilondA) * (aircraft.CS_l_h/aircraft.MAC_length) * aircraft.Vh_V ** 2)
+    StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.CS_dEpsilondA) * (aircraft.CS_l_h/aircraft.MAC_length) * aircraft.CS_Vh_V ** 2)
     StabilityMargin             = 0.05
     StabilitySh_S_margin        = StabilityFrac * xcgRange - StabilityFrac * (aircraft.x_ac_cruise - StabilityMargin)
     StabilitySh_S               = StabilityFrac * xcgRange - StabilityFrac * aircraft.x_ac_cruise

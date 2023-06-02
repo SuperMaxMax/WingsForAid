@@ -91,7 +91,7 @@ class UAV:
         self.l_n = 0.8651                   # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
-   # Calculate yourself:     self.lambda_co2 = -0.0428           # Half chord sweep angle [rad]
+        self.lambda_co2 = -0.0428           # Half chord sweep angle [rad]
         self.lambda_co4 = 0.0               # Quarter chord sweep angle [rad]
         self.lin_par1 = 0.5249              # [-]
         self.lin_par2 = 42.049              # [-]
