@@ -11,9 +11,11 @@ from parameters import UAV, atmosphere
 aircraft = UAV('aircraft')
 atm = atmosphere()
 
+# Position x_cg forward and backward. 
 aircraft.x_cg_position_aft = aircraft.X_LEMAC + aircraft.X_cg_aft * aircraft.MAC_length
 aircraft.x_cg_position_fwd = aircraft.X_LEMAC + aircraft.X_cg_fwd * aircraft.MAC_length
 
+# initial guess for position. Is needed to run, but does not influence result. 
 aircraft.position_landing_fwd = [2, 0]
 aircraft.position_landing_back = [4, 1]
 
@@ -60,12 +62,14 @@ def longitudinal_position_landing_gear(aircraft, x_point, ypoint):
     x_front_max = x_front_max_fwd
     x_front_min = x_front_min_aft
 
+    # Plot limit for the front undercarriage
     line_1 = ax.plot([x_front_max, x_front_max], [-0.5, 0.5], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
     line_2 = ax.plot([x_front_min, x_front_min], [-0.5, 0.5], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])[0]
     
     
 
 def lateral_position_landing_gear(aircraft):
+    "lateral limits on the aircraft"
     global Z_position_cg
     global line_3
     global line_4
@@ -78,6 +82,8 @@ def lateral_position_landing_gear(aircraft):
     if line_5 is not None:
         line_5[0].remove()
 
+    # Turnover angle limit of z-position of c.g.
+
     d = aircraft.position_landing_back[0] - aircraft.position_landing_fwd[0]
 
     angle_alpha = np.arctan(aircraft.position_landing_back[1] / d)
@@ -87,12 +93,14 @@ def lateral_position_landing_gear(aircraft):
     Z_position_cg = np.tan(angle_psi) * c
     parameter_text.set_text(f'Max Z_position_c.g.: {Z_position_cg:.2f} [m]')
 
-    # pitch angle limit
-    angle_theta_max = 15 * (np.pi/180)
+    
+    # Pitch Angle limit NOTE: 15 degrees can change for our aircraft. 
+
+    angle_theta_max = 15 * (np.pi/180) 
     x_cg_aft_limit = aircraft.x_cg_position_aft + Z_position_cg * np.tan(angle_theta_max)
     line_3 = ax.plot([x_cg_aft_limit, x_cg_aft_limit], [-0.5, 0.5], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
-    print(line_3)
-    # II - Limit for the main leg position for give N to attain stability against turnover
+
+    # II - Limit for the main leg position for give N to attain stability against turnover NOTE: right now z_cg is assumed to be 0.8*z_cg_max. This should be an arbitrary value. 
     d_wheel = 0.3
     n_y = 0.5
     k_sg = 1
@@ -122,15 +130,17 @@ def lateral_position_landing_gear(aircraft):
         y_1_range.append(y_1)
         y_2_range.append(y_2)
 
+    # plotting turn_over limit II in torenbeek. 
     line_4 = ax.plot(x_range, y_1_range, linewidth = '0.8', color='red', path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])
     line_5 = ax.plot(x_range, y_2_range, linewidth = '0.8', color='red', path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
-    # #ax.plot(x_range, y_2_range, linewidth='0.8', color= 'red')
+
     plt.draw()
 
 
 ##########################################################################################################
-"""Clicking of position of forward and backward undercarriage"""
+
 def on_click(event):
+    """Clicking of position of forward and backward undercarriage"""
     global left_click_point
     global right_click_point
 
@@ -146,9 +156,6 @@ def on_click(event):
             aircraft.position_landing_back = [event.xdata, event.ydata]
             longitudinal_position_landing_gear(aircraft, event.xdata, event.ydata)
             lateral_position_landing_gear(aircraft)
-            
-            # Call the lateral_position_landing_gear function to update Z_position_cg
-            
 
         elif event.button == 3:  # Right-click
             if right_click_point is None:
@@ -191,6 +198,8 @@ cid = fig.canvas.mpl_connect('key_press_event', on_key)
 # Set the plot limits
 x_cg_point = ax.scatter([aircraft.x_cg_position_aft], [0], color='black', label='2: c.g. aft')
 x_cg_point = ax.scatter([aircraft.x_cg_position_fwd], [0], color='black', label='1: c.g. fwd')
+
+# Plotting fuselage
 ax.plot([-2+aircraft.x_cg_position_fwd, 1.5+aircraft.x_cg_position_fwd], [aircraft.w_out/2, aircraft.w_out/2], color='0.25', linewidth=0.8)
 ax.plot([-2+aircraft.x_cg_position_fwd, 1.5+aircraft.x_cg_position_fwd], [-aircraft.w_out/2, -aircraft.w_out/2], color='0.25', linewidth=0.8)
 
@@ -203,14 +212,16 @@ ax.plot([-2+aircraft.x_cg_position_fwd, -2.4+aircraft.x_cg_position_fwd], [-airc
 ax.set_xlim(-0.3, aircraft.l_f-1)
 ax.set_ylim(-aircraft.b/2, aircraft.b/2+1)
 ax.axhline(0, color='blue', linestyle='dotted')
+# End plotting Fuselage
 
+# Plotting z-cg. max location in top right corner
 parameter_text = ax.text(0.95, 0.95, f'Max Z_position c.g.: {Z_position_cg:.2f} [m]',
                          transform=ax.transAxes, ha='right', va='top')
 
 plt.text(aircraft.x_cg_position_aft+0.03, 0.2, 2, fontsize=8, va='center')
 plt.text(aircraft.x_cg_position_fwd+0.03, 0.2, 1, fontsize=8, va='center')
 
-# Plot Wing Position
+# Plot Wing Position and planform
 spanwise_pos = (aircraft.MAC_length - aircraft.rootchord) / -((aircraft.rootchord-aircraft.tipchord)/(aircraft.b/2))
 ax.plot([aircraft.X_LEMAC, aircraft.X_LEMAC+aircraft.MAC_length], [spanwise_pos, spanwise_pos],linewidth=1, color='orange')
 ax.plot([aircraft.X_LEMAC - aircraft.x_lemac, aircraft.X_LEMAC - aircraft.x_lemac+aircraft.rootchord], [0, 0], linewidth=1, color='orange')
