@@ -123,6 +123,6 @@ def weight_empty(obj):
     else:
         obj.W_boom = 0
 
-    obj.W_TO = obj.W_OE + obj.W_F + obj.W_PL   
+       
     print("MTOW: ", obj.W_TO) 
 
