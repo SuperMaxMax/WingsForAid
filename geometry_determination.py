@@ -175,6 +175,7 @@ def geometry_determination(obj, plot=False, high_WS = False):
     
     # wingspan
     obj.b = np.sqrt(obj.A*obj.Sw)
+    print(obj.b)
     
 
     obj.MGC = obj.Sw/obj.b                                      # Mean geometric chord [m]
@@ -189,6 +190,7 @@ def geometry_determination(obj, plot=False, high_WS = False):
     # root and tipchord
     obj.rootchord = (2*obj.Sw)/((1+obj.taper)*obj.b)
     obj.tipchord = obj.taper*obj.rootchord
+    print(obj.rootchord, obj.tipchord)
 
     points = np.array([[0, obj.rootchord/4, obj.tipchord/4, 0, -obj.tipchord/4, -3*obj.tipchord/4, -3*obj.rootchord/4, -obj.rootchord/4],
                         [0, 0, obj.b/2, obj.b/2, obj.b/2, obj.b/2, 0, 0]])
