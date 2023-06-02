@@ -110,6 +110,7 @@ def plot_lift_distr(object):
         a_2d = object.AE_cl_alpha       #iw(airfoil)[1]
         alpha_0 = object.AE_alpha0 #iw(airfoil)[2]
         b = (AR * S)**0.5
+
         Croot = 2/(1+Lambda) * S/b
         MAC = Croot * 2 / 3 * ((1 + Lambda + Lambda**2)/(1+Lambda))                             #Change to iteration between Croot and MAC
       #  MAC = S / b
