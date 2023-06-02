@@ -60,12 +60,13 @@ for concept in [aircraft]:
 
     # --- plotting of concept
     print(f"{concept.name} done in {n} iterations \n")
+    geo.geometry_determination(concept, plot = True)
     # cg calculation
     plt.figure(1)
     plt.subplot(121)
     c2cg.cg_calc(concept)
 
-    geo.geometry_determination(concept, plot = True)
+    
 
     # V-n diagram
     # plt.subplot(122)

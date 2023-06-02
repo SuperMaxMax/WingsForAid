@@ -114,8 +114,8 @@ class UAV:
 
         "==== Miscellaneous ===="
         "MTOW vs OEW GA, "
-        self.lin_par1            = 0.5522       # [-]
-        self.lin_par2            = 39.162       # [-]
+        self.lin_par1            = 0.5249       # [-]
+        self.lin_par2            = 42.049       # [-]
 
 class Cessna_172:
     def __init__(self, engine_pos, braced_wing, boom):
