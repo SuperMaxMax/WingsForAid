@@ -35,7 +35,7 @@ for concept in [aircraft]:
         concept.W_F  = W_F
         
         # geometry determination
-        geo.geometry_determination(concept)
+        geo.geometry_determination(concept, high_WS=True)
         #concept.WS = 70.805
 
         # class 2
@@ -80,8 +80,8 @@ for concept in [aircraft]:
     values = [getattr(concept, member) for member in members]
 
     # remove brackets and round values
-    values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
-    values = [round(value, 4) if isinstance(value, float) else value for value in values]
+    # values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
+    # values = [round(value, 4) if isinstance(value, float) else value for value in values]
 
     # add to dataframe
     df[concept.name] = values
