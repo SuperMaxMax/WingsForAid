@@ -126,7 +126,7 @@ class UAV:
         self.w_in = 1.2                     # Inner fuselage width [m]
         self.w_out = 1.4                    # Outer fuselage width [m]
         self.x_lemac = 0.2871               # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
-        self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
+        self.xc_OEW_p = 0.2                # Center of gravity of OEW as a fraction of the MAC [-]
         self.y_mac = 2.04                 # Spanwise location of the MAC [m]
         self.i_w = 0.19 * np.pi / 180       # Incidence angle of wing wrt fuselage [rad]
         self.wing_twist = 0 *np.pi/180      #wing twist (difference root and chord) [rad]
@@ -200,7 +200,7 @@ class UAV:
         self.CS_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.CS_lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
         self.CS_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.CS_Sh_S = 0.40                    # [-] Ratio between horizontal tailplane surface area and surface area wing
+        self.CS_Sh_S = 0.30                    # [-] Ratio between horizontal tailplane surface area and surface area wing
 
         # Vertical tailplane
         self.CS_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity

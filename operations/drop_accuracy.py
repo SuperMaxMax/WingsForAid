@@ -211,7 +211,7 @@ def PlotTraj(states, title):
     plt.title("reference drop" + str(title))
     plt.show()
 
-def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score):
+def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score=0):
     points = Stats["bounds"][-1]
     cmap = plt.get_cmap('hot')
 
@@ -255,6 +255,43 @@ def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score):
 
 # INITIALISE
 
+def PlotBar(ManTPM, TPMw, ManCases, concase):
+
+    cases = []
+    for mancase in ManCases:
+        mancase_name = []
+        for val in mancase:
+            mancase_name.append(str(np.round(val,2)))
+        cases.append(str(mancase))
+
+    fig, ax = plt.subplots()
+    N = len(cases)
+    scores = np.zeros(N)
+    width = 0.5
+
+    w_counter = 0
+    for boolean, tpm in ManTPM.items():
+        tpm = np.array(tpm)
+        w = TPMw[w_counter]
+        bar = tpm * w
+        p = ax.bar(cases, bar, width, bottom=scores,
+                   label=str(boolean+"|"+str(np.round(w,2))))
+        scores += bar
+        w_counter += 1
+
+    ax.set_title("TPM per case for condition " + str(concase))
+    plt.legend(loc='lower center', ncol=3, bbox_to_anchor=(0.5, +1.5))
+    plt.subplots_adjust(left=0.1,
+                        bottom=0.6,
+                        right=0.95,
+                        top=0.7,
+                        wspace=0.3,
+                        hspace=0.4)
+    ax.tick_params(axis='x', labelrotation=-75)
+    plt.show()
+
+    return scores
+
 # get defaults design values
 AC = UAV('aircraft')
 print("AC default:", AC.__dict__)
@@ -287,13 +324,13 @@ AC_V_s = AC.V_s_min
 AC_nmax = 3
 
 # Selection criteria
+cat_w = [1, 0.2, 0.4, 0.4]
 TPM_weights = np.array([
-    1, # REQ
-    0.5*0.5, 0.5*0.5,  # REQ: Sfit, Pvi
-    0.2*0.2, 0.2*0.8, # OPS: Racc, amax
-    0.3*0.3, 0.3*0.4, 0.3*0.3 # AC: n,pitch,V
+    cat_w[0]*1, # REQ
+    cat_w[1]*0.5, cat_w[1]*0.5,  # REQ: Sfit, Pvi
+    cat_w[2]*0.2, cat_w[2]*0.8, # OPS: Racc, amax
+    cat_w[3]*0.3, cat_w[3]*0.4, cat_w[3]*0.3 # AC: n,pitch,V
 ])
-print(TPM_weights)
 
 # Drop Conditions
 # limits
@@ -363,14 +400,12 @@ print("total simulations:", len(M_COMB), len(C_COMB), len(U_COMB), "=", Ntot, "i
 time_start = time.time()
 
 # START TRYING COMBINATIONS
-print("\n================= ================= =================",
-      len(C_COMB), "Drop Conditions Combinations")
+print("\n================= ================= =================")
 ConResults = {
     "Maneuver": [], # parameters of chosen maneuver
-    "REQ": [], # pass?
     "Score": [] # weighted TPM sum
 }
-ManeuverTPM = []
+
 N_Con = 0
 for DropCon in C_COMB:
     print("\n================= =================")
@@ -387,6 +422,16 @@ for DropCon in C_COMB:
         "worst a_max": [],
         "Racc": [],
         "bounds": []
+    }
+    ManeuverTPM = {
+        "REQ passed": [],
+        "AC_na": [],
+        "AC_pa": [],
+        "AC_Va": [],
+        "OPS_R": [],
+        "OPS_am": [],
+        "REQ_S": [],
+        "REQ_Vi": [],
     }
 
     N_Man = 0
@@ -450,35 +495,30 @@ for DropCon in C_COMB:
             max(DropResults["impact velocity [m/s]"]))
 
         # normalize & prep TPM
-        ManeuverTPM.append([ 0, 0,0, 0,0, 0,0,0 ,0])
-
         if Sfit == 100 and Pvi >= 95:
-            ManeuverTPM[-1][0]=(100)
+            ManeuverTPM["REQ passed"].append(100)
         else:
-            ManeuverTPM[-1][0]=(0)
-        ManeuverTPM[-1][1]=(round(Sfit))
-        ManeuverTPM[-1][2]=(round(Pvi))
-        ManeuverTPM[-1][3]=(round(Dfit))
-        ManeuverTPM[-1][4]=(100*(1-(ManResults["worst a_max"][-1]/AC_nmax)))
-        ManeuverTPM[-1][5]=(100*(1 - (ManCase[1] / AC_nmax)))
-        ManeuverTPM[-1][6]=(100*(1 - (ManCase[2] / max(abs(M_pitch[0]), abs(M_pitch[1])))))
-        ManeuverTPM[-1][7]=(100*(ManCase[0]-AC_V_s)/AC_V_s)
+            ManeuverTPM["REQ passed"].append(0)
+        ManeuverTPM["REQ_S"].append(round(Sfit))
+        ManeuverTPM["REQ_Vi"].append(round(Pvi))
+        ManeuverTPM["OPS_R"].append(round(Dfit))
+        ManeuverTPM["OPS_am"].append(100*(1-(ManResults["worst a_max"][-1]/AC_nmax)))
+        ManeuverTPM["AC_na"].append(100*(1 - (ManCase[1] / AC_nmax)))
+        ManeuverTPM["AC_pa"].append(100*(1 - (abs(ManCase[2]) / max(abs(M_pitch[0]), abs(M_pitch[1])))))
+        ManeuverTPM["AC_Va"].append(100*max((ManCase[0]-AC_V_s)/AC_V_s,0))
 
-        # weighted criteria sum
-        Score = 0
-        for w, tpm in zip(TPM_weights, ManeuverTPM[-1]):
-            print(w,tpm)
-            Score += w*tpm
-        ManeuverTPM[-1][-1]=Score
-        PlotScatter(DropResults, ManResults, ManCase, DropCon, dropzone_poly, hull_poly, Score)
+        PlotScatter(DropResults, ManResults, ManCase, DropCon, dropzone_poly, hull_poly)
 
         N_Man += 1
 
-    # rank MANV
-    # choose best
-    # append to condition
-    # bar plot (manv)
+    # bar plot (manv) & weighted criteria sum
+    Scores = PlotBar(ManeuverTPM, TPM_weights, M_COMB, DropCon)
 
+    # rank & append best
+    index = [sorted(Scores).index(v) for v in Scores]
+    ConResults["Maneuver"].append(M_COMB[index[0]])
+    ConResults["Score"].append(Scores[index[0]])
+    print("Results from ",DropCon,"are:\n",ConResults)
     N_Con += 1
 
 # rank conditions
@@ -486,6 +526,8 @@ for DropCon in C_COMB:
 # Mparam = f(Case param)
 # CaseResults = f(Case param)
 
+# PROGRAM END
+print("\n================= ================= =================")
 time_end = time.time()
 print(Ntot, "simulations took:",
       (time_end-time_start), "=[s] or",

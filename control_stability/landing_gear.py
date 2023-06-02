@@ -2,9 +2,9 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 from matplotlib import patheffects
-import sympy as sp 
+# import sympy as sp 
 
-sys.path.append('.')
+sys.path.append('..')
 
 from parameters import UAV, atmosphere
 
@@ -183,6 +183,8 @@ def on_key(event):
 ##########################################################################################################
 """Plotting"""
 # Enable interactive mode
+
+
 plt.ion()
 
 # Create a figure and an axis
@@ -216,20 +218,20 @@ ax.axhline(0, color='blue', linestyle='dotted')
 
 # Plotting z-cg. max location in top right corner
 parameter_text = ax.text(0.95, 0.95, f'Max Z_position c.g.: {Z_position_cg:.2f} [m]',
-                         transform=ax.transAxes, ha='right', va='top')
+                        transform=ax.transAxes, ha='right', va='top')
 
 plt.text(aircraft.x_cg_position_aft+0.03, 0.2, 2, fontsize=8, va='center')
 plt.text(aircraft.x_cg_position_fwd+0.03, 0.2, 1, fontsize=8, va='center')
 
 # Plot Wing Position and planform
 spanwise_pos = (aircraft.MAC_length - aircraft.rootchord) / -((aircraft.rootchord-aircraft.tipchord)/(aircraft.b/2))
-ax.plot([aircraft.X_LEMAC, aircraft.X_LEMAC+aircraft.MAC_length], [spanwise_pos, spanwise_pos],linewidth=1, color='orange')
-ax.plot([aircraft.X_LEMAC - aircraft.x_lemac, aircraft.X_LEMAC - aircraft.x_lemac+aircraft.rootchord], [0, 0], linewidth=1, color='orange')
+ax.plot([aircraft.X_LEMAC, aircraft.X_LEMAC+aircraft.MAC_length], [spanwise_pos, spanwise_pos],color='0.25', linewidth=0.8)
+ax.plot([aircraft.X_LEMAC - aircraft.x_lemac, aircraft.X_LEMAC - aircraft.x_lemac+aircraft.rootchord], [0, 0], color='0.25', linewidth=0.8)
 
 x_root_quart = aircraft.X_LEMAC-aircraft.x_lemac + 1/4*aircraft.rootchord
-ax.plot([x_root_quart-1/4*aircraft.tipchord, x_root_quart+3/4*aircraft.tipchord], [aircraft.b/2, aircraft.b/2], linewidth=1, color='orange')
-ax.plot([aircraft.X_LEMAC-aircraft.x_lemac, x_root_quart-1/4*aircraft.tipchord], [0, aircraft.b/2], linewidth=1, color='orange')
-ax.plot([aircraft.X_LEMAC-aircraft.x_lemac+aircraft.rootchord, x_root_quart+3/4*aircraft.tipchord], [0, aircraft.b/2], linewidth=1, color='orange')
+ax.plot([x_root_quart-1/4*aircraft.tipchord, x_root_quart+3/4*aircraft.tipchord], [aircraft.b/2, aircraft.b/2], color='0.25', linewidth=0.8)
+ax.plot([aircraft.X_LEMAC-aircraft.x_lemac, x_root_quart-1/4*aircraft.tipchord], [0, aircraft.b/2], color='0.25', linewidth=0.8)
+ax.plot([aircraft.X_LEMAC-aircraft.x_lemac+aircraft.rootchord, x_root_quart+3/4*aircraft.tipchord], [0, aircraft.b/2], color='0.25', linewidth=0.8)
 
 plt.grid()
 plt.legend(loc="upper left")
