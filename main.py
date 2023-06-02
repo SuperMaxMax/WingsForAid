@@ -3,25 +3,12 @@ import Class_I_weight_estimation as c1
 import Class_II_weight_estimation as c2
 import Class_II_cg_estimation as c2cg
 import geometry_determination as geo
-import V_n_diagrams as Vn
+# import V_n_diagrams as Vn
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# DET_CON_1 = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
-# DET_CON_1_braced = UAV('DET_CON_1_braced', 'tractor', boom=False, braced_wing=True)
-# DET_CON_2 = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=False)
-# DET_CON_2_braced = UAV('DET_CON_2_braced', 'tractor', boom=True, braced_wing=True)
-# DET_CON_3 = UAV('DET_CON_3', 'pusher', boom=False, braced_wing=False)
-# DET_CON_3_braced = UAV('DET_CON_3_braced', 'pusher', boom=False, braced_wing=True)
-# DET_CON_4 = UAV('DET_CON_4', 'pusher', boom=True, braced_wing=False)
-# DET_CON_4_braced = UAV('DET_CON_4_braced', 'pusher', boom=True, braced_wing=True)
-# DET_CON_5 = UAV('DET_CON_5', 'fuselage', boom=False, braced_wing=False)
-# DET_CON_5_braced = UAV('DET_CON_5_braced', 'fuselage', boom=False, braced_wing=True)
-# DET_CON_6 = UAV('DET_CON_6', 'fuselage', boom=True, braced_wing=False)
-# DET_CON_6_braced = UAV('DET_CON_6_braced', 'fuselage', boom=True, braced_wing=True)
-
-Cessna = Cessna_172('tractor', braced_wing=True, boom=False)
+aircraft = UAV("droppy", 'tractor', braced_wing=True, boom=True)
 
 # start
 plot = False
@@ -30,7 +17,7 @@ remove_duplicates = False
 # create dataframe with members and values, to save all concepts in
 df = pd.DataFrame()
 
-for concept in [Cessna]:
+for concept in [aircraft]:
     # --- iteration
     n = 1
     it = True
@@ -72,10 +59,10 @@ for concept in [Cessna]:
     c2cg.cg_calc(concept)
 
     # V-n diagram
-    plt.subplot(122)
-    Vn.plot_all(concept)
-    if plot == True:
-        plt.show()
+    # plt.subplot(122)
+    # Vn.plot_all(concept)
+    # if plot == True:
+    #     plt.show()
     
     # --- saving
     # save all attributes of object to csv file
@@ -93,7 +80,7 @@ for concept in [Cessna]:
 df.index = members
 
 # export dataframe of current design to csv file
-df['Cessna 172'].to_csv('output.csv', sep=';')
+df['droppy'].to_csv('output.csv', sep=';')
 
 # remove row in dataframe if all values in that row are the same
 if remove_duplicates == True:

@@ -191,7 +191,7 @@ class Cessna_172:
         
         self.LDG_dist            = 420          # Landing distance [m]
 
-        self.n_ult               = 3.8 * 1.5    # Ultimate load factor [-]
+        self.n_ult               = 4.4 * 1.5    # Ultimate load factor [-]
 
         "-Speeds"
         self.V_s_min             = 50*(1.852/3.6)       # Dropping speed [m/s]
