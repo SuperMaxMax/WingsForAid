@@ -2,9 +2,9 @@ import numpy as np
 class UAV:
     def __init__(self, name):
         "=== Class I / Class II parameters ==="
-        self.A = 8                         # Aspect ratio [-]
+        self.A = 7.75                         # Aspect ratio [-]
         self.BHP_cruise = 76.3436
-        self.CD0 = 0.0273                   # Zero lift coefficient [-]
+        self.CD0 =  0.00595                    # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
         self.CL_TO = 1.2397                 # [-]
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
@@ -16,7 +16,7 @@ class UAV:
         self.LDG_dist = 750.0               # Landing distance [m]
         self.L_D = 14.1804                  # Lift to drag ratio [-]
         self.Lambda = -0.0065
-        self.MAC_length = 1.0161            # Mean aerodynamic chord [m]
+        self.MAC_length = 1.3045447021067196            # Mean aerodynamic chord [m]
         self.MGC = 1.0822                   # Mean geometric chord [m]
         self.M_res = 0.075 
         self.Mff = 0.9254                   # Fuel fraction [-]
@@ -61,7 +61,7 @@ class UAV:
         self.X_cg_full = 0.4115             # MTOW cg location CG/MAC [-]
         self.X_cg_fwd = 0.1704              # Forward cg location CG/MAC [-]
         self.X_cg_range = 0.363             # Range of cg location CG/MAC [-]
-        self.b = 10.8219                    # Wing span [m]
+        self.b = 9.526939435096667                    # Wing span [m]
         self.boom                = True     # Boom, true if boom tail is implemented
         self.bot_clearance = 0.1            # Bottom clearance [m]
         self.braced_wing         = True     # True if wing is braced
@@ -72,7 +72,7 @@ class UAV:
         self.cruise_frac = 0.8348           # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
         self.d_eff = 1.241                  # Effective diameter [m]
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
-        self.dihedral = 1
+        self.dihedral = 0
         self.e = 0.7                        # Oswald factor [-]
         self.engine_cg = 0.327              # Engine cg location [m]
         self.engine_fairing = 0.2           # Engine fairing length [m]
@@ -90,7 +90,7 @@ class UAV:
         self.l_n = 0.8651                   # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
-        self.lambda_co2 = -0.0428           # Half chord sweep angle [rad]
+   # Calculate yourself:     self.lambda_co2 = -0.0428           # Half chord sweep angle [rad]
         self.lambda_co4 = 0.0               # Quarter chord sweep angle [rad]
         self.lin_par1 = 0.5249              # [-]
         self.lin_par2 = 42.049              # [-]
@@ -110,7 +110,6 @@ class UAV:
         self.rho0 = 1.225                   # Air density at sea level [kg/m^3]
         self.rho_TO = 1.225                 # Take-off air density if airport is at sea level [kg/m^3]
         self.rho_cruise = 0.9046            # Cruise air density [kg/m^3]
-        self.rootchord = 1.546              # Root chord [m]
         self.s_tail = 2                     # Tail surface area [m]
         self.side_clearance = 0.2           # Side clearance [m], this is for both sides
         self.sigma_TO = 1.0
@@ -118,14 +117,17 @@ class UAV:
         self.structural_thickness = 0.2     # Structural thickness fuselage [m], this is for both sides
         self.t_c = 0.12                     # Thickness to chord ratio [-]
         self.taper = 0.4                    # Taper ratio [-]
-        self.tipchord = 0.6184              # Tip chord [m]
+        self.rootchord = 2/(1+self.taper) * self.Sw/self.b             # Root chord [m]
+
+        self.tipchord = self.rootchord*self.taper             # Tip chord [m]
         self.top_clearance = 0.2            # Top clearance [m]
         self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility    
         self.w_in = 1.2                     # Inner fuselage width [m]
         self.w_out = 1.4                    # Outer fuselage width [m]
         self.x_lemac = 0.2871               # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
-        self.y_mac = 2.3182                 # Spanwise location of the MAC [m]
+        self.y_mac = 2.04                 # Spanwise location of the MAC [m]
+        self.i_w = 0.19 * np.pi / 180       # Incidence angle of wing wrt fuselage [rad]
 
         "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
         self.something = 1 # add units
@@ -138,16 +140,17 @@ class UAV:
         self.airfoil = "4415"
 
         if self.airfoil == "4415":
-            self.AE_Cl0 = 0.457                   # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
-            self.AE_clcd_max = 163.5
-            self.AE_clcd32_max = 170.1
-            self.AE_clcd12_max = 165.7
-            self.AE_cl_max = 1.735
-            self.AE_alpha_s = 18.0 * np.pi / 180
-            self.AE_cd0 = 0.00595
-            self.AE_cl_alpha = 0.103 * 180 / np.pi # 1 / rad
-            self.AE_cm_alpha = 0.00748
-            self.AE_cm0 = -0.0941
+            self.AE_Cl0 = 0.457                                 # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
+            self.AE_clcd_max = 163.5                            # Maximum clcd
+            self.AE_clcd32_max = 170.1                          # Maximum clcd**(3/2)
+            self.AE_clcd12_max = 165.7                          # 
+            self.AE_cl_max = 1.735                              # Maximum cl_max
+            self.AE_alpha_s = 18.0 * np.pi / 180                # Stall angle of attack
+            self.AE_cd0 = 0.00595                               # Drag coefficient at zero lift
+            self.AE_cl_alpha = 0.103 * 180 / np.pi              # Lift curve slope [1 / rad]    
+            self.AE_cm_alpha = 0.00748                          # Moment coefficient derivative [1/rad]
+            self.AE_cm0 = -0.0941                               # Moment coefficient at zero AoA
+            self.AE_alpha0 = -self.AE_Cl0 / self.AE_cl_alpha    # Angle of attack at zero lift
 
         if self.airfoil == "clarky":
             self.AE_clcd_max = 154.7
@@ -160,18 +163,22 @@ class UAV:
             self.AE_cl_alpha = 0.113 * 180 / np.pi
             self.AE_cm_alpha = 0.00627
             self.AE_cm0 = -0.0844
+            self.AE_alpha0 = -self.AE_Cl0 / self.AE_cl_alpha 
 
 
-        "Flight Performance parameters"     # NOTE: Add identifier "FP_" before variable names
-        self.screenheight = 50*0.3048       # screen height of 50 ft (CS23)
-        self.rpm_maxcont  = 5500            # rpm
-        self.omega_prop   = 237             # rad/s, based on 5500 rpm max continuous power and 2.43 gearbox ratio
-        self.prop_radius  = 0.8255          # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
-        self.ceiling      = 18000*0.3048    # [m] 18000 ft service ceiling
-        self.th_ceil      = 30000*0.3048
-        self.SFC          = 7.91666667E-8   # kg/J specific fuel consumption
-        self.fuelcapacity = 100             # L
-        self.fueldensity  = 0.7429          # kg/L
+        "Flight Performance parameters"         # NOTE: Add identifier "FP_" before variable names
+        self.screenheight   = 50*0.3048         # screen height of 50 ft (CS23)
+        self.rpm_maxcont    = 5500              # rpm
+        self.omega_prop     = 237               # rad/s, based on 5500 rpm max continuous power and 2.43 gearbox ratio
+        self.prop_radius    = 0.8255            # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
+        self.ceiling        = 18000*0.3048      # [m] 18000 ft service ceiling
+        self.th_ceil        = 30000*0.3048
+        self.SFC            = 7.91666667E-8     # kg/J specific fuel consumption
+        self.fuelcapacity   = 100               # L
+        self.fueldensity    = 0.7429            # kg/L
+        self.turnrate_half  = 1.5               # deg/s
+        self.turnrate_1     = 3.0               # deg/s
+        self.turnrate_2     = 6.0               # deg/s
 
 
         "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
@@ -204,6 +211,7 @@ class UAV:
         self.n_boxes = 12  # [-]
         self.hatchDT = 1  # [s]
         self.hatchDTdev = 0.5  # [s]
+        self.OP_V_boxlim = 100/3.6 # [m/s] box drop max speed
         self.boxDX = 0.5  # [m]
         self.boxDY = 0.5  # [m]
         self.boxDZ = 0  # [m]
@@ -220,9 +228,10 @@ class UAV:
         self.OP_accuracyY = 25  # [m]
 
         self.OP_hmin = 15  # [m]              # requirements
-        self.OP_V_crosswind = 25  # [m/s]
-        self.OP_V_tailwind = 25  # m/s]
-        self.OP_V_headwind = 25  # [m/s]
+        self.OP_V_crosswind = 10  # [m/s]
+        self.OP_V_tailwind = 15  # m/s]
+        self.OP_V_headwind = 15  # [m/s]
+        self.OP_V_wind = 15  # [m/s]
 
 class airport:
     def __init__(self, name):

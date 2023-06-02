@@ -7,10 +7,12 @@ from parameters import UAV
 import pandas as pd
 import csv
 import matplotlib.pyplot as plt
+from scipy import integrate
 
 aircraft = UAV('aircraft')
-
+#
 airfoil = aircraft.airfoil 
+
 
 def iw(airfoil):
     ### FIND CL optimal ###
@@ -74,86 +76,154 @@ def iw(airfoil):
     
     return Iw, cl_alpha, alpha_zero_lift
 
-iw(airfoil)
+#iw(airfoil)
 
-def lift(coefficients, theta, b, c): #Gives lift for certain point with position theta and c
-    sum = 0
-    for i in range(len(coefficients)):
-        sum += coefficients[i]*np.sin((i+1) * theta)
-    p = 4 * b / c * sum
-    return p
+def plot_lift_distr(object):
+    variable = "Lambda"      #Lambda, AR or Twist
+    plot_mode = "Normalized"         #"Normalized" for normalized plots
+    if variable == "Lambda":    
+        variable_list2 = [0.4]
+    elif variable == "AR":  
+        variable_list2 = [7,7.25,7.5,7.75,8]
+    elif variable == "Twist":
+        variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
 
-def plot_lift_distr():
-    segments = 10
-    N = segments - 1
-    S = 25 #aircraft.Sw
-    AR = 8
-    Lambda = 0.6
-    alpha_twist = -1 * np.pi / 180
-    i_w = 2 * np.pi / 180 #iw(airfoil)[0]
-    a_2d = 6.3          #iw(airfoil)[1]
-    alpha_0 = -1.5 *  np.pi / 180 #iw(airfoil)[2]
-    b = (AR * S)**0.5
-    MAC = S/b                               #Change to iteration between Croot and MAC
-    
-    N = 3
-    a_2d = 6
-    A = 8
-    alpha_0 = -2 * np.pi / 180
+    for parameter in variable_list2:
+        segments = 10
+        N = segments - 1
+        S = object.Sw #aircraft.Sw
+        if variable == "AR":
+            AR = parameter
+        else:
+            AR = 7.75
+        if variable == "Lambda":
+            Lambda = parameter
+        else:
+            Lambda = 0.4
+        if variable == "Twist":
+            alpha_twist = parameter
+        else:
+            alpha_twist = 0 * np.pi / 180
 
 
-    Croot = (1.5*(1+Lambda)*MAC)/(1+Lambda+Lambda**2)
-   # if 
-    theta = np.linspace(90 * np.pi / 180, 0, N, endpoint = False)[::-1] #Change to get gooed amount of sections
-    #theta = np.array([np.pi/6,0, np.pi/3, 0,np.pi/2])
-  #  theta = np.array([45 * np.pi / 180, 67.5 * np.pi / 180])
-    alpha = np.linspace(i_w + alpha_twist, i_w, N, endpoint = False)[::-1]
- #   z = (b/2) * np.cos(theta)
-    c = Croot * (1 - (1-Lambda) * np.cos(theta))
-    mu = (c * a_2d) / (4 * b)
-    #solve Ansin(ntheta)
-  #  LHS = mu * (alpha - alpha_0)
-    B = np.zeros((N,N))
-    print(theta)
-    for i in range(0,N):
-        print("i:", i)
-        for j in range(0,N):
-           # print("j:", j)
-            print("theta:", theta)
-            print( ((4 * A / a_2d) + (j+1) / np.sin(theta[i])) * np.sin((j+1)* theta[i]))
-            B[i,j] = ((4 * A / a_2d) + (j+1) / np.sin(theta[i])) * np.sin((j+1)* theta[i])
-          #  B[i,j] = np.sin((2*j - 1) * theta[i]) * (1 + (mu[i] * (2 * j - 1)) / np.sin(theta[i]))
+        i_w = 0.19 * np.pi / 180 #iw(airfoil)[0]
+        a_2d = object.AE_cl_alpha       #iw(airfoil)[1]
+        alpha_0 = object.AE_alpha0 #iw(airfoil)[2]
+        b = (AR * S)**0.5
+        Croot = 2/(1+Lambda) * S/b
+        MAC = Croot * 2 / 3 * ((1 + Lambda + Lambda**2)/(1+Lambda))                             #Change to iteration between Croot and MAC
+      #  MAC = S / b
+      #  Croot =  (1.5*(1+Lambda)*MAC)/(1+Lambda+Lambda**2)
+        print(MAC)
+        theta = np.linspace(np.pi/(2*N), np.pi/2, N, endpoint = True) #Change to get gooed amount of sections
+        alpha = np.linspace(i_w+alpha_twist, i_w, N, endpoint = False)
+        z = (b/2) * np.cos(theta)
+        c = Croot * (1 - (1-Lambda) * np.cos(theta))
+        mu = (c * a_2d) / (4 * b)
+
+        #solve Ansin(ntheta)
+        LHS = mu * (alpha - alpha_0)
+
+        RHS = np.zeros((N,N))
+        for i in range(N):
+            for j in range(N):
+                RHS[i,j] = np.sin((2*j + 1) * theta[i]) * (1 + (mu[i] * (2 * j + 1)) / np.sin(theta[i]))
+
+        #print(LHS)
+        #print(RHS/mu)
+        A = np.linalg.solve(RHS, LHS)
+        #print(A)
+
+        sum = np.zeros(N)
+        for i in range(N):
+            for j in range(N):
+                sum[i] += A[j] * np.sin((2 * j + 1) * theta[i])
+
+
+        CL = 4 * b * sum / c
+        CL1 = np.insert(CL, 0, 0)
+        y_s = np.insert(z, 0, b / 2)
+
+        if plot_mode == "Normalized":
+            CL1 = CL1/max(CL1)
+            y_s = y_s / (b/2)
             
-    #print(np.linalg.solve(B,np.ones(N)))
+    
+        label = variable + "= " + str(parameter)
+        plt.plot(y_s, CL1, marker = "s", label = label)
 
-    coefficients = np.linalg.solve(B,alpha)
-    print(B)
+        ##Wing Lift Coefficient
+        C_L_wing = np.pi * AR * A[0]
+        V_c = aircraft.V_cruise
+        rho_c = aircraft.rho_cruise
+        W_TO = aircraft.W_TO * 9.80665
+        C_L_req = 2*W_TO/(rho_c * (V_c**2) * S)
+        
 
-    thetas = np.arange(0.0001, np.pi/2, 0.01)
-    z = (b/2) * np.cos(thetas)
+        ##Wing INDUCED DRAG
+        cdi_sum = 0
+        for i in range(len(A)):
+            cdi_sum += (i+1) * A[i]**2
 
-    cs = Croot * (1 - (1-Lambda) * np.cos(thetas))
-    C_L_i = lift(coefficients, thetas, b, cs)
-    print("asdf")
-    print(z)
-    print(C_L_i)
+        CD_induced = np.pi * AR *  cdi_sum #(Wing) 
 
-    #C_L_wing = 
-    plt.plot(z, C_L_i)
+        #Span efficiency factor
+        delta = 0
+        for i in range(1,len(A)):
+            delta += (i+1) * (A[i] / A[0])**2
+        
+        span_eff = 1 / (1 + delta)
+        print('=====================================================================')
+        print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
+        print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_req, "CD_i = ", CD_induced)
+        #print(C_L_wing**2 / (AR* np.pi * CD_induced))
+
+        #print("CL_wing", C_L_wing)
+        #print("CL required for cruis", C_L_req)
+        #print("CDi_wing", CD_induced)
+
+
+    #Find integral current distribution
+    area_lift_dist = -integrate.simps(CL1, y_s)
+    
+
+    #Elliptical lift distribution
+    y = np.linspace(0, b/2, 50, endpoint = True)
+    #Cli_elliptical = (b/2) * np.sqrt(1-(((np.pi * b * y)/(8 * area_lift_dist))**2))
+    Cli_elliptical = (8*area_lift_dist)/(np.pi*b) * np.sqrt(1-(2*y/b)**2)
+ #   plt.plot(y, Cli_elliptical, label = "Elliptical")
+
+    #General plot
+    plt.grid()
     plt.xlabel('semi span [m]')
     plt.ylabel('C_L')
+    plt.legend()
     plt.show()
     
-plot_lift_distr()
+plot_lift_distr(aircraft)
     
-def fuel_volume(airfoil, Croot, Lambda):
-    N = 50
-    theta = np.linspace(0, 90 * np.pi / 180, N, endpoint = False) #Change to get gooed amount of sections
-    chords = Croot * (1 - (1-Lambda) * np.cos(theta))
-    m = float(airfoil[0]) / 100
-    p = float(airfoil[1]) / 100
-    for c in chords:
-        x = np.linspace(0.25*c, 0.75*c, 100) #update when location spars known
+def fuel_volume(airfoil, Croot, Lambda, b):
+    if len(airfoil) != 4: 
+        print('fuel volume calculation is only valid for 4-digit NACA as of now')
+    V = 0 
+    N = 50 #number of span direction sections
+    M = 50 #number of chord direction sections per span location
+    for i in range(N):
+        S = 0 
+        c = Croot * (1 - (1-Lambda) * i/N)
+        m = float(airfoil[0]) / 100
+        p = float(airfoil[1]) / 10
+        X = np.linspace(0, 1, M) #update when location spars known
+        dx = 1/M
+        for x in X:
+            if x > 0.25 and x <= p: 
+                y = m/p * (2*p*x - x**2)
+                S += y*dx * c**2
+            elif x > p and x < 0.75: 
+                y =  m/((1 - p)**2) * ((1 - 2*p) + 2*p*x - x**2) #check wiki
+                S += y*dx * c**2
+        V += S * (b/2)/N #half span volume in m3
+    V = V * 1000 #in liters
+    return V 
 
-        
-    
+print(fuel_volume(airfoil, aircraft.rootchord, 0.4, aircraft.b))

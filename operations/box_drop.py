@@ -1,4 +1,7 @@
 import sys
+
+import matplotlib.collections
+
 sys.path.append("..")
 
 # Start your import below this
@@ -8,6 +11,8 @@ import scipy as sp
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import matplotlib.patches as mlpatch
+import matplotlib.colorbar as cbar
 import time
 import itertools as it
 
@@ -106,16 +111,16 @@ class BOX:
         box_pos = {
             1: [0 * dx, dy, dz],
             2: [0 * dx, -dy, dz],
-            3: [1 * dx, dy, dz],
-            4: [1 * dx, -dy, dz],
-            5: [2 * dx, dy, dz],
-            6: [2 * dx, -dy, dz],
-            7: [3 * dx, dy, dz],
-            8: [3 * dx, -dy, dz],
-            9: [4 * dx, dy, dz],
-            10: [4 * dx, -dy, dz],
-            11: [5 * dx, dy, dz],
-            12: [5 * dx, -dy, dz],
+            3: [5 * dx, dy, dz],
+            4: [5 * dx, -dy, dz],
+            5: [1 * dx, dy, dz],
+            6: [1 * dx, -dy, dz],
+            7: [4 * dx, dy, dz],
+            8: [4 * dx, -dy, dz],
+            9: [2 * dx, dy, dz],
+            10: [2 * dx, -dy, dz],
+            11: [3 * dx, dy, dz],
+            12: [3 * dx, -dy, dz],
         }
         self.Pos_AC = np.array(box_pos[boxN])  # [m] relative to AC c.g.
 
@@ -132,9 +137,11 @@ class BOX:
 # print_name(aircraft)
 
 def subdivide(range,N):
-    N -= 1
     var = []
-    if N <= 0: var.append(np.mean(range))
+    if N <= 0:
+        var.append(np.mean(range))
+    elif N == 1:
+        var = range
     else:
         i = 0
         DR = range[1] - range[0]
@@ -147,6 +154,7 @@ def subdivide(range,N):
 if True:
     AC = UAV('aircraft')
     print(AC.__dict__)
+    print("\n")
 
     atm = atmosphere()
 
@@ -155,14 +163,16 @@ if True:
     IT_max = 10E4
     plot_traj = False
     plot_scatter = True
-    plot_sensitivity = False
-    N_divisions = 3 # careful with this one, it scales with ((N+1)!)^2
+    plot_bounds = True
+    N_divisions_maneuver = 1
+    N_divisions_disturbance = 1
+    N_divisions_timing = 0
 
     # global parameters
     AC.n_drops = 1  # [-]
     AC.n_boxes = 1  # [-]
 
-    # drop parameters
+    # drop parameters limits
     AC.OP_app_V = 25  #[m/s]            # approach
     AC.OP_app_Dn = 1  # [g0]
     AC.OP_drop_V = 25  # [m/s]          # drop
@@ -171,38 +181,46 @@ if True:
     AC.OP_exit_Dn = 1  # [g0]           # exit
     H_min = 15  # [m]
 
-    # disturbances
+    # disturbances limits
     atm.V_crosswind = 10  # [m/s]
     atm.V_headwind = 10  # [m/s]
     atm.V_tailwind = -atm.V_headwind  # m/s]
     AC.PL_per_box = 20 # [kg]
+    AC.minW_per_box = 10 # [kg]
+    time_dev_drop = 0.5 # [s]
+    time_dev_brake = 0.5  # [s]
+    time_dev_flap = 1  # [s]
+
+    # START CASE EVALUATION
 
     # Generate drop maneuver variations
     Maneuver = {
-        "approach speed": subdivide([20, AC.V_s_min], N_divisions), # add actual minimum stall speed
-        "approach load factor": subdivide([0, 3], N_divisions),
-        "drop angle": subdivide([-45, 45], N_divisions)
+        "approach speed": subdivide([20, AC.V_s_min], N_divisions_maneuver), # add actual minimum stall speed
+        "approach load factor": subdivide([0, 3], N_divisions_maneuver),
+        "drop angle": subdivide([-45, 15], N_divisions_maneuver)
+    }
+
+    VarResults = {
+        "mean DX [m]": [],
+        "mean DY [m]": [],
+        "deviation DX [m]": [],
+        "deviation DY [m]": [],
+        "worst-case impact velocity [m/s]": [],
+        "worst-case acceleration [g]": []
     }
 
     allNames = sorted(Maneuver)
-    combinations = list(it.product(*(Maneuver[Name] for Name in allNames)))
-    print("\n================= =================\n", len(combinations), "maneuvers combinations\n")
-    print(combinations)
+    Mancombinations = list(it.product(*(Maneuver[Name] for Name in allNames)))
+    print("================= =================\n", len(Mancombinations), "maneuvers combinations\n")
+    #print(Mancombinations)
 
-    for maneuver_case in combinations:
-        print("maneuvers case ", str(maneuver_case))
+    Maneuver_ID = 1
+    for maneuver_case in Mancombinations:
+        print("\n", Maneuver_ID, "/", len(Mancombinations),
+              "maneuvers case ", str(maneuver_case))
         AC.OP_app_V = maneuver_case[0]
         AC.OP_drop_Dn = maneuver_case[1]
         AC.OP_drop_angle = maneuver_case[2]
-
-        VarResults = {
-            "mean DX [m]": [],
-            "mean DY [m]": [],
-            "deviation DX [m]": [],
-            "deviation DY [m]": [],
-            "worst-case impact velocity": [],
-            "worst-case acceleration": []
-        }
 
         # calc AC traj s.t. h_min == 15m
         Dh = 0
@@ -224,30 +242,50 @@ if True:
         }
 
         Disturbances = {
-            "payload mass [kg]": subdivide([10, AC.PL_per_box], N_divisions),
-            "crosswind [m/s]": subdivide([-atm.V_crosswind, atm.V_crosswind], N_divisions),
-            "headwind [m/s]": subdivide([-atm.V_headwind, atm.V_headwind], N_divisions)
-            #"drop time [s]": subdivide([0,XXXXXXXX],2)
+            "payload mass [kg]": subdivide([AC.minW_per_box, AC.PL_per_box], N_divisions_disturbance),
+            "crosswind [m/s]": subdivide([-atm.V_crosswind, atm.V_crosswind], N_divisions_disturbance),
+            "headwind [m/s]": subdivide([-atm.V_headwind, atm.V_headwind], N_divisions_disturbance),
+            "timing deviation drop [s]": subdivide([-time_dev_drop ,time_dev_drop],N_divisions_timing),
+            "timing deviation brake [s]": subdivide([-time_dev_brake, time_dev_brake], N_divisions_timing),
+            "timing deviation flaps [s]": subdivide([-time_dev_flap, time_dev_flap], N_divisions_timing)
         }
 
         allNames = sorted(Disturbances)
-        combinations = list(it.product(*(Disturbances[Name] for Name in allNames)))
-        print("\n=================\n", len(combinations), "disturbance combinations\n")
-        print(combinations)
+        Varcombinations = list(it.product(*(Disturbances[Name] for Name in allNames)))
+        print("\n=================\n", len(Varcombinations), "disturbance combinations")
+        #print(Varcombinations)
 
-        for disturbance_case in combinations:
-            print("disturbance case ", str(disturbance_case))
+        Disturbance_ID = 1
+        for disturbance_case in Varcombinations:
+            print(Disturbance_ID, "/", len(Varcombinations),
+                  "disturbance case ", str(disturbance_case))
             atm.V_crosswind = disturbance_case[0]  # [m/s]
             atm.V_headwind = disturbance_case[1]  # [m/s]
             atm.V_tailwind = -atm.V_headwind  # m/s]
             AC.PL_mass = disturbance_case[2] # [kg]
+            time_dev_brake = disturbance_case[4]  # [s]
+            time_dev_drop = disturbance_case[3] # [s]
+            time_dev_flap = disturbance_case[5]  # [s]
+
+            # disturb drop time
+            if time_dev_drop != 0:
+                AC.OP_drop_angle += (atm.g / AC.OP_app_Dn) * (AC.OP_app_Dn - 1) * time_dev_drop
+                AC.pos = np.array([0, 0, H_min + Dh])
+                + np.array(
+                    [np.cos(AC.OP_drop_angle), np.sin(AC.OP_drop_angle), 0]
+                ) * AC.OP_app_V * time_dev_drop
 
             # get drop state for (each) box with drop order and box layout
             box_number = 1
             while box_number <= AC.n_boxes:
 
+                # initialise box pos & vel
                 box = BOX(box_number, AC)
                 box.mass += AC.PL_mass # payload
+
+                # disturb box timings
+                box.DT_brake += time_dev_brake
+                box.DT_flaps += time_dev_flap
 
                 # get trajectory of (each) box from initial state & CD(t)
                 N = 0
@@ -310,6 +348,7 @@ if True:
                 # iterate
                 box_number += 1
 
+            Disturbance_ID += 1
 
         # process results
         VarResults["mean DX [m]"].append(
@@ -320,15 +359,16 @@ if True:
             abs(max(DropResults["impact DX [m]"])-min(DropResults["impact DX [m]"])))
         VarResults["deviation DY [m]"].append(
             abs(max(DropResults["impact DY [m]"]) - min(DropResults["impact DY [m]"])))
-        VarResults["worst-case impact velocity"].append(
+        VarResults["worst-case impact velocity [m/s]"].append(
             max(DropResults["impact velocity [m/s]"]))
-        VarResults["worst-case acceleration"].append(
+        VarResults["worst-case acceleration [g]"].append(
             max(DropResults["impact deceleration [g]"])) # ignore ground impact accel as indicated by impact speed already
+        # calculate expected spread TODO
 
         # show VarResult
         if plot_scatter:
             # print results
-            print("\ndrop case with", len(combinations), "combinations and", AC.n_boxes, "boxes :")
+            print("\ndrop case with", len(Varcombinations), "combinations and", AC.n_boxes, "boxes :")
             for var in VarResults:
                 print(var, VarResults[var][-1])
 
@@ -337,8 +377,66 @@ if True:
             plt.scatter(DropResults["impact DX [m]"]-VarResults["mean DX [m]"][-1],
                         DropResults["impact DY [m]"]-VarResults["mean DY [m]"][-1],
                         c=DropResults["impact velocity [m/s]"], ec='k', cmap=cmap)
-            plt.title("landing spots")
+            plt.title("landing spots for maneuver "+str(maneuver_case))
+            plt.colorbar()
             plt.show()
 
-            # plot disturbance effects TODO
+        Maneuver_ID += 1
 
+    if plot_bounds:
+
+        # variables to plot
+        vs   = VarResults["worst-case impact velocity [m/s]"]
+        xavg = VarResults["mean DX [m]"]
+        yavg = VarResults["mean DY [m]"]
+        xdev = VarResults["deviation DX [m]"]
+        ydev = VarResults["deviation DY [m]"]
+        REQ_LDG = 25  # [m] TODO link  to val
+
+        # initialize plot area
+        fig, ax = plt.subplots(1)
+        Rlim = 0.6*max(max(xdev), max(ydev), REQ_LDG)
+        plt.ylim(-Rlim, Rlim)
+        plt.xlim(-Rlim, Rlim)
+        handles, labels = ax.get_legend_handles_labels()
+
+        # add REQ limit
+        rect = mlpatch.Rectangle((-REQ_LDG / 2, -REQ_LDG / 2), REQ_LDG, REQ_LDG,
+                                 edgecolor='black',
+                                 linewidth=1,
+                                 hatch='//', fill=False,
+                                 label="REQ limit"
+                                 )
+        ax.add_patch(rect)
+        handles.append(rect)
+
+        # initialize colormap
+        N = len(vs)
+        colors = (vs+max(vs))/min(vs) # negative normal to 0-1
+        normal = plt.Normalize(min(vs), max(vs))
+        cmap = plt.get_cmap('hot')
+        c = cmap(colors)
+        print(cmap)
+        print(colors)
+        print(c)
+
+        # draw landing zones
+        for i in range(N):
+            rect = mlpatch.Rectangle((-xdev[i]/2,-ydev[i]/2),xdev[i],ydev[i],
+                                    edgecolor=c[i],
+                                    linewidth = 2,
+                                    fill=False,
+                                    label = str(Mancombinations[i])
+                                    )
+            ax.add_patch(rect)
+            handles.append(rect)
+
+        cax, _ = cbar.make_axes(ax)
+        cb2 = cbar.ColorbarBase(cax, cmap=cmap, norm=normal)
+
+        # add legend
+        plt.legend(handles=handles, loc='lower center',
+                   bbox_to_anchor=(0, -0.15),
+                   ncol=3)
+
+        plt.show()

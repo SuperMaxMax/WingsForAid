@@ -3,7 +3,7 @@ import csv
 import pandas as pd
 import numpy as np
 
-all_airfoils = [2412, 4415, 23012, 23015, 63215, 64415, "clarky", "usa35b"]
+all_airfoils = [2412, 4415, 23012, 23015, 63215, 64415, "clarky", "usa35b", 4412]
 
 list_clcd_max = []
 list_clcd32_max = []
@@ -97,6 +97,8 @@ for airfoil in all_airfoils:
                         cm_alpha = 0.0105
                     elif airfoil == "clarky": 
                         cm_alpha = 0.00627
+                    elif airfoil == 4412:
+                        cm_alpha = 0.00801
                     
 
     ### CL/CD STUFF ###
@@ -162,3 +164,4 @@ dataframe = {'clcd_max': list_clcd_max, "clcd32_max": list_clcd32_max, "clcd12_m
 data_frame_all_airfoil = pd.DataFrame(data=dataframe, index=["2412", "4415", "23012", "23015", "63215", "64415", "clarky", "usa35b"])
 
 data_frame_all_airfoil.to_csv('airfoil_data_XFLR5.csv', index=False)
+print(data_frame_all_airfoil)

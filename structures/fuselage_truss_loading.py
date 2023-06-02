@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from parameters import UAV
+ac=UAV("aircraft")
 #from loading_diagram_wing import aircraft
 
 ## Define material ##
@@ -7,6 +9,12 @@ import matplotlib.pyplot as plt
 yield_stress = 460*10**6
 density=7850
 E = 205*10**9
+
+## Define main forces ##
+Thrust = 2800
+Lift = ac.W_TO*ac.g0
+Strut =4000
+# print(Thrust,Lift,Strut)
 
 ### Define dimensions ###
 L_AE=1.2
@@ -17,38 +25,38 @@ L_AA_=1.2
 theta = np.arctan((L_AE/2)/L_AB)
 phy = np.arctan(L_AB/L_AA_)
 #### Define loads ####
-Ax=100
-Az=100
-Ax_=100
-Ay_=100
-Az_=100
+Ax=0.2*Thrust
+Az=0.075*Lift
+Ax_=Ax
+Ay_=0
+Az_=-0.25*Lift
 
-Bx=100
-Bz=100
-Bx_=100
-By_=100
-Bz_=100
+Bx=0.2*Thrust
+Bz=0.075*Lift
+Bx_=Bx
+By_=Strut
+Bz_=0.475*Lift
 
-Cx=100
-Cz=100
-Cx_=100
-Cz_=100
+Cx=0.1*Thrust
+Cz=-0.05*Lift
+Cx_=Cx
+Cz_=0.25*Lift
 
-Dx=100
-Dz=100
-Dx_=100
-Dy_=100
-Dz_=100
+Dx=0.2*Thrust
+Dz=0.075*Lift
+Dx_=Dx
+Dy_=Strut
+Dz_=0.475*Lift
 
-Ex=100
-Ez=100
-Ex_=100
-Ey_=100
-Ez_=100
+Ex=0.2*Thrust
+Ez=0.075*Lift
+Ex_=Ex
+Ey_=0
+Ez_=-0.25*Lift
 
-Fx=0
+Fx=0.1*Thrust
 Fz=0
-Fx_=0
+Fx_=Fx
 Fz_=0
 
 ### Define loads ###
@@ -137,4 +145,40 @@ for i in index_compression:
 # print(index_compression)
 
 total_mass = sum(mass)
-print("Total modular fuselage mass",total_mass)
+# print("loading",loads)
+# print("masses",mass)
+# print("Total modular fuselage mass",total_mass)
+
+
+#### Panel fuselage calculations #####
+
+
+q_h = (Lift/2)/L_AB
+b=L_AA_
+v=0.33
+c_shear=15
+c_comp=8
+t_min1 = q_h*b**2*12*(1-v**2)/(c_shear*np.pi**2*E) #minimum thickness of side sheet (clamped both sides) for shear buckling
+mass1= t_min1*b*L_AB*density
+print('minimum mass of side sheet, shear buckling',mass1)
+
+mass2=density*L_AA_*Thrust/yield_stress #minumim area of cross section for thrust tension
+print('minimum mass for thrust tension',mass2)
+
+mass3=density*L_AE*4000/yield_stress
+t_min3=(Strut/yield_stress)/L_AA_
+print('minimum mass for wing strut tension',mass3)
+
+t_min4=(12*(ac.W_sc+ac.W_F)*ac.g0*L_AE*(1-v**2)/(c_comp*E*np.pi**2))**(1/3)
+mass4=t_min4*density*L_AE*L_AB
+print('minumum mass for compression due to wing structural weight',mass4)
+
+t_min5=(12*0.5*(ac.W_sc+ac.W_F)*ac.g0*L_AA_*(1-v**2)/(c_comp*E*np.pi**2))**(1/3)
+mass5=t_min5*density*L_AA_*L_AB
+#print(0.5*(ac.W_sc+ac.W_F)*ac.g0)
+print('minumum mass for compression of one side pannel due to wing structural weight',mass5)
+
+t_min6=(12*1500*L_AA_*(1-v**2)/(c_comp*E*np.pi**2))**(1/3)
+mass6=t_min5*density*L_AA_*L_AE
+print('minumum mass for compression of bottom pannel due to wing structural weight',mass6)
+
