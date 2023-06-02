@@ -61,7 +61,7 @@ def Aerodynamic_centre_determination(aircraft):
     aircraft.Mcruise            = Mach_calculation(atm, aircraft.V_cruise, aircraft.h_cruise)
     aircraft.Mmin               = Mach_calculation(atm, aircraft.V_s_min, aircraft.h_TO)
     
-    aircraft.CLa_h_cruise       = LiftRateCoefficient(aircraft, aircraft.Mcruise, aircraft.A_h, aircraft.lambda_co2_h)
+    aircraft.CLa_h_cruise       = LiftRateCoefficient(aircraft, aircraft.Mcruise, aircraft.CS_A_h, aircraft.CS_lambda_co2_h)
 
     aircraft.CLa_w_cruise       = LiftRateCoefficient(aircraft, aircraft.Mcruise, aircraft.A, aircraft.lambda_co2)
     aircraft.CLa_w_approach     = LiftRateCoefficient(aircraft, aircraft.Mmin, aircraft.A, aircraft.lambda_co2)
@@ -79,7 +79,7 @@ def Aerodynamic_centre_determination(aircraft):
     aircraft.x_ac_approach      = aircraft.x_ac_wf_approach + aircraft.dx_ac_n_approach
 
 def C_m_alpha_calculation(aircraft, x_cg):
-    aircraft.C_N_h_alpha = 2 * np.pi * aircraft.A_h/(aircraft.A_h + 2)
+    aircraft.C_N_h_alpha = 2 * np.pi * aircraft.CS_A_h/(aircraft.CS_A_h + 2)
 
     aircraft.C_m_alpha = aircraft.AE_cl_alpha * (x_cg - aircraft.CS_x_ac_w) - aircraft.C_N_h_alpha * (1 - aircraft.CS_dEpsilondA) * (aircraft.CS_Vh_V)**2 * aircraft.CS_Sh_S * aircraft.CS_l_h/aircraft.MAC_length
 
@@ -179,7 +179,7 @@ Cl_delta_P = 1#TODO
 "FIXME: Controlability and Stability Curves"
 ################################################################################################################
 
-def controlability_curve(aircraft, xcgRange): #TODO: change constants here 
+def controlability_curve(aircraft, xcgRange):
     """For the controllability curve, the CL_h, CL_Ah and Cm_ac of the aircraft needs to be found. 
     For CL_h: SEAD L8 S17
     For CL_Ah: L = W @ approach
@@ -211,7 +211,7 @@ def stability_curve(aircraft, xcgRange):
     
     # Making stability line
 
-    StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.dEpsilondA) * (aircraft.CS_l_h/aircraft.MAC_length) * aircraft.Vh_V ** 2)
+    StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.CS_dEpsilondA) * (aircraft.CS_l_h/aircraft.MAC_length) * aircraft.CS_Vh_V ** 2)
     StabilityMargin             = 0.05
     StabilitySh_S_margin        = StabilityFrac * xcgRange - StabilityFrac * (aircraft.x_ac_cruise - StabilityMargin)
     StabilitySh_S               = StabilityFrac * xcgRange - StabilityFrac * aircraft.x_ac_cruise
@@ -241,12 +241,12 @@ def plot_scissor_plot(aircraft):
     Sh_S_stab = stability_curve(aircraft, aircraft.X_cg_aft)[1]
 
     if Sh_S_cont > Sh_S_stab:
-        aircraft.Sh_S = Sh_S_cont
+        aircraft.CS_Sh_S = Sh_S_cont
     else:
-        aircraft.Sh_S = Sh_S_stab
+        aircraft.CS_Sh_S = Sh_S_stab
 
     x_cg_limit = [aircraft.X_cg_fwd, aircraft.X_cg_aft]
-    S_h_S_array = [aircraft.Sh_S, aircraft.Sh_S]
+    S_h_S_array = [aircraft.CS_Sh_S, aircraft.CS_Sh_S]
 
     ax1.plot(x_cg_limit, S_h_S_array, color = 'orange')
 
