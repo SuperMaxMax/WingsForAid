@@ -57,11 +57,33 @@ def weight_fuel(obj):
     M_f_used = weight_fuel_used(obj)
 
     W_F = (1 + obj.M_res) * M_f_used
-
     return W_F
 
+def profile(obj, n_boxes, n_drops, range = None, dropregion = None):
+    W0 = obj.W_TO
+    Mf_used = 0.0
+    h_cruise= obj.h_cruise
+    if range == None:
+        range = obj.R / 2                           
+    else:
+        range = range*1000
+    if dropregion == None:
+        W = W0
+        # ======== Take-off Mff ========
+        Mff_untilTO = obj.W1W_TO * obj.W2W1 * obj.W3W2
+        Mf_used_TO  = (1 - Mff_untilTO) * W
+        W   -= Mf_used_TO
+        Mf_used += Mf_used_TO
+        # =========== Climb ============
+        interdropdist = range / n_drops                         # Distance between drops in meters
+        
+        for i in range(n_drops):
+
+
+
+
 def run(obj):
-    obj.W_F  = weight_fuel(obj)  # perform calculation of fuel weight
-    obj.W_OE = weight_empty_operational(obj)            # perform calculation of operational empty weight
-    obj.W_TO = weight_take_off(obj.W_OE, obj.W_F, obj.W_PL) # combines weights to find total weight
+    obj.W_F  = weight_fuel(obj)                                 # perform calculation of fuel weight
+    obj.W_OE = weight_empty_operational(obj)                    # perform calculation of operational empty weight
+    obj.W_TO = weight_take_off(obj.W_OE, obj.W_F, obj.W_PL)     # combines weights to find total weight
  
