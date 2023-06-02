@@ -80,7 +80,7 @@ def iw(airfoil):
 
 def plot_lift_distr(object):
     variable = "Lambda"      #Lambda, AR or Twist
-    plot_mode = "Normalized"         #"Normalized" for normalized plots
+    plot_mode = "Normalize"         #"Normalized" for normalized plots
     if variable == "Lambda":    
         variable_list2 = [0.4]
     elif variable == "AR":  
@@ -89,7 +89,7 @@ def plot_lift_distr(object):
         variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
 
     for parameter in variable_list2:
-        segments = 10
+        segments = 30
         N = segments - 1
         S = object.Sw #aircraft.Sw
         if variable == "AR":
@@ -143,6 +143,7 @@ def plot_lift_distr(object):
 
         CL = 4 * b * sum / c
         CL1 = np.insert(CL, 0, 0)
+        c = np.insert(c,0, Croot*Lambda)
         y_s = np.insert(z, 0, b / 2)
 
         if plot_mode == "Normalized":
@@ -151,7 +152,7 @@ def plot_lift_distr(object):
             
     
         label = variable + "= " + str(parameter)
-        plt.plot(y_s, CL1, marker = "s", label = label)
+       # plt.plot(y_s, CL1, marker = "s", label = label)
 
         ##Wing Lift Coefficient
         C_L_wing = np.pi * AR * A[0]
@@ -182,10 +183,23 @@ def plot_lift_distr(object):
         #print("CL_wing", C_L_wing)
         #print("CL required for cruis", C_L_req)
         #print("CDi_wing", CD_induced)
+        q = 0.5 * object.rho_cruise * object.V_cruise**2
+        print(CL1, c)
+        #print(Croot*Lambda)
+        l = CL1*c*q
+        plt.plot(y_s, l)
+        lift_coefficients = np.polyfit(y_s, l, N)
+
+
+        print("asdf", lift_coefficients)
+        #print(-2*integrate.simps(l, y_s))
+        print(W_TO)
+        print(l)
 
 
     #Find integral current distribution
     area_lift_dist = -integrate.simps(CL1, y_s)
+    print(area_lift_dist)
     
 
     #Elliptical lift distribution
@@ -201,9 +215,9 @@ def plot_lift_distr(object):
     plt.legend()
     plt.show()
 
-    return AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, i_w #DONT CHANGE ORDER OR DO IT IN MAIN AS WELL
+    return AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, i_w, y_s, l #DONT CHANGE ORDER OR DO IT IN MAIN AS WELL
     
-#plot_lift_distr(aircraft)
+plot_lift_distr(aircraft)
     
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
