@@ -28,7 +28,7 @@ def create_line(x1, y1, x2, y2, num_points):
     line = np.vstack((x, y))
     return line
 
-def geometry_determination(obj, plot=False):
+def geometry_determination(obj, plot=False, high_WS = False):
     # create empty array for capturing design points from W/P - W/S diagrams
     design_points = np.empty(0)
     for i in range(len(obj.CL_max_clean)):                  
@@ -157,13 +157,17 @@ def geometry_determination(obj, plot=False):
         obj.S_G = 35.66
     # --- Wing parameters
     Weight_TO = obj.W_TO*obj.g0                                 # find the take off weight in newtons
-    WS_values = design_points[0:12:2]                           # take the S/W values
-    WP_values = design_points[1:13:2]                           # take the P/W values
-    obj.WS    = WS_values[0]
-    obj.WP    = WP_values[0]
+    if high_WS:
+        obj.WS = design_point_high[0]
+        obj.WP = design_point_high[1]
+    else:
+        WS_values = design_points[0:12:2]                           # take the S/W values
+        WP_values = design_points[1:13:2]                           # take the P/W values
+        obj.WS    = WS_values[0]
+        obj.WP    = WP_values[0]
     
     # find surface area
-    obj.Sw = Weight_TO/WS_values
+    obj.Sw = Weight_TO/obj.WS
     
     
     # find power value                 
