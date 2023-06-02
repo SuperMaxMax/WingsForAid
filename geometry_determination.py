@@ -200,8 +200,8 @@ def geometry_determination(obj, plot=False, high_WS = False):
     hc = create_line(points[0][-1], points[1][-1], points[0][4], points[1][4], 1000)    # half chord line
     
     # points used to create MAC
-    point_tip = (points[0][2]+obj.rootchord[i], points[1][2])
-    point_root= (points[0][6]-obj.tipchord[i], points[1][6])
+    point_tip = (points[0][2]+obj.rootchord, points[1][2])
+    point_root= (points[0][6]-obj.tipchord, points[1][6])
     constr_line = create_line(point_root[0], point_root[1], point_tip[0], point_tip[1], 1000)
     mask = np.abs(constr_line - hc)
     mask = mask[0] + mask[1]
