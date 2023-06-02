@@ -158,8 +158,8 @@ def geometry_determination(obj, plot=False, high_WS = False):
     # --- Wing parameters
     Weight_TO = obj.W_TO*obj.g0                                 # find the take off weight in newtons
     if high_WS:
-        obj.WS = design_point_high[0]
-        obj.WP = design_point_high[1]
+        obj.WS = np.array([design_point_high[0]])
+        obj.WP = np.array([design_point_high[1]])
     else:
         WS_values = design_points[0:12:2]                           # take the S/W values
         WP_values = design_points[1:13:2]                           # take the P/W values
