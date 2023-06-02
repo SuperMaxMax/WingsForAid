@@ -27,10 +27,10 @@ for concept in [aircraft]:
     while it:
         # class 1
         W_OE = c1.weight_empty_operational(concept)
-        W_F = c1.profile(concept, 12, 6, 100)
+        W_F = c1.profile(concept, 12, 1)
         W_PL= n_boxes*concept.boxweight
         concept.W_TO = W_OE + W_F + W_PL
-        print(f"Class I estimation {n}: MTOW [kg] = {concept.W_TO}")
+        print(f"Class I estimation {n}: MTOW [kg] = {np.round(concept.W_TO)}")
         concept.W_OE = W_OE
         concept.W_F  = W_F
         
@@ -40,6 +40,7 @@ for concept in [aircraft]:
 
         # class 2
         c2.weight_empty(concept)
+        concept.W_TO = concept.W_OE + concept.W_F + n_boxes*concept.boxweight
         W_TO_c2 = concept.W_OE + concept.W_F + n_boxes*concept.boxweight
         print(f"Class II estimation {n}: MTOW = {np.round(concept.W_TO, 2)} [kg]")
         print(f"Fuel weight: {np.round(concept.W_F, 2)} [kg]")
@@ -63,6 +64,8 @@ for concept in [aircraft]:
     plt.figure(1)
     plt.subplot(121)
     c2cg.cg_calc(concept)
+
+    geo.geometry_determination(concept, plot = True)
 
     # V-n diagram
     # plt.subplot(122)
