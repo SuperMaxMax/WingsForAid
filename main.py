@@ -35,7 +35,7 @@ for concept in [aircraft]:
         concept.W_F  = W_F
         
         # geometry determination
-        geo.geometry_determination(concept, high_WS=True)
+        geo.geometry_determination(concept)
         #concept.WS = 70.805
 
         # class 2
