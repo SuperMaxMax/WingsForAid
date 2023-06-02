@@ -19,14 +19,20 @@ df = pd.DataFrame()
 
 for concept in [aircraft]:
     # --- iteration
+    n_boxes = 12
     n = 1
     it = True
     W_TO_c2_old = 750
 
     while it:
         # class 1
-        c1.run(concept)
+        W_OE = c1.weight_empty_operational(concept)
+        W_F = c1.profile(concept, 12, 6, 100)
+        W_PL= n_boxes*concept.boxweight
+        concept.W_TO = W_OE + W_F + W_PL
         print(f"Class I estimation {n}: MTOW [kg] = {concept.W_TO}")
+        concept.W_OE = W_OE
+        concept.W_F  = W_F
         
         # geometry determination
         geo.geometry_determination(concept)
@@ -34,10 +40,10 @@ for concept in [aircraft]:
 
         # class 2
         c2.weight_empty(concept)
-        W_TO_c2 = concept.W_TO
-        print(f"Class II estimation {n}: MTOW [kg] = {concept.W_TO} kg")
-        print(f"Fuel weight: {concept.W_F} kg")
-        print(f"Operative empty weight: {concept.W_OE} kg")
+        W_TO_c2 = concept.W_OE + concept.W_F + n_boxes*concept.boxweight
+        print(f"Class II estimation {n}: MTOW = {np.round(concept.W_TO, 2)} [kg]")
+        print(f"Fuel weight: {np.round(concept.W_F, 2)} [kg]")
+        print(f"Operative empty weight: {np.round(concept.W_OE, 2)} [kg]")
 
         # update load factor
         # concept.n_ult = Vn.max_n(concept)*1.5

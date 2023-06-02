@@ -50,7 +50,7 @@ class UAV:
 
         "-Weights"
         self.W_e                 = 62.6         # Definitive weight per engine [kg]
-        self.W_TO                = 700          # Take-off weight [kg]
+        self.W_TO                = 740         # Take-off weight [kg]
         self.W_PL                = 240          # Payload weight [kg]
         self.WS                  = 708.05       # Wing Loading [N/m^2]
 
@@ -87,6 +87,7 @@ class UAV:
         self.n_drops             = 1             # Number of drops [-]
         self.n_boxes             = 12            # Number of boxes [-]
         self.n_boxes_abreast     = 2             # Number or boxes side by side [-]
+        self.boxweight           = 23            # kg
         self.n_rows              = 6
         self.R                   = 500000        # Range [m]
         self.M_res               = 0.10          # Fraction of remaing fuel at the end of flight/reserve fuel [-]
