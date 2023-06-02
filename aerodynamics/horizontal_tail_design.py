@@ -95,7 +95,7 @@ print(airfoil_select(required_lift()))
 
 
 def plot_lift_distr(object):
-    variable = "Lambda"      #Lambda, AR or Twist
+    variable = "AR"      #Lambda, AR or Twist
     plot_mode = "Normalize"         #"Normalized" for normalized plots
     if variable == "Lambda":    
         variable_list2 = [0.4, 0.6, 0.8, 1]
@@ -220,4 +220,4 @@ def plot_lift_distr(object):
     plt.legend()
     plt.show()
     
-#plot_lift_distr(aircraft)
+ plot_lift_distr(aircraft)

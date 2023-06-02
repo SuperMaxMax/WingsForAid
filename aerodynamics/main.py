@@ -25,8 +25,8 @@ span_eff = wing_data[3]
 CL_wing = wing_data[4]
 CD_induced_wing = wing_data[5]
 incidence_wing = wing_data[6]
-print(incidence_wing)
 
+ 
 
 
 #AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, span_eff, i_w
