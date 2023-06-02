@@ -103,7 +103,8 @@ def geometry_determination(obj, plot=False):
         design_points = np.append(design_points, design_point)
         design_point_high = None
         WS_intersection = WP_Climb[1][np.argmin(np.abs(WP_Climb[0]-WP_cruise[0]))]
-        print(WS_intersection)
+        WP_intersection = WP_Climb[0][np.argmin(np.abs(WP_Climb[0]-WP_cruise[0]))]
+        design_point_high = (WS_intersection, WP_intersection)
         
 
 
