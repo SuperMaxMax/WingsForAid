@@ -294,9 +294,3 @@ def plot_all(obj):
     plot_gust(obj)
     plt.title(f"V-n diagram for {obj.name}")
     plt.show()
-
-
-concept = UAV('Validate', 'tractor', boom=False, braced_wing=False)
-concept.WS = 70.805
-
-plot_all(concept)

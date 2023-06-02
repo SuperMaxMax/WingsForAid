@@ -60,8 +60,8 @@ def weight_fuel(obj):
 
     return W_F
 
-
 def run(obj):
     obj.W_F  = weight_fuel(obj)  # perform calculation of fuel weight
     obj.W_OE = weight_empty_operational(obj)            # perform calculation of operational empty weight
     obj.W_TO = weight_take_off(obj.W_OE, obj.W_F, obj.W_PL) # combines weights to find total weight
+ 
