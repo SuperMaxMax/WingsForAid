@@ -8,7 +8,7 @@ class UAV:
         self.type                = "utility"    # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
 
         "-Aircraft geometry"
-        self.A                   = 10            # Aspect ratio [-]
+        self.A                   = 8             # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.braced_wing         = braced_wing   # True if wing is braced
         self.kq                  = 0.95          # Volume factor used to calculate wetted area of the wing

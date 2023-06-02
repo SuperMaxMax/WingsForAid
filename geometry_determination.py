@@ -158,6 +158,7 @@ def geometry_determination(obj, plot=False):
     
     # find surface area
     obj.Sw = Weight_TO/WS_values
+    print(obj.Sw)
     
     
     # find power value                 
@@ -165,6 +166,7 @@ def geometry_determination(obj, plot=False):
     
     # wingspan
     obj.b = np.sqrt(obj.A*obj.Sw)
+    
 
     obj.MGC = obj.Sw/obj.b                                      # Mean geometric chord [m]
     
