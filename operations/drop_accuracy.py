@@ -24,6 +24,7 @@ import shapely
 
 # FUNCTIONS
 def SimuDrop(DropCon, DropMan, DropUnc, DropResults):
+    # TODO adjust box param s.t. it lands as expected with default maneuver( current design)
     # get states and apply uncertainties
     CR_Vw = DropCon[1] + DropUnc[1]
     CR_wheading = DropCon[2] + DropUnc[2]
@@ -210,14 +211,14 @@ def PlotTraj(states, title):
     plt.title("reference drop" + str(title))
     plt.show()
 
-def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2):
+def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score):
     points = Stats["bounds"][-1]
     cmap = plt.get_cmap('hot')
 
     # possible landing (combinatory uncertainties)
     plt.scatter(Drops["impact DX [m]"][1:] - Drops["impact DX [m]"][0],
                 Drops["impact DY [m]"][1:] - Drops["impact DY [m]"][0],
-                c=Drops["impact velocity [m/s]"][1:], ec='k', cmap=cmap,label='possible', vmin=-V_boxhit_lim, vmax=0)
+                c=Drops["impact velocity [m/s]"][1:], ec='k', cmap=cmap,label='possible', vmin=-50, vmax=0)
     plt.colorbar(label='impact velocity [m/s]')
 
     # reference drop
@@ -246,7 +247,10 @@ def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2):
     plt.title("landing spots for:" +
             "\ncondition:"+ str(cc_r) +
             " & maneuver:"+ str(mc_r) +
-            "\nSfit=" + str(round(Stats["Dfit"][-1])) + "%")
+            "\nSfit=" + str(round(Stats["Sfit"][-1])) + "%" +
+              " and Dfit=" + str(round(Stats["Dfit"][-1]))
+              + "% | Score:" + str(round(score))
+    )
     plt.show()
 
 # INITIALISE
@@ -266,8 +270,8 @@ dt_sim = 1 / 10E3  # [s] between frames
 IT_max = 10E4
 
 # Operational limits
-V_boxdrop_lim = AC.OP_V_boxlim = 100/6.5 # [m/s] 100kph drop limit
-V_boxhit_lim = AC.OP_Vbox_LDG = 40/6.5 # [m/s] 100kph drop limit
+V_boxdrop_lim = AC.OP_V_boxlim = 100/3.6 # [m/s] 100kph drop limit
+V_boxhit_lim = AC.OP_Vbox_LDG = 40/3.6 # [m/s] 100kph drop limit
 b_zone = 25 # [m]
 h_zone = 25 # [m]
 dropzone = np.array([
@@ -278,10 +282,18 @@ dropzone = np.array([
 ])
 dropzone_poly = Polygon(dropzone)
 Hmin = AC.OP_hmin # [m]
-
 # Design limits
 AC_V_s = AC.V_s_min
 AC_nmax = 3
+
+# Selection criteria
+TPM_weights = np.array([
+    1, # REQ
+    0.5*0.5, 0.5*0.5,  # REQ: Sfit, Pvi
+    0.2*0.2, 0.2*0.8, # OPS: Racc, amax
+    0.3*0.3, 0.3*0.4, 0.3*0.3 # AC: n,pitch,V
+])
+print(TPM_weights)
 
 # Drop Conditions
 # limits
@@ -290,7 +302,7 @@ C_Vw = [0, AC.OP_V_wind] # [kg]
 C_w_heading = [0, 180] # [deg]
 C_Nbox = 1 # [deg]
 # c combinations
-N_div_C = 2
+N_div_C = 0
 C_VAR = {
     "Mbox": subdivide(C_Mbox, N_div_C-1),
     "Vw": subdivide(C_Vw, N_div_C),
@@ -309,7 +321,7 @@ M_pitch = [-45, 5] # [deg]
 M_heading = [0,0] # [deg] not actually a free var
 M_Hmin = [Hmin, Hmin+1] # [m]
 # m combinations
-N_div_M = 0
+N_div_M = 1
 M_VAR = {
     "V_app": subdivide(M_V_app, N_div_M-1),
     "n_app": subdivide(M_n_app, N_div_M-1),
@@ -353,12 +365,12 @@ time_start = time.time()
 # START TRYING COMBINATIONS
 print("\n================= ================= =================",
       len(C_COMB), "Drop Conditions Combinations")
-ConditionResults = {
-    "best M": [],
-    "avg Vimpact": [],
-    "avg Sfit": [],
-    "worst Sfit": []
+ConResults = {
+    "Maneuver": [], # parameters of chosen maneuver
+    "REQ": [], # pass?
+    "Score": [] # weighted TPM sum
 }
+ManeuverTPM = []
 N_Con = 0
 for DropCon in C_COMB:
     print("\n================= =================")
@@ -376,6 +388,7 @@ for DropCon in C_COMB:
         "Racc": [],
         "bounds": []
     }
+
     N_Man = 0
     for ManCase in M_COMB:
         print("\n=================")
@@ -418,7 +431,8 @@ for DropCon in C_COMB:
         ManResults["Dfit"].append(Dfit)
         ManResults["Sfit"].append(Sfit)
 
-        ManResults["PVi95"].append(100*Pvi/N_Unc)
+        Pvi *= 100/N_Unc
+        ManResults["PVi95"].append(Pvi)
         ManResults["Racc"].append(max(Racc))
         ManResults["bounds"].append(points)
 
@@ -435,15 +449,43 @@ for DropCon in C_COMB:
         ManResults["worst V_impact"].append(
             max(DropResults["impact velocity [m/s]"]))
 
-        PlotScatter(DropResults, ManResults, ManCase, DropCon, dropzone_poly, hull_poly)
+        # normalize & prep TPM
+        ManeuverTPM.append([ 0, 0,0, 0,0, 0,0,0 ,0])
+
+        if Sfit == 100 and Pvi >= 95:
+            ManeuverTPM[-1][0]=(100)
+        else:
+            ManeuverTPM[-1][0]=(0)
+        ManeuverTPM[-1][1]=(round(Sfit))
+        ManeuverTPM[-1][2]=(round(Pvi))
+        ManeuverTPM[-1][3]=(round(Dfit))
+        ManeuverTPM[-1][4]=(100*(1-(ManResults["worst a_max"][-1]/AC_nmax)))
+        ManeuverTPM[-1][5]=(100*(1 - (ManCase[1] / AC_nmax)))
+        ManeuverTPM[-1][6]=(100*(1 - (ManCase[2] / max(abs(M_pitch[0]), abs(M_pitch[1])))))
+        ManeuverTPM[-1][7]=(100*(ManCase[0]-AC_V_s)/AC_V_s)
+
+        # weighted criteria sum
+        Score = 0
+        for w, tpm in zip(TPM_weights, ManeuverTPM[-1]):
+            print(w,tpm)
+            Score += w*tpm
+        ManeuverTPM[-1][-1]=Score
+        PlotScatter(DropResults, ManResults, ManCase, DropCon, dropzone_poly, hull_poly, Score)
+
         N_Man += 1
 
-    # get case evaluation, find best maneuver
-    print(ManResults)
+    # rank MANV
+    # choose best
+    # append to condition
+    # bar plot (manv)
+
     N_Con += 1
 
+# rank conditions
+# bar plot (cond)
 # Mparam = f(Case param)
 # CaseResults = f(Case param)
+
 time_end = time.time()
 print(Ntot, "simulations took:",
       (time_end-time_start), "=[s] or",
