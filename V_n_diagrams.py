@@ -243,6 +243,7 @@ def plot_gust(obj):
     plt.plot([V[2], V[4]], [n_peak[2], n_peak[4]], color = 'crimson')             #Between C' and D'
     plt.plot([V[3], V[5]], [n_peak[3], n_peak[5]], color = 'crimson')             #Between F' and E'
     plt.plot([V[4], V[5]], [n_peak[4], n_peak[5]], color = 'crimson')             #Between D' and E'
+    print(n_peak)
 
 
     n_max = CS23_max(obj)
