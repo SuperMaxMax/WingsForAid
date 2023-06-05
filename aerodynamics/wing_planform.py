@@ -78,7 +78,7 @@ def iw(airfoil):
 
 #iw(airfoil)
 
-def main_wing_planform():
+def main_wing_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
         i_w = i_w[0]
         variable = "Lambda"      #Lambda, AR or Twist
