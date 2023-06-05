@@ -46,7 +46,8 @@ class costs:
 
 # Per 30 ac at GB 27 are expected to be operational at any time on average
 changing_ac = False
-changing_roi = True
+changing_price = True
+roi_calc = False
 c = costs()
 
 def op(tot_ac):
@@ -106,26 +107,27 @@ def calc(extra_ac,price):
         
     return(costtime, income,ac,maintcost)
 
+################## PLOT STUFF DOWN BELOW ##############################
 
-
-
-
-
-
-
-if changing_roi:
+if changing_price:
     for i in c.kgprice:
         extra_ac = 40
         costovertime, income, actot, maintenance = calc(extra_ac,i)
         revenue = []
+        roi = []
         print(income)
         for j in range(len(income)):
             revenue.append(income[j]-maintenance[j])
-        plt.plot(range(c.timemax),revenue, label = i)
-    # plt.grid(True, which='minor') 
+            if income[j] != maintenance[j]:
+                roi.append(income[j]/maintenance[j])
+            else:
+                roi.append(0)
+        # plt.plot(range(c.timemax),revenue, label = i)
+        plt.plot(range(c.timemax),roi, label = i)
+    plt.grid(True, which='both') 
 
-    plt.axhline(y=0, color='k')
-    plt.legend()
+    # plt.axhline(y=0, color='k')
+    plt.legend(loc='right')
     plt.show()
 
 
