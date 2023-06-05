@@ -9,10 +9,6 @@ import csv
 import matplotlib.pyplot as plt
 from scipy import integrate, optimize
 
-
-
-
-
 def iw(airfoil):
     ### FIND CL optimal ###
     file_name_clcd = "cl-cd-" + str(airfoil)
