@@ -194,7 +194,7 @@ def plot_lift_distr(i_w):
         #print('=====================================================================')
         #print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
         #print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
-        print(i_w*180/np.pi, C_L_wing - C_L_h, airfoildata.index.tolist())
+        #print(i_w*180/np.pi, C_L_wing - C_L_h, airfoildata.index.tolist())
 
     #Find integral current distribution
     area_lift_dist = -integrate.simps(CL1, y_s)
@@ -221,5 +221,6 @@ airfoildata = airfoil_select(required_lift(), 0)
 C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
 initial_guess = 1000 #required_lift()/C_l_alpha
 
-i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x'][0]
-print(i_w_optimal)
+#i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x'][0]
+#print(i_w_optimal)
+print(aircraft.taper)
