@@ -244,7 +244,7 @@ def main_wing_planform():
 
     return AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, i_w, y_s, l #DONT CHANGE ORDER OR DO IT IN MAIN AS WELL
     
-print(main_wing_planform())
+#print(main_wing_planform())
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
