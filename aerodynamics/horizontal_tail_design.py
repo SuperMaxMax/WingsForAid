@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 from scipy import integrate, optimize
 
 from parameters import UAV
-aircraft = UAV('aircraft')
+object = UAV('aircraft')
 
 
-def required_lift():
+def required_lift(aircraft):
     #load in parameters from current design
     AR = aircraft.AE_A
     sweep_c4 = aircraft.AE_sweep_co4
@@ -99,7 +99,7 @@ def airfoil_select(C_L_h, change):
     return df.loc[[airfoil]]
 #print(airfoil_select(required_lift()))
 
-def horizontal_tail_planform():
+def horizontal_tail_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
         variable = "Lambda"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
@@ -110,7 +110,7 @@ def horizontal_tail_planform():
         elif variable == "Twist":
             variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
         
-        airfoildata_temp = airfoil_select(required_lift()[0], 0)
+        airfoildata_temp = airfoil_select(required_lift(aircraft)[0], 0)
         a_stall = airfoildata_temp['alpha_s'].tolist()[0] * np.pi /180
         
         for parameter in variable_list2:
@@ -121,7 +121,7 @@ def horizontal_tail_planform():
             else: 
                 change = 0
             
-            airfoildata = airfoil_select(required_lift()[0], change)
+            airfoildata = airfoil_select(required_lift(aircraft)[0], change)
 
             segments = 100
             N = segments - 1
@@ -139,7 +139,7 @@ def horizontal_tail_planform():
             else:
                 alpha_twist = 0 * np.pi / 180
             
-            C_L_h = required_lift()[0]
+            C_L_h = required_lift(aircraft)[0]
             i_w = i_w[0]
             a_2d = airfoildata['C_l_alpha'].tolist()[0]         #AIRFOIL PARAMETER                                  
             alpha_0 = airfoildata['alpha_0'].tolist()[0]        #AIRFOIL PARAMETER
@@ -217,14 +217,14 @@ def horizontal_tail_planform():
         if not full_print:
             return abs(C_L_wing - C_L_h)
         elif full_print:
-            return AR, b #choose whatever
+            return AR, b, Lambda, alpha_twist  #choose whatever
 
     airfoildata = airfoil_select(required_lift()[0], 0)
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
     initial_guess = required_lift()[0]/C_l_alpha
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     print(a_h_optimal)
-    AR, b = plot_lift_distr(a_h_optimal, full_print = True)
+    AR, b, Lambda, alpha_twist  = plot_lift_distr(a_h_optimal, full_print = True)
 
     #Adding effect of downwash
     C_L_W_c = required_lift()[1]
@@ -237,6 +237,24 @@ def horizontal_tail_planform():
     epsilon = epsilon_0 + epsilon_alpha * i_w
     i_h = a_h_optimal - a_f + epsilon
     
-    return AR, b, i_h #choose whatever 
+    # Horizontal tailplane
+    aircraft.AE_A_h = AR                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+    aircraft.AE_lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
+    aircraft.AE_dEpsilondA = epsilon_alpha              # Downwash [-] TODO: check this value, this is a pure guess
+    aircraft.AE_A_h = AR                        
+    aircraft.AE_b_h = b                     
+    aircraft.AE_i_w_h = i_h       
+    aircraft.AE_wing_twist_h = alpha_twist    
+    self.AE_sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
+    aircraft.AE_sweep_co2_h = 1 / np.tan(tan(aircraft.AE_sweep_co4_h) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.AE_sweep_LE_h = 1 / np.tan(tan(aircraft.AE_sweep_co4_h) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
+    aircraft.AE_taper_h = Lambda                
+    aircraft.AE_rootchord_h = 2 * aircraft.AE_Sw_h / (aircraft.AE_b_h * (1+Lambda))            
+    aircraft.AE_tipchord_h = aircraft.AE_rootchord_h*Lambda        
+    aircraft.AE_MAC_length_h = 2/3 * aircraft.AE_rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)        
+    aircraft.AE_y_mac_h = 1/3*(aircraft.AE_b_h/2)*(1+2*Lambda)/(1+Lambda)   
+    aircraft.AE_x_lemac_h = aircraft.AE_y_mac_h/np.tan(aircraft.AE_sweep_LE_h)
+
+    return 
 
 print(horizontal_tail_planform())

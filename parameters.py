@@ -169,9 +169,21 @@ class UAV:
         self.AE_l_h = 4.5                      # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
-        self.AE_lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area wing
+        self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
+        self.AE_taper_h = 0.6                
+        self.AE_b_h = 4                     
+        self.AE_i_w_h = 0.04       
+        self.AE_wing_twist_h = 0.04    
+        self.AE_sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
+        self.AE_sweep_co2_h = -0.04 
+        self.AE_sweep_LE_h = 0.04
+        self.AE_rootchord_h = 1            
+        self.AE_tipchord_h = 0.6        
+        self.AE_MAC_length_h = 0.8       
+        self.AE_y_mac_h = 1
+        self.AE_x_lemac_h = 0.2
+
 
         # Vertical tailplane
         self.AE_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
