@@ -27,6 +27,7 @@ def required_lift():
     MAC = aircraft.AE_MAC_length
     xcg_fwrd = aircraft.X_cg_fwd
     xcg_aft = aircraft.X_cg_aft
+    Sh_SW = aircraft.AE_Sh_S
 
     #test to verify code
     # AR = 28
@@ -42,8 +43,8 @@ def required_lift():
     # MAC = 0.8
 
     #temp values from book
-    V_H = 0.7 #table 6.4 "aircraft design synthesis a systems engineering approach"
-    #V_H = Sh*lh / Sw * MAC
+    #V_H = 0.7 #table 6.4 "aircraft design synthesis a systems engineering approach"
+    V_H = Sh_SW * aircraft.AE_l_h / MAC
 
     #inbetween calculutions 
     C_L = 2*W_TO/(rho_c * (V_c**2) * S) #lift in cruise
@@ -60,8 +61,9 @@ def required_lift():
         C_L_h_new = (C_m_0_wf + C_L * (h - h0)) / (V_H)
         if abs(C_L_h_new) > abs(C_L_h):
             C_L_h = C_L_h_new
+    C_L_W_c = C_L
     
-    return C_L_h
+    return C_L_h, C_L_W_c
 
 def airfoil_select(C_L_h, change):
     #airfoil data
@@ -108,7 +110,7 @@ def horizontal_tail_planform():
         elif variable == "Twist":
             variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
         
-        airfoildata_temp = airfoil_select(required_lift(), 0)
+        airfoildata_temp = airfoil_select(required_lift()[0], 0)
         a_stall = airfoildata_temp['alpha_s'].tolist()[0] * np.pi /180
         
         for parameter in variable_list2:
@@ -119,7 +121,7 @@ def horizontal_tail_planform():
             else: 
                 change = 0
             
-            airfoildata = airfoil_select(required_lift(), change)
+            airfoildata = airfoil_select(required_lift()[0], change)
 
             segments = 100
             N = segments - 1
@@ -137,7 +139,7 @@ def horizontal_tail_planform():
             else:
                 alpha_twist = 0 * np.pi / 180
             
-            C_L_h = required_lift()
+            C_L_h = required_lift()[0]
             i_w = i_w[0]
             a_2d = airfoildata['C_l_alpha'].tolist()[0]         #AIRFOIL PARAMETER                                  
             alpha_0 = airfoildata['alpha_0'].tolist()[0]        #AIRFOIL PARAMETER
@@ -194,7 +196,7 @@ def horizontal_tail_planform():
             #print('=====================================================================')
             #print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
             #print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
-            #print(i_w*180/np.pi, C_L_wing - C_L_h, airfoildata.index.tolist())
+            print(i_w*180/np.pi, C_L_wing - C_L_h, airfoildata.index.tolist())
 
         #Find integral current distribution
         area_lift_dist = -integrate.simps(CL1, y_s)
@@ -217,13 +219,24 @@ def horizontal_tail_planform():
         elif full_print:
             return AR, b #choose whatever
 
-    airfoildata = airfoil_select(required_lift(), 0)
+    airfoildata = airfoil_select(required_lift()[0], 0)
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
-    initial_guess = required_lift()/C_l_alpha
-    i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
+    initial_guess = required_lift()[0]/C_l_alpha
+    a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
+    print(a_h_optimal)
+    AR, b = plot_lift_distr(a_h_optimal, full_print = True)
 
-    AR, b = plot_lift_distr(i_w_optimal, full_print = True)
+    #Adding effect of downwash
+    C_L_W_c = required_lift()[1]
+    AR_w = aircraft.AE_A
+    i_w = aircraft.AE_i_w
+    a_f = aircraft.AE_alpha_f
+    C_L_a_W = aircraft.AE_CL_a_W
+    epsilon_0 = 2 * C_L_W_c / (np.pi * AR_w)
+    epsilon_alpha = 2 * C_L_a_W / (np.pi * AR_w)
+    epsilon = epsilon_0 + epsilon_alpha * i_w
+    i_h = a_h_optimal - a_f + epsilon
     
-    return AR, b #choose whaever 
+    return AR, b, i_h #choose whatever 
 
 print(horizontal_tail_planform())
