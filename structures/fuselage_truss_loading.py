@@ -182,3 +182,10 @@ t_min6=(12*1500*L_AA_*(1-v**2)/(c_comp*E*np.pi**2))**(1/3)
 mass6=t_min5*density*L_AA_*L_AE
 print('minumum mass for compression of bottom pannel due to wing structural weight',mass6)
 
+#############################################################
+## Some structural loading forces calculations
+C_L_h = -0.1331864964576476
+F_h=ac.W_TO*ac.g0*(ac.AE_Vh_V)**2*ac.AE_Sh_S*C_L_h/ac.AE_CL_max_clean
+print("F_h",F_h)
+
+
