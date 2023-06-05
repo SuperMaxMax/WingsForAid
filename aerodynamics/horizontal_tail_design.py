@@ -98,7 +98,7 @@ def airfoil_select(C_L_h, change):
 #print(airfoil_select(required_lift()))
 
 def horizontal_tail_planform():
-    def plot_lift_distr(i_w):
+    def plot_lift_distr(i_w, full_print = False):
         variable = "Lambda"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
@@ -212,15 +212,18 @@ def horizontal_tail_planform():
         plt.legend()
         #plt.show()
         
-        return abs(C_L_wing - C_L_h)
-        
-    #plot_lift_distr()
+        if not full_print:
+            return abs(C_L_wing - C_L_h)
+        elif full_print:
+            return AR, b #choose whatever
 
     airfoildata = airfoil_select(required_lift(), 0)
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
     initial_guess = required_lift()/C_l_alpha
-    i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x'][0]
+    i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
+
+    AR, b = plot_lift_distr(i_w_optimal, full_print = True)
     
-    return i_w_optimal
+    return AR, b #choose whaever 
 
 print(horizontal_tail_planform())
