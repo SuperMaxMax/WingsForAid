@@ -4,9 +4,9 @@ class BOX:
     def __init__(self, box_number):
         # parameters
         self.CD = 0
-        self.CD0 = 	2.1 #[-]
+        self.CD0 = 	1.05 #[-] flat cube
         self.DCD_brake = 0.5 #[-]
-        self.DCD_flaps = 1.28 #[-]
+        self.DCD_flaps = 1.17 #[-] separation sheet
         self.DT_brake = 0.5 # [s]
         self.DT_flaps = 1  # [s]
         self.T_deployment = 0.5 # [s] ease drag transition
