@@ -9,9 +9,8 @@ import csv
 import matplotlib.pyplot as plt
 from scipy import integrate, optimize
 
-aircraft = UAV('aircraft')
-#
-airfoil = aircraft.airfoil 
+
+
 
 
 def iw(airfoil):
@@ -213,7 +212,6 @@ def main_wing_planform(aircraft):
             #print(W_TO)
             #print(l)
 
-
         #Find integral current distribution
         area_lift_dist = -integrate.simps(CL1, y_s)
         #print(area_lift_dist)
@@ -235,16 +233,37 @@ def main_wing_planform(aircraft):
         if not full_print:
             return abs(C_L_wing-C_L_req)
         elif full_print:
-            return AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, i_w, y_s, l
+            return AR, Lambda, alpha_twist, span_eff, CD_induced, i_w
     
+    airfoil = aircraft.airfoil
     initial_guess = iw(airfoil)[0]
     i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
+    AR, Lambda, alpha_twist, span_eff, i_w = plot_lift_distr(i_w_optimal, full_print=True)
 
-    AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, i_w, y_s, l = plot_lift_distr(i_w_optimal, full_print=True)
+    aircraft.AE_A = AR                        # Updated aspect ratio [-]
+    aircraft.AE_CL_a_W = 4.2                    # Still to be updated lift curve slope [-] 
+    aircraft.AE_L_D = 14.1804                   # Still to be updated lift to drag ratio [-]
+    aircraft.AE_MAC_length = 1.3045             # Updated mean aerodynamic chord [m]
+    aircraft.AE_MAC_ac = 0.24                   # Updated location of aerodynamic center relative to MAC [-]
+    aircraft.AE_b = (AR*aircraft.AE_Sw)**0.5                       # Updated wing span [m]
+    aircraft.AE_span_eff = span_eff                        # Span eficiency factor (different from oswald) [-]
+    #aircraft.AE_e = 0.7                         # Still to be updated oswald efficiency factor [-]
+    aircraft.AE_i_w = i_w        # Updated incidence angle of wing wrt fuselage [rad]
+    aircraft.AE_wing_twist = alpha_twist       # Updated wing twist (difference root and chord) [rad]
+    aircraft.AE_sweep_co2 = 1 / np.tan(tan(aircraft.AE_sweep_co4) - 4/AR * (25/100*(1-Lambda)/(1+Lambda)))             # Still to be updated half chord sweep angle [rad]
 
-    return AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, i_w, y_s, l #DONT CHANGE ORDER OR DO IT IN MAIN AS WELL
+    aircraft.AE_taper = Lambda                   # Updated taper ratio [-]
+    aircraft.AE_rootchord = 1.7561              # Updated Root chord [m]
+    aircraft.AE_tipchord = aircraft.AE_rootchord*Lambda           # Updated tip chord [m]
+    aircraft.AE_x_lemac = 0.2871                # Still to be updated distance from LE root chord to the leading edge mean aerodynamic chord [m]
+    aircraft.AE_y_mac = 2.04                    # Updated spanwise location of the MAC [m]
+
     
-#print(main_wing_planform())
+    return 
+
+aircraft =  UAV('aircraft')
+main_wing_planform(aircraft)
+print(aircraft.AE_A)
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
