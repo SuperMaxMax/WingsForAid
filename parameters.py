@@ -150,6 +150,7 @@ class UAV:
         self.AE_Sw_wetted = 23.4226             # Updated wetted area of the wing [m^2]
         self.AE_b = 9.527                       # Updated wing span [m]
         self.AE_dihedral = 0                    # Updated wing dihedral angle [rad]
+        self.AE_span_eff = 0.95                        # Span eficiency factor (different from oswald) [-]
         self.AE_e = 0.7                         # Still to be updated oswald efficiency factor [-]
         self.AE_i_w = 0.19 * np.pi / 180        # Updated incidence angle of wing wrt fuselage [rad]
         self.AE_wing_twist = 0 *np.pi/180       # Updated wing twist (difference root and chord) [rad]
