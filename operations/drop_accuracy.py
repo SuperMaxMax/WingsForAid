@@ -370,10 +370,10 @@ print("try conditions:", C_COMB)
 M_V_app = [AC_V_s, V_boxdrop_lim] # [m/s]
 M_n_app = [0.5, AC_nmax] # [g]
 M_pitch = [-45, 5] # [deg]
-M_heading = [0,0] # [deg] not actually a free var
+M_heading = [0, 0] # [deg] not actually a free var
 M_Hmin = [Hmin, Hmin+1] # [m]
 # m combinations
-N_div_M = 2
+N_div_M = 3
 M_VAR = {
     "V_app": subdivide(M_V_app, 1),
     "n_app": subdivide(M_n_app, N_div_M),

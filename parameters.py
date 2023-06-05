@@ -277,4 +277,3 @@ class atmosphere:
         self.R      = 287.05    
         self.p0     = 101325    # Pa 
         self.gamma  = 1.4
-
