@@ -8,6 +8,12 @@ c = [-4.64970233e-08,  1.33281512e-06, -1.39844253e-05,  5.02004763e-05,  #No cl
                              -7.63817658e+04,  1.02621415e+03]
 
 
+
+c = [-9.66193857e-01,  2.21217522e+01, -2.15539510e+02,  1.16482541e+03,
+ -3.81444542e+03,  7.76224418e+03, -9.67481071e+03,  6.99194179e+03,
+ -2.62539473e+03,  3.40489460e+02,  1.02549983e+03]
+
+
 c = c[::-1]
 import numpy as np
 x = np.arange(0, 4.5, 0.1)
@@ -15,6 +21,7 @@ def polynomial(coefficients, x):
     y = 0
     for i in range(len(coefficients)):
         y+= coefficients[i]*x**i
+        print(coefficients[i], i)
 
     return y
         
