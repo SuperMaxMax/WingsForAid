@@ -188,27 +188,26 @@ def plot_lift_distr(object):
         #print(Croot*Lambda)
         l = CL1*c*q
         plt.plot(y_s, l)
-        lift_coefficients = np.polyfit(y_s, l, 10)
         
-                
-        lift_coefficients = lift_coefficients[::-1]
-        x = np.arange(-0.3, b/2, 0.001)
-        def polynomial(coefficients, x):
-            y = 0
-            for i in range(len(coefficients)):
-                y+= coefficients[i]*x**i
-                print(coefficients[i], i)
+        #Getting coefficients for a polynomial fit for the lift distribution
+        # lift_coefficients = np.polyfit(y_s, l, 10)
+              
+        # lift_coefficients = lift_coefficients[::-1]
+        # x = np.arange(-0.3, b/2, 0.001)
+        # def polynomial(coefficients, x):
+        #     y = 0
+        #     for i in range(len(coefficients)):
+        #         y+= coefficients[i]*x**i
+        #         print(coefficients[i], i)
 
-            return y
+        #     return y
                 
-
-        y = polynomial(lift_coefficients, x)
+        # y = polynomial(lift_coefficients, x)
         
+        # plt.plot(x, y)
+        # plt.show()
 
-        plt.plot(x, y)
-        plt.show()
-
-        print("asdf", lift_coefficients)
+        # print("asdf", lift_coefficients)
         #print(-2*integrate.simps(l, y_s))
         print(W_TO)
         print(l)
