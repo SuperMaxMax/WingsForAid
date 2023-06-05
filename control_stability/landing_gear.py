@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import patheffects
 # import sympy as sp 
 
-sys.path.append('..')
+sys.path.append('.')
 
 from parameters import UAV, atmosphere
 
@@ -63,8 +63,8 @@ def longitudinal_position_landing_gear(aircraft, x_point, ypoint):
     x_front_min = x_front_min_aft
 
     # Plot limit for the front undercarriage
-    line_1 = ax.plot([x_front_max, x_front_max], [-0.5, 0.5], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
-    line_2 = ax.plot([x_front_min, x_front_min], [-0.5, 0.5], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])[0]
+    line_1 = ax.plot([x_front_max, x_front_max], [-1, 1], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
+    line_2 = ax.plot([x_front_min, x_front_min], [-1, 1], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])[0]
     
     
 
@@ -96,9 +96,9 @@ def lateral_position_landing_gear(aircraft):
     
     # Pitch Angle limit NOTE: 15 degrees can change for our aircraft. 
 
-    angle_theta_max = 15 * (np.pi/180) 
+    angle_theta_max = 30 * (np.pi/180) 
     x_cg_aft_limit = aircraft.x_cg_position_aft + Z_position_cg * np.tan(angle_theta_max)
-    line_3 = ax.plot([x_cg_aft_limit, x_cg_aft_limit], [-0.5, 0.5], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
+    line_3 = ax.plot([x_cg_aft_limit, x_cg_aft_limit], [-1, 1], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
 
     # II - Limit for the main leg position for give N to attain stability against turnover NOTE: right now z_cg is assumed to be 0.8*z_cg_max. This should be an arbitrary value. 
     d_wheel = 0.3
