@@ -100,10 +100,10 @@ def tau(df):
 
 
 def eta(df):     # Weights based on mission profile
-    cruise_weight   = 0.475
-    loiter_weight   = 0.038
-    ascend_weight   = 0.174
-    descend_weight  = 0.228
+    cruise_weight   = 0.519
+    loiter_weight   = 0.041
+    ascend_weight   = 0.190
+    descend_weight  = 0.249
     cruise_par      = "clcd12_max"
     loiter_par      = "clcd32_max"
     ascend_par      = "clcd_max"
