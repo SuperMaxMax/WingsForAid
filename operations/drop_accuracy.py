@@ -51,8 +51,8 @@ def SimuDrop(DropCon, DropMan, DropUnc, DropResults):
         AC_pos = np.array([0, 0, Approach["Hmin"] + Dh])\
                  + np.array([
                     np.cos(Approach["pitch"]),
-                    np.sin(Approach["pitch"]),
-                    0
+                    0,
+                    np.sin(Approach["pitch"])
                 ]) * Approach["V_app"] * time_dev_drop
 
     # apply uncertainties to box
@@ -62,9 +62,9 @@ def SimuDrop(DropCon, DropMan, DropUnc, DropResults):
     newbox.DT_flaps += DropUnc[5]
 
     # get box position relative to AC
-    boxDX = 0.2+0.4
-    boxDY = 0.1+0.4/2
-    boxDZ = 0
+    boxDX = box_layout[0]
+    boxDY = box_layout[1]
+    boxDZ = box_layout[2]
     box_pos = {
         0: [0 * boxDX, boxDY, boxDZ],
         1: [0 * boxDX, -boxDY, boxDZ],
@@ -235,15 +235,15 @@ def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score=0):
 
     plt.legend(loc='lower center', ncol=3, bbox_to_anchor=(0.5, -0.3))
     plt.subplots_adjust(left=0.1,
-                        bottom=0.2,
+                        bottom=0.1,
                         right=0.95,
-                        top=0.8,
+                        top=0.85,
                         wspace=0.3,
                         hspace=0.4)
     mc_r = []
-    for var in mancase: mc_r.append(round(var))
+    for var in mancase: mc_r.append(np.round(var, 2))
     cc_r = []
-    for var in concase: cc_r.append(round(var))
+    for var in concase: cc_r.append(np.round(var, 2))
     plt.title("landing spots for:" +
             "\ncondition:"+ str(cc_r) +
             " & maneuver:"+ str(mc_r) +
@@ -262,7 +262,7 @@ def PlotBar(ManTPM, TPMw, ManCases, concase):
         mancase_name = []
         for val in mancase:
             mancase_name.append(str(np.round(val,2)))
-        cases.append(str(mancase))
+        cases.append(str(mancase_name))
 
     fig, ax = plt.subplots()
     N = len(cases)
@@ -280,9 +280,9 @@ def PlotBar(ManTPM, TPMw, ManCases, concase):
         w_counter += 1
 
     ax.set_title("TPM per case for condition " + str(concase))
-    plt.legend(loc='lower center', ncol=3, bbox_to_anchor=(0.5, +1.5))
+    plt.legend(loc='lower center', ncol=3, bbox_to_anchor=(0.5, +1.3))
     plt.subplots_adjust(left=0.1,
-                        bottom=0.6,
+                        bottom=0.5,
                         right=0.95,
                         top=0.7,
                         wspace=0.3,
@@ -291,6 +291,13 @@ def PlotBar(ManTPM, TPMw, ManCases, concase):
     plt.show()
 
     return scores
+
+def unique(list1): # get unique elements of list
+    unique_list = []
+    for x in list1:
+        if x not in unique_list:
+            unique_list.append(x)
+    return unique_list
 
 # get defaults design values
 AC = UAV('aircraft')
@@ -303,14 +310,16 @@ box = BOX(1)
 print("box default:", box.__dict__)
 
 # Simulation param
-dt_sim = 1 / 10E3  # [s] between frames
+dt_sim = 5 / 10E3  # [s] between simulation frames
 IT_max = 10E4
 
-# Operational limits
-V_boxdrop_lim = AC.OP_V_boxlim = 100/3.6 # [m/s] 100kph drop limit
-V_boxhit_lim = AC.OP_Vbox_LDG = 40/3.6 # [m/s] 100kph drop limit
-b_zone = 25 # [m]
-h_zone = 25 # [m]
+# Operational limits & requirements
+V_boxdrop_lim = 100/3.6 # [m/s] 100kph drop limit
+V_boxhit_lim = 40/3.6 # [m/s] 40kph drop limit
+box_layout = [AC.boxDX, AC.boxDY, AC.boxDZ]
+Hmin = AC.OP_hmin # [m]
+b_zone = AC.OP_b_dropzone # [m]
+h_zone = AC.OP_h_dropzone # [m]
 dropzone = np.array([
     [-b_zone/2,-h_zone/2],
     [-b_zone/2, h_zone/2],
@@ -318,18 +327,18 @@ dropzone = np.array([
     [ b_zone/2,-h_zone/2]
 ])
 dropzone_poly = Polygon(dropzone)
-Hmin = AC.OP_hmin # [m]
+
 # Design limits
 AC_V_s = AC.V_s_min
-AC_nmax = 3
+AC_nmax = AC.OP_n_app_max
 
 # Selection criteria
-cat_w = [1, 0.2, 0.4, 0.4]
+cat_w = [1, 0.5, 0.1, 0.4]
 TPM_weights = np.array([
     cat_w[0]*1, # REQ
     cat_w[1]*0.5, cat_w[1]*0.5,  # REQ: Sfit, Pvi
     cat_w[2]*0.2, cat_w[2]*0.8, # OPS: Racc, amax
-    cat_w[3]*0.3, cat_w[3]*0.4, cat_w[3]*0.3 # AC: n,pitch,V
+    cat_w[3]*0.7, cat_w[3]*0.15, cat_w[3]*0.15 # AC: n,pitch,V
 ])
 
 # Drop Conditions
@@ -339,15 +348,21 @@ C_Vw = [0, AC.OP_V_wind] # [kg]
 C_w_heading = [0, 180] # [deg]
 C_Nbox = 1 # [deg]
 # c combinations
-N_div_C = 0
+N_div_C = 3
 C_VAR = {
-    "Mbox": subdivide(C_Mbox, N_div_C-1),
-    "Vw": subdivide(C_Vw, N_div_C),
+    "Mbox": subdivide(C_Mbox, 1),
+    "Vw": subdivide(C_Vw, 2),
     "w_heading": subdivide(C_w_heading, N_div_C),
     "box_number": range(C_Nbox)
 }
 allNames = C_VAR
 C_COMB = list(it.product(*(C_VAR[Name] for Name in allNames)))
+C_COMB_red = []
+for c_comb in C_COMB:
+    c_comb = list(c_comb)
+    if c_comb[1] == 0:c_comb[2] = 0 # no wing heading difference if no wind
+    C_COMB_red.append(c_comb)
+C_COMB = unique(C_COMB_red)
 print("try conditions:", C_COMB)
 
 # Maneuver
@@ -358,45 +373,54 @@ M_pitch = [-45, 5] # [deg]
 M_heading = [0,0] # [deg] not actually a free var
 M_Hmin = [Hmin, Hmin+1] # [m]
 # m combinations
-N_div_M = 1
+N_div_M = 2
 M_VAR = {
-    "V_app": subdivide(M_V_app, N_div_M-1),
-    "n_app": subdivide(M_n_app, N_div_M-1),
+    "V_app": subdivide(M_V_app, 1),
+    "n_app": subdivide(M_n_app, N_div_M),
     "pitch": subdivide(M_pitch, N_div_M),
     "heading": subdivide(M_heading, 0),
     "Hmin": subdivide(M_Hmin, 0)
 }
 allNames = M_VAR
 M_COMB = list(it.product(*(M_VAR[Name] for Name in allNames)))
+M_COMB_red = []
+for m_comb in M_COMB:
+    m_comb = list(m_comb)
+    if m_comb[2]==0: m_comb[1]=0 # no load factor if angle is 0
+    M_COMB_red.append(m_comb)
+M_COMB = unique(M_COMB_red)
 print("try maneuvers:", M_COMB)
 
 # Uncertainties
 # limits
+U_dt = 0.5 # [s] default time deviation
 U_Mbox = [-0.5,0.5] # [kg]
-U_T_drop = [-1,1] # [s]
-U_T_brake = [-0.5,0.5] # [s]
-U_T_flap = [-0.5,0.5] # [s]
-U_pos = [-5,5] # [m]
-U_Vw = [-5,5] # [m/s]
-U_w_heading = [-25,25] # [deg]
+U_T_drop = [-U_dt, U_dt] # [s]
+U_T_brake = [-U_dt, U_dt] # [s]
+U_T_flap = [-U_dt, U_dt] # [s]
+U_pos = [-5, 5] # [m]
+U_Vw = [-5, 5] # [m/s]
+U_w_heading = [-25, 25] # [deg]
 # U combinations
 N_div_U = 2
 U_VAR = {
     "Mbox": subdivide(U_Mbox, 0),
-    "Vw": subdivide(U_Vw, N_div_U-1),
-    "w_heading": subdivide(U_w_heading, N_div_U),
-    "T_drop": subdivide(U_T_drop, 0),
-    "T_brake": subdivide(U_T_brake, 1),
-    "T_flap": subdivide(U_T_flap, 1),
+    "Vw": subdivide(U_Vw, 1),
+    "w_heading": subdivide(U_w_heading, 3),
+    "T_drop": subdivide(U_T_drop, 1),
+    "T_brake": subdivide(U_T_brake, 0),
+    "T_flap": subdivide(U_T_flap, 0),
     "posX": subdivide(U_pos, 0),
     "posY": subdivide(U_pos, 0)
 }
 allNames = U_VAR
 U_COMB = list(it.product(*(U_VAR[Name] for Name in allNames)))
+U_COMB = unique(U_COMB)
 print("with uncertainty:", U_COMB)
 
+# Trial summary
 Ntot = len(M_COMB)*len(C_COMB)*len(U_COMB)
-print("total simulations:", len(M_COMB), len(C_COMB), len(U_COMB), "=", Ntot, "in about", (187/384)*Ntot/60, "[min]")
+print("total simulations:", len(C_COMB), len(M_COMB), len(U_COMB), "=", Ntot, "in about", (6426/13824)*Ntot/60, "[min]")
 time_start = time.time()
 
 # START TRYING COMBINATIONS
@@ -425,13 +449,13 @@ for DropCon in C_COMB:
     }
     ManeuverTPM = {
         "REQ passed": [],
-        "AC_na": [],
-        "AC_pa": [],
-        "AC_Va": [],
-        "OPS_R": [],
-        "OPS_am": [],
         "REQ_S": [],
         "REQ_Vi": [],
+        "OPS_R": [],
+        "OPS_am": [],
+        "AC_na": [],
+        "AC_pa": [],
+        "AC_Va": []
     }
 
     N_Man = 0
@@ -453,7 +477,7 @@ for DropCon in C_COMB:
         state = SimuDrop(DropCon, ManCase, DropUncRef, DropResults)
         #PlotTraj(state, ManCase)
 
-        # simulate uncertainty drops
+        # simulate drop uncertainties
         Racc = []
         Pvi = 0
         for DropUnc in U_COMB:
@@ -501,7 +525,7 @@ for DropCon in C_COMB:
             ManeuverTPM["REQ passed"].append(0)
         ManeuverTPM["REQ_S"].append(round(Sfit))
         ManeuverTPM["REQ_Vi"].append(round(Pvi))
-        ManeuverTPM["OPS_R"].append(round(Dfit))
+        ManeuverTPM["OPS_R"].append(round(100-Dfit))
         ManeuverTPM["OPS_am"].append(100*(1-(ManResults["worst a_max"][-1]/AC_nmax)))
         ManeuverTPM["AC_na"].append(100*(1 - (ManCase[1] / AC_nmax)))
         ManeuverTPM["AC_pa"].append(100*(1 - (abs(ManCase[2]) / max(abs(M_pitch[0]), abs(M_pitch[1])))))
@@ -531,4 +555,4 @@ print("\n================= ================= =================")
 time_end = time.time()
 print(Ntot, "simulations took:",
       (time_end-time_start), "=[s] or",
-      (time_end-time_start)/3600,  "[h]")
+      (time_end-time_start)/60,  "[min]")

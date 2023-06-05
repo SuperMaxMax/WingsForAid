@@ -212,24 +212,21 @@ class UAV:
         self.n_drops = 1  # [-]
         self.n_boxes = 12  # [-]
         self.hatchDT = 1  # [s]
-        self.hatchDTdev = 0.5  # [s]
         self.OP_V_boxlim = 100/3.6 # [m/s] box drop max speed
+        self.OP_Vbox_LDG = 40 / 3.6  # [m/s] 40kph drop limit
         self.boxDX = 0.5  # [m]
-        self.boxDY = 0.5  # [m]
+        self.boxDY = 0.3  # [m]
         self.boxDZ = 0  # [m]
 
         self.OP_theta_app = 0  # [deg]       # approach
         self.OP_V_app = 100  # [m/s]
 
-        self.OP_V_drop = 100  # [m/s]       # drop
-        self.OP_Dn_drop = 1  # [g0]
-        self.OP_theta_drop = 0  # [deg]
-        self.OP_Vbox_LDG = 1  # [m/s]
-        self.OP_amax_box = 1  # [m/s2]
-        self.OP_accuracyX = 25  # [m]
-        self.OP_accuracyY = 25  # [m]
+        self.OP_n_app_max = 3 # [g]
+        self.OP_V_impact_max = 40/3.6 # [m/s] 95% of landing under that
 
         self.OP_hmin = 15  # [m]              # requirements
+        self.OP_b_dropzone = 25 # [m]
+        self.OP_h_dropzone = 25  # [m]
         self.OP_V_crosswind = 10  # [m/s]
         self.OP_V_tailwind = 15  # m/s]
         self.OP_V_headwind = 15  # [m/s]
