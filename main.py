@@ -1,5 +1,7 @@
 from aerodynamics.example import print_name, overwrite_value
 from parameters import UAV
+import pandas as pd
+import numpy as np
 
 # # export dataframe of current design to csv file
 # df['DET_CON_2_braced'].to_csv('DET_CON_2_braced.csv', sep=';')
@@ -18,6 +20,7 @@ if __name__ == '__main__':
     print("AC default:", AC.__dict__)
 
     # --- saving
+    df = pd.DataFrame()
     # save all attributes of object to csv file
     members = [attr for attr in dir(AC) if not callable(getattr(AC, attr)) and not attr.startswith("__")]
     values = [getattr(AC, member) for member in members]
