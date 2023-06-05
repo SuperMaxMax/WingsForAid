@@ -3,11 +3,12 @@ sys.path.append("..")
 
 # Start your import below this
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import math as m
 
 class costs:
     def __init__(self):
-        self.timemax    = 10    # years
+        self.timemax    = 11    # years
         self.startAC    = 30    # aircraft
         self.ACextramin = 30     # aircraft per year
         self.ACextramax = 31    # aircraft per year
@@ -28,7 +29,7 @@ class costs:
         self.payl_box   = 20    # kg of payload per box
         self.box_w      = 3     # weight of box in kg
         self.boxes      = 12    # amount of boxes per sortie
-        self.kgprice    = [0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2]
+        self.kgprice    = [1.25,1.3,1.35]
         # [1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2]   # euros per kg
 
         self.sortie_pd  = 3.4148976
@@ -46,7 +47,8 @@ class costs:
 
 # Per 30 ac at GB 27 are expected to be operational at any time on average
 changing_ac = False
-changing_roi = True
+changing_price = True
+roi_calc = False
 c = costs()
 
 def op(tot_ac):
@@ -106,26 +108,40 @@ def calc(extra_ac,price):
         
     return(costtime, income,ac,maintcost)
 
+################## PLOT STUFF DOWN BELOW ##############################
 
-
-
-
-
-
-
-if changing_roi:
+if changing_price:
     for i in c.kgprice:
         extra_ac = 40
         costovertime, income, actot, maintenance = calc(extra_ac,i)
         revenue = []
-        print(income)
+        roi = []
+        totalrev = []
         for j in range(len(income)):
-            revenue.append(income[j]-maintenance[j])
-        plt.plot(range(c.timemax),revenue, label = i)
-    # plt.grid(True, which='minor') 
-
-    plt.axhline(y=0, color='k')
-    plt.legend()
+            if income[j] != 0:
+                revenue.append(income[j]-maintenance[j])
+                totalrev.append(sum(revenue))
+                if income[j] != maintenance[j]:
+                    roi.append(income[j]/maintenance[j])
+                else:
+                    roi.append(0)
+        # plt.plot(range(1,c.timemax,1),revenue, label = i)
+        plt.plot(range(1,c.timemax,1),totalrev, label = i)
+        # plt.plot(range(1,c.timemax,1),roi, label = i)
+    # plt.grid(True, which='both') 
+    left, bottom, width, height = (0.9, 1.3, 9.2, 0.2)
+    rect=mpatches.Rectangle((left,bottom),width,height, 
+                        #fill=False,
+                        alpha=0.1,
+                       facecolor="green")
+    plt.gca().add_patch(rect)
+    # plt.plot(range(1,c.timemax,1),[1]*10, color='k', linestyle=':')
+    # plt.axhline(y=1, color='k')
+    # plt.axhline(y=1.5, color='k')
+    # Reversing the order of legend labels
+    handles, labels = plt.gca().get_legend_handles_labels()
+    plt.legend(handles[::-1], labels[::-1])
+    # plt.legend(loc='right')
     plt.show()
 
 
