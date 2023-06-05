@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import patheffects
 # import sympy as sp 
 
-sys.path.append('..')
+sys.path.append('.')
 
 from parameters import UAV, atmosphere
 
