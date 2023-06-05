@@ -257,4 +257,3 @@ def horizontal_tail_planform(aircraft):
 
     return 
 
-print(horizontal_tail_planform())
