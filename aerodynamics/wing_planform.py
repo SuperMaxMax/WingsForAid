@@ -175,6 +175,7 @@ def main_wing_planform(aircraft):
                 delta += (i+1) * (A[i] / A[0])**2
             
             span_eff = 1 / (1 + delta)
+            oswald = span_eff * 0.971 * 0.804 #from https://www.fzt.haw-hamburg.de/pers/Scholz/OPerA/OPerA_PUB_DLRK_12-09-10.pdf
 
             tau = 1/span_eff - 1
 
@@ -267,8 +268,8 @@ def main_wing_planform(aircraft):
     return 
 
 aircraft =  UAV('aircraft')
-main_wing_planform(aircraft)
-print(aircraft.AE_A)
+#main_wing_planform(aircraft)
+#print(aircraft.AE_A)
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
@@ -285,7 +286,7 @@ def fuel_volume(airfoil, Croot, Lambda, b):
         dx = 1/M
         for x in X:
             if x > 0.25 and x <= p: 
-                y = m/p * (2*p*x - x**2)
+                y = m/(p**2) * (2*p*x - x**2)
                 S += y*dx * c**2
             elif x > p and x < 0.75: 
                 y =  m/((1 - p)**2) * ((1 - 2*p) + 2*p*x - x**2) #check wiki
@@ -294,4 +295,4 @@ def fuel_volume(airfoil, Croot, Lambda, b):
     V = V * 1000 #in liters
     return V 
 
-#print(fuel_volume(airfoil, aircraft.rootchord, 0.4, aircraft.b))
+print(fuel_volume(aircraft.airfoil, aircraft.rootchord, 0.4, aircraft.b))
