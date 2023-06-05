@@ -169,13 +169,13 @@ class UAV:
         self.AE_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.AE_Sh_S = 0.30                    # [-] Ratio between horizontal tailplane surface area and surface area wing
+        self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area wing
 
         # Vertical tailplane
         self.AE_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
         self.AE_A_v = None                     # [-] Aspect ratio vertical tail
         self.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane 
-        self.AE_Sv_S = None                    # [-] Ratio between vertical tailplane surface area and surface area wing
+        self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
 
         "-NACA4415"
         self.airfoil = "4415"
