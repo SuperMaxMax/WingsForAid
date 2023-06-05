@@ -172,12 +172,12 @@ def plot_scissor_plot(aircraft):
     Sh_S_stab = stability_curve(aircraft, aircraft.X_cg_aft)[1]
 
     if Sh_S_cont > Sh_S_stab:
-        aircraft.Sh_S = Sh_S_cont
+        aircraft.CS_Sh_S = Sh_S_cont
     else:
-        aircraft.Sh_S = Sh_S_stab
+        aircraft.CS_Sh_S = Sh_S_stab
 
     x_cg_limit = [aircraft.X_cg_fwd, aircraft.X_cg_aft]
-    S_h_S_array = [aircraft.Sh_S, aircraft.Sh_S]
+    S_h_S_array = [aircraft.CS_Sh_S, aircraft.Sh_S]
 
     ax1.plot(x_cg_limit, S_h_S_array, color = 'orange')
 

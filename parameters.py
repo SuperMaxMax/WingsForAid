@@ -119,17 +119,15 @@ class UAV:
         self.t_c = 0.12                     # Thickness to chord ratio [-]
         self.taper = 0.4                    # Taper ratio [-]
         self.rootchord = 2/(1+self.taper) * self.Sw/self.b             # Root chord [m]
-
         self.tipchord = self.rootchord*self.taper             # Tip chord [m]
         self.top_clearance = 0.2            # Top clearance [m]
         self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility    
         self.w_in = 1.2                     # Inner fuselage width [m]
         self.w_out = 1.4                    # Outer fuselage width [m]
         self.x_lemac = 0.2871               # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
-        self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
-        self.y_mac = 2.04                 # Spanwise location of the MAC [m]
-        self.i_w = 0.19 * np.pi / 180       # Incidence angle of wing wrt fuselage [rad]
-        self.wing_twist = 0 *np.pi/180      #wing twist (difference root and chord) [rad]
+        self.xc_OEW_p = 0.2                 # Center of gravity of OEW as a fraction of the MAC [-]
+        self.y_mac = 2.04                   # Spanwise location of the MAC [m]
+        
 
         "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
         self.something = 1 # add units
@@ -137,7 +135,46 @@ class UAV:
         self.ST_SF = 1.5
 
         "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
-        
+        "Main wing and overall a/c"
+        self.AE_A = 7.75                        # Updated aspect ratio [-]
+        self.AE_CD0 = 0.006                     # Still tp be updated Zero lift drag [-]
+        self.AE_CL_LDG = 1.5702                 # Still to be updated [-]
+        self.AE_CL_max_TO = 1.5                 # Still to be updated maximum lift coefficient at take-off [-]
+        self.AE_CL_max_clean = 1.5              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.AE_CL_max_land = 1.9               # Still to be updated maximum lift coefficient at landing [-]
+        self.AE_CLa = 4.2                       # Still to be updated lift curve slope [-] 
+        self.AE_L_D = 14.1804                   # Still to be updated lift to drag ratio [-]
+        self.AE_MAC_length = 1.3045             # Updated mean aerodynamic chord [m]
+        self.AE_MAC_ac = 0.24                   # Updated location of aerodynamic center relative to MAC [-]
+        self.AE_Sw = 11.7113                    # Updated wing area [m^2]
+        self.AE_Sw_wetted = 23.4226             # Updated wetted area of the wing [m^2]
+        self.AE_b = 9.527                       # Updated wing span [m]
+        self.AE_dihedral = 0                    # Updated wing dihedral angle [rad]
+        self.AE_e = 0.7                         # Still to be updated oswald efficiency factor [-]
+        self.AE_i_w = 0.19 * np.pi / 180        # Updated incidence angle of wing wrt fuselage [rad]
+        self.AE_wing_twist = 0 *np.pi/180       # Updated wing twist (difference root and chord) [rad]
+        self.AE_sweep_co2 = -0.0428             # Still to be updated half chord sweep angle [rad]
+        self.AE_sweep_co4 = 0.0                 # Updated half chord sweep [rad]
+        self.AE_taper = 0.4                     # Updated taper ratio [-]
+        self.AE_rootchord = 1.7561              # Updated Root chord [m]
+        self.AE_tipchord = 0.7024               # Updated tip chord [m]
+        self.AE_x_lemac = 0.2871                # Still to be updated distance from LE root chord to the leading edge mean aerodynamic chord [m]
+        self.AE_y_mac = 2.04                    # Updated spanwise location of the MAC [m]
+
+        # Horizontal tailplane
+        self.AE_l_h = 4.5                      # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
+        self.AE_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+        self.AE_lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
+        self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
+        self.AE_Sh_S = 0.30                    # [-] Ratio between horizontal tailplane surface area and surface area wing
+
+        # Vertical tailplane
+        self.AE_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
+        self.AE_A_v = None                     # [-] Aspect ratio vertical tail
+        self.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane 
+        self.AE_Sv_S = None                    # [-] Ratio between vertical tailplane surface area and surface area wing
+
         "-NACA4415"
         self.airfoil = "4415"
 
@@ -194,20 +231,6 @@ class UAV:
         self.CS_n_blades = 3                   # [-] number of propeller blades NOTE: Depends on chosen propeller
         self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
 
-        # Horizontal tailplane
-        self.CS_l_h = 4.5                   # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
-        self.CS_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
-        self.CS_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
-        self.CS_lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
-        self.CS_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.CS_Sh_S = 0.40                    # [-] Ratio between horizontal tailplane surface area and surface area wing
-
-        # Vertical tailplane
-        self.CS_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
-        self.CS_A_v = None                     # [-] Aspect ratio vertical tail
-        self.CS_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane 
-        self.CS_Sv_S = None                    # [-] Ratio between vertical tailplane surface area and surface area wing
-
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
         self.n_drops = 1  # [-]
         self.n_boxes = 12  # [-]
@@ -235,14 +258,9 @@ class UAV:
 
         "Tim's coefficients:"
 
-        lift_coefficients = [-4.64970233e-08,  1.33281512e-06, -1.39844253e-05,  5.02004763e-05,  #No clue if this is correct
-                             1.34340260e-04, -1.05075580e-03, -2.95189891e-03,  1.89082949e-02,
-                             8.49297399e-02, -2.79515926e-01, -2.24670348e+00,  2.99288268e+00,
-                             5.30704946e+01, -2.00229786e+01, -1.19842392e+03,  6.12640703e+02,
-                             2.67539560e+04, -6.27887289e+04, -4.26912912e+05,  3.37435924e+06,
-                             -1.17389949e+07,  2.57579109e+07, -3.88663744e+07,  4.13412545e+07,
-                             -3.08618888e+07,  1.57188640e+07, -5.14751005e+06,  9.62206912e+05,
-                             -7.63817658e+04,  1.02621415e+03]
+        lift_coefficients = [1.02549983e+03,  3.40489460e+02, -2.62539473e+03,  6.99194179e+03,     #Coefficents of a polynomial fit for the 
+                            -9.67481071e+03,  7.76224418e+03, -3.81444542e+03,  1.16482541e+03,     #lift distribution over the half span
+                            -2.15539510e+02,  2.21217522e+01, -9.66193857e-01]                      #Highest order coefficient first
 
 class airport:
     def __init__(self, name):
