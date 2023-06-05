@@ -248,29 +248,48 @@ class UAV:
         self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
 
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
-        self.n_drops = 1  # [-]
-        self.n_boxes = 12  # [-]
-        self.hatchDT = 1  # [s]
-        self.OP_V_boxlim = 100/3.6 # [m/s] box drop max speed
+        # inputs
+        self.OP_fuel_energy_density = 44.65E6 # [J/kg]
+        self.OP_h_loiter = 500 * 0.3048  # [m]
+        self.OP_h_dropzone = 0 # [m]
+
+        # requirements
+        self.OP_hmin = 15  # [m]              # requirements
+        self.OP_b_dropzone = 25 # [m]
+        self.OP_l_dropzone = 25  # [m]
+        self.OP_V_crosswind = 10  # [m/s]
+        self.OP_V_tailwind = 15  # m/s]
+        self.OP_V_headwind = 15  # [m/s]
+        self.OP_V_wind = max(self.OP_V_headwind,self.OP_V_crosswind,self.OP_V_tailwind)  # [m/s]
+
+        self.OP_Range = 250 # [km]
+        self.OP_N_boxes_per_sortie = 12  # [-]
+        self.OP_MR_PL = 22000 # [kg/day]
+        self.OP_PL_per_box = 20 # [kg]
+        self.OP_TTFD = 72 # [h]
+
+        # box drop maneuver
+        self.OP_V_boxlim = 100 / 3.6 # [m/s] box drop max speed
         self.OP_Vbox_LDG = 40 / 3.6  # [m/s] 40kph drop limit
         self.boxDX = 0.5  # [m]
         self.boxDY = 0.3  # [m]
         self.boxDZ = 0  # [m]
 
-        self.OP_theta_app = 0  # [deg]       # approach
-        self.OP_V_app = 100  # [m/s]
+        # cost breakdown inputs
+        self.OP_T_ops = 28 # [days]
+        self.OP_N_ops = 142 # [operations]
+        self.OP_AC_per_op = 21 # [#AC] available on average
+        self.OP_n_drops = 2 # [#] choice!
+        self.OP_TTFS = 68.96 # [h] from contract to finished assembly and first sortie starts
+        self.OP_T_sortie_gnd = 2.067 # [hr]
 
-        self.OP_n_app_max = 3 # [g]
-        self.OP_V_impact_max = 40/3.6 # [m/s] 95% of landing under that
+        self.OP_CST_nofuel = 61565740.67 # [euro]
+        self.OP_fuelprice = 1.5 # [euro/L]
 
-        self.OP_hmin = 15  # [m]              # requirements
-        self.OP_b_dropzone = 25 # [m]
-        self.OP_h_dropzone = 25  # [m]
-        self.OP_V_crosswind = 10  # [m/s]
-        self.OP_V_tailwind = 15  # m/s]
-        self.OP_V_headwind = 15  # [m/s]
-        self.OP_V_wind = 15  # [m/s]
-
+        self.OP_T_taxi = 5/60 # [h]
+        self.OP_T_TO = 10 / 60  # [h]
+        self.OP_T_LDG = 10 / 60  # [h]
+        self.OP_T_clearance = 5 / 60  # [h]
 
         "Tim's coefficients:"
 
