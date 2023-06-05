@@ -84,7 +84,7 @@ class UAV:
         self.h_TO = 0                       # Take-off altitude, airport altitude [m]
         self.h_cruise = 3048.0              # Cruise altitude [m]
         self.h_in = 0.9                     # Inner fuselage height [m]
-        self.h_out = 1.1                    # Outer fuselage height [m]
+        self.h_out = 0.737                    # Outer fuselage height [m]
         self.kq = 0.95                      # Volume factor used to calculate wetted area of the wing [-]
         self.l_f = 5.4651                   # Fuselage length [m]
         self.l_f_boom = 2                   # Boom length [m]
@@ -123,9 +123,9 @@ class UAV:
         self.top_clearance = 0.2            # Top clearance [m]
         self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility    
         self.w_in = 1.2                     # Inner fuselage width [m]
-        self.w_out = 1.4                    # Outer fuselage width [m]
+        self.w_out = 1.1                    # Outer fuselage width [m]
         self.x_lemac = 0.2871               # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
-        self.xc_OEW_p = 0.2                 # Center of gravity of OEW as a fraction of the MAC [-]
+        self.xc_OEW_p = 0.25                 # Center of gravity of OEW as a fraction of the MAC [-]
         self.y_mac = 2.04                   # Spanwise location of the MAC [m]
         
 
@@ -166,7 +166,7 @@ class UAV:
         self.AE_alpha_f = 0                     # Still to be updated angle of attack of the fuselage [rad]
 
         # Horizontal tailplane
-        self.AE_l_h = 4.5                      # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.AE_l_h = 4                      # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
@@ -246,31 +246,49 @@ class UAV:
         self.CS_Cm_0_airfoil = -0.083       # TODO: Update value - Moment coefficient of airfoil [-]
         self.CS_n_blades = 3                   # [-] number of propeller blades NOTE: Depends on chosen propeller
         self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
-
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
-        self.n_drops = 1  # [-]
-        self.n_boxes = 12  # [-]
-        self.hatchDT = 1  # [s]
-        self.OP_V_boxlim = 100/3.6 # [m/s] box drop max speed
+        # inputs
+        self.OP_fuel_energy_density = 44.65E6 # [J/kg]
+        self.OP_h_loiter = 500 * 0.3048  # [m]
+        self.OP_h_dropzone = 0 # [m]
+
+        # requirements
+        self.OP_hmin = 15  # [m]              # requirements
+        self.OP_b_dropzone = 25 # [m]
+        self.OP_l_dropzone = 25  # [m]
+        self.OP_V_crosswind = 10  # [m/s]
+        self.OP_V_tailwind = 15  # m/s]
+        self.OP_V_headwind = 15  # [m/s]
+        self.OP_V_wind = max(self.OP_V_headwind,self.OP_V_crosswind,self.OP_V_tailwind)  # [m/s]
+
+        self.OP_Range = 250 # [km]
+        self.OP_N_boxes_per_sortie = 12  # [-]
+        self.OP_MR_PL = 22000 # [kg/day]
+        self.OP_PL_per_box = 20 # [kg]
+        self.OP_TTFD = 72 # [h]
+
+        # box drop maneuver
+        self.OP_V_boxlim = 100 / 3.6 # [m/s] box drop max speed
         self.OP_Vbox_LDG = 40 / 3.6  # [m/s] 40kph drop limit
         self.boxDX = 0.5  # [m]
         self.boxDY = 0.3  # [m]
         self.boxDZ = 0  # [m]
 
-        self.OP_theta_app = 0  # [deg]       # approach
-        self.OP_V_app = 100  # [m/s]
+        # cost breakdown inputs
+        self.OP_T_ops = 28 # [days]
+        self.OP_N_ops = 142 # [operations]
+        self.OP_AC_per_op = 21 # [#AC] available on average
+        self.OP_n_drops = 2 # [#] choice!
+        self.OP_TTFS = 68.96 # [h] from contract to finished assembly and first sortie starts
+        self.OP_T_sortie_gnd = 2.067 # [hr]
 
-        self.OP_n_app_max = 3 # [g]
-        self.OP_V_impact_max = 40/3.6 # [m/s] 95% of landing under that
+        self.OP_CST_nofuel = 61565740.67 # [euro]
+        self.OP_fuelprice = 1.5 # [euro/L]
 
-        self.OP_hmin = 15  # [m]              # requirements
-        self.OP_b_dropzone = 25 # [m]
-        self.OP_h_dropzone = 25  # [m]
-        self.OP_V_crosswind = 10  # [m/s]
-        self.OP_V_tailwind = 15  # m/s]
-        self.OP_V_headwind = 15  # [m/s]
-        self.OP_V_wind = 15  # [m/s]
-
+        self.OP_T_taxi = 5/60 # [h]
+        self.OP_T_TO = 10 / 60  # [h]
+        self.OP_T_LDG = 10 / 60  # [h]
+        self.OP_T_clearance = 5 / 60  # [h]
 
         "Tim's coefficients:"
 
