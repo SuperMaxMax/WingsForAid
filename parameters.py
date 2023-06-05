@@ -272,9 +272,8 @@ class atmosphere:
     def __init__(self):
         self.rho0   = 1.225     # kg/m^3
         self.lambd  = -0.0065   # troposphere, deg K/m
-        self.T0     = 273.15    # K
+        self.T0     = 288.15    # K
         self.g      = 9.80665   # m/s^2
         self.R      = 287.05    
         self.p0     = 101325    # Pa 
         self.gamma  = 1.4
-
