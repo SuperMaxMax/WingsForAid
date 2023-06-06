@@ -298,7 +298,7 @@ turnperformance(aircraft, atm)
 
 # -----------------------------------------------------------------
 
-def cruiseperformance(ac_obj, atm_obj, Range=None, V_cruise=None, h_cruise=None, Payload_Range=False):
+def cruiseperformance(ac_obj, atm_obj, n_boxes, W_F_TO, Range=None, V_cruise=None, h_cruise=None):
     if Range == None:
         R = ac_obj.R
     else:
@@ -311,13 +311,13 @@ def cruiseperformance(ac_obj, atm_obj, Range=None, V_cruise=None, h_cruise=None,
         h_cruise = ac_obj.h_cruise
     else:
         h_cruise = h_cruise
-    W_cr    = ac_obj.W_TO * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2 * ac_obj.W4W3 * atm_obj.g
+    W_cr    = (ac_obj.W_OE + W_F_TO + n_boxes * ac_obj.boxweight) * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2 * ac_obj.W4W3
     rho_cr  = atm_parameters(atm_obj, h_cruise)[2]
     p_cr    = atm_parameters(atm_obj, h_cruise)[0]
     r_it = 0.0
     t    = 0.0
     dt   = 0.1
-    W    = W_cr
+    W    = W_cr * atm_obj.g
     while r_it < R:
         CL_cr   = 2*W/(rho_cr*V_cruise**2*ac_obj.Sw)
         CD_cr   = dragpolar(ac_obj, CL_cr)
@@ -330,11 +330,13 @@ def cruiseperformance(ac_obj, atm_obj, Range=None, V_cruise=None, h_cruise=None,
             print(f"Power available: {Pa} [W] | Power required: {P_req} [W]")
         F       = ac_obj.SFC * P_req
         W       -= (F*dt)
+    W_F_used = W_cr - W
+    kg_kgkm = W_F_used / (n_boxes * ac_obj.boxweight)
     print("---------------------------------------------------")
     print(f"Cruise performance - Range {R/1000} [km] - Cruise speed {V_cruise} [m/s] - Cruise height {h_cruise} [m]")
     print("---------------------------------------------------")
     print(f"The cruise time is {np.round(t, 2)} seconds ({np.round(t/3600, 2)} hours)")
-    print(f"The fuel used during the cruise is {np.round(W_cr - W)} [kilograms] ({np.round(((W_cr-W)/0.7429), 2)} [L] @ {ac_obj.fueldensity} [kg/m^3])")
+    print(f"The fuel used during the cruise is {np.round(W_F_used)} [kilograms] ({np.round(((W_cr-W)/0.7429), 2)} [L] @ {ac_obj.fueldensity} [kg/m^3])")
     print("---------------------------------------------------")
     return None
 # cruiseperformance(aircraft, atm)
@@ -504,8 +506,6 @@ def LA_eom(obj, ap, atmos, Plot=True):
 
 
 # ------------------------------------------------------------------------------
-
-
 def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
     # P_descend is the throttle setting while descending
 
