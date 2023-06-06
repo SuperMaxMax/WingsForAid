@@ -252,6 +252,7 @@ class UAV:
         self.OP_fuel_energy_density = 44.65E6 # [J/kg]
         self.OP_h_loiter = 500 * 0.3048  # [m]
         self.OP_h_dropzone = 0 # [m]
+        self.OP_n_app_max = 3 # [g]
 
         # requirements
         self.OP_hmin = 15  # [m]              # requirements
@@ -270,7 +271,7 @@ class UAV:
 
         # box drop maneuver
         self.OP_V_boxlim = 100 / 3.6 # [m/s] box drop max speed
-        self.OP_Vbox_LDG = 40 / 3.6  # [m/s] 40kph drop limit
+        self.OP_Vbox_LDG = 30 / 3.6  # [m/s] 40kph drop limit
         self.boxDX = 0.5  # [m]
         self.boxDY = 0.3  # [m]
         self.boxDZ = 0  # [m]
