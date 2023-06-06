@@ -66,7 +66,7 @@ def required_lift(aircraft):
 
     rpm = 4 #Change to object variable [1/min]
     omega = rpm / 60 * 2 * np.pi
-    power = 4 #Change to object variable [W]
+    power = 10 #Change to object variable [W]
 
     M = power / omega
 
@@ -79,6 +79,7 @@ def required_lift(aircraft):
     S_v = Sv_Sw * Sw
 
     C_L_h = L_h / (0.5 * rho_c * V_c**2 * S_v)
+    C_L_h = 0.2
 
 
     C_L_W_c = 2*W_TO/(rho_c * (V_c**2) * Sw) #lift in cruise
@@ -91,6 +92,38 @@ def required_lift(aircraft):
     #Incidence angle such that alpha is zero in cruise, so calc cruise torque by prop
     #Determine rest based on systems engineering book
 
+def airfoil_select(C_L_h, change):
+    #airfoil data
+    #NACA0006, 0009, 0012
+    #data from https://digital.library.unt.edu/ark:/67531/metadc65459/m2/1/high_res_d/19930090937.pdf except alpha stall
+    list_Cl0 = [0, 0, 0]
+    list_Cd_min = [0.0054, 0.0064, 0.0069]
+    list_Cm_0 =[0, 0, 0]
+    list_alpha_0 = [0, 0, 0]
+    list_alpha_s = [11.0, 13.2, 16.4]
+    list_Cl_max = [0.91, 1.39, 1.66]
+    list_Cl_alpha = [0.098 * 180/np.pi, 0.098 * 180/np.pi, 0.099 * 180/np.pi]
+    list_tc = [0.06, 0.09, 0.12]
+
+    dataframe = {'C_l_0': list_Cl0, "Cdmin": list_Cd_min, "Cm0": list_Cm_0, "alpha_0": list_alpha_0, "alpha_s": list_alpha_s, "C_l_max": list_Cl_max, "C_l_alpha": list_Cl_alpha, "t/c": list_tc}
+    df = pd.DataFrame(data=dataframe, index=["0006", "0009", "0012"]) #NACA
+
+    airfoils = ["0006", "0009", "0012"] #NACA
+
+    if abs(C_L_h) < 0.1:
+        if change == 0 or change == -1:
+            airfoil = airfoils[0]
+        elif change == 1:
+            airfoil = airfoils[0+change]
+    elif abs(C_L_h) < 0.2:
+        airfoil = airfoils[1+change]
+    else:
+        if abs(C_L_h) > 0.5:
+            print("Required lift coefficient of horizontal too high something must be changed in the design to limit it. Currently C_L_h = ", C_L_h)
+        else:
+            airfoil = airfoils[2+change]
+    
+    return df.loc[[airfoil]]
 
 def horizontal_tail_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
@@ -223,3 +256,6 @@ def horizontal_tail_planform(aircraft):
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     print(a_h_optimal)
     AR, b, Lambda, alpha_twist, S, CL_a_h  = plot_lift_distr(a_h_optimal, full_print = True)
+
+
+horizontal_tail_planform(object)
