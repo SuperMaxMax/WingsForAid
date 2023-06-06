@@ -64,9 +64,9 @@ def required_lift(aircraft):
     W_TO = aircraft.W_TO * 9.80665
 
 
-    rpm = 4 #Change to object variable [1/min]
+    rpm = 3000 #Change to object variable [1/min]
     omega = rpm / 60 * 2 * np.pi
-    power = 10 #Change to object variable [W]
+    power = 100*745.7 #Change to object variable [W]
 
     M = power / omega
 
