@@ -101,8 +101,8 @@ if flaptype == 'singleslotted':
     CS_cprime_c_LD = 1 + CS_dc_cf_LD * CS_fc_c # wing chord length with landing extended flaps / chord [-]
     CS_dClmax_TO = 1.3 * 0.7  # Additional airfoil lift at take-off due to single slotted flap (ADSEE-II, L3 S36)
     CS_dClmax_LD = 1.3  # Additional airfoil lift at landing due to single slotted flap
-    print("Single slotted flap")
-    print(f"\ndClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
+    print("\nSingle slotted flap")
+    print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
 
 if flaptype == 'fowler':
     CS_deltaf_TO                   = 15  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S15)
@@ -114,8 +114,10 @@ if flaptype == 'fowler':
     CS_cprime_c_LD = 1 + CS_dc_cf_LD * CS_fc_c  # wing chord length with landing extended flaps / chord [-]
     CS_dClmax_TO = 1.3 * 0.7 * CS_cprime_c_TO   # Additional airfoil lift at take-off due to fowler flap (ADSEE-II, L3 S36)
     CS_dClmax_LD = 1.3 * CS_cprime_c_LD  # Additional airfoil lift at landing due to fowler flap
-    print('Fowler flap')
-    print(f"\ndClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
+    print('\nFowler flap')
+    print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
+
+print(f"\nCLmax current wing in clean configuration: {aircraft.AE_CL_max_clean}")
 
 calcCL = False # calculate dCLmax for a given Swf, or vice versa
 
@@ -125,14 +127,15 @@ if calcCL:
     print(f"CS_dCLmax_TO: {CS_dCLmax_TO}, CS_dCLmax_LD: {CS_dCLmax_LD}")
 
 else:
-    CS_dCLmax_TO = float(input("\nCS_dCLmax_TO: "))
-    CS_dCLmax_LD = float(input("CS_dCLmax_LD: "))
+    CS_dCLmax_TO = float(input("\ndCLmax_TO required: "))
+    CS_dCLmax_LD = float(input("dCLmax_LD required: "))
     CS_Swf_TO = CS_dCLmax_TO / (0.9 * CS_dClmax_TO * np.cos(CS_lambda_hinge)) * aircraft.Sw
     CS_Swf_LD = CS_dCLmax_LD / (0.9 * CS_dClmax_LD * np.cos(CS_lambda_hinge)) * aircraft.Sw
     
     CS_Swf = max(CS_Swf_TO, CS_Swf_LD) # most constraining case becomes required flapped area
     
-    print(f"Swf_TO: {round(CS_Swf_TO / aircraft.Sw * 100, 3)}% Sw") 
+    print(f"\nNew CLmax during take-off: {aircraft.AE_CL_max_clean + CS_dCLmax_TO}\nNew CLmax during landing: {aircraft.AE_CL_max_clean + CS_dCLmax_LD}")
+    print(f"\nSwf_TO: {round(CS_Swf_TO / aircraft.Sw * 100, 3)}% Sw") 
     print(f"Swf_LD: {round(CS_Swf_LD / aircraft.Sw * 100, 3)}% Sw")
 
 
@@ -165,15 +168,6 @@ def Flaplength(taperratio, rootchord, span, HLDroot, flappedsurface):
         return y1
        
 CS_yend_f = Flaplength(aircraft.taper, aircraft.rootchord, aircraft.b, aircraft.w_out / 2, CS_Swf)
-
-# Aileron calculations
-# aileron max up = max down = 15 deg
-CS_ystart_a = CS_yend_f
-CS_yend_a = aircraft.b / 2 - CS_ystart_a - 0.1 # to allow some spacing near wingtip
-
-# Look at step by step plan for aileron from adsee 2 L3 S57
-Cl_delta_a = 1#TODO: continue here
-Cl_delta_P = 1#TODO
 
 #################################################################################################################
 "FIXME: Controlability and Stability Curves"
