@@ -311,6 +311,8 @@ class UAV:
         self.ST_n_ult_neg = -2.78 #negative ultimate load factor
         self.ST_Torque_eng = 128 #Nm, Rotax 912 torque
         self.ST_Thrust_eng = 2800 #N Rotax 912 thrust
+        self.ST_W_eng = 65.7 #kg Rotax 912 plus clutch, exhaust, alternator, air guide hood, NO MOUNT
+        self.ST_Torque_eng2 = 240 #Nm, UL 260 torque
 
 class airport:
     def __init__(self, name):
