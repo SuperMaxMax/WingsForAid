@@ -3,6 +3,7 @@ import sys
 import matplotlib.pyplot as plt
 from matplotlib import patheffects
 from scipy.integrate import quad
+<<<<<<< Updated upstream
 from scipy.optimize import fsolve
 from math import *
 
@@ -15,10 +16,20 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
     ''' '''
     '''Roll performance requirments'''
     phi_des = 60 * (pi/180)  # Roll requirement
+=======
+from sympy import Eq, symbols, solve
+
+
+def aileron_design(aircraft):
+    ''' '''
+    '''Roll performance parameters'''
+    phi_des = 60 * (np.pi/180)  # Roll requirement
+>>>>>>> Stashed changes
     t_lim = 1.3  # Max time available to complete the roll requirement
     t = 3  # starting time
 
     '''Design parameters'''
+<<<<<<< Updated upstream
     delta_a_max = 20 * (pi/180) # max aileron deflection
     tau = 0.48  # factor based on the fraction of chord that is the aileron
     Ixx = 1200  # mass moment of inertia x-axis [kg m^2] TODO Update value 
@@ -35,14 +46,40 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
         
         # v Steady State Rollrate v
         Pss = sqrt(2*L_a/((aircraft.Sw + aircraft.AE_Sh_S * aircraft.Sw + aircraft.AE_Sv_S * aircraft.Sw) * Cdr * y_d**3))
+=======
+    delta_a_max = 20 * (np.pi/180) # max aileron deflection
+    tau = 0.48  # factor based on the fraction of chord that is the aileron
+    Ixx = 1200  # mass moment of inertia x-axis [kg m^2] TODO Update value 
+    ystart_a = 0.94  # 
+    y0 = 0.95 * aircraft.b/2    #distance symmetry line aircraft to start aileron
+
+    while t > t_lim:
+        y1 = ystart_a * aircraft.b/2       #distance symmetry line aircraft to end aileron
+
+        C_l_delta_a = (2*aircraft.CLa_w_cruise* tau *aircraft.rootchord/(aircraft.Sw * aircraft.b)) * ((y0**2/2 + 2/3 * ((aircraft.taper - 1)/aircraft.b) * y0**3)- (y1**2/2 + 2/3 * ((aircraft.taper - 1)/aircraft.b) * y1**3))
+        
+        C_l = C_l_delta_a * delta_a_max
+
+        L_a = 1/2 * atm.rho0 * (aircraft.V_s_min * 1.3)**2 * aircraft.Sw * aircraft.b * C_l
+        
+        y_d = 0.4 * aircraft.b/2        # [m] This is the average distance between the centre of gravity of the aircraft and the centre of drag
+        Cdr = 0.9
+        Pss = np.sqrt(2*L_a/((aircraft.Sw + aircraft.AE_Sh_S * aircraft.Sw + aircraft.AE_Sv_S * aircraft.Sw) * Cdr * y_d**3))
+>>>>>>> Stashed changes
     
         phi_1 = Ixx/(atm.rho0 * y_d**3* Cdr * (aircraft.Sw + aircraft.AE_Sh_S * aircraft.Sw + aircraft.AE_Sv_S * aircraft.Sw)) * np.log(Pss**2)
 
         P_roll_rate = Pss**2/(2*phi_1)
 
+<<<<<<< Updated upstream
         t = sqrt(2*phi_des/P_roll_rate)
 
         ystart_a = ystart_a - 0.01*aircraft.b/2
+=======
+        t = np.sqrt(2*phi_des/P_roll_rate)
+
+        ystart_a = ystart_a - 0.01
+>>>>>>> Stashed changes
 
 
     print("\n--------Aileron Design------------\n")
@@ -53,6 +90,10 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
     aircraft.y_a_1 = 0.95
 
     delta_L = L_a/2 /((aircraft.y_a_1 + aircraft.y_a_0)/2 * aircraft.b/2)
+<<<<<<< Updated upstream
+=======
+    print(f"delta_L:{delta_L}")
+>>>>>>> Stashed changes
 
 def elevator_design(aircraft):
     
@@ -65,6 +106,7 @@ def elevator_design(aircraft):
 
     CL_h = -1
     L_h = 0.5 * 0.7 * CL_h * (aircraft.V_cruise)**2 * aircraft.AE_Sh_S * aircraft.Sw
+<<<<<<< Updated upstream
 
 def rudder_design(aircraft):
     
@@ -74,6 +116,20 @@ def rudder_design(aircraft):
     S_s = 1.02 * (aircraft.l_f * aircraft.h_out + aircraft.AE_Sv_S * aircraft.Sw)
 
     x_ca = aircraft.l_f * aircraft.h_out * aircraft.X_FCG + aircraft.AE_S_v * aircraft.AE_l_v
+=======
+    print(L_h)
+
+
+def rudder_design(aircraft):
+    
+    V_w = 40 * (0.51444444444) # [m/s] side wind
+
+    V_t = np.sqrt((1.3 * aircraft.V_s_min)**2 + V_w**2) # [m/s] total speed
+
+    S_s = 1.02 * (aircraft.l_f * aircraft.h_out + aircraft.AE_Sv_S * aircraft.Sw)
+
+    x_ca = aircraft.l_f * aircraft.h_out * aircraft.X_FCG + aircraft.CS_S_v * aircraft.l_v
+>>>>>>> Stashed changes
     d_ca = x_ca - aircraft.x_cg_position_aft
 
     C_d_y = 0.6 # Assumption
@@ -81,6 +137,7 @@ def rudder_design(aircraft):
     F_w = 0.5 * atm.rho0 * C_d_y * V_w**2 * S_s
 
     angle_beta = np.arctan(V_w/(1.3 * aircraft.V_s_min))
+<<<<<<< Updated upstream
 
     C_L_alpha_v = 3
     dsigma_dalpha = 0 
@@ -115,6 +172,40 @@ def rudder_design(aircraft):
     else:
         print(f"delta_r_required:{delta_r_value*180/pi}")
         print(f"sigma:{sigma_value}")
+=======
+    
+    C_L_alpha_v = 2.95
+    dsigma_dalpha = 0 
+    eta_v = 0.96
+    
+    vertical_tail_volume = l_v*aircraft.CS_S_v/(aircraft.b*aircraft.Sw)
+
+    C_n_beta = 0.75 * C_L_alpha_v * (1-dsigma_dalpha) * eta_v * vertical_tail_volume
+    C_y_beta = -1.35 * C_L_alpha_v * (1 - dsigma_dalpha) * eta_v * aircraft.AE_Sv_S
+
+    tau_r = 0.51
+    C_Y_delta_r = C_L_alpha_v * eta_v * tau_r * 1 * aircraft.AE_Sv_S 
+    C_n_delta_r = -C_L_alpha_v * vertical_tail_volume * eta_v * tau_r * 1
+
+
+
+    # Define the variables
+    delta_r, sigma = symbols('delta_r sigma')
+
+    # Define the equations
+    equation1 = Eq(0.5 * atm.rho0 * V_t**2 * aircraft.Sw * aircraft.b * (C_n_beta*(angle_beta - sigma) + C_n_delta_r * delta_r) + F_w * np.cos(sigma) * d_ca, 0)
+    equation2 = Eq(0.5 * atm.rho0 * V_w**2 * S_s * C_d_y - 0.5*atm.rho0 * V_t**2 * aircraft.Sw * (C_y_beta*(angle_beta-sigma)+C_Y_delta_r*delta_r))
+
+    # Solve the system of equations
+    solution = solve((equation1, equation2), (delta_r, sigma))
+
+    # Extract the values
+    delta_r_value = solution[delta_r]
+    sigma_value = solution[sigma]
+
+    print(f"delta_r_required:{delta_r_value}")
+    print(f"sigma_required:{sigma_value}")
+>>>>>>> Stashed changes
 
 def main_control_surface(aircraft):
     aileron_design(aircraft)

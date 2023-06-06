@@ -67,6 +67,8 @@ def cg_calc(obj):
     # X_LEMAC = obj.X_LEMAC
     X_LEMAC = 0.35 * (obj.l_f + obj.l_f_boom)
     obj.X_LEMAC = X_LEMAC
+    aircraft.X_FCG = X_FCG
+    print(aircraft.X_FCG)
     obj.X_FCG = X_FCG
 
     # Final CG
