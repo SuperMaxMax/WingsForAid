@@ -23,11 +23,11 @@ def takeoffweight(obj, W_F):
     TOW = ZFW + W_F
     return TOW
 
-def atm_parameters(obj, h):
-    T    = atm.T0 + atm.lambd * h
-    rho  = atm.rho0*np.power((T/obj.T0), (-((atm.g / (atm.lambd * atm.R))+1)))
-    p    = atm.p0*np.power((T/obj.T0), (-(atm.g / (atm.lambd * atm.R))))
-    a    = np.sqrt(atm.gamma*obj.R*T)
+def atm_parameters(atm_obj, h):
+    T    = atm_obj.T0 + atm_obj.lambd * h
+    rho  = atm_obj.rho0*np.power((T/atm_obj.T0), (-((atm_obj.g / (atm_obj.lambd * atm.R))+1)))
+    p    = atm_obj.p0*np.power((T/atm_obj.T0), (-(atm_obj.g / (atm_obj.lambd * atm.R))))
+    a    = np.sqrt(atm.gamma*atm_obj.R*T)
     return p, T, rho, a
 
 def dragpolar(ac_obj, CL):
@@ -94,7 +94,7 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
     print(f"This calculation took {end_time-start_time} seconds")
     return
 
-def flightceiling(ac_obj, atm_obj, W_F, plot=True):
+def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
     W   = ac_obj.W_TO * atm_obj.g
     h   = 0.0
     Pa  = ac_obj.power * ac_obj.prop_eff * 735.49875
@@ -124,11 +124,12 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True):
         ROC = np.append(ROC, roc)
         Height = np.append(Height, h)
         Weight = np.append(Weight, W)
-    print("----------------------------------------------------------------------------")
-    print(f"The time to get to a cruising altitude of {ac_obj.h_cruise} [m] is {Time[np.abs(Height - ac_obj.h_cruise) <= 20.0][0]} [seconds]")
-    print(f"The fuel used to get to a cruising altitude of {ac_obj.h_cruise} [m] is {np.round((Weight[0]-Weight[np.abs(Height - ac_obj.h_cruise) <= 20.0][0])/atm_obj.g)} [kg]")
-    print(f"The maximum altitude is equal to {np.round(Height[-1])} [m]")
-    print("----------------------------------------------------------------------------")
+    if result:
+        print("----------------------------------------------------------------------------")
+        print(f"The time to get to a cruising altitude of {ac_obj.h_cruise} [m] is {Time[np.abs(Height - ac_obj.h_cruise) <= 20.0][0]} [seconds]")
+        print(f"The fuel used to get to a cruising altitude of {ac_obj.h_cruise} [m] is {np.round((Weight[0]-Weight[np.abs(Height - ac_obj.h_cruise) <= 20.0][0])/atm_obj.g)} [kg]")
+        print(f"The maximum altitude is equal to {np.round(Height[-1])} [m]")
+        print("----------------------------------------------------------------------------")
     if plot:
         # Create a figure and three subplots
         fig, (ax1, ax2, ax3) = plt.subplots(3, 1, sharex=True)
@@ -149,6 +150,7 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True):
         plt.tight_layout()
 
         plt.show()
+    return Time, Height
 
 # # ---------------- Assumptions for take-off equations of motion -----------------
 # # Wind is included by take it into account in the speed: V_eff = V - V_wind
@@ -294,7 +296,7 @@ def turnperformance(ac_obj, atm_obj, W = None, h = None, V = None):
     print(f"The minimum turn radius at TAS = {np.round(V, 2)} [m/s], ALT = {np.round(h, 2)} [m] and Weight = {np.round(W, 2)} [kg] is {np.round(R_min, 2)} [m]")
     print("-------------------------------------------------------------------------")
     return
-turnperformance(aircraft, atm)
+# turnperformance(aircraft, atm)
 
 # -----------------------------------------------------------------
 
@@ -587,3 +589,152 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
 
 
 # descend(aircraft, atm, 90, (aircraft.W_OE+100)*atm.g, 95, 500, 0.6)
+
+def cruiseheight(distance, desired_alt):
+    if 0.0 <= distance <= 10000.0:
+        h_cruise = 1000 * 0.3048                                                             
+    elif 10000.0 <= distance <= 50000.0:
+        h_cruise = 1000 + (distance - 10000.0) * 0.1
+    elif 50000.0 <= distance <= 100000.0:
+        h_cruise = 5000 + (distance - 50000.0) * 0.05
+    elif 100000.0 <= distance <= 200000.0:
+        h_cruise = 7500 + (distance - 100000.0) * 0.025
+    else:
+        h_cruise = cruiseheight
+    h_cruise = round(h_cruise/500) * 500 * 0.3048
+    return h_cruise
+
+def climbmaneuver(ac_obj, atm_obj, h, h_cruise, W0):
+    x   = 0.0
+    t   = 0.0
+    dt  = 1.0
+    h   = h
+    p, rho  = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
+    CL_opt = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    W = W0
+    W_F_used = 0.0
+    while h < h_cruise:
+        V   = np.sqrt(2*W*atm_obj.g / (rho*ac_obj.Sw*CL_opt))
+        Pa  = ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt
+        CD  = dragpolar(ac_obj, CL_opt)
+        Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
+        ROC = (Pa-Pr)/(W*atm_obj.g)
+        gamma = ROC / V
+        x   += V*np.cos(gamma)*dt
+        h   += ROC * dt
+        W   -= (Pa / ac_obj.prop_eff) * ac_obj.SFC * dt
+        M_F_used += (Pa / ac_obj.prop_eff) * ac_obj.SFC * dt
+        t   += dt
+    return t, x, W_F_used, W
+
+def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
+    x   = 0.0
+    t   = 0.0
+    dt  = 1.0
+    p, rho  = atm_parameters(atm_obj, h_cruise)[0], atm_parameters(atm_obj, h_cruise)[2]
+    W = W0
+    W_F_used = 0.0
+    if V_cruise == None:
+            CL  = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+            CD  = dragpolar(ac_obj, CL)
+    while x <= distance:
+        if V_cruise == None:
+            V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL))
+        else:
+            CL  = 2*W*atm_obj.g/(rho*V_cruise**2*ac_obj.Sw)
+            CD  = dragpolar(ac_obj, CL)
+            V   = V_cruise
+        x += V * dt
+        Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD 
+        Pbr = Pr/ac_obj.prop_eff
+        FF  = Pbr * ac_obj.SFC
+        W_F_used += FF * dt
+        W -= FF * dt
+        t += dt
+    return t, W_F_used, W
+
+def descent(ac_obj, atm_obj, h_cruise, h_stop, W0):
+    CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD = dragpolar(ac_obj, CL)
+    h = h_cruise
+    p, rho  = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
+    W = W0
+    x = 0.0
+    t = 0.0
+    dt = 1.0
+    FF_idle = 1 / 3600
+    W_F_used = 0.0
+    while h > h_stop:
+        V   = 2*W*atm_obj.g/(rho*ac_obj.Sw*CL)
+        Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
+        ROD = -Pr/(W*atm_obj.g)
+        gamma = ROD/V
+        h   -= ROD * dt
+        W   -= FF_idle * dt
+        W_F_used = FF_idle * dt
+        x   += V*np.cos(gamma)*dt
+        p, rho = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
+    return t, x, W_F_used, W
+
+def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Print = False):
+    W_F = 0.0
+    x   = 0.0
+    t   = 0.0
+    dt  = 1.0
+    h   = 15.0                          #after screenheight
+    # Enter h_cruise in feet
+    if Range == None:
+        Range = ac_obj.R / 2
+    else:
+        Range *= 1000
+    if V_cruise == None:
+        CL_cr_opt = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    else:
+        V_cruise = V_cruise
+    W_TO = ac_obj.W_OE + W_F + n_boxes * ac_obj.boxweight
+    W = W_TO
+    if Print:
+        print("=====================================================")
+        print(f"Take-off weight: {W_TO} [kg] | OEW: {ac_obj.W_OE} [kg] | Fuelweight: {W_F} [kg] / {W_F/ac_obj.fueldensity} [L] | Payload: {n_boxes} boxes / {n_boxes*ac_obj.boxweight} [kg]")
+    W_a_TO = W_TO * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2
+    W = W_a_TO
+    W_F_used = W_TO - W_a_TO
+    W_F += W_F_used
+    # Now comes climb to projected cruise
+    if dropregion == None:                      #either 1 drop or n evenly spaced drops
+        target_dist = Range / n_drops
+        cruise_alt  = cruiseheight(target_dist, h_cruise)
+        for i in range(n_drops):
+            # Climb part
+            t_climb, x_climb, W_F_used_climb, W_climb = climbmaneuver(ac_obj, atm_obj, h, cruise_alt, W)
+            t += t_climb
+            x += x_climb
+            W_F_used += W_F_used_climb
+            W = W_climb
+            # Cruise part - first calculate cruise distance
+            dtt_remaining = target_dist - x
+            CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+            CD = dragpolar(ac_obj, CL)
+            LD_max = CL / CD
+            descent_dist = cruise_alt * LD_max
+            cruise_dist = dtt_remaining - descent_dist
+            t_cruise, W_F_used_cruise, W_cruise = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
+            t += t_cruise
+            x += cruise_dist
+            W_F_used += W_F_used_cruise
+            W = W_cruise
+            # Descent part
+            
+
+
+
+
+
+
+
+
+
+
+
+
+    

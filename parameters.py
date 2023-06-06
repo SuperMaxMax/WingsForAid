@@ -58,10 +58,10 @@ class UAV:
         self.W_w = 55.5897                  # Wing weight [kg]
         self.WfinalW10 = 0.993              # Landing, taxi & shut-down fraction [-]
         self.X_LEMAC = 2.276                # Leading edge mean aerodynamic chord [m]
-        self.X_cg_aft = 0.45479              # Aft cg location CG/MAC [-]
-        self.X_cg_full = 0.333645             # MTOW cg location CG/MAC [-]
-        self.X_cg_fwd = 0.187867              # Forward cg location CG/MAC [-]
-        self.X_cg_range = 0.266923             # Range of cg location CG/MAC [-]
+        self.X_cg_aft = 0.5335              # Aft cg location CG/MAC [-]
+        self.X_cg_full = 0.4115             # MTOW cg location CG/MAC [-]
+        self.X_cg_fwd = 0.1704              # Forward cg location CG/MAC [-]
+        self.X_cg_range = 0.363             # Range of cg location CG/MAC [-]
         self.b = 9.526939435096667                    # Wing span [m]
         self.boom                = True     # Boom, true if boom tail is implemented
         self.bot_clearance = 0.1            # Bottom clearance [m]
@@ -86,8 +86,8 @@ class UAV:
         self.h_in = 0.9                     # Inner fuselage height [m]
         self.h_out = 0.737                    # Outer fuselage height [m]
         self.kq = 0.95                      # Volume factor used to calculate wetted area of the wing [-]
-        self.l_f = 5.4651                   # Fuselage length [m]
-        self.l_f_boom = 2                   # Boom length [m]
+        self.l_f = 4.3                   # Fuselage length [m]
+        self.l_f_boom = 2.5                   # Boom length [m]
         self.l_n = 0.8651                   # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
@@ -180,7 +180,7 @@ class UAV:
         self.AE_sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
         self.AE_sweep_co2_h = -0.04 
         self.AE_sweep_LE_h = 0.04
-        self.AE_rootchord_h = 1            
+        self.AE_rootchord_h = 0.895            
         self.AE_tipchord_h = 0.6        
         self.AE_MAC_length_h = 0.8       
         self.AE_y_mac_h = 1
@@ -237,6 +237,7 @@ class UAV:
         self.turnrate_half  = 1.5               # deg/s
         self.turnrate_1     = 3.0               # deg/s
         self.turnrate_2     = 6.0               # deg/s
+        self.accelheight    = 300*0.3048
 
 
         "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
