@@ -308,7 +308,8 @@ class UAV:
         self.ST_n_m = 3.8 # positive limit maneuvering load factor (from Vn)
         self.ST_n_ult_pos = 6.6 #positive ultimate load factor
         self.ST_n_ult_neg = -2.78 #negative ultimate load factor
-        self.ST_T_eng = 128 #Nm, Rotax 912 torque
+        self.ST_Torque_eng = 128 #Nm, Rotax 912 torque
+        self.ST_Thrust_eng = 2800 #N Rotax 912 thrust
 
 class airport:
     def __init__(self, name):
