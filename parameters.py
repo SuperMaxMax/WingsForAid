@@ -183,6 +183,7 @@ class UAV:
         self.AE_MAC_length_h = 0.8       
         self.AE_y_mac_h = 1
         self.AE_x_lemac_h = 0.2
+        self.AE_lambda_co2_h = 0
 
 
         # Vertical tailplane
