@@ -305,6 +305,10 @@ class UAV:
         self.ST_n_nw = 2.25 #load factor for nose wheel load
         self.ST_n_imp = 3.0 #impact inertia load factor
         self.ST_n_LW = 2/3 #L/W at bad landing
+        self.ST_n_m = 3.8 # positive limit maneuvering load factor (from Vn)
+        self.ST_n_ult_pos = 6.6 #positive ultimate load factor
+        self.ST_n_ult_neg = -2.78 #negative ultimate load factor
+        self.ST_T_eng = 128 #Nm, Rotax 912 torque
 
 class airport:
     def __init__(self, name):
