@@ -27,7 +27,7 @@ for concept in [aircraft]:
     while it:
         # class 1
         W_OE = c1.weight_empty_operational(concept)
-        W_F  = c1.profile(concept, 12, 3, 50)
+        W_F  = c1.profile(concept, 12, 1)
         W_PL = n_boxes*concept.boxweight
         concept.W_TO = W_OE + W_F + W_PL
         print(f"Class I estimation {n}: MTOW [kg] = {np.round(concept.W_TO)}")
@@ -35,7 +35,7 @@ for concept in [aircraft]:
         concept.W_F  = W_F
         
         # geometry determination
-        geo.geometry_determination(concept, high_WS=True)
+        geo.geometry_determination(concept)
         #concept.WS = 70.805
 
         # class 2
@@ -60,7 +60,7 @@ for concept in [aircraft]:
 
     # --- plotting of concept
     print(f"{concept.name} done in {n} iterations \n")
-    geo.geometry_determination(concept, high_WS = True, plot = True)
+    geo.geometry_determination(concept, plot = True)
     # cg calculation
     plt.figure(1)
     plt.subplot(121)
