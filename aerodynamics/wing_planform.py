@@ -76,7 +76,7 @@ def iw(airfoil):
 def main_wing_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
         i_w = i_w[0]
-        variable = "Lambda"      #Lambda, AR or Twist
+        variable = "AR"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
             variable_list2 = [0.4]
@@ -148,8 +148,8 @@ def main_wing_planform(aircraft):
                 
         
             label = variable + "= " + str(parameter)
-        # plt.plot(y_s, CL1, marker = "s", label = label)
-
+         #   plt.plot(y_s, CL1, marker = "s", label = label)
+           # plt.show()
             ##Wing Lift Coefficient
             C_L_wing = np.pi * AR * A[0]
             V_c = aircraft.V_cruise
@@ -178,14 +178,13 @@ def main_wing_planform(aircraft):
             
             CL_a_w = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
 
-            #print('=====================================================================')
-            #print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
-            #print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_req, "CD_i = ", CD_induced)
-            #print(C_L_wing**2 / (AR* np.pi * CD_induced))
-
-            #print("CL_wing", C_L_wing)
-            #print("CL required for cruis", C_L_req)
-            #print("CDi_wing", CD_induced)
+            print('=====================================================================')
+            print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
+            print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_req, "CD_i = ", CD_induced)
+            print(C_L_wing**2 / (AR* np.pi * CD_induced))
+            print("CL_wing", C_L_wing)
+            print("CL required for cruis", C_L_req)
+            print("CDi_wing", CD_induced)
             q = 0.5 * aircraft.rho_cruise * aircraft.V_cruise**2
             #print(CL1, c)
             #print(Croot*Lambda)
