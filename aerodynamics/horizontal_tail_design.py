@@ -264,6 +264,8 @@ def horizontal_tail_planform(aircraft):
     aircraft.AE_x_lemac_h = aircraft.AE_y_mac_h/np.tan(aircraft.AE_sweep_LE_h)
     aircraft.AE_CL_a_h = CL_a_h
     print("Afsd", CL_a_h)
+    print(b)
+    print(S)
     return 
 
 aircraft = UAV("aircraft")
