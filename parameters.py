@@ -142,7 +142,7 @@ class UAV:
         self.AE_CL_max_TO = 1.5                 # Still to be updated maximum lift coefficient at take-off [-]
         self.AE_CL_max_clean = 1.5              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.AE_CL_max_land = 1.9               # Still to be updated maximum lift coefficient at landing [-]
-        self.AE_CL_a_W = 4.2                    # Still to be updated lift curve slope [-] 
+        self.AE_CL_a_w = 4.742599905112777                    # Lift curve slope [1/rad] 
         self.AE_L_D = 14.1804                   # Still to be updated lift to drag ratio [-]
         self.AE_MAC_length = 1.3045             # Updated mean aerodynamic chord [m]
         self.AE_MAC_ac = 0.24                   # Updated location of aerodynamic center relative to MAC [-]
@@ -171,6 +171,8 @@ class UAV:
         self.AE_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
         self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
+        self.AE_CL_a_h = 4.1923692363710074                 # Lift curve slope horizontal tailplane [1/rad] 
+
         self.AE_taper_h = 0.6                
         self.AE_b_h = 4                     
         self.AE_i_w_h = 0.04       
