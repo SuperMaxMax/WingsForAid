@@ -5,6 +5,10 @@ from matplotlib import patheffects
 from scipy.integrate import quad
 import math
 
+sys.path.append('..')
+
+from parameters import UAV, atmosphere
+aircraft = UAV('aircraft')
 
 # Setting with which can be determined if first the aircraft is filled with fuel or with payload
 fuel_first = False
@@ -64,8 +68,8 @@ def cg_calc(obj):
     # X_LEMAC and xc_OEW
     xc_OEW = obj.xc_OEW_p*obj.MAC_length
     #X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
-    # X_LEMAC = obj.X_LEMAC
-    X_LEMAC = 0.35 * (obj.l_f + obj.l_f_boom)
+    X_LEMAC = obj.X_LEMAC
+    # X_LEMAC = 0.32 * (obj.l_f + obj.l_f_boom)
     obj.X_LEMAC = X_LEMAC
     obj.X_FCG = X_FCG
 
@@ -141,12 +145,11 @@ def cg_calc(obj):
     obj.X_cg_aft = max(Xs) + obj.X_cg_range * 0.05
 
     obj.AE_l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
-    print(obj.AE_l_h)
-    print(obj.l_f + obj.l_f_boom)
+
     # Plot lines for forward and aft cg positions
     # plt.axvline(x=0, linestyle='--', color='red', label='0% MAC')
     # plt.axvline(x=1, linestyle=':', color='red', label='100% MAC')
-
+    fig1 = plt.figure()
     plt.axvline(x=obj.X_cg_fwd, linestyle='--', color='blue', label='most forward c.g. considered')
     plt.axvline(x=obj.X_cg_aft, linestyle='--', color='red', label='most aft c.g. considered')
     plt.xlim((0, 1))
@@ -155,6 +158,34 @@ def cg_calc(obj):
     plt.grid()
     plt.legend()
     plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
-    plt.show()
+    # plt.show()
 
     return max(Xs), min(Xs), obj.X_cg_range
+
+def iteration(aircraft):
+
+
+    X_max_array = []
+    X_min_array = []
+    X_range_array = []
+    X_cg_range_lim_array = []
+    wing_pos_array = np.arange(0.25, 0.55, 0.005)
+
+    for i in wing_pos_array:
+        aircraft.X_LEMAC = i * (aircraft.l_f + aircraft.l_f_boom)
+        
+        X_max, X_min, X_cg_range_lim = cg_calc(aircraft)
+        X_range = X_max - X_min
+        X_max_array.append(X_max)
+        X_min_array.append(X_min)
+        X_range_array.append(X_range)
+        X_cg_range_lim_array.append(X_cg_range_lim)
+
+    fig2 = plt.figure()
+    print(X_cg_range_lim_array[12])
+    plt.plot(X_min_array, wing_pos_array)
+    plt.plot(X_max_array, wing_pos_array)
+    
+    plt.show()
+    
+iteration(aircraft)
