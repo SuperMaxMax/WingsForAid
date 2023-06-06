@@ -9,11 +9,6 @@ import csv
 import matplotlib.pyplot as plt
 from scipy import integrate, optimize
 
-aircraft = UAV('aircraft')
-#
-airfoil = aircraft.airfoil 
-
-
 def iw(airfoil):
     ### FIND CL optimal ###
     file_name_clcd = "cl-cd-" + str(airfoil)
@@ -78,7 +73,7 @@ def iw(airfoil):
 
 #iw(airfoil)
 
-def main_wing_planform():
+def main_wing_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
         i_w = i_w[0]
         variable = "Lambda"      #Lambda, AR or Twist
@@ -176,6 +171,13 @@ def main_wing_planform():
                 delta += (i+1) * (A[i] / A[0])**2
             
             span_eff = 1 / (1 + delta)
+            oswald = span_eff * 0.971 * 0.804 #from https://www.fzt.haw-hamburg.de/pers/Scholz/OPerA/OPerA_PUB_DLRK_12-09-10.pdf
+
+            tau = 1/span_eff - 1
+
+            
+            CL_a_w = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
+
             #print('=====================================================================')
             #print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
             #print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_req, "CD_i = ", CD_induced)
@@ -213,7 +215,6 @@ def main_wing_planform():
             #print(W_TO)
             #print(l)
 
-
         #Find integral current distribution
         area_lift_dist = -integrate.simps(CL1, y_s)
         #print(area_lift_dist)
@@ -235,16 +236,36 @@ def main_wing_planform():
         if not full_print:
             return abs(C_L_wing-C_L_req)
         elif full_print:
-            return AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, i_w, y_s, l
+            return AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w
     
+    airfoil = aircraft.airfoil
     initial_guess = iw(airfoil)[0]
     i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
+    AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w = plot_lift_distr(i_w_optimal, full_print=True)
 
-    AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, i_w, y_s, l = plot_lift_distr(i_w_optimal, full_print=True)
+    aircraft.AE_A = AR                        
+    aircraft.AE_b = (AR*aircraft.AE_Sw)**0.5                      
+    aircraft.AE_span_eff = span_eff                     
+    tau = 1/span_eff - 1
+    aircraft.AE_CL_a_w = CL_a_w  
+    aircraft.AE_tau = tau
+    aircraft.AE_i_w = i_w       
+    aircraft.AE_wing_twist = alpha_twist    
+    aircraft.AE_sweep_co2 = 1 / np.tan(np.tan(aircraft.AE_sweep_co4) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.AE_sweep_LE = 1 / np.tan(np.tan(aircraft.AE_sweep_co4) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
+         
+    aircraft.AE_taper = Lambda                
+    aircraft.AE_rootchord = 2 * aircraft.AE_Sw / (aircraft.AE_b * (1+Lambda))            
+    aircraft.AE_tipchord = aircraft.AE_rootchord*Lambda        
+    aircraft.AE_MAC_length = 2/3 * aircraft.AE_rootchord * (1 + Lambda + Lambda**2) / (1 + Lambda)        
+    aircraft.AE_y_mac = 1/3*(aircraft.AE_b/2)*(1+2*Lambda)/(1+Lambda)   
+    aircraft.AE_x_lemac = aircraft.AE_y_mac/np.tan(aircraft.AE_sweep_LE)
+               
+    return 
 
-    return AR, Lambda, alpha_twist, span_eff, C_L_wing, CD_induced, i_w, y_s, l #DONT CHANGE ORDER OR DO IT IN MAIN AS WELL
-    
-#print(main_wing_planform())
+aircraft =  UAV('aircraft')
+main_wing_planform(aircraft)
+#print(aircraft.AE_A)
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
@@ -261,7 +282,7 @@ def fuel_volume(airfoil, Croot, Lambda, b):
         dx = 1/M
         for x in X:
             if x > 0.25 and x <= p: 
-                y = m/p * (2*p*x - x**2)
+                y = m/(p**2) * (2*p*x - x**2)
                 S += y*dx * c**2
             elif x > p and x < 0.75: 
                 y =  m/((1 - p)**2) * ((1 - 2*p) + 2*p*x - x**2) #check wiki
@@ -270,4 +291,4 @@ def fuel_volume(airfoil, Croot, Lambda, b):
     V = V * 1000 #in liters
     return V 
 
-#print(fuel_volume(airfoil, aircraft.rootchord, 0.4, aircraft.b))
+print(fuel_volume(aircraft.airfoil, aircraft.rootchord, 0.4, aircraft.b))

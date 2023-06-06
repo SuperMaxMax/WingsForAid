@@ -1,3 +1,22 @@
+# 24. Select the vertical tail volume coefficient, V V (Table 6.4).
+# 25. Assume the vertical tail moment arm (lv) equal to the horizontal tail moment arm (l).
+# 26. Calculate vertical tail planform area, Sv (Equation (6.74)).
+# 27. Select vertical tail airfoil section (Section 6.8.2.4).
+# 28. Select vertical tail aspect ratio, ARv(Section 6.8.2.6).
+# 29. Select vertical tail taper ratio, λv(Section 6.8.2.7).
+# 30. Determine the vertical tail incidence angle (Section 6.8.2.5).
+# 31. Determine the vertical tail sweep angle (Section 6.8.2.8).
+# 32. Determine the vertical tail dihedral angle (Section 6.8.2.9).
+# 33. Calculate vertical tail span (bv), root chord (Cvroot), and tip chord (Cvtip ), and
+# MACv(Equations (6.76)–(6.79)).
+# 34. Check the spin recovery.
+# 35. Adjust the location of the vertical tail relative to the horizontal tail by changing lv to
+# satisfy the spin recovery requirements (Section 6.8.2.2).
+# 36. Analyze directional trim (Section 6.8.1).
+# 37. Analyze directional stability (Section 6.8.1).
+# 38. Modify to meet the design requirements.
+# 39. Optimize the tail.
+
 import sys
 import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
@@ -9,60 +28,69 @@ import matplotlib.pyplot as plt
 from scipy import integrate, optimize
 
 from parameters import UAV
+object = UAV('aircraft')
+
+def vertical_wing_design(aircraft):
+    #airfoil data
+    #NACA 0009
+    #data from https://digital.library.unt.edu/ark:/67531/metadc65459/m2/1/high_res_d/19930090937.pdf except alpha stall
+    list_Cl0 = 0
+    list_Cd_min = 0.0064
+    list_Cm_0 = 0
+    list_alpha_0 = 0
+    list_alpha_s = 13.2
+    list_Cl_max = 1.39
+    list_Cl_alpha = 0.098 * 180/np.pi
+    list_tc = 0.09
+    
+    Sv_Sw = aircraft.AE_Sv_S
+    b = aircraft.AE_b
+    l_v = aircraft.AE_l_h
+    Sw = aircraft.AE_Sw
+
+    V_v = Sv_Sw * l_v / b
+    S_v = Sv_Sw * Sw
+    print(V_v)
 
 
+vertical_wing_design(object)
+
+#All vertical tail volume things known so only influence planform sizing
+
+#Function that determines required lift based on counter torque
 def required_lift(aircraft):
-    #load in parameters from current design
-    AR = aircraft.AE_A
-    sweep_c4 = aircraft.AE_sweep_co4
-    taper = aircraft.AE_taper
-    C_m_af = aircraft.AE_cm0
-    alpha_t = aircraft.AE_wing_twist
     V_c = aircraft.V_cruise
     rho_c = aircraft.rho_cruise
     W_TO = aircraft.W_TO * 9.80665
-    S = aircraft.AE_Sw
-    h0 = aircraft.AE_MAC_ac
-    MAC = aircraft.AE_MAC_length
-    xcg_fwrd = aircraft.X_cg_fwd
-    xcg_aft = aircraft.X_cg_aft
-    Sh_SW = aircraft.AE_Sh_S
 
-    #test to verify code
-    # AR = 28
-    # sweep_c4 = 0
-    # taper = 0.8
-    # C_m_af = -0.013
-    # alpha_t = -1.1 
-    # V_c = 48.872222
-    # rho_c = 0.905
-    # W_TO = 850 * 9.81
-    # S = 18
-    # h0 = 0.23
-    # MAC = 0.8
 
-    #temp values from book
-    #V_H = 0.7 #table 6.4 "aircraft design synthesis a systems engineering approach"
-    V_H = Sh_SW * aircraft.AE_l_h / MAC
+    rpm = 4 #Change to object variable [1/min]
+    omega = rpm / 60 * 2 * np.pi
+    power = 10 #Change to object variable [W]
 
-    #inbetween calculutions 
-    C_L = 2*W_TO/(rho_c * (V_c**2) * S) #lift in cruise
-    sweep_LE = np.arctan(np.tan(sweep_c4) - (4/AR) * (25/100 * (1-taper)/(1+taper))) #leading edge sweep
-    #sweep_LE = 8 * np.pi/180 #test to verify code
-    C_m_0_wf = C_m_af * (AR * (np.cos(sweep_LE) ** 2)) / (AR + 2 * np.cos(sweep_LE)) + 0.01 * alpha_t
+    M = power / omega
 
-    most_extreme_cg = [xcg_fwrd, xcg_aft]
-    C_L_h = 0 
-    for xcg_wf in most_extreme_cg:
-        h = xcg_wf
-        #h = 0.114 #test to verify code
-   
-        C_L_h_new = (C_m_0_wf + C_L * (h - h0)) / (V_H)
-        if abs(C_L_h_new) > abs(C_L_h):
-            C_L_h = C_L_h_new
-    C_L_W_c = C_L
-    
+    ver_dist = 2 #Change to object variable, distance between centre of pressure vertical tail and vertical cg location
+
+    L_h = M / ver_dist
+
+    Sw = aircraft.AE_Sw
+    Sv_Sw = aircraft.AE_Sv_S
+    S_v = Sv_Sw * Sw
+
+    C_L_h = L_h / (0.5 * rho_c * V_c**2 * S_v)
+    #C_L_h = 0.4
+
+
+    C_L_W_c = 2*W_TO/(rho_c * (V_c**2) * Sw) #lift in cruise
+
     return C_L_h, C_L_W_c
+
+
+
+#Sizing function
+    #Incidence angle such that alpha is zero in cruise, so calc cruise torque by prop
+    #Determine rest based on systems engineering book
 
 def airfoil_select(C_L_h, change):
     #airfoil data
@@ -99,7 +127,6 @@ def airfoil_select(C_L_h, change):
                 airfoil = airfoils[2]
     
     return df.loc[[airfoil]]
-#print(airfoil_select(required_lift()))
 
 def horizontal_tail_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
@@ -110,7 +137,7 @@ def horizontal_tail_planform(aircraft):
         elif variable == "AR":  
             variable_list2 = [5.1666666]
         elif variable == "Twist":
-            variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
+            variable_list2 = [0]
         
         airfoildata_temp = airfoil_select(required_lift(aircraft)[0], 0)
         a_stall = airfoildata_temp['alpha_s'].tolist()[0] * np.pi /180
@@ -233,38 +260,5 @@ def horizontal_tail_planform(aircraft):
     print(a_h_optimal)
     AR, b, Lambda, alpha_twist, S, CL_a_h  = plot_lift_distr(a_h_optimal, full_print = True)
 
-    #Adding effect of downwash
-    C_L_W_c = required_lift(aircraft)[1]
-    AR_w = aircraft.AE_A
-    i_w = aircraft.AE_i_w
-    a_f = aircraft.AE_alpha_f
-    C_L_a_w = aircraft.AE_CL_a_w
-    epsilon_0 = 2 * C_L_W_c / (np.pi * AR_w)
-    epsilon_alpha = 2 * C_L_a_w / (np.pi * AR_w)
-    epsilon = epsilon_0 + epsilon_alpha * i_w
-    i_h = a_h_optimal - a_f + epsilon
-    
-    # Horizontal tailplane
-    aircraft.AE_S_h = S
-    aircraft.AE_A_h = AR                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
-    aircraft.AE_lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
-    aircraft.AE_dEpsilondA = epsilon_alpha              # Downwash [-] TODO: check this value, this is a pure guess
-    aircraft.AE_A_h = AR                        
-    aircraft.AE_b_h = b                     
-    aircraft.AE_i_w_h = i_h       
-    aircraft.AE_wing_twist_h = alpha_twist    
-    aircraft.AE_sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
-    aircraft.AE_sweep_co2_h = 1 / np.tan(np.tan(aircraft.AE_sweep_co4_h) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
-    aircraft.AE_sweep_LE_h = 1 / np.tan(np.tan(aircraft.AE_sweep_co4_h) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
-    aircraft.AE_taper_h = Lambda                
-    aircraft.AE_rootchord_h = 2 * aircraft.AE_S_h / (aircraft.AE_b_h * (1+Lambda))            
-    aircraft.AE_tipchord_h = aircraft.AE_rootchord_h*Lambda        
-    aircraft.AE_MAC_length_h = 2/3 * aircraft.AE_rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)        
-    aircraft.AE_y_mac_h = 1/3*(aircraft.AE_b_h/2)*(1+2*Lambda)/(1+Lambda)   
-    aircraft.AE_x_lemac_h = aircraft.AE_y_mac_h/np.tan(aircraft.AE_sweep_LE_h)
-    aircraft.AE_CL_a_h = CL_a_h
-    print("Afsd", CL_a_h)
-    return 
 
-aircraft = UAV("aircraft")
-horizontal_tail_planform(aircraft)
+horizontal_tail_planform(object)
