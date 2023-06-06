@@ -93,7 +93,10 @@ def airfoil_select(C_L_h, change):
         if abs(C_L_h) > 0.5:
             print("Required lift coefficient of horizontal too high something must be changed in the design to limit it. Currently C_L_h = ", C_L_h)
         else:
-            airfoil = airfoils[2+change]
+            if change == 0 or change == -1:
+                airfoil = airfoils[2+change]
+            else: 
+                airfoil = airfoils[2]
     
     return df.loc[[airfoil]]
 #print(airfoil_select(required_lift()))
@@ -191,6 +194,10 @@ def horizontal_tail_planform(aircraft):
             for i in range(1,len(A)):
                 delta += (i+1) * (A[i] / A[0])**2
             span_eff = 1 / (1 + delta)
+            tau = 1/span_eff - 1
+            
+            CL_a_h = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
+
 
             #print('=====================================================================')
             #print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
@@ -217,23 +224,23 @@ def horizontal_tail_planform(aircraft):
         if not full_print:
             return abs(C_L_wing - C_L_h)
         elif full_print:
-            return AR, b, Lambda, alpha_twist, S  #choose whatever
+            return AR, b, Lambda, alpha_twist, S, CL_a_h  #choose whatever
 
     airfoildata = airfoil_select(required_lift(aircraft)[0], 0)
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
     initial_guess = required_lift(aircraft)[0]/C_l_alpha
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     print(a_h_optimal)
-    AR, b, Lambda, alpha_twist, S  = plot_lift_distr(a_h_optimal, full_print = True)
+    AR, b, Lambda, alpha_twist, S, CL_a_h  = plot_lift_distr(a_h_optimal, full_print = True)
 
     #Adding effect of downwash
     C_L_W_c = required_lift(aircraft)[1]
     AR_w = aircraft.AE_A
     i_w = aircraft.AE_i_w
     a_f = aircraft.AE_alpha_f
-    C_L_a_W = aircraft.AE_CL_a_W
+    C_L_a_w = aircraft.AE_CL_a_w
     epsilon_0 = 2 * C_L_W_c / (np.pi * AR_w)
-    epsilon_alpha = 2 * C_L_a_W / (np.pi * AR_w)
+    epsilon_alpha = 2 * C_L_a_w / (np.pi * AR_w)
     epsilon = epsilon_0 + epsilon_alpha * i_w
     i_h = a_h_optimal - a_f + epsilon
     
@@ -255,7 +262,8 @@ def horizontal_tail_planform(aircraft):
     aircraft.AE_MAC_length_h = 2/3 * aircraft.AE_rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)        
     aircraft.AE_y_mac_h = 1/3*(aircraft.AE_b_h/2)*(1+2*Lambda)/(1+Lambda)   
     aircraft.AE_x_lemac_h = aircraft.AE_y_mac_h/np.tan(aircraft.AE_sweep_LE_h)
-
+    aircraft.AE_CL_a_h = CL_a_h
+    print("Afsd", CL_a_h)
     return 
 
 aircraft = UAV("aircraft")

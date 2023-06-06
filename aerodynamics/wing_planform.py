@@ -76,7 +76,7 @@ def iw(airfoil):
 def main_wing_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
         i_w = i_w[0]
-        variable = "Lambda"      #Lambda, AR or Twist
+        variable = "AR"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
             variable_list2 = [0.4]
@@ -148,8 +148,8 @@ def main_wing_planform(aircraft):
                 
         
             label = variable + "= " + str(parameter)
-        # plt.plot(y_s, CL1, marker = "s", label = label)
-
+         #   plt.plot(y_s, CL1, marker = "s", label = label)
+           # plt.show()
             ##Wing Lift Coefficient
             C_L_wing = np.pi * AR * A[0]
             V_c = aircraft.V_cruise
@@ -176,16 +176,15 @@ def main_wing_planform(aircraft):
             tau = 1/span_eff - 1
 
             
-            CL_a_W = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
+            CL_a_w = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
 
-            #print('=====================================================================')
-            #print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
-            #print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_req, "CD_i = ", CD_induced)
-            #print(C_L_wing**2 / (AR* np.pi * CD_induced))
-
-            #print("CL_wing", C_L_wing)
-            #print("CL required for cruis", C_L_req)
-            #print("CDi_wing", CD_induced)
+            print('=====================================================================')
+            print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
+            print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_req, "CD_i = ", CD_induced)
+            print(C_L_wing**2 / (AR* np.pi * CD_induced))
+            print("CL_wing", C_L_wing)
+            print("CL required for cruis", C_L_req)
+            print("CDi_wing", CD_induced)
             q = 0.5 * aircraft.rho_cruise * aircraft.V_cruise**2
             #print(CL1, c)
             #print(Croot*Lambda)
@@ -241,18 +240,18 @@ def main_wing_planform(aircraft):
     airfoil = aircraft.airfoil
     initial_guess = iw(airfoil)[0]
     i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
-    AR, Lambda, alpha_twist, span_eff, i_w, tau, CL_a_w = plot_lift_distr(i_w_optimal, full_print=True)
+    AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w = plot_lift_distr(i_w_optimal, full_print=True)
 
     aircraft.AE_A = AR                        
     aircraft.AE_b = (AR*aircraft.AE_Sw)**0.5                      
     aircraft.AE_span_eff = span_eff                     
     tau = 1/span_eff - 1
-    aircraft.AE_CL_a_W = CL_a_w             
+    aircraft.AE_CL_a_w = CL_a_w  
     aircraft.AE_tau = tau
     aircraft.AE_i_w = i_w       
     aircraft.AE_wing_twist = alpha_twist    
-    aircraft.AE_sweep_co2 = 1 / np.tan(tan(aircraft.AE_sweep_co4) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
-    aircraft.AE_sweep_LE = 1 / np.tan(tan(aircraft.AE_sweep_co4) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
+    aircraft.AE_sweep_co2 = 1 / np.tan(np.tan(aircraft.AE_sweep_co4) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.AE_sweep_LE = 1 / np.tan(np.tan(aircraft.AE_sweep_co4) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
          
     aircraft.AE_taper = Lambda                
     aircraft.AE_rootchord = 2 * aircraft.AE_Sw / (aircraft.AE_b * (1+Lambda))            
@@ -264,7 +263,7 @@ def main_wing_planform(aircraft):
     return 
 
 aircraft =  UAV('aircraft')
-#main_wing_planform(aircraft)
+main_wing_planform(aircraft)
 #print(aircraft.AE_A)
 
 def fuel_volume(airfoil, Croot, Lambda, b):

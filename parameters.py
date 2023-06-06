@@ -84,7 +84,7 @@ class UAV:
         self.h_TO = 0                       # Take-off altitude, airport altitude [m]
         self.h_cruise = 3048.0              # Cruise altitude [m]
         self.h_in = 0.9                     # Inner fuselage height [m]
-        self.h_out = 1.1                    # Outer fuselage height [m]
+        self.h_out = 0.737                    # Outer fuselage height [m]
         self.kq = 0.95                      # Volume factor used to calculate wetted area of the wing [-]
         self.l_f = 5.4651                   # Fuselage length [m]
         self.l_f_boom = 2                   # Boom length [m]
@@ -123,9 +123,9 @@ class UAV:
         self.top_clearance = 0.2            # Top clearance [m]
         self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility    
         self.w_in = 1.2                     # Inner fuselage width [m]
-        self.w_out = 1.4                    # Outer fuselage width [m]
+        self.w_out = 1.1                    # Outer fuselage width [m]
         self.x_lemac = 0.2871               # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
-        self.xc_OEW_p = 0.2                 # Center of gravity of OEW as a fraction of the MAC [-]
+        self.xc_OEW_p = 0.25                 # Center of gravity of OEW as a fraction of the MAC [-]
         self.y_mac = 2.04                   # Spanwise location of the MAC [m]
         
 
@@ -142,7 +142,7 @@ class UAV:
         self.AE_CL_max_TO = 1.5                 # Still to be updated maximum lift coefficient at take-off [-]
         self.AE_CL_max_clean = 1.5              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.AE_CL_max_land = 1.9               # Still to be updated maximum lift coefficient at landing [-]
-        self.AE_CL_a_W = 4.2                    # Still to be updated lift curve slope [-] 
+        self.AE_CL_a_w = 4.742599905112777                    # Lift curve slope [1/rad] 
         self.AE_L_D = 14.1804                   # Still to be updated lift to drag ratio [-]
         self.AE_MAC_length = 1.3045             # Updated mean aerodynamic chord [m]
         self.AE_MAC_ac = 0.24                   # Updated location of aerodynamic center relative to MAC [-]
@@ -166,11 +166,13 @@ class UAV:
         self.AE_alpha_f = 0                     # Still to be updated angle of attack of the fuselage [rad]
 
         # Horizontal tailplane
-        self.AE_l_h = 4.5                      # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.AE_l_h = 4                      # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
         self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
+        self.AE_CL_a_h = 4.1923692363710074                 # Lift curve slope horizontal tailplane [1/rad] 
+
         self.AE_taper_h = 0.6                
         self.AE_b_h = 4                     
         self.AE_i_w_h = 0.04       
@@ -183,6 +185,7 @@ class UAV:
         self.AE_MAC_length_h = 0.8       
         self.AE_y_mac_h = 1
         self.AE_x_lemac_h = 0.2
+        self.AE_lambda_co2_h = 0
 
 
         # Vertical tailplane
@@ -234,6 +237,7 @@ class UAV:
         self.turnrate_half  = 1.5               # deg/s
         self.turnrate_1     = 3.0               # deg/s
         self.turnrate_2     = 6.0               # deg/s
+        self.accelheight    = 300*0.3048
 
 
         "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
@@ -246,7 +250,6 @@ class UAV:
         self.CS_Cm_0_airfoil = -0.083       # TODO: Update value - Moment coefficient of airfoil [-]
         self.CS_n_blades = 3                   # [-] number of propeller blades NOTE: Depends on chosen propeller
         self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
-
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
         # inputs
         self.OP_fuel_energy_density = 44.65E6 # [J/kg]
@@ -297,6 +300,18 @@ class UAV:
         self.lift_coefficients = [1.02549983e+03,  3.40489460e+02, -2.62539473e+03,  6.99194179e+03,     #Coefficents of a polynomial fit for the 
                             -9.67481071e+03,  7.76224418e+03, -3.81444542e+03,  1.16482541e+03,     #lift distribution over the half span
                             -2.15539510e+02,  2.21217522e+01, -9.66193857e-01]                      #Highest order coefficient first
+
+        "Jan W's coefficinets:"
+
+        self.ST_U_de = 50 #derived gust velocity (ft/s)
+        self.ST_n_nw = 2.25 #load factor for nose wheel load
+        self.ST_n_imp = 3.0 #impact inertia load factor
+        self.ST_n_LW = 2/3 #L/W at bad landing
+        self.ST_n_m = 3.8 # positive limit maneuvering load factor (from Vn)
+        self.ST_n_ult_pos = 6.6 #positive ultimate load factor
+        self.ST_n_ult_neg = -2.78 #negative ultimate load factor
+        self.ST_Torque_eng = 128 #Nm, Rotax 912 torque
+        self.ST_Thrust_eng = 2800 #N Rotax 912 thrust
 
 class airport:
     def __init__(self, name):
