@@ -79,7 +79,7 @@ def required_lift(aircraft):
     S_v = Sv_Sw * Sw
 
     C_L_h = L_h / (0.5 * rho_c * V_c**2 * S_v)
-    C_L_h = 0.2
+    #C_L_h = 0.4
 
 
     C_L_W_c = 2*W_TO/(rho_c * (V_c**2) * Sw) #lift in cruise
@@ -121,7 +121,10 @@ def airfoil_select(C_L_h, change):
         if abs(C_L_h) > 0.5:
             print("Required lift coefficient of horizontal too high something must be changed in the design to limit it. Currently C_L_h = ", C_L_h)
         else:
-            airfoil = airfoils[2+change]
+            if change == 0 or change == -1:
+                airfoil = airfoils[2+change]
+            else: 
+                airfoil = airfoils[2]
     
     return df.loc[[airfoil]]
 
