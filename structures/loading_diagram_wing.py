@@ -111,9 +111,11 @@ def spanwise_wing_weight_ty(y):
     return spanwise_wing_weight(y)*y
 
 def spanwise_wing_loading(y):
-    # put if for worst case scenarios
-    gamma_0 = (ac.W_TO-ac.W_F)*ac.g0*(4/np.pi)*(1/ac.rho_cruise)*(1/ac.V_cruise)*(1/ac.b)
-    return ac.rho_cruise*ac.V_cruise*gamma_0*np.sqrt(1-(2*y/ac.b)**2) # when inputting XFLR -> check for matching coordinate systems
+    # # put if for worst case scenarios
+    # gamma_0 = (ac.W_TO-ac.W_F)*ac.g0*(4/np.pi)*(1/ac.rho_cruise)*(1/ac.V_cruise)*(1/ac.b)
+    # return ac.rho_cruise*ac.V_cruise*gamma_0*np.sqrt(1-(2*y/ac.b)**2) # when inputting XFLR -> check for matching coordinate systems
+    c = ac.lift_coefficients[::-1]
+    return np.polyval(c, y)
 
 def spanwise_wing_loading_ty(y):
     # put if for worst case scenarios
@@ -192,17 +194,17 @@ for i in range(2):
     shear = []
     torque = []
     
-    # flexural axis assumption
+    # flexural axis assumption # -> replace 0.25 with front spar location variable, also add in location based on wingbox design -> for iteration
     flex_ax = 0.25+0.45*(0.75-0.25) # chord from leading edge
 
     # define moment arms
     cop = 0.25                      # chord from leading edge
     ma_wing_loading = (flex_ax-cop)*chord(y_span) # moment arm wing loading
     torque_wing_loading = ma_wing_loading*spanwise_wing_loading(y_span) # torque wing loading
-    pos_flap = 0.75+0.45*(1-0.75)
+    pos_flap = 0.75+0.45*(1-0.75) # make variable in future !!!
     ma_flap = (flex_ax-pos_flap)*chord(y_span)
     torque_flap = ma_flap*-spanwise_flap_weight()
-    pos_ail = 0.75+0.45*(1-0.75)
+    pos_ail = 0.75+0.45*(1-0.75) # make variable in future !!!
     ma_ail = (flex_ax-pos_ail)*chord(y_span)
     torque_ail = ma_ail*-spanwise_aileron_weight()
 
