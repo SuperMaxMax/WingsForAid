@@ -299,6 +299,13 @@ class UAV:
                             -9.67481071e+03,  7.76224418e+03, -3.81444542e+03,  1.16482541e+03,     #lift distribution over the half span
                             -2.15539510e+02,  2.21217522e+01, -9.66193857e-01]                      #Highest order coefficient first
 
+        "Jan W's coefficinets:"
+
+        self.ST_U_de = 50 #derived gust velocity (ft/s)
+        self.ST_n_nw = 2.25 #load factor for nose wheel load
+        self.ST_n_imp = 3.0 #impact inertia load factor
+        self.ST_n_LW = 2/3 #L/W at bad landing
+
 class airport:
     def __init__(self, name):
         self.name       = name

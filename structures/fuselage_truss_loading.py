@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from parameters import UAV
 ac=UAV("aircraft")
+from parameters import atmosphere
+at=atmosphere("aircraft")
 #from loading_diagram_wing import aircraft
 
 ## Define material ##
@@ -184,8 +186,30 @@ print('minumum mass for compression of bottom pannel due to wing structural weig
 
 #############################################################
 ## Some structural loading forces calculations
+
+T_eng = 0
+
 C_L_h = -0.1331864964576476
-F_h=ac.W_TO*ac.g0*(ac.AE_Vh_V)**2*ac.AE_Sh_S*C_L_h/ac.AE_CL_max_clean
-print("F_h",F_h)
+F_h_cruise=ac.W_TO*ac.g0*(ac.AE_Vh_V)**2*ac.AE_Sh_S*C_L_h/ac.AE_CL_max_clean
+print("F_h in cruise",F_h_cruise)
+rho = 1.225
+U_de = 50 #derived gust velocity (ft/s)
+miu_g = 2*ac.WS*0.2/(rho*0.00194032033*ac.AE_MAC_length*3.2808399*ac.AE_CL_a_w*ac.g0*3.280839895013123)
+Kg = 0.88*miu_g/(5.3+miu_g)#gust alleviation factor
 
+V_a = ac.V_A /0.51444 # from m/s to kt
+lb_to_N = 4.4482216153
+m2_to_ft2 = 10.7639104
+S_ht=ac.AE_Sh_S*ac.Sw*m2_to_ft2
+S_vt = ac.AE_Sv_S*ac.Sw*m2_to_ft2
+n=1
 
+dF_h = n*ac.W_TO*ac.g0*((ac.X_cg_aft-ac.AE_MAC_ac)*ac.AE_MAC_length/ac.AE_l_h - ac.AE_Sh_S*(ac.AE_CL_a_h/ac.AE_CL_a_w)*(1-ac.AE_dEpsilondA) - rho/2*(ac.AE_Sh_S*ac.Sw*ac.AE_CL_a_h*ac.AE_l_h/ac.W_TO)) # in N
+
+dF_h_gust = Kg*ac.ST_U_de* ac.V_A/0.51444 *S_ht/498 *(1-ac.AE_dEpsilondA)* lb_to_N #in N
+
+dF_v_gust  = Kg*ac.ST_U_de* ac.V_A/0.51444 *S_vt/498 * lb_to_N #in N
+
+print(dF_h)
+print(dF_h_gust)
+print(dF_v_gust)
