@@ -142,27 +142,27 @@ class UAV:
         self.AE_CL_max_TO = 1.5                 # Still to be updated maximum lift coefficient at take-off [-]
         self.AE_CL_max_clean = 1.5              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.AE_CL_max_land = 1.9               # Still to be updated maximum lift coefficient at landing [-]
-        self.AE_CL_a_w = 4.742599905112777                    # Lift curve slope [1/rad] 
+        self.AE_CL_a_w = 4.743                  # Updated Lift curve slope [1/rad] 
         self.AE_L_D = 14.1804                   # Still to be updated lift to drag ratio [-]
-        self.AE_MAC_length = 1.3045             # Updated mean aerodynamic chord [m]
+        self.AE_MAC_length = 1.248              # Updated mean aerodynamic chord [m]
         self.AE_MAC_ac = 0.24                   # Updated location of aerodynamic center relative to MAC [-]
         self.AE_Sw = 11.7113                    # Updated wing area [m^2]
         self.AE_Sw_wetted = 23.4226             # Updated wetted area of the wing [m^2]
         self.AE_b = 9.527                       # Updated wing span [m]
         self.AE_dihedral = 0                    # Updated wing dihedral angle [rad]
-        self.AE_span_eff = 0.95                        # Span eficiency factor (different from oswald) [-]
+        self.AE_span_eff = 0.9940               # Updated Span eficiency factor (different from oswald) [-]
         self.AE_tau = 1                         # Factor used in prandtl glauert correction for airfoil curve slope to wing [-]
-        self.AE_e = 0.7                         # Still to be updated oswald efficiency factor [-]
-        self.AE_i_w = 0.19 * np.pi / 180        # Updated incidence angle of wing wrt fuselage [rad]
-        self.AE_wing_twist = 0 *np.pi/180       # Updated wing twist (difference root and chord) [rad]
-        self.AE_sweep_co2 = -0.0428             # Still to be updated half chord sweep angle [rad]
+        self.AE_e = 0.776                       # Updated oswald efficiency factor [-]
+        self.AE_i_w = 0.935 * np.pi / 180       # Updated incidence angle of wing wrt fuselage [rad]
+        self.AE_wing_twist = -2.0 *np.pi/180    # Updated wing twist (difference root and chord) [rad]
+        self.AE_sweep_co2 = -0.02736            # Updated half chord sweep angle [rad]
         self.AE_sweep_co4 = 0.0                 # Updated half chord sweep [rad]
-        self.AE_sweep_LE = 0.0428         
-        self.AE_taper = 0.4                     # Updated taper ratio [-]
-        self.AE_rootchord = 1.7561              # Updated Root chord [m]
-        self.AE_tipchord = 0.7024               # Updated tip chord [m]
+        self.AE_sweep_LE = 0.0428               # Updated leading edge sweep [rad] 
+        self.AE_taper = 0.65                    # Updated taper ratio [-]
+        self.AE_rootchord = 1.490               # Updated Root chord [m]
+        self.AE_tipchord = 0.9685               # Updated tip chord [m]
         self.AE_x_lemac = 0.2871                # Still to be updated distance from LE root chord to the leading edge mean aerodynamic chord [m]
-        self.AE_y_mac = 2.04                    # Updated spanwise location of the MAC [m]
+        self.AE_y_mac = 2.21                    # Updated spanwise location of the MAC [m]
         self.AE_alpha_f = 0                     # Still to be updated angle of attack of the fuselage [rad]
 
         # Horizontal tailplane
@@ -208,7 +208,7 @@ class UAV:
             self.AE_cl_alpha = 0.103 * 180 / np.pi              # Lift curve slope [1 / rad]    
             self.AE_cm_alpha = 0.00748                          # Moment coefficient derivative [1/rad]
             self.AE_cm0 = -0.0941                               # Moment coefficient at zero AoA
-            self.AE_alpha0 = -self.AE_Cl0 / self.AE_cl_alpha    # Angle of attack at zero lift
+            self.AE_alpha0 = -0.0774    # Angle of attack at zero lift
 
         if self.airfoil == "clarky":
             self.AE_clcd_max = 154.7
