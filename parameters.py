@@ -305,9 +305,9 @@ class UAV:
         self.OP_V_headwind = 15  # [m/s]
         self.OP_V_wind = max(self.OP_V_headwind,self.OP_V_crosswind,self.OP_V_tailwind)  # [m/s]
 
-        self.OP_Range = 250 # [km]
+        self.OP_Range = 262.5 # [km]
         self.OP_N_boxes_per_sortie = 12  # [-]
-        self.OP_MR_PL = 22000 # [kg/day]
+        self.OP_MR_PL = 21000 # [kg/day]
         self.OP_PL_per_box = 20 # [kg]
         self.OP_TTFD = 72 # [h]
 
@@ -320,19 +320,14 @@ class UAV:
 
         # cost breakdown inputs
         self.OP_T_ops = 28 # [days]
-        self.OP_N_ops = 142 # [operations]
-        self.OP_AC_per_op = 21 # [#AC] available on average
+        self.OP_N_ops = 659 # [operations]
+        self.OP_AC_per_op = 20 # [#AC] available on average
         self.OP_n_drops = 2 # [#] choice!
-        self.OP_TTFS = 68.96 # [h] from contract to finished assembly and first sortie starts
-        self.OP_T_sortie_gnd = 2.067 # [hr]
-
-        self.OP_CST_nofuel = 61565740.67 # [euro]
-        self.OP_fuelprice = 1.5 # [euro/L]
-
-        self.OP_T_taxi = 5/60 # [h]
-        self.OP_T_TO = 10 / 60  # [h]
-        self.OP_T_LDG = 10 / 60  # [h]
-        self.OP_T_clearance = 5 / 60  # [h]
+        self.OP_TTFS = 66.712 # [h] from contract to finished assembly and first sortie starts
+        self.OP_T_ground = 2 # [h]
+        self.OP_T_pilot = 0.75 # [h]
+        self.OP_CST_nofuel = 217584726.5 # [euro]
+        self.OP_fuelprice = 1.1935 # [euro/L]
 
         "Tim's coefficients:"
 

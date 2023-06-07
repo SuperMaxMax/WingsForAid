@@ -680,6 +680,7 @@ def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     return t, x, W_F_used, h
 
 def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Summary = False, plot = False):
+    flight_profile = []
     # Define a number of arrays used for plotting
     h_array = np.empty(0)
     x_array = np.empty(0)
@@ -779,6 +780,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             W -= boxesperdrop * ac_obj.boxweight
             if i == 0:
                 print(f"Time to first drop: {t} [sec] / {np.round(t/3600, 2)} [hrs]")
+                flight_profile.append(t)
     else:
         target_dist = Range - dropregion*1000                           # distance to first target
         cruise_alt_tft = cruiseheight(target_dist, h_cruise)            # tft = to first target
@@ -818,6 +820,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         W -= W_F_used_descent
         W -= boxesperdrop * ac_obj.boxweight
         print(f"Time to first drop: {t} [sec] / {np.round(t/3600, 2)} [hrs]")
+        flight_profile.append(t)
         # ============================================================================================================================
         # Drops in dropregion
         interdropdist = (dropregion*1000) / (n_drops - 1)
@@ -924,6 +927,8 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         plt.xlabel("Horizontal distance [m]")
         plt.ylabel("Altitude [m]")
         plt.show()
-    return
+    flight_profile.append(t) #total sortie time
+    flight_profile.append(W_F_used) # fuel burnt
+    return flight_profile
 
 fuelusesortie(aircraft, atm, 12, 3, 14000, 62, 65, dropregion=50, Summary = True, plot=True)

@@ -66,20 +66,21 @@ def SimuDrop(DropCon, DropMan, DropUnc, DropResults):
     boxDY = box_layout[1]
     boxDZ = box_layout[2]
     box_pos = {
-        0: [0 * boxDX, boxDY, boxDZ],
-        1: [0 * boxDX, -boxDY, boxDZ],
-        2: [5 * boxDX, boxDY, boxDZ],
-        3: [5 * boxDX, -boxDY, boxDZ],
-        4: [1 * boxDX, boxDY, boxDZ],
-        5: [1 * boxDX, -boxDY, boxDZ],
-        6: [4 * boxDX, boxDY, boxDZ],
-        7: [4 * boxDX, -boxDY, boxDZ],
-        8: [2 * boxDX, boxDY, boxDZ],
-        9: [2 * boxDX, -boxDY, boxDZ],
-        10: [3 * boxDX, boxDY, boxDZ],
-        11: [3 * boxDX, -boxDY, boxDZ],
+        0: [0, 0, 0], # reference
+        1: [0 * boxDX, boxDY, boxDZ], #diagonal front left
+        2: [5 * boxDX, -boxDY, boxDZ], #diagonal back right
+        3: [0 * boxDX, -boxDY, boxDZ],
+        4: [5 * boxDX, boxDY, boxDZ],
+        5: [1 * boxDX, boxDY, boxDZ], #diagonal front left
+        6: [4 * boxDX, -boxDY, boxDZ], #diagonal back right
+        7: [1 * boxDX, -boxDY, boxDZ],
+        8: [4 * boxDX, boxDY, boxDZ],
+        9: [2 * boxDX, boxDY, boxDZ], #diagonal front left
+        10: [3 * boxDX, -boxDY, boxDZ], #diagonal back right
+        11: [2 * boxDX, -boxDY, boxDZ],
+        12: [3 * boxDX, boxDY, boxDZ],
     }
-    box_pos = np.array(box_pos[DropCon[3]])
+    box_pos = np.array(box_pos[DropCon[-1]])
 
     # get initial state
     rho = atm.rho0
@@ -249,7 +250,7 @@ def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score=0):
             " & maneuver:"+ str(mc_r) +
             "\nSfit=" + str(round(Stats["Sfit"][-1])) + "%" +
               " and Dfit=" + str(round(Stats["Dfit"][-1]))
-              + "% | Score:" + str(round(score))
+              + "% | Score:" + str(np.round(score,1))
     )
     plt.show()
 
@@ -257,12 +258,12 @@ def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score=0):
 
 def PlotBar(ManTPM, TPMw, ManCases, concase, scores):
 
-    cases = []
-    for mancase in ManCases:
-        mancase_name = []
-        for val in mancase:
-            mancase_name.append(str(np.round(val,2)))
-        cases.append(str(mancase_name))
+    # cases = []
+    # for mancase in ManCases:
+    #     mancase_name = []
+    #     for val in mancase:
+    #         mancase_name.append(str(np.round(val,2)))
+    #     cases.append(str(mancase_name))
     cases = list(np.argsort(scores))
 
     fig, ax = plt.subplots()
@@ -276,7 +277,7 @@ def PlotBar(ManTPM, TPMw, ManCases, concase, scores):
         w = TPMw[w_counter]
         bar = tpm * w
         p = ax.bar(cases, bar, width, bottom=bottom,
-                   label=str(boolean+"|"+str(np.round(w,2))))
+                   label=str(boolean+"|"+str(np.round(w, 2))))
         bottom += bar
         w_counter += 1
 
@@ -314,7 +315,7 @@ print("box default:", box.__dict__)
 dt_sim = 5 / 10E3  # [s] between simulation frames
 IT_max = 10E4
 DoVerif = False
-SingleTry = True
+SingleTry = False
 
 # Operational limits & requirements
 V_boxdrop_lim = 100/3.6 # [m/s] 100kph drop limit
@@ -340,11 +341,11 @@ TPM_weights = np.array([
 C_Mbox = [10, 20] # [kg]
 C_Vw = [0, AC.OP_V_wind] # [kg]
 C_w_heading = [0, 180] # [deg]
-C_Nbox = 1 # [#]
+C_Nbox = 2 # [#]
 # c combinations
-N_div_C = 2-1
+N_div_C = 2
 if SingleTry:
-    C_Nbox = 4-1
+    C_Nbox = 4
     C_VAR = {
         "Mbox": subdivide(C_Mbox, 0),
         "Vw": subdivide([0,0], 0),
@@ -358,6 +359,14 @@ else:
         "w_heading": subdivide(C_w_heading, N_div_C),
         "box_number": [C_Nbox]
     }
+    if N_div_C == 0: # case with no distrubances, just box variations
+        C_Nbox = 4
+        C_VAR = {
+            "Mbox": subdivide([10,10], 0), # use min box == max var
+            "Vw": subdivide([0,0], 0),
+            "w_heading": subdivide([0,0], 0),
+            "box_number": [6]
+        }
 allNames = C_VAR
 C_COMB = list(it.product(*(C_VAR[Name] for Name in allNames)))
 C_COMB_red = []
@@ -376,7 +385,7 @@ M_pitch = [-45, 0] # [deg]
 M_heading = [0, 0] # [deg] not actually a free var
 M_Hmin = [Hmin, Hmin+1] # [m]
 # m combinations
-N_div_M = 2
+N_div_M = 0
 M_VAR = {
     "V_app": subdivide(M_V_app, min(N_div_M, 1)),
     "n_app": subdivide(M_n_app, N_div_M),
@@ -384,6 +393,14 @@ M_VAR = {
     "heading": subdivide(M_heading, 0),
     "Hmin": subdivide(M_Hmin, 0)
 }
+if N_div_M == 0: # use standard W4A maneuver
+    M_VAR = {
+        "V_app": [AC_V_s],
+        "n_app": [0],
+        "pitch": [0],
+        "heading": [0],
+        "Hmin": [Hmin]
+    }
 allNames = M_VAR
 M_COMB = list(it.product(*(M_VAR[Name] for Name in allNames)))
 M_COMB_red = []
@@ -412,7 +429,7 @@ N_div_U = 2
 if SingleTry:
     U_Mbox = [-5,5]
     U_Vw = [-AC.OP_V_wind,AC.OP_V_wind]
-    U_w_heading = [0,180]
+    U_w_heading = [0, 180]
     U_VAR = {
         "Mbox": subdivide(U_Mbox, 1),
         "Vw": subdivide(U_Vw, 2),
@@ -462,7 +479,8 @@ ConResults = {
     "Dfit": [],
     "Sfit": [],
     "bounds": [], # better bounds
-    "states": [] # better Vi
+    "states": [], # better Vi
+    "TPM": []
 }
 
 N_Con = 1
@@ -492,6 +510,7 @@ for DropCon in C_COMB:
         "AC_pa": [],
         "AC_Va": []
     }
+    Scores = []
 
     N_Man = 1
     for ManCase in M_COMB:
@@ -509,6 +528,7 @@ for DropCon in C_COMB:
 
         # simulate reference drop
         DropUncRef = np.zeros(len(U_COMB[0]))
+        DropCon[-1] = 0
         state = SimuDrop(DropCon, ManCase, DropUncRef, DropResults)
         if SingleTry: PlotTraj(state, ManCase)
 
@@ -564,39 +584,52 @@ for DropCon in C_COMB:
             ManeuverTPM["REQ passed"].append(0)
         ManeuverTPM["REQ_S"].append(round(Sfit))
         ManeuverTPM["REQ_Vi"].append(round(Pvi))
-        ManeuverTPM["OPS_R"].append(round(100-Dfit))
+        ManeuverTPM["OPS_R"].append(100*round(1-Dfit))
         ManeuverTPM["OPS_am"].append(100*(1-(ManResults["worst a_max"][-1]/AC_nmax)))
         ManeuverTPM["AC_na"].append(100*(1 - (ManCase[1] / AC_nmax)))
         ManeuverTPM["AC_pa"].append(100*(1 - (abs(ManCase[2]) / max(abs(M_pitch[0]), abs(M_pitch[1])))))
         ManeuverTPM["AC_Va"].append(100*max((ManCase[0]-AC_V_s)/AC_V_s,0))
 
-        PlotScatter(DropResults, ManResults, ManCase, DropCon, dropzone_poly, hull_poly)
+        TPM = []
+        for boolean, tpm in ManeuverTPM.items():
+            TPM.append(tpm)
+        print(TPM)
+        print(TPM_weights)
+        Score = np.sum(np.vdot(
+            np.array(TPM),
+            np.array(TPM_weights)))
+        Scores.append(Score)
+        PlotScatter(DropResults, ManResults, ManCase, DropCon, dropzone_poly, hull_poly, Score)
 
         N_Man += 1
 
     # Weighted criteria sum
-    Scores = np.zeros((len(M_COMB)))
-    w_i = 0
-    for boolean, tpm in ManeuverTPM.items():
-        tpm = np.array(tpm)
-        w = TPM_weights[w_i]
-        ds = tpm * w
-        Scores += ds
+    # w_i = 0
+    # for boolean, tpm in ManeuverTPM.items():
+    #     tpm = np.array(tpm)
+    #     w = TPM_weights[w_i]
+    #     ds = tpm * w
+    #     Scores += ds
     # rank & append best
     index = np.argsort(Scores)
 
     ConResults["Condition-Maneuver"].append([DropCon, M_COMB[index[-1]]])
     ConResults["Score"].append(Scores[index[-1]])
+    ConTPM = []
+    for tpm in ManeuverTPM:
+        ConResults["TPM"].append(tpm[index[-1]])
 
     # bar plot
-    if not SingleTry:
+    if not SingleTry and N_div_M > 0:
         print("Results from ", DropCon, "are:\n", ConResults)
-        PlotBar(ManeuverTPM, TPM_weights, M_COMB, DropCon, Scores)
+        PlotBar(ConResults["TPM"], TPM_weights, M_COMB, C_COMB, Scores)
     N_Con += 1
 
 # plot ref drop overlay
 # plot scatter overlay
 # plot bar (cond)
+if not SingleTry and N_div_C > 0:
+    PlotBar(ManeuverTPM, TPM_weights, ConResults["Condition-Maneuver"][0], ConResults["Condition-Maneuver"][1], ConResults["Score"])
 
 # Sensitivity & Causality
 # Mparam = f(Case param)

@@ -7,8 +7,8 @@ class BOX:
         self.CD0 = 	1.05 #[-] flat cube
         self.DCD_brake = 0.5 #[-]
         self.DCD_flaps = 1.17 #[-] separation sheet
-        self.DT_brake = 0.5 # [s]
-        self.DT_flaps = 1  # [s]
+        self.DT_brake = 0.2 # [s]
+        self.DT_flaps = 0.5  # [s]
         self.T_deployment = 0.5 # [s] ease drag transition
 
         self.S = 0.4*0.4 # [m2]
