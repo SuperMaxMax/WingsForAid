@@ -76,7 +76,7 @@ def iw(airfoil):
 def main_wing_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
         i_w = i_w[0]
-        variable = "AR"      #Lambda, AR or Twist
+        variable = "Lambda"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
             variable_list2 = [0.4]
@@ -100,7 +100,7 @@ def main_wing_planform(aircraft):
             if variable == "Twist":
                 alpha_twist = parameter
             else:
-                alpha_twist = 0 * np.pi / 180
+                alpha_twist = -1 * np.pi / 180
 
 
             a_2d = aircraft.AE_cl_alpha       #iw(airfoil)[1]
