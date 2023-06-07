@@ -10,7 +10,10 @@ import math
 fuel_first = False
 
 def cg_calc(obj):
-    ''' '''
+    # Wing placement
+    X_LEMAC = 0.42 * obj.l_f
+    obj.X_LEMAC = X_LEMAC
+
     '''v Wing group v'''
     if obj.lambda_co4 == 0:
         wing_cg = 0.4 * obj.rootchord                 # 40% of root chord plus Leading Edge location
@@ -34,7 +37,7 @@ def cg_calc(obj):
     boom_cg = obj.l_f + 0.5*obj.l_f_boom    # educated guess
    
     # Equipment
-    eq_cg = 0.5*obj.l_f                         # educated guess
+    eq_cg = obj.engine_length + 0.25      # behind the firewall of the engine
 
     # Nacelle
     nacelle_cg = engine_cg                      # nacelle cg assumed to be at engine cg
@@ -42,34 +45,24 @@ def cg_calc(obj):
     # Undercarriage
     # For now: cg assumed to be at aircraft cg -> not taken into account for X_FCG, but is part of OEW
 
-    if obj.boom == True:
-        W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
-        X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
-    else:
-        W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc
-        X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n)/(W_fus_gr - obj.W_uc)
-
-    # X_LEMAC and xc_OEW
-    xc_OEW = obj.xc_OEW_p*obj.MAC_length
-    #X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
-    # X_LEMAC = obj.X_LEMAC
-    # X_LEMAC = 0.35 * (obj.l_f + obj.l_f_boom)
-    X_LEMAC = 0.42 * obj.l_f
-    obj.X_LEMAC = X_LEMAC
+    W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
+    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
 
     obj.X_FCG = X_FCG
+    
+    xc_OEW = obj.xc_OEW_p*obj.MAC_length
+    #X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
 
     # Final CG
     W_OEW = W_wing_gr+W_fus_gr
-    X_OEW = X_LEMAC + xc_OEW
+    X_OEW = (X_LEMAC-obj.X_lemac+x_wcg) + xc_OEW
 
     # Fuel
     W_fuel_wi = obj.W_F
     X_fuel_wi = X_LEMAC + 0.5*obj.MAC_length
 
     # Payload
-    if obj.engine_pos == 'tractor':
-        dist_front = obj.engine_length + 0.45  # [m]
+    dist_front = obj.engine_length + 0.45  # [m]
 
     if obj.n_boxes_abreast == 2:
         box_configs = [[2,0,0,0,0,0], [0,2,0,0,0,0], [0,0,2,0,0,0], [0,0,0,2,0,0], [0,0,0,0,2,0], [0,0,0,0,0,2], [2,2,0,0,0,0], [0,2,2,0,0,0], [0,0,2,2,0,0], [0,0,0,2,2,0], [0,0,0,0,2,2], [2,2,2,0,0,0], [0,2,2,2,0,0], [0,0,2,2,2,0], [0,0,0,2,2,2], [2,2,2,2,0,0], [0,2,2,2,2,0], [0,0,2,2,2,2], [2,2,2,2,2,0], [0,2,2,2,2,2], [2,2,2,2,2,2]]
