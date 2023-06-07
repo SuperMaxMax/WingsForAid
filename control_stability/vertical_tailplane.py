@@ -3,7 +3,6 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 from matplotlib import patheffects
-from sympy import symbols, Eq, solve
 
 sys.path.append('..')
 
@@ -27,7 +26,7 @@ def lateral_coefficients(aircraft, lcg):
     l_v = aircraft.AE_l_h # It was assumed the horizontal tailplane was positioned at the same position as the vertical tailplane. 
     aircraft.AE_l_v = l_v
 
-    Sv_S = aircraft.b/l_v * (C_n_beta_spec+0.04 - (C_n_beta_fus + C_n_beta_prop + C_n_beta_i)) / (C_Y_v_alpha * (aircraft.AE_Vv_V)**2)
+    Sv_S = aircraft.b/l_v * (C_n_beta_spec - (C_n_beta_fus + C_n_beta_prop + C_n_beta_i)) / (C_Y_v_alpha * (aircraft.AE_Vv_V)**2)
     aircraft.AE_Sv_S = Sv_S
     aircraft.AE_S_v = aircraft.AE_Sv_S * aircraft.Sw
     aircraft.CS_S_v = Sv_S * aircraft.Sw

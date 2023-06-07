@@ -10,12 +10,15 @@ import math
 fuel_first = False
 
 def cg_calc(obj):
+
+    obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
+
     # Wing placement
-    X_LEMAC = 0.42 * obj.l_f
+    X_LEMAC = 0.41 * obj.l_f
     obj.X_LEMAC = X_LEMAC
 
     '''v Wing group v'''
-    if obj.lambda_co4 == 0:
+    if obj.sweep_co4 == 0:
         wing_cg = 0.4 * obj.rootchord                 # 40% of root chord plus Leading Edge location
     else:
         wing_cg = 0.4 * obj.rootchord                 # to be done later, depends on spar locations (table 8-15 Torenbeek)
@@ -26,13 +29,13 @@ def cg_calc(obj):
     W_wing_gr = obj.W_w + obj.W_sc
     x_wcg = (wing_cg*obj.W_w + control_surfaces_cg*obj.W_sc)/(W_wing_gr)  # cg distance of wing group wrt leading edge rootchord
 
-    '''v Fuselage group v'''
+    '''v Fuselage group v''' # Everything except winggroup
     # Fuselage & engine
     prop_correction = 0.06          # correction for propeller weight
     fus_cg = 0.48 * obj.l_f         # educated guess
     engine_cg = obj.engine_cg - prop_correction     # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
 
-    #Influence of boom
+    # Boom & tail
     tail_cg = obj.l_f + 0.75*obj.l_f_boom    # educated guess
     boom_cg = obj.l_f + 0.5*obj.l_f_boom    # educated guess
    
@@ -47,15 +50,20 @@ def cg_calc(obj):
 
     W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
     X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
-
+    print(f"W_fus_gr:{W_fus_gr}")
+    print(f"X_W_gr:{X_LEMAC - obj.x_lemac + x_wcg}")
     obj.X_FCG = X_FCG
     
-    xc_OEW = obj.xc_OEW_p*obj.MAC_length
+    # xc_OEW = obj.xc_OEW_p*obj.MAC_length
     #X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
 
     # Final CG
     W_OEW = W_wing_gr+W_fus_gr
-    X_OEW = (X_LEMAC-obj.X_lemac+x_wcg) + xc_OEW
+    print(f"W_OEW:{W_OEW}")
+    X_OEW = X_LEMAC + obj.xc_OEW_p * obj.MAC_length
+    # X_OEW = ((X_LEMAC - obj.x_lemac + x_wcg) * W_wing_gr + X_FCG * W_fus_gr) / (W_OEW)
+    print(f"X_OEW:{X_OEW}")
+    # X_OEW = X_LEMAC-obj.x_lemac+( x_wcg) + xc_OEW
 
     # Fuel
     W_fuel_wi = obj.W_F
@@ -72,11 +80,11 @@ def cg_calc(obj):
     box_weights = [sum(i)*20 for i in box_configs]
     box_xcg_positions = [np.dot(i, box_xs)/sum(i) for i in box_configs]
 
-    # OEW + fuel
+    # cg of OEW + fuel
     W_OEW_fuel_frac = (W_OEW + W_fuel_wi)/obj.W_TO
     X_OEW_fuel = (W_OEW*X_OEW + W_fuel_wi*X_fuel_wi)/(W_OEW + W_fuel_wi)
 
-    # OEW + fuel + box configurations
+    # cg of OEW + fuel + box configurations (MTOW?)
     W_OEW_fuel_box_frac = [W_OEW_fuel_frac + i/obj.W_TO for i in box_weights]
     X_OEW_fuel_box = [((W_OEW+W_fuel_wi)*X_OEW_fuel + i*X_box)/(W_OEW+W_fuel_wi+i) for i, X_box in zip(box_weights, box_xcg_positions)]
 
@@ -84,7 +92,6 @@ def cg_calc(obj):
     W_OEW_box_frac = [W_OEW/obj.W_TO + i/obj.W_TO for i in box_weights]
 
     X_OEW_box = [(W_OEW*X_OEW + (i)*(X_box))/(W_OEW+i) for i, X_box in zip(box_weights, box_xcg_positions)]
-
 
     # Plot each point
     if fuel_first:
@@ -111,7 +118,7 @@ def cg_calc(obj):
             
     # Save most forward and most aft and fully loaded c.g. in object
     obj.X_cg_full = Xs[-1]
-    obj.X_cg_range = max(Xs) - 0.20
+    obj.X_cg_range = max(Xs) - 0.22
     obj.X_cg_fwd = 0.22 - obj.X_cg_range * 0.05
     obj.X_cg_aft = max(Xs) + obj.X_cg_range * 0.05
 
