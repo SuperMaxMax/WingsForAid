@@ -10,7 +10,7 @@ import math
 fuel_first = False
 
 def cg_calc(obj):
-
+    # Calculate MTOW
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement

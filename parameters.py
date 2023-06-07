@@ -112,6 +112,9 @@ class UAV:
         self.structural_thickness = 0.2     # Structural thickness fuselage [m], this is for both sides
         self.sweep_co2 = -0.02736364725188103 # Updated half chord sweep angle [rad]
         self.sweep_co4 = 0.0                 # Updated half chord sweep [rad]
+        self.Sh_S = 0.237
+        self.Sv_S = 0.111
+  
         # T
         self.T0 = 288.15                    # Sea level temperature [K]
         self.TOP_req = 250 
@@ -158,7 +161,7 @@ class UAV:
         self.w_out = 1.1                    # Outer fuselage width [m]
         # X
         self.X_LEMAC = 2.276                # Leading edge mean aerodynamic chord [m]
-        self.x_lemac = 0.2871               # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
+        self.x_lemac = 0.06057988483270884  # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.xc_OEW_p = 0.25                 # Center of gravity of OEW as a fraction of the MAC [-]
         self.X_cg_aft = 0.5335              # Aft cg location CG/MAC [-]
         self.X_cg_full = 0.4115             # MTOW cg location CG/MAC [-]

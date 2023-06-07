@@ -17,7 +17,7 @@ def lateral_coefficients(aircraft, lcg):
 
     C_n_beta_fus = -K_beta * (aircraft.l_f*aircraft.h_out) * aircraft.l_f / (aircraft.Sw * aircraft.b) * (aircraft.h_out/aircraft.h_out)**(0.5) * (aircraft.w_out/aircraft.w_out)**(1/3)   #(9-64)
 
-    C_n_beta_prop = -0.053 * aircraft.CS_n_blades * (aircraft.X_LEMAC) * aircraft.CS_D_prop**2 / (aircraft.Sw * aircraft.b)
+    C_n_beta_prop = -0.053 * aircraft.CS_n_blades * (aircraft.X_LEMAC) * (2 * aircraft.prop_radius)**2 / (aircraft.Sw * aircraft.b)
 
     C_n_beta_i = -0.017 #(9.67, high wing)
 
@@ -34,7 +34,7 @@ def lateral_coefficients(aircraft, lcg):
 
 
 def ver_run(aircraft):
-    lcg = aircraft.X_LEMAC + aircraft.X_cg_full * aircraft.MAC_length
+    lcg = aircraft.X_LEMAC + aircraft.X_cg_aft * aircraft.MAC_length
     lateral_coefficients(aircraft, lcg)
 
 

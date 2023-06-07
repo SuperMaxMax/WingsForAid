@@ -20,14 +20,16 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
 
     '''Design parameters'''
     delta_a_max = 20 * (pi/180) # max aileron deflection
-    tau = 0.48  # factor based on the fraction of chord that is the aileron
+    tau = 0.74  # factor based on the fraction of chord that is the aileron
     Ixx = 1200  # mass moment of inertia x-axis [kg m^2] TODO Update value 
-    ystart_a = 0.94 * aircraft.b/2 # staring location of aileron
+    ystart_a = 0.95 * aircraft.b/2 # staring location of aileron
     yend_a = 0.95 * aircraft.b/2  # end location of aileron
     y_d = 0.4 * aircraft.b/2  # average distance between the centre of gravity of the aircraft and the centre of drag [m] 
     Cdr = 0.9  # aircraft drag coefficient in rolling motion
 
     while t > t_lim:
+        ystart_a = ystart_a - 0.01*aircraft.b/2
+
         # v Roll moment calculation v
         C_l_delta_a = (2*aircraft.CLa_w_cruise* tau *aircraft.rootchord/(aircraft.Sw * aircraft.b)) * ((yend_a**2/2 + 2/3 * ((aircraft.taper - 1)/aircraft.b) * yend_a**3)- (ystart_a**2/2 + 2/3 * ((aircraft.taper - 1)/aircraft.b) * ystart_a**3))
         C_l_max = C_l_delta_a * delta_a_max
@@ -42,11 +44,11 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
 
         t = sqrt(2*phi_des/P_roll_rate)
 
-        ystart_a = ystart_a - 0.01*aircraft.b/2
+        
 
 
     print("\n--------Aileron Design------------\n")
-    print(f"The aileron will span from {round(ystart_a*100, 3)}% to 95% of the span of the wing")
+    print(f"The aileron will span from {round(ystart_a - aircraft.w_out/2, 3)}m to {round(yend_a - aircraft.w_out/2, 3)}m of the span of the wing with respect to the rootchord")
     print(f"The time to roll {phi_des * 180/np.pi} degrees will be {t} s")
 
     aircraft.y_a_0 = ystart_a

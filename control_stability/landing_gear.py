@@ -227,8 +227,9 @@ plt.text(aircraft.x_cg_position_aft+0.03, 0.2, 2, fontsize=8, va='center')
 plt.text(aircraft.x_cg_position_fwd+0.03, 0.2, 1, fontsize=8, va='center')
 
 # Plot Wing Position and planform
-spanwise_pos = (aircraft.MAC_length - aircraft.rootchord) / -((aircraft.rootchord-aircraft.tipchord)/(aircraft.b/2))
-#ax.plot([aircraft.X_LEMAC, aircraft.X_LEMAC+aircraft.MAC_length], [spanwise_pos, spanwise_pos],color='0.25', linewidth=0.8)
+
+ax.plot([aircraft.X_LEMAC, aircraft.X_LEMAC+aircraft.MAC_length], [aircraft.y_mac, aircraft.y_mac],color='0.25', linewidth=0.8)
+
 ax.plot([aircraft.X_LEMAC - aircraft.x_lemac, aircraft.X_LEMAC - aircraft.x_lemac+aircraft.rootchord], [0, 0], color='0.25', linewidth=0.8)
 
 x_root_quart = aircraft.X_LEMAC-aircraft.x_lemac + 1/4*aircraft.rootchord
