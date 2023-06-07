@@ -345,6 +345,8 @@ class UAV:
         self.ST_Thrust_eng = 2800 #N Rotax 912 thrust
         self.ST_W_eng = 65.7 #kg Rotax 912 plus clutch, exhaust, alternator, air guide hood, NO MOUNT
         self.ST_Torque_eng2 = 240 #Nm, UL 260 torque
+        self.ST_l_strut = 2.563733275367119 #m strut lenght (single)
+        self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
 
 class airport:
     def __init__(self, name):
