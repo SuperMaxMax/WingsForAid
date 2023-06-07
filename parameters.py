@@ -86,8 +86,8 @@ class UAV:
         self.h_in = 0.9                     # Inner fuselage height [m]
         self.h_out = 0.737                    # Outer fuselage height [m]
         self.kq = 0.95                      # Volume factor used to calculate wetted area of the wing [-]
-        self.l_f = 5.4651                   # Fuselage length [m]
-        self.l_f_boom = 2                   # Boom length [m]
+        self.l_f = 4.3                   # Fuselage length [m]
+        self.l_f_boom = 2.5                   # Boom length [m]
         self.l_n = 0.8651                   # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
@@ -180,7 +180,7 @@ class UAV:
         self.AE_sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
         self.AE_sweep_co2_h = -0.04 
         self.AE_sweep_LE_h = 0.04
-        self.AE_rootchord_h = 1            
+        self.AE_rootchord_h = 0.895            
         self.AE_tipchord_h = 0.6        
         self.AE_MAC_length_h = 0.8       
         self.AE_y_mac_h = 1
