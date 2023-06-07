@@ -867,6 +867,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             # Drop box
             W -= boxesperdrop * ac_obj.boxweight
     x_plot = x
+    print(f"W_F_used after dropping all boxes: {W_F_used} [kg]")
     # Return to base
     x_return = 0.0 
     cruise_alt_RTB = cruiseheight(Range, h_cruise)
@@ -914,7 +915,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     W *= ac_obj.WfinalW10
     W_F_used += (W_beforelanding - W)
     # Calculate the fuel use per kg payload per km range (that means half the distance flown)
-    F_kg_km = W_F_used/(n_boxes*ac_obj.boxweight*Range)
+    F_kg_km = np.round(W_F_used/(n_boxes*ac_obj.boxweight*Range/1000), 5)
     print(f"The fuel used to transport one kg of payload over one km is {F_kg_km} [1/km]")
     endtime = time.time()
     if Summary:
@@ -933,3 +934,5 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     flight_profile.append(t) #total sortie time
     flight_profile.append(W_F_used) # fuel burnt
     return flight_profile
+
+fuelusesortie(aircraft, atm, 12, 1, 15000, 62.5, 60, Summary=True)
