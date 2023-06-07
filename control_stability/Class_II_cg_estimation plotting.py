@@ -169,10 +169,10 @@ def iteration(aircraft):
     X_min_array = []
     X_range_array = []
     X_cg_range_lim_array = []
-    wing_pos_array = np.arange(0.25, 0.55, 0.005)
+    wing_pos_array = np.arange(0.55, 0.65, 0.001)
 
     for i in wing_pos_array:
-        aircraft.X_LEMAC = i * (aircraft.l_f + aircraft.l_f_boom)
+        aircraft.X_LEMAC = i * aircraft.l_f
         
         X_max, X_min, X_cg_range_lim = cg_calc(aircraft)
         X_range = X_max - X_min
@@ -185,7 +185,7 @@ def iteration(aircraft):
     print(X_cg_range_lim_array[12])
     plt.plot(X_min_array, wing_pos_array)
     plt.plot(X_max_array, wing_pos_array)
-    
+    plt.text(0.9, 0.3, aircraft.X_LEMAC, fontsize=8, va='center')
     plt.show()
     
 iteration(aircraft)

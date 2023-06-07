@@ -65,10 +65,10 @@ def cg_calc(obj):
     xc_OEW = obj.xc_OEW_p*obj.MAC_length
     #X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
     # X_LEMAC = obj.X_LEMAC
-    X_LEMAC = 0.35 * (obj.l_f + obj.l_f_boom)
+    # X_LEMAC = 0.35 * (obj.l_f + obj.l_f_boom)
+    X_LEMAC = 0.58 * obj.l_f
     obj.X_LEMAC = X_LEMAC
-    aircraft.X_FCG = X_FCG
-    print(aircraft.X_FCG)
+
     obj.X_FCG = X_FCG
 
     # Final CG
@@ -143,8 +143,14 @@ def cg_calc(obj):
     obj.X_cg_aft = max(Xs) + obj.X_cg_range * 0.05
 
     obj.AE_l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
-    print(obj.AE_l_h)
-    print(obj.l_f + obj.l_f_boom)
+    print(f"l_f:{obj.l_f}")
+    print(f"X_LEMAC:{obj.X_LEMAC}")
+    print(f"X_cg_aft:{obj.X_cg_aft}")
+    print(f"MAC_length:{obj.MAC_length}")
+    print(f"l_f_boom:{obj.l_f_boom}")
+    print(f"obj.AE_rootchord_h:{obj.AE_rootchord_h}")
+    print(f"l_h:{obj.AE_l_h}")
+    print(f"l_aircraft:{obj.l_f + obj.l_f_boom}")
     # Plot lines for forward and aft cg positions
     # plt.axvline(x=0, linestyle='--', color='red', label='0% MAC')
     # plt.axvline(x=1, linestyle=':', color='red', label='100% MAC')
