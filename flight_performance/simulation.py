@@ -600,7 +600,7 @@ def cruiseheight(distance, desired_alt):
     elif 100000.0 <= distance <= 200000.0:
         h_cruise = 7500 + (distance - 100000.0) * 0.025
     else:
-        h_cruise = cruiseheight
+        h_cruise = desired_alt
     h_cruise = round(h_cruise/500) * 500 * 0.3048
     return h_cruise
 
@@ -608,7 +608,6 @@ def climbmaneuver(ac_obj, atm_obj, h, h_cruise, W0):
     x   = 0.0
     t   = 0.0
     dt  = 1.0
-    h   = h
     p, rho  = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
     CL_opt = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     W = W0
@@ -623,9 +622,10 @@ def climbmaneuver(ac_obj, atm_obj, h, h_cruise, W0):
         x   += V*np.cos(gamma)*dt
         h   += ROC * dt
         W   -= (Pa / ac_obj.prop_eff) * ac_obj.SFC * dt
-        M_F_used += (Pa / ac_obj.prop_eff) * ac_obj.SFC * dt
+        W_F_used += (Pa / ac_obj.prop_eff) * ac_obj.SFC * dt
         t   += dt
-    return t, x, W_F_used, W
+        p, rho  = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
+    return t, x, W_F_used, h
 
 def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
     x   = 0.0
@@ -648,40 +648,51 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD 
         Pbr = Pr/ac_obj.prop_eff
         FF  = Pbr * ac_obj.SFC
-        W_F_used += FF * dt
+        W_F_used += FF * dt 
         W -= FF * dt
         t += dt
-    return t, W_F_used, W
+    return t, W_F_used
 
-def descent(ac_obj, atm_obj, h_cruise, h_stop, W0):
+def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD = dragpolar(ac_obj, CL)
+    LD_max = CL / CD
+    gamma_LD_max = np.arctan(1/(LD_max))
     h = h_cruise
     p, rho  = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
     W = W0
     x = 0.0
     t = 0.0
     dt = 1.0
-    FF_idle = 1 / 3600
+    FF_idle = 3 / 3600
     W_F_used = 0.0
     while h > h_stop:
-        V   = 2*W*atm_obj.g/(rho*ac_obj.Sw*CL)
-        Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
-        ROD = -Pr/(W*atm_obj.g)
-        gamma = ROD/V
-        h   -= ROD * dt
+        V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL))
+        D   = 1/2 * rho * V**2 * ac_obj.Sw * CD
+        gamma = - D / (W*atm_obj.g)
+        ROD = V*gamma
+        h   += ROD * dt
         W   -= FF_idle * dt
-        W_F_used = FF_idle * dt
+        W_F_used += FF_idle * dt
         x   += V*np.cos(gamma)*dt
         p, rho = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
-    return t, x, W_F_used, W
+        t += dt
+    return t, x, W_F_used, h
 
-def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Print = False):
-    W_F = 0.0
+def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Summary = False):
+    starttime = time.time()
+    W_F_used = 0.0
     x   = 0.0
     t   = 0.0
     dt  = 1.0
     h   = 15.0                          #after screenheight
+    CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD = dragpolar(ac_obj, CL)
+    LD_max = CL / CD
+    boxesperdrop = n_boxes / n_drops
+    if boxesperdrop % 2 != 0:
+        print(f"The amount of boxes ({n_boxes}) and the amount of drops ({n_drops}) are not compatible.")
+        print(f"The boxes need to be dropped in multiples of two to avoid a lateral C.O.G. shift")
     # Enter h_cruise in feet
     if Range == None:
         Range = ac_obj.R / 2
@@ -693,38 +704,157 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         V_cruise = V_cruise
     W_TO = ac_obj.W_OE + W_F + n_boxes * ac_obj.boxweight
     W = W_TO
-    if Print:
+    if Summary:
         print("=====================================================")
-        print(f"Take-off weight: {W_TO} [kg] | OEW: {ac_obj.W_OE} [kg] | Fuelweight: {W_F} [kg] / {W_F/ac_obj.fueldensity} [L] | Payload: {n_boxes} boxes / {n_boxes*ac_obj.boxweight} [kg]")
+        print(f"Take-off weight: {np.round(W_TO, 2)} [kg] | OEW: {np.round(ac_obj.W_OE, 2)} [kg] | Fuelweight: {np.round(W_F, 2)} [kg] / {np.round(W_F/ac_obj.fueldensity, 2)} [L] | Payload: {np.round(n_boxes, 2)} boxes / {np.round(n_boxes*ac_obj.boxweight, 2)} [kg]")
     W_a_TO = W_TO * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2
     W = W_a_TO
     W_F_used = W_TO - W_a_TO
-    W_F += W_F_used
+    # print(f"W_F_used after take off: {W_F_used}")
+    W_F -= W_F_used
     # Now comes climb to projected cruise
     if dropregion == None:                      #either 1 drop or n evenly spaced drops
         target_dist = Range / n_drops
         cruise_alt  = cruiseheight(target_dist, h_cruise)
         for i in range(n_drops):
+            x_between_drop = 0.0
             # Climb part
-            t_climb, x_climb, W_F_used_climb, W_climb = climbmaneuver(ac_obj, atm_obj, h, cruise_alt, W)
+            t_climb, x_climb, W_F_used_climb, h = climbmaneuver(ac_obj, atm_obj, h, cruise_alt, W)
+            # print(f"Horizontal distance climb: {x_climb} [m]")
             t += t_climb
             x += x_climb
+            x_between_drop += x_climb
             W_F_used += W_F_used_climb
-            W = W_climb
+            print(f"W_F_used after climb {i}: {W_F_used_climb} [kg] in {t_climb} [sec]")
+            W -= W_F_used_climb
             # Cruise part - first calculate cruise distance
-            dtt_remaining = target_dist - x
-            CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
-            CD = dragpolar(ac_obj, CL)
-            LD_max = CL / CD
-            descent_dist = cruise_alt * LD_max
+            dtt_remaining = target_dist - x_between_drop
+            descent_dist = (cruise_alt-15.0) * LD_max
             cruise_dist = dtt_remaining - descent_dist
-            t_cruise, W_F_used_cruise, W_cruise = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
+            print(f"Climb distance: {x_climb} [m] | Cruise distance: {cruise_dist} [m] | Descent distance: {descent_dist} [m]")
+            t_cruise, W_F_used_cruise = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
+            print(f"cruise time: {t_cruise}")
             t += t_cruise
             x += cruise_dist
+            x_between_drop = cruise_dist
             W_F_used += W_F_used_cruise
-            W = W_cruise
+            print(f"W_F_used after cruise {i}: {W_F_used_cruise}")
+            W -= W_F_used_cruise
             # Descent part
-            
+            t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt, 15.0, W)
+            print(f"Horizontal distance descent: {x_descent} [m]")
+            t += t_descent
+            x += x_descent
+            x_between_drop += x_descent
+            W_F_used += W_F_used_descent
+            print(f"W_F_used after descent {i}: {W_F_used_descent} | time descent {i}: {t_descent}")
+            W -= W_F_used_descent
+            # After each descent, a certain amount of boxes are dropped
+            W -= boxesperdrop * ac_obj.boxweight
+    else:
+        target_dist = Range - dropregion*1000                           # distance to first target
+        cruise_alt_tft = cruiseheight(target_dist, h_cruise)            # tft = to first target
+        # To first target
+        # Climb part
+        t_climb, x_climb, W_F_used_climb, h = climbmaneuver(ac_obj, atm_obj, h, cruise_alt_tft, W)
+        t += t_climb
+        x += x_climb
+        W_F_used += W_F_used_climb
+        W -= W_F_used_climb
+        # Cruise part - first calculate cruise distance
+        dtt_remaining = target_dist - x
+        descent_dist = (cruise_alt_tft - 15.0) * LD_max
+        cruise_dist = dtt_remaining - descent_dist
+        t_cruise, W_F_used_cruise = cruisecalc(ac_obj, atm_obj, cruise_alt_tft, cruise_dist, W, V_cruise)
+        t += t_cruise
+        x += cruise_dist
+        W_F_used += W_F_used_cruise
+        W -= W_F_used_cruise
+        # Descent part
+        t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt_tft, 15.0, W)
+        t += t_descent
+        x += x_descent
+        W_F_used += W_F_used_descent
+        W -= W_F_used_descent
+        W -= boxesperdrop * ac_obj.boxweight
+        # ============================================================================================================================
+        # Drops in dropregion
+        interdropdist = (dropregion*1000) / n_drops
+        cruise_alt_int_drop = cruiseheight(interdropdist, h_cruise)
+        for i in range(n_drops - 1):
+            x_indropregion = 0.0
+            t_cl_indrop, x_cl_indrop, W_F_used_cl_indrop, h = climbmaneuver(ac_obj, atm_obj, h, cruise_alt_int_drop, W)
+            t += t_cl_indrop
+            x += x_cl_indrop
+            x_indropregion += x_cl_indrop
+            W_F_used += W_F_used_cl_indrop
+            W -= W_F_used_cl_indrop
+            # Cruise
+            dtnd = interdropdist - x_indropregion
+            d_des = LD_max * (cruise_alt_int_drop-15.0)
+            cruise_dist_int_drop = dtnd - d_des
+            t_cr_indrop, W_F_used_cr_indrop = cruisecalc(ac_obj, atm_obj, cruise_alt_int_drop, cruise_dist_int_drop, W, V_cruise)
+            t += t_cr_indrop
+            x += cruise_dist_int_drop
+            x_indropregion += cruise_dist_int_drop
+            W_F_used += W_F_used_cr_indrop
+            W -= W_F_used_cr_indrop
+            print(f"After cruise {i}: {W} [kg]")
+            # Descent
+            t_des_indrop, x_des_indrop, W_F_used_des_indrop, h = descentmaneuver(ac_obj, atm_obj, cruise_alt_int_drop, 15.0, W)
+            t += t_des_indrop
+            x += x_des_indrop
+            W_F_used += W_F_used_des_indrop
+            W -= W_F_used_des_indrop
+            # Drop box
+            W -= boxesperdrop * ac_obj.boxweight
+    # Return to base
+    x_return = 0.0 
+    cruise_alt_RTB = cruiseheight(Range, h_cruise)
+    t_cl_RTB, x_cl_RTB, W_F_used_cl_RTB, h = climbmaneuver(ac_obj, atm_obj, h, cruise_alt_RTB, W)
+    t += t_cl_RTB
+    x += x_cl_RTB
+    x_return += x_cl_RTB
+    W_F_used += W_F_used_cl_RTB
+    # print(f"W_F_used for climb RTB: {W_F_used_cl_RTB} [kg]")
+    W -= W_F_used_cl_RTB
+    # Cruise return to base
+    dtb_remaining = Range - x_return
+    desc_dist_RTB = LD_max * cruise_alt_RTB
+    cruise_dist_RTB = dtb_remaining - desc_dist_RTB
+    t_cr_RTB, W_F_used_cr_RTB = cruisecalc(ac_obj, atm_obj, cruise_alt_RTB, cruise_dist_RTB, W, V_cruise)
+    t += t_cr_RTB
+    x += cruise_dist_RTB
+    W_F_used += W_F_used_cr_RTB
+    # print(f"W_F_used for cruise RTB: {W_F_used_cr_RTB} [kg]")
+    W -= W_F_used_cr_RTB
+    # Descent
+    t_des_RTB, x_des_RTB, W_F_used_des_RTB, h = descentmaneuver(ac_obj, atm_obj, cruise_alt_RTB, 15.0, W)
+    t += t_des_RTB
+    x += x_des_RTB
+    W_F_used += W_F_used_des_RTB
+    # print(f"W_F_used for descent RTB: {W_F_used_des_RTB} [kg]")
+    W -= W_F_used_des_RTB
+    W_beforelanding = W
+    # Landing, taxi, shutdown using fuel fractions
+    W *= ac_obj.WfinalW10
+    W_F_used += (W_beforelanding - W)
+    endtime = time.time()
+    if Summary:
+        print(f"=================================== Sortie Summary ===================================")
+        print(f"Payload: {n_boxes} boxes ({np.round(n_boxes*ac_obj.boxweight, 2)} [kg]) | {n_drops} dropping maneuvers")
+        print(f"Range: {np.round(Range/1000, 2)} [km] | Distance flown: {np.round(x/1000, 2)} [km] | Flight time: {np.round(t/3600, 2)} [hrs]")
+        print(f"Fuel used: {np.round(W_F_used, 2)} [kg]")
+        print(f"======================================================================================")
+        print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
+        print(f"======================================================================================")
+    return
+
+fuelusesortie(aircraft, atm, 12, 1, 10000, 65, 60, Summary = True)
+        
+
+
+
 
 
 

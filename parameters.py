@@ -4,7 +4,7 @@ class UAV:
         "=== Class I / Class II parameters ==="
         self.A = 7.75                         # Aspect ratio [-]
         self.BHP_cruise = 76.3436
-        self.CD0 =  0.00595                    # Zero lift coefficient [-]
+        self.CD0 =  0.027                   # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
         self.CL_TO = 1.2397                 # [-]
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
@@ -231,7 +231,7 @@ class UAV:
         self.prop_radius    = 0.8255            # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
         self.ceiling        = 18000*0.3048      # [m] 18000 ft service ceiling
         self.th_ceil        = 30000*0.3048
-        self.SFC            = 7.91666667E-8     # kg/J specific fuel consumption
+        self.SFC            = 1.5*7.77777778e-8 # kg/J specific fuel consumption
         self.fuelcapacity   = 100               # L
         self.fueldensity    = 0.7429            # kg/L
         self.turnrate_half  = 1.5               # deg/s
