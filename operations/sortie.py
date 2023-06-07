@@ -58,6 +58,10 @@ def operations_eval(ac):
     CST_per_kg = CST_TOT / PL_tot
     print("cost per kg:"+str(np.round(CST_per_kg,3))+"[euro/kg]")
 
+    ac.CST_PL_per_kg = CST_per_kg
+    ac.N_sortie_per_day = N_sortie_per_day
+    ac.OP_TTFD = TTFD
+    ac.T_sortie = T_sortie
     return CST_per_kg, N_sortie_per_day, TTFD
 
 if __name__ == '__main__':
