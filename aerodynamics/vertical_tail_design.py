@@ -136,7 +136,7 @@ def horizontal_tail_planform(aircraft):
         if variable == "Lambda":    
             variable_list2 = [0.6]
         elif variable == "AR":  
-            variable_list2 = [2]
+            variable_list2 = [2.5]
         elif variable == "Twist":
             variable_list2 = [0]
         
@@ -155,7 +155,7 @@ def horizontal_tail_planform(aircraft):
 
             segments = 100
             N = segments - 1
-            S = aircraft.AE_Sw * aircraft.AE_Sh_S  #tail.S
+            S = aircraft.AE_Sw * aircraft.AE_Sv_S  #tail.S
             if variable == "AR":
                 AR = parameter
             else:
@@ -170,6 +170,7 @@ def horizontal_tail_planform(aircraft):
                 alpha_twist = 0 * np.pi / 180
 
             b = (AR * S)**0.5
+            print(b, "b")
             airfoildata = airfoil_select(required_lift(aircraft, b)[0], change)
             
             C_L_h = required_lift(aircraft, b)[0]
@@ -227,7 +228,14 @@ def horizontal_tail_planform(aircraft):
             span_eff = 1 / (1 + delta)
             tau = 1/span_eff - 1
             
+            print("a_2d", a_2d)
+            print("span_eff", span_eff)
+            print("tau", tau)
+            print("AR", AR)
+
             CL_a_h = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
+            print("CLav", CL_a_h)
+
 
 
             print('=====================================================================')
@@ -264,7 +272,6 @@ def horizontal_tail_planform(aircraft):
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     #print('pppppppp', a_h_optimal,type(a_h_optimal))
     AR, b, Lambda, alpha_twist, S, CL_a_v  = plot_lift_distr(a_h_optimal, full_print = True)
-    print("CLav", CL_a_v)
 
 
 horizontal_tail_planform(object)
