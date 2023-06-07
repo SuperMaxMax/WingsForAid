@@ -75,9 +75,9 @@ class UAV:
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
         self.dihedral = 0
         self.e = 0.7                        # Oswald factor [-]
-        self.engine_cg = 0.327              # Engine cg location [m]
+        self.engine_cg = 0.267              # Engine cg location [m]
         self.engine_fairing = 0.2           # Engine fairing length [m]
-        self.engine_length = 0.6651         # Engine length [m]
+        self.engine_length = 0.534         # Engine length [m]
         self.engine_pos = 'tractor'         # Engine position: "tractor" or "pusher" or "fuselage"
         self.eta_p = 0.82                   # Propulsive efficiency [-]
         self.g0 = 9.8066                    # Gravitational acceleration [m/s^2]
@@ -87,7 +87,7 @@ class UAV:
         self.h_out = 0.737                    # Outer fuselage height [m]
         self.kq = 0.95                      # Volume factor used to calculate wetted area of the wing [-]
         self.l_f = 4.3                   # Fuselage length [m]
-        self.l_f_boom = 2.5                   # Boom length [m]
+        self.l_f_boom = 2                   # Boom length [m]
         self.l_n = 0.8651                   # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]

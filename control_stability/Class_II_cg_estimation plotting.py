@@ -83,7 +83,7 @@ def cg_calc(obj):
 
     # Payload
     if obj.engine_pos == 'tractor':
-        dist_front = obj.engine_length + 0.6  # [m]
+        dist_front = obj.engine_length + 0.45  # [m]
     elif obj.engine_pos == 'pusher':
         dist_front = 0.4
     elif obj.engine_pos == 'fuselage':
@@ -92,7 +92,7 @@ def cg_calc(obj):
     if obj.n_boxes_abreast == 2:
         box_configs = [[2,0,0,0,0,0], [0,2,0,0,0,0], [0,0,2,0,0,0], [0,0,0,2,0,0], [0,0,0,0,2,0], [0,0,0,0,0,2], [2,2,0,0,0,0], [0,2,2,0,0,0], [0,0,2,2,0,0], [0,0,0,2,2,0], [0,0,0,0,2,2], [2,2,2,0,0,0], [0,2,2,2,0,0], [0,0,2,2,2,0], [0,0,0,2,2,2], [2,2,2,2,0,0], [0,2,2,2,2,0], [0,0,2,2,2,2], [2,2,2,2,2,0], [0,2,2,2,2,2], [2,2,2,2,2,2]]
         labels = ['200000', '020000', '002000', '000200', '000020', '000002', '220000', '022000', '002200', '000220', '000022', '222000', '022200', '002220', '000222', '222200', '022220', '002222', '222220', '022222', '222222']
-        box_xs = [dist_front+0.2, dist_front+0.8, dist_front+1.4, dist_front+2.0, dist_front+2.6, dist_front+3.2]   
+        box_xs = [dist_front+0.2, dist_front+0.65, dist_front+1.15, dist_front+1.65, dist_front+2.15, dist_front+2.6]      
     elif obj.n_boxes_abreast == 3:
         box_configs = [[3,0,0,0], [0,3,0,0], [0,0,3,0], [0,0,0,3], [3,3,0,0], [0,3,3,0], [0,0,3,3], [3,3,3,0], [0,3,3,3], [3,3,3,3]]
         labels = ['3000', '0300', '0030', '0003', '3300', '0330', '0033', '3330', '0333', '3333']
@@ -147,8 +147,6 @@ def cg_calc(obj):
     obj.AE_l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
 
     # Plot lines for forward and aft cg positions
-    # plt.axvline(x=0, linestyle='--', color='red', label='0% MAC')
-    # plt.axvline(x=1, linestyle=':', color='red', label='100% MAC')
     fig1 = plt.figure()
     plt.axvline(x=obj.X_cg_fwd, linestyle='--', color='blue', label='most forward c.g. considered')
     plt.axvline(x=obj.X_cg_aft, linestyle='--', color='red', label='most aft c.g. considered')
@@ -164,12 +162,11 @@ def cg_calc(obj):
 
 def iteration(aircraft):
 
-
     X_max_array = []
     X_min_array = []
     X_range_array = []
     X_cg_range_lim_array = []
-    wing_pos_array = np.arange(0.55, 0.65, 0.001)
+    wing_pos_array = np.arange(0.35, 0.55, 0.005)
 
     for i in wing_pos_array:
         aircraft.X_LEMAC = i * aircraft.l_f

@@ -15,9 +15,6 @@ from vertical_tailplane import ver_run
 from control_surfaces import main_control_surface
 
 cg_calc(aircraft)
-print(aircraft.X_LEMAC)
-print(aircraft.X_FCG)
-
 hor_run(aircraft)
 ver_run(aircraft)
 exec(open("landing_gear.py").read(), {'aircraft':aircraft})
