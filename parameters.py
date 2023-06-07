@@ -144,7 +144,7 @@ class UAV:
         self.AE_CL_max_land = 1.9               # Still to be updated maximum lift coefficient at landing [-]
         self.AE_CL_a_w = 4.743                  # Updated Lift curve slope [1/rad] 
         self.AE_L_D = 14.1804                   # Still to be updated lift to drag ratio [-]
-        self.AE_MAC_length = 1.248              # Updated mean aerodynamic chord [m]
+        self.AE_MAC_length = 1.2477198640078417             # Updated mean aerodynamic chord [m]
         self.AE_MAC_ac = 0.24                   # Updated location of aerodynamic center relative to MAC [-]
         self.AE_Sw = 11.7113                    # Updated wing area [m^2]
         self.AE_Sw_wetted = 23.4226             # Updated wetted area of the wing [m^2]
