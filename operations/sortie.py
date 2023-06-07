@@ -58,6 +58,8 @@ def operations_eval(ac):
     CST_per_kg = CST_TOT / PL_tot
     print("cost per kg:"+str(np.round(CST_per_kg,3))+"[euro/kg]")
 
+    return CST_per_kg, N_sortie_per_day, TTFD
+
 if __name__ == '__main__':
     AC = UAV('aircraft')
     print("AC default:", AC.__dict__)
