@@ -96,11 +96,11 @@ def main_wing_planform(aircraft):
             if variable == "Lambda":
                 Lambda = parameter
             else:
-                Lambda = 0.4
+                Lambda = 0.6
             if variable == "Twist":
                 alpha_twist = parameter
             else:
-                alpha_twist = -1 * np.pi / 180
+                alpha_twist = -2 * np.pi / 180
 
 
             a_2d = aircraft.AE_cl_alpha       #iw(airfoil)[1]
