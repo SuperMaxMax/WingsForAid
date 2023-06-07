@@ -125,7 +125,7 @@ def Swet(section):
 def Cd_misc(section):
     if section == 'landing':
         #10.7639104 factor for m2 to ft2
-        Cd = 10.7639104 * 2 * 0.05 *  aircraft.tire_main_height * aircraft.tire_main_width + 10.7639104 * 0.05 * aircraft.tire_nose_height * aircraft.tire_nose_width
+        Cd = 2 * 0.55 *  aircraft.tire_main_height * aircraft.tire_main_width + 0.55 * aircraft.tire_nose_height * aircraft.tire_nose_width
     else:
         Cd = 0
     return Cd/aircraft.Sw

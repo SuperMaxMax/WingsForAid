@@ -12,7 +12,7 @@ class UAV:
         self.braced_wing         = True     # True if wing is braced
         self.boxweight = 23.0               # weight of a single box [kg]
         # C
-        self.CD0 =  0.0256                    # Zero lift coefficient [-]
+        self.CD0 =  0.02578                    # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
         self.CL_TO = 1.2397                 # [-]
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
