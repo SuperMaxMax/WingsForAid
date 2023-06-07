@@ -679,13 +679,26 @@ def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
         t += dt
     return t, x, W_F_used, h
 
-def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Summary = False):
+def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Summary = False, plot = False):
+    # Define a number of arrays used for plotting
+    h_array = np.empty(0)
+    x_array = np.empty(0)
+    t_array = np.empty(0)
+    W_F_used_array = np.empty(0)
+    # =========================================================================
     starttime = time.time()
     W_F_used = 0.0
     x   = 0.0
+    x_plot = 0.0
     t   = 0.0
     dt  = 1.0
     h   = 15.0                          #after screenheight
+    # Add start values to arrays
+    x_array = np.append(x_array, x)
+    h_array = np.append(h_array, h)
+    t_array = np.append(t_array, t)
+    W_F_used_array = np.append(W_F_used_array, W_F_used)
+    # =========================================================================
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD = dragpolar(ac_obj, CL)
     LD_max = CL / CD
@@ -716,6 +729,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     if dropregion == None:                      #either 1 drop or n evenly spaced drops
         target_dist = Range / n_drops
         cruise_alt  = cruiseheight(target_dist, h_cruise)
+        print(f"The cruising altitude for this sortie is {round(cruise_alt/0.3048)} [ft] (in between all drops)")
         for i in range(n_drops):
             x_between_drop = 0.0
             # Climb part
@@ -723,34 +737,48 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             # print(f"Horizontal distance climb: {x_climb} [m]")
             t += t_climb
             x += x_climb
+            x_array = np.append(x_array, x)
+            h_array = np.append(h_array, h)
+            t_array = np.append(h_array, t)
             x_between_drop += x_climb
             W_F_used += W_F_used_climb
-            print(f"W_F_used after climb {i}: {W_F_used_climb} [kg] in {t_climb} [sec]")
+            W_F_used_array = np.append(W_F_used_array, W_F_used)
+            # print(f"W_F_used after climb {i}: {W_F_used_climb} [kg] in {t_climb} [sec]")
             W -= W_F_used_climb
             # Cruise part - first calculate cruise distance
             dtt_remaining = target_dist - x_between_drop
             descent_dist = (cruise_alt-15.0) * LD_max
             cruise_dist = dtt_remaining - descent_dist
-            print(f"Climb distance: {x_climb} [m] | Cruise distance: {cruise_dist} [m] | Descent distance: {descent_dist} [m]")
+            # print(f"Climb distance: {x_climb} [m] | Cruise distance: {cruise_dist} [m] | Descent distance: {descent_dist} [m]")
             t_cruise, W_F_used_cruise = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
-            print(f"cruise time: {t_cruise}")
+            # print(f"cruise time: {t_cruise}")
             t += t_cruise
             x += cruise_dist
+            x_array = np.append(x_array, x)
+            h_array = np.append(h_array, h)
+            t_array = np.append(h_array, t)
             x_between_drop = cruise_dist
             W_F_used += W_F_used_cruise
-            print(f"W_F_used after cruise {i}: {W_F_used_cruise}")
+            W_F_used_array = np.append(W_F_used_array, W_F_used)
+            # print(f"W_F_used after cruise {i}: {W_F_used_cruise}")
             W -= W_F_used_cruise
             # Descent part
             t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt, 15.0, W)
-            print(f"Horizontal distance descent: {x_descent} [m]")
+            # print(f"Horizontal distance descent: {x_descent} [m]")
             t += t_descent
             x += x_descent
             x_between_drop += x_descent
             W_F_used += W_F_used_descent
-            print(f"W_F_used after descent {i}: {W_F_used_descent} | time descent {i}: {t_descent}")
+            x_array = np.append(x_array, x)
+            h_array = np.append(h_array, h)
+            t_array = np.append(h_array, t)
+            W_F_used_array = np.append(W_F_used_array, W_F_used)
+            # print(f"W_F_used after descent {i}: {W_F_used_descent} | time descent {i}: {t_descent}")
             W -= W_F_used_descent
             # After each descent, a certain amount of boxes are dropped
             W -= boxesperdrop * ac_obj.boxweight
+            if i == 0:
+                print(f"Time to first drop: {t} [sec] / {np.round(t/3600, 2)} [hrs]")
     else:
         target_dist = Range - dropregion*1000                           # distance to first target
         cruise_alt_tft = cruiseheight(target_dist, h_cruise)            # tft = to first target
@@ -760,6 +788,10 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         t += t_climb
         x += x_climb
         W_F_used += W_F_used_climb
+        x_array = np.append(x_array, x)
+        h_array = np.append(h_array, h)
+        t_array = np.append(h_array, t)
+        W_F_used_array = np.append(W_F_used_array, W_F_used)
         W -= W_F_used_climb
         # Cruise part - first calculate cruise distance
         dtt_remaining = target_dist - x
@@ -770,16 +802,25 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         x += cruise_dist
         W_F_used += W_F_used_cruise
         W -= W_F_used_cruise
+        x_array = np.append(x_array, x)
+        h_array = np.append(h_array, h)
+        t_array = np.append(h_array, t)
+        W_F_used_array = np.append(W_F_used_array, W_F_used)
         # Descent part
         t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt_tft, 15.0, W)
         t += t_descent
         x += x_descent
         W_F_used += W_F_used_descent
+        x_array = np.append(x_array, x)
+        h_array = np.append(h_array, h)
+        t_array = np.append(h_array, t)
+        W_F_used_array = np.append(W_F_used_array, W_F_used)
         W -= W_F_used_descent
         W -= boxesperdrop * ac_obj.boxweight
+        print(f"Time to first drop: {t} [sec] / {np.round(t/3600, 2)} [hrs]")
         # ============================================================================================================================
         # Drops in dropregion
-        interdropdist = (dropregion*1000) / n_drops
+        interdropdist = (dropregion*1000) / (n_drops - 1)
         cruise_alt_int_drop = cruiseheight(interdropdist, h_cruise)
         for i in range(n_drops - 1):
             x_indropregion = 0.0
@@ -787,27 +828,42 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             t += t_cl_indrop
             x += x_cl_indrop
             x_indropregion += x_cl_indrop
+            # print(f"Climb distance in dropzone {i}: {x_cl_indrop} [m]")
             W_F_used += W_F_used_cl_indrop
+            x_array = np.append(x_array, x)
+            h_array = np.append(h_array, h)
+            t_array = np.append(h_array, t)
+            W_F_used_array = np.append(W_F_used_array, W_F_used)
             W -= W_F_used_cl_indrop
             # Cruise
             dtnd = interdropdist - x_indropregion
             d_des = LD_max * (cruise_alt_int_drop-15.0)
             cruise_dist_int_drop = dtnd - d_des
+            # print(f'Inter-drop cruise distance {i}: {cruise_dist_int_drop} [m]')
             t_cr_indrop, W_F_used_cr_indrop = cruisecalc(ac_obj, atm_obj, cruise_alt_int_drop, cruise_dist_int_drop, W, V_cruise)
             t += t_cr_indrop
             x += cruise_dist_int_drop
             x_indropregion += cruise_dist_int_drop
             W_F_used += W_F_used_cr_indrop
+            x_array = np.append(x_array, x)
+            h_array = np.append(h_array, h)
+            t_array = np.append(h_array, t)
+            W_F_used_array = np.append(W_F_used_array, W_F_used)
             W -= W_F_used_cr_indrop
-            print(f"After cruise {i}: {W} [kg]")
             # Descent
             t_des_indrop, x_des_indrop, W_F_used_des_indrop, h = descentmaneuver(ac_obj, atm_obj, cruise_alt_int_drop, 15.0, W)
             t += t_des_indrop
             x += x_des_indrop
+            # print(f"descent distance in dropzone {i}: {x_des_indrop} [m]")
             W_F_used += W_F_used_des_indrop
             W -= W_F_used_des_indrop
+            x_array = np.append(x_array, x)
+            h_array = np.append(h_array, h)
+            t_array = np.append(h_array, t)
+            W_F_used_array = np.append(W_F_used_array, W_F_used)
             # Drop box
             W -= boxesperdrop * ac_obj.boxweight
+    x_plot = x
     # Return to base
     x_return = 0.0 
     cruise_alt_RTB = cruiseheight(Range, h_cruise)
@@ -815,7 +871,12 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     t += t_cl_RTB
     x += x_cl_RTB
     x_return += x_cl_RTB
+    x_plot -= x_cl_RTB
     W_F_used += W_F_used_cl_RTB
+    x_array = np.append(x_array, x_plot)
+    h_array = np.append(h_array, h)
+    t_array = np.append(h_array, t)
+    W_F_used_array = np.append(W_F_used_array, W_F_used)
     # print(f"W_F_used for climb RTB: {W_F_used_cl_RTB} [kg]")
     W -= W_F_used_cl_RTB
     # Cruise return to base
@@ -825,14 +886,24 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     t_cr_RTB, W_F_used_cr_RTB = cruisecalc(ac_obj, atm_obj, cruise_alt_RTB, cruise_dist_RTB, W, V_cruise)
     t += t_cr_RTB
     x += cruise_dist_RTB
+    x_plot -= cruise_dist_RTB
     W_F_used += W_F_used_cr_RTB
+    x_array = np.append(x_array, x_plot)
+    h_array = np.append(h_array, h)
+    t_array = np.append(h_array, t)
+    W_F_used_array = np.append(W_F_used_array, W_F_used)
     # print(f"W_F_used for cruise RTB: {W_F_used_cr_RTB} [kg]")
     W -= W_F_used_cr_RTB
     # Descent
     t_des_RTB, x_des_RTB, W_F_used_des_RTB, h = descentmaneuver(ac_obj, atm_obj, cruise_alt_RTB, 15.0, W)
     t += t_des_RTB
     x += x_des_RTB
+    x_plot -= x_des_RTB
     W_F_used += W_F_used_des_RTB
+    x_array = np.append(x_array, x_plot)
+    h_array = np.append(h_array, h)
+    t_array = np.append(h_array, t)
+    W_F_used_array = np.append(W_F_used_array, W_F_used)
     # print(f"W_F_used for descent RTB: {W_F_used_des_RTB} [kg]")
     W -= W_F_used_des_RTB
     W_beforelanding = W
@@ -848,23 +919,11 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         print(f"======================================================================================")
         print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
         print(f"======================================================================================")
+    if plot:
+        plt.plot(x_array, h_array)
+        plt.xlabel("Horizontal distance [m]")
+        plt.ylabel("Altitude [m]")
+        plt.show()
     return
 
-fuelusesortie(aircraft, atm, 12, 1, 10000, 65, 60, Summary = True)
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+fuelusesortie(aircraft, atm, 12, 3, 14000, 62, 65, dropregion=50, Summary = True, plot=True)
