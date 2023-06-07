@@ -12,7 +12,7 @@ class UAV:
         self.braced_wing         = True     # True if wing is braced
         self.boxweight = 23.0               # weight of a single box [kg]
         # C
-        self.CD0 =  0.027                    # Zero lift coefficient [-]
+        self.CD0 =  0.0256                    # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
         self.CL_TO = 1.2397                 # [-]
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
@@ -101,6 +101,8 @@ class UAV:
         self.rootchord = 1.490             # Root chord [m]
         # S
         self.S_G = 19.77                    # Gross shell area fuselage [m^2]
+        self.Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
+        self.Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
         self.Sw = 11.7113                   # Wing area [m^2]
         self.Sw_wetted = 23.4226            # Wetted area of the wing [m^2]
         self.s_tail = 2                     # Tail surface area [m]
@@ -114,8 +116,12 @@ class UAV:
         self.T0 = 288.15                    # Sea level temperature [K]
         self.TOP_req = 250 
         self.t_c = 0.12                     # Thickness to chord ratio [-]
-        self.taper = 0.65                    # Taper ratio [-]
-        self.tipchord = 0.9685             # Tip chord [m]
+        self.taper = 0.65                   # Taper ratio [-]
+        self.tipchord = 0.9685              # Tip chord [m]
+        self.tire_nose_height = 0.35306     # Nose landing gear tire height [m]
+        self.tire_nose_width = 0.14478      # Nose landing gear tire width [m]
+        self.tire_main_height = 0.381       # Main landing gear tire height [m]
+        self.tire_main_width = 0.1524       # Main landing gear tire height [m]
         self.top_clearance = 0.2            # Top clearance [m]
         self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility   
         # U

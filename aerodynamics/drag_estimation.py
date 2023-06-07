@@ -25,9 +25,10 @@ def Cf(section):
     
     Cf_turb = 0.445/(((np.log10(Re))**2.58) *  (1+0.144*(M**2)**0.65))
     Cf_lam = 1.328/np.sqrt(Re)
-    if section == 'wing' or 'htail' or 'vtail':
+
+    if section == 'wing' or section == 'htail' or section == 'vtail':
         Cf = 0.1*Cf_lam + 0.9*Cf_turb
-    elif section == 'landing' or 'fuselage' or 'strut' or 'boom':
+    elif section == 'landing' or section == 'fuselage' or section == 'strut' or section == 'boom':
         Cf = Cf_turb
     else: 
         print('wrong section imported')
@@ -41,13 +42,16 @@ def FF(section):
     M = V_c/speed_of_sound
     if section == 'wing':
         type = 'lifting'
-        airfoil = '4415'
+        t_c = 0.15
+        x_c_max = 0.4
     elif section == 'htail':
         type = 'lifting'
-        airfoil = '0012'
+        t_c = 0.12
+        x_c_max = 0.3
     elif section == 'vtail':
         type = 'lifting'
-        airfoil = '0009'
+        t_c = 0.09
+        x_c_max = 0.3
     elif section == 'landing':
         type = 'fus'
         l = 0.4
@@ -55,7 +59,7 @@ def FF(section):
     elif section == 'fuselage':
         type = 'fus'
         l = 4.6342
-        d = 0.67
+        d = 1.0
     elif section == 'strut':
         type = 'fus'
         l = 2.56
@@ -68,8 +72,6 @@ def FF(section):
         print('wrong section imported')
 
     if type == 'lifting':
-        x_c_max = float(airfoil[1]) / 10
-        t_c = float(airfoil[2]+airfoil[3])
         FF = (1 + (0.6/x_c_max) * t_c + 100 * t_c**4) * (1.34 * M**0.18)
     elif type == 'fus':
         FF = 1 + 60/((l/d)**3) + (l/d)/400
@@ -80,13 +82,13 @@ def FF(section):
 def IF(section):
     if section == 'wing':
         IF = 1
-    elif section == 'htail' or 'vtail':
+    elif section == 'htail' or section == 'vtail':
         IF = 1.04
     elif section == 'landing':
         IF = 1.1
     elif section == 'fuselage':
         IF = 1
-    elif section == 'strut' or 'boom':
+    elif section == 'strut' or section == 'boom':
         IF = 1.1
     else: 
          print('wrong section imported')
@@ -97,10 +99,12 @@ def IF(section):
 def Swet(section):
     if section == 'wing':
         Swet = 1.07 * 2 * aircraft.Sw
-    elif section == 'htail' or 'vtail':
-        Swet = 1.05 * 2 * aircraft.Sh
+    elif section == 'htail':
+        Swet = 1.05 * 2 * aircraft.Sh_S * aircraft.Sw
+    elif section == 'vtail':
+        Swet = 1.05 * 2 * aircraft.Sv_S * aircraft.Sw
     elif section == 'fuselage':
-        D = 0.67
+        D = 1.0
         L1 = 0.9342
         L2 = 2.9
         L3 = 0.8
@@ -118,9 +122,40 @@ def Swet(section):
 
     return Swet
 
+def Cd_misc(section):
+    if section == 'landing':
+        #10.7639104 factor for m2 to ft2
+        Cd = 10.7639104 * 2 * 0.05 *  aircraft.tire_main_height * aircraft.tire_main_width + 10.7639104 * 0.05 * aircraft.tire_nose_height * aircraft.tire_nose_width
+    else:
+        Cd = 0
+    return Cd/aircraft.Sw
+
+#define all sections of the aircraft
 parts = ['wing', 'htail', 'vtail', 'landing', 'fuselage', 'strut', 'boom']
 
-dataframe = {'Cf': Cf(parts), "FF": FF(parts), "IF": IF(parts), "Swet": Swet(parts)}
-drag_info = pd.DataFrame(data=dataframe, index=parts)
+#run all drag contributions per part
+Cf_list = []
+FF_list = []
+IF_list = []
+Swet_list = []
+sum1_list = []
+Cd_misc_list = []
 
+for part in parts:
+    Cf_list.append(Cf(part))
+    FF_list.append(FF(part))
+    IF_list.append(IF(part))
+    Swet_list.append(Swet(part))
+    sum1_list.append(Cf(part) * FF(part) * IF(part) * Swet(part) / aircraft.Sw)
+    Cd_misc_list.append(Cd_misc(part))
+
+#save data to data frame
+dataframe = {'Cf': Cf_list, "FF": FF_list, "IF": IF_list, "Swet": Swet_list, 'Sum': sum1_list, 'Cd_misc': Cd_misc_list}
+drag_info = pd.DataFrame(data=dataframe, index=parts)
 print(drag_info)
+
+#print(drag_info)
+first_sum = sum(sum1_list)
+second_sum = sum(Cd_misc_list)
+leakage = (first_sum + second_sum)*0.05
+print(first_sum + second_sum + leakage)
