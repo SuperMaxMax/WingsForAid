@@ -108,6 +108,8 @@ class UAV:
         self.sigma_TO = 1.0
         self.sigma_cruise = 0.7385
         self.structural_thickness = 0.2     # Structural thickness fuselage [m], this is for both sides
+        self.sweep_co2 = -0.02736364725188103 # Updated half chord sweep angle [rad]
+        self.sweep_co4 = 0.0                 # Updated half chord sweep [rad]
         # T
         self.T0 = 288.15                    # Sea level temperature [K]
         self.TOP_req = 250 
@@ -157,12 +159,12 @@ class UAV:
         self.X_cg_fwd = 0.1704              # Forward cg location CG/MAC [-]
         self.X_cg_range = 0.363             # Range of cg location CG/MAC [-]
         # Y
-        self.y_mac = 2.04                   # Spanwise location of the MAC [m]
+        self.y_mac = 2.2133293637093265                    # Spanwise location of the MAC [m]
         
 
         "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
         self.something = 1 # add units
-        self.y_mac = 2                      # Spanwise location of the MAC [m]
+        #self.y_mac = 2                      # Spanwise location of the MAC [m]
         self.ST_SF = 1.5
 
         "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
