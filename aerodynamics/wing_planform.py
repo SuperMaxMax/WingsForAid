@@ -267,7 +267,7 @@ def main_wing_planform(aircraft):
     aircraft.AE_y_mac = 1/3*(aircraft.AE_b/2)*(1+2*Lambda)/(1+Lambda)   
     aircraft.AE_x_lemac = aircraft.AE_y_mac*np.tan(aircraft.AE_sweep_LE)
 
-    print('afoqwbqlbng', aircraft.AE_y_mac, aircraft.AE_x_lemac, aircraft.AE_sweep_LE)
+    print('afoqwbqlbng', aircraft.AE_y_mac, aircraft.AE_x_lemac, aircraft.AE_sweep_LE, aircraft.AE_MAC_length)
                
     return 
 
