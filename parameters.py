@@ -155,14 +155,14 @@ class UAV:
         self.AE_e = 0.776                       # Updated oswald efficiency factor [-]
         self.AE_i_w = 0.935 * np.pi / 180       # Updated incidence angle of wing wrt fuselage [rad]
         self.AE_wing_twist = -2.0 *np.pi/180    # Updated wing twist (difference root and chord) [rad]
-        self.AE_sweep_co2 = -0.02736            # Updated half chord sweep angle [rad]
+        self.AE_sweep_co2 = -0.02736364725188103            # Updated half chord sweep angle [rad]
         self.AE_sweep_co4 = 0.0                 # Updated half chord sweep [rad]
-        self.AE_sweep_LE = 0.0428               # Updated leading edge sweep [rad] 
+        self.AE_sweep_LE = 0.02736364725188103               # Updated leading edge sweep [rad] 
         self.AE_taper = 0.65                    # Updated taper ratio [-]
         self.AE_rootchord = 1.490               # Updated Root chord [m]
         self.AE_tipchord = 0.9685               # Updated tip chord [m]
-        self.AE_x_lemac = 0.2871                # Still to be updated distance from LE root chord to the leading edge mean aerodynamic chord [m]
-        self.AE_y_mac = 2.21                    # Updated spanwise location of the MAC [m]
+        self.AE_x_lemac = 0.06057988483270884                # Still to be updated distance from LE root chord to the leading edge mean aerodynamic chord [m]
+        self.AE_y_mac = 2.2133293637093265                    # Updated spanwise location of the MAC [m]
         self.AE_alpha_f = 0                     # Still to be updated angle of attack of the fuselage [rad]
 
         # Horizontal tailplane
