@@ -172,8 +172,9 @@ y_span = np.linspace(0, ac.b/2, 1000)
 
 # Material choice for strut weight, add column for material index: sqrt(E)/rho -> the higher the value the better -> False
 material_df['sqrt(E)/rho'] = np.sqrt(material_df['E'])/material_df['density']
-# density, raw cost, eco cost, co2, yield stress, E, Kc, sqrt(E)/rho
-prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4]
+material_df['simga_yield/rho'] = material_df['yield stress']/material_df['density']
+# density, raw cost, eco cost, co2, yield stress, E, Kc, sqrt(E)/rho, sigma_yield/rho
+prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4, 0]
 possible_materials = rank_material(prop_weights_strut, [False])[:5]
 ms = pd.DataFrame(index=possible_materials, columns=['Case 1', 'Case 2'])
 
