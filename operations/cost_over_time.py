@@ -31,6 +31,7 @@ class costs:
         self.boxes      = 12    # amount of boxes per sortie
         self.kgprice    = [1.25,1.3,1.35]
         # [1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2]   # euros per kg
+        # [1.25,1.3,1.35]
 
         self.sortie_pd  = 3.4148976
         self.days_perop = 28
@@ -46,7 +47,7 @@ class costs:
 
 
 # Per 30 ac at GB 27 are expected to be operational at any time on average
-changing_ac = False
+changing_ac = True
 changing_price = True
 roi_calc = False
 c = costs()
