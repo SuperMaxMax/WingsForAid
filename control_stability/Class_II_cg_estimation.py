@@ -9,8 +9,11 @@ import math
 # Setting with which can be determined if first the aircraft is filled with fuel or with payload
 fuel_first = False
 
-def cg_calc(obj):
+def cg_calc(obj, plot):
     # Calculate MTOW
+    l_opt = 1.4 * np.sqrt(4 * obj.MAC_length * obj.Sw * 0.7 / (np.pi * obj.w_out))
+    print(f"l_opt:{l_opt}")
+
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement
@@ -50,8 +53,6 @@ def cg_calc(obj):
 
     W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
     X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
-    print(f"W_fus_gr:{W_fus_gr}")
-    print(f"X_W_gr:{X_LEMAC - obj.x_lemac + x_wcg}")
     obj.X_FCG = X_FCG
     
     # xc_OEW = obj.xc_OEW_p*obj.MAC_length
@@ -59,10 +60,9 @@ def cg_calc(obj):
 
     # Final CG
     W_OEW = W_wing_gr+W_fus_gr
-    print(f"W_OEW:{W_OEW}")
     X_OEW = X_LEMAC + obj.xc_OEW_p * obj.MAC_length
     # X_OEW = ((X_LEMAC - obj.x_lemac + x_wcg) * W_wing_gr + X_FCG * W_fus_gr) / (W_OEW)
-    print(f"X_OEW:{X_OEW}")
+
     # X_OEW = X_LEMAC-obj.x_lemac+( x_wcg) + xc_OEW
 
     # Fuel
@@ -123,14 +123,7 @@ def cg_calc(obj):
     obj.X_cg_aft = max(Xs) + obj.X_cg_range * 0.05
 
     obj.AE_l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
-    print(f"l_f:{obj.l_f}")
-    print(f"X_LEMAC:{obj.X_LEMAC}")
-    print(f"X_cg_aft:{obj.X_cg_aft}")
-    print(f"MAC_length:{obj.MAC_length}")
-    print(f"l_f_boom:{obj.l_f_boom}")
-    print(f"obj.AE_rootchord_h:{obj.AE_rootchord_h}")
-    print(f"l_h:{obj.AE_l_h}")
-    print(f"l_aircraft:{obj.l_f + obj.l_f_boom}")
+
     # Plot lines for forward and aft cg positions
     # plt.axvline(x=0, linestyle='--', color='red', label='0% MAC')
     # plt.axvline(x=1, linestyle=':', color='red', label='100% MAC')
@@ -143,6 +136,7 @@ def cg_calc(obj):
     plt.grid()
     plt.legend()
     plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
-    plt.show()
+    if plot:
+        plt.show()
 
     return max(Xs), min(Xs), obj.X_cg_range

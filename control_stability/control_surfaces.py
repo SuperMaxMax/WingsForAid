@@ -11,6 +11,9 @@ sys.path.append('..')
 from parameters import atmosphere
 atm      = atmosphere()
 
+def Chordlength(y, aircraft):
+    return aircraft.rootchord * (1 - ((1-aircraft.taper) / (aircraft.b / 2)) * y)
+
 def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Approach, Ch 12.4
     ''' '''
     '''Roll performance requirments'''
@@ -24,7 +27,7 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
         phi_des = phi_des_list[i]
         t_lim = t_lim_list[i]
         delta_a_max = 20 * (pi/180) # max aileron deflection
-        tau = 0.74  # factor based on the fraction of chord that is the aileron
+        tau = 0.47  # factor based on the fraction of chord that is the aileron
         Ixx = 1200  # mass moment of inertia x-axis [kg m^2] TODO Update value 
         ystart_a = 0.95 * aircraft.b/2 # staring location of aileron
         yend_a = 0.95 * aircraft.b/2  # end location of aileron
@@ -49,14 +52,10 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
             t = sqrt(2*phi_des/P_roll_rate)
         ystart_a_list.append(ystart_a)
       
-
-
-    print("\n--------Aileron Design------------\n")
-    print(f"The aileron will span from {round(min(ystart_a_list) - aircraft.w_out/2, 3)}m to {round(yend_a - aircraft.w_out/2, 3)}m of the span of the wing with respect to the rootchord")
-    print(f"The time to roll {round(phi_des * 180/np.pi, 3)} degrees will be {round(t,3)} s")
-
-    aircraft.y_a_0 = ystart_a
+    aircraft.y_a_0 = min(ystart_a_list)
     aircraft.y_a_1 = 0.95
+
+    aircraft.S_aileron = (aircraft.y_a_1 - aircraft.y_a_0) * (Chordlength(aircraft.y_a_0, aircraft) + Chordlength(aircraft.y_a_1, aircraft))/2
 
     delta_L = L_a/2 /((aircraft.y_a_1 + aircraft.y_a_0)/2 * aircraft.b/2)
 
@@ -94,7 +93,7 @@ def rudder_design(aircraft):
     
     
     vertical_tail_volume = aircraft.AE_l_v*aircraft.AE_S_v/(aircraft.b*aircraft.Sw)
-    print(f"vert_tail_vol:{vertical_tail_volume}")
+
     C_n_beta = 0.75 * C_L_alpha_v * (1 - dsigma_dalpha) * eta_v * vertical_tail_volume
     C_y_beta = -1.35 * C_L_alpha_v * (1 - dsigma_dalpha) * eta_v * aircraft.AE_Sv_S
 
@@ -117,11 +116,10 @@ def rudder_design(aircraft):
     delta_r_value = solution[0]
     sigma_value = solution[1]
     
+    aircraft.delta_r_value = delta_r_value
+
     if delta_r_value*180/pi > 30:
         print(f"\nRequired rudder deflection ({round(delta_r_value*180/pi, 3)} degrees) exceeds maximum rudder deflection (30 degrees)\n")
-    else:
-        print(f"delta_r_required:{round(delta_r_value*180/pi, 3)}")
-        print(f"sigma:{round(sigma_value, )}")
 
     #aircraft.S_r = aircraft.C_r_C_v * aircraft.C_v * aircraft.b_v
 
