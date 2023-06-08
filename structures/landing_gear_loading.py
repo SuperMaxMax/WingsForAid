@@ -11,5 +11,5 @@ z_cg = np.array([0.3,0.5061,0.67,0.67/2,0.67,0.67])
 
 z_cg_tot = sum(z_cg*masses)/sum(masses)
 print(z_cg_tot)
-z_cg_ground = z_cg_tot + ac.ST_z_floor
+z_cg_ground = z_cg_tot + ac.ST_z_ground
 print(z_cg_ground)
