@@ -18,9 +18,9 @@ def main_stab_control(aircraft, plot, print_value):
 
     cg_calc(aircraft, plot)
     hor_run(aircraft, plot)
-    # ver_run(aircraft)
-    # exec(open("landing_gear.py").read(), {'aircraft':aircraft, 'plot':plot})
-    # main_control_surface(aircraft)
+    ver_run(aircraft)
+    exec(open("landing_gear.py").read(), {'aircraft':aircraft, 'plot':plot})
+    main_control_surface(aircraft)
 
     if print_value:
         print("\n-----------------Summary-Stabily-&-Control----------------\n")
@@ -29,6 +29,7 @@ def main_stab_control(aircraft, plot, print_value):
 
         print(f"CG_range is from {round(aircraft.X_cg_fwd, 3)} to {round(aircraft.X_cg_aft, 3)}")
         print(f"X_LEMAC is {round(aircraft.X_LEMAC, 3)} m\n")
+        print(f"l_h:{aircraft.AE_l_h}")
 
         print("--------------------Horizontal tailplane----------------------\n")
 
@@ -45,7 +46,7 @@ def main_stab_control(aircraft, plot, print_value):
 
         print("\n-------------------Aileron Design-----------------------------")
         print(f"The aileron will span from {round(aircraft.y_a_0 - aircraft.w_out/2, 3)}m to {round(aircraft.y_a_1 - aircraft.w_out/2, 3)}m of the span of the wing with respect to the rootchord")
-        print(f"The area of the aileron on one wing will be {aircraft.S_aileron} m^2\n")
+        print(f"The area of the aileron on one wing will be {round(aircraft.S_aileron, 3)} m^2\n")
 
         print("--------------------Elevator Design------------------------------\n")
 

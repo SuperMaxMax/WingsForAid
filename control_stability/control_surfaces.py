@@ -53,7 +53,7 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
         ystart_a_list.append(ystart_a)
       
     aircraft.y_a_0 = min(ystart_a_list)
-    aircraft.y_a_1 = 0.95
+    aircraft.y_a_1 = 0.95*aircraft.b/2
 
     aircraft.S_aileron = (aircraft.y_a_1 - aircraft.y_a_0) * (Chordlength(aircraft.y_a_0, aircraft) + Chordlength(aircraft.y_a_1, aircraft))/2
 
