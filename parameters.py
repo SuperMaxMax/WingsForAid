@@ -67,7 +67,7 @@ class UAV:
         self.Lambda = -0.0065
         self.l_fus_nose_cone = 0.9342       # Fuselage nose length [m]  
         self.l_fus_main_cone = 2.9          # Fuselage main cilindrical part length [m]
-        self.l_fus_tail_cone = 0.8          # Fuselage tail cone length [m]
+        self.l_fus_tail_cone = 0.94          # Fuselage tail cone length [m]
         self.l_f = 4.3                      # Fuselage length [m]
         self.l_f_boom = 2                   # Boom length [m]
         self.l_n = 0.8651                   # Nosecone length [m]
