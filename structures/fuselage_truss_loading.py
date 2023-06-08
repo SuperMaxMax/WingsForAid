@@ -12,16 +12,17 @@ yield_stress = 460*10**6
 density=7850
 E = 205*10**9
 
-# #al 5052
-# yield_stress = 255*10**6
-# density=2680
-# E=70.3*10**9
 
-# s-steel 4130
+
+# s-steel 410
 yield_stress = 1225*10**6
 density=7800
 E = 200*10**9
 
+# #al 5052
+# yield_stress = 255*10**6
+# density=2680
+# E=70.3*10**9
 ## Define main forces ##
 Thrust = 2800
 Lift = ac.W_TO*ac.g0

@@ -378,6 +378,10 @@ class UAV:
         self.ST_Torque_eng2 = 240 #Nm, UL 260 torque
         self.ST_l_strut = 2.563733275367119 #m strut lenght (single)
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
+        self.ST_W_fus = 40.3381 #kg mass of fuselage structure (only)
+        self.ST_W_tb = 8.746397065450095 #kg mass of tail boom, given it is 2.8 m long
+        self.ST_z_floor = 0.5 #m floor height
+        self.ST_z_prop = 0.3 #m propeller clearance
 
 class airport:
     def __init__(self, name):
