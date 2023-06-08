@@ -28,6 +28,7 @@ class UAV:
         self.d_eff = 1.241                  # Effective diameter [m]
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
         self.dihedral = 0
+        self.d_fuselage = 1                 # Fuselage diameter in [m]
         # E
         self.e = 0.776                        # Oswald factor [-]
         self.engine_cg = 0.267              # Engine cg location [m]
@@ -56,7 +57,10 @@ class UAV:
         self.LDG_dist = 750.0               # Landing distance [m]
         self.L_D = 14.1804                  # Lift to drag ratio [-]
         self.Lambda = -0.0065
-        self.l_f = 4.3                   # Fuselage length [m]
+        self.l_fus_nose_cone = 0.9342       # Fuselage nose length [m]  
+        self.l_fus_main_cone = 2.9          # Fuselage main cilindrical part length [m]
+        self.l_fus_tail_cone = 0.8          # Fuselage tail cone length [m]
+        self.l_f = 4.3                      # Fuselage length [m]
         self.l_f_boom = 2                   # Boom length [m]
         self.l_n = 0.8651                   # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
