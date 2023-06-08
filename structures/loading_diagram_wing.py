@@ -155,7 +155,7 @@ def spanwise_func_2(y):
     return -spanwise_wing_weight(y)-spanwise_fuel_weight(y)
 
 ac = UAV('aircraft')
-plot = True
+plot = False
 
 # aircraft parameters -> to be connected with parameters.py later
 ac.wing_strut_location = 0.437277492*ac.b/2                         # [m] | based on statistical data, value is now based on half span running from middle fuselage
@@ -177,8 +177,8 @@ prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4]
 possible_materials = rank_material(prop_weights_strut, [False])[:5]
 ms = pd.DataFrame(index=possible_materials, columns=['Case 1', 'Case 2'])
 
-for i in range(2):
-    if i == 0:
+for k in range(2):
+    if k == 0:
         load_case = 1
     else:
         load_case = 0
@@ -212,10 +212,10 @@ for i in range(2):
         normal.append(By*(1-np.heaviside(i-ac.wing_strut_location, 1)))
         if load_case == 1:
             shear.append(-(quad(spanwise_func_1, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.wing_strut_location, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
-            torque.append(trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
+            torque.append(-trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
         else:
             shear.append(-(quad(spanwise_func_2, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.wing_strut_location, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
-            torque.append(trapezoid(torque_flap[j:]+torque_ail[j:], y_span[j:]))
+            torque.append(-trapezoid(torque_flap[j:]+torque_ail[j:], y_span[j:]))
     # get the bending moment by integrating the shear along the length
     moment = cumulative_trapezoid(shear, y_span, initial=0)
 
@@ -247,4 +247,9 @@ for i in range(2):
             m = A*mat_density*ac.l_strut
             ms.loc[mat, 'Case 2'] = m
 
-print(ms)
+    if k == 0:
+        loading_tension = [normal, shear, moment, torque]
+    else:
+        loading_compression = [normal, shear, moment, torque]
+
+# print(ms)
