@@ -22,7 +22,7 @@ def lateral_coefficients(aircraft, lcg):
     C_n_beta_i = -0.017 #(9.67, high wing)
 
     C_n_beta_spec = 0.065  # This is the C_n_beta from the Cessna-152 and as we have to be at least as stable as them this is our requirements
-    C_Y_v_alpha = 0.05*180/np.pi # This is an assumed value in [1/rad]. This depends on the chosen airfoil for the vertical tailplane. 
+    C_Y_v_alpha = 3 # This is an assumed value in [1/rad]. This depends on the chosen airfoil for the vertical tailplane. 
     l_v = aircraft.AE_l_h # It was assumed the horizontal tailplane was positioned at the same position as the vertical tailplane. 
     aircraft.AE_l_v = l_v
 
