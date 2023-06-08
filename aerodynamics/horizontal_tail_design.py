@@ -135,7 +135,7 @@ def horizontal_tail_planform(aircraft):
             if variable == "Lambda":
                 Lambda = parameter
             else:
-                Lambda = 0.6
+                Lambda = 0.8
             if variable == "Twist":
                 alpha_twist = parameter
             else:
@@ -199,11 +199,10 @@ def horizontal_tail_planform(aircraft):
             CL_a_h = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
 
 
-            #print('=====================================================================')
-            #print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
-            #print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
-            print(i_w*180/np.pi, C_L_wing - C_L_h, airfoildata.index.tolist())
-            #print("C_L", C_L_wing)
+            print('=====================================================================')
+            print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
+            print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
+            #print(i_w*180/np.pi, C_L_wing - C_L_h, airfoildata.index.tolist())
 
         #Find integral current distribution
         area_lift_dist = -integrate.simps(CL1, y_s)
@@ -216,11 +215,11 @@ def horizontal_tail_planform(aircraft):
 
         #print('lestgo')
         #General plot
-        plt.grid()
-        plt.xlabel('semi span [m]')
-        plt.ylabel('C_L')
-        plt.legend()
-        plt.show()
+        # plt.grid()
+        # plt.xlabel('semi span [m]')
+        # plt.ylabel('C_L')
+        # plt.legend()
+        # plt.show()
         
         if not full_print:
             return abs(C_L_wing - C_L_h)
