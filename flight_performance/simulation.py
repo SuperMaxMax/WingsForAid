@@ -653,6 +653,28 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
         t += dt
     return t, W_F_used
 
+
+
+# def cruiseperf_varying(ac_obj, atm_obj):
+#     W_F_used = np.empty(0)
+#     h_cruise = np.arange(5000, 15000, 500) * 0.3048
+#     V_cruise = np.arange(45, 70, 5)
+#     x_cruise = np.arange(10000, 111000, 1000)
+#     for j in range(3):
+#         V = 50 + 5*j
+#         for i in range(len(h_cruise)):
+#             W_F_used_s = cruisecalc(ac_obj, atm_obj, h_cruise[i], 100000, 710, V)
+#             W_F_used = np.append(W_F_used, W_F_used_s)
+#         plt.plot(h_cruise, W_F_used[20*j:20*j + 20], label=f"Cruise speed: {V} [m/s]")
+#     plt.xlabel("h_cruise [m]")
+#     plt.ylabel("W_F_used [kg]")
+#     plt.title("W_F_used versus h_cruise")
+#     plt.legend()
+#     plt.show()
+
+# cruiseperf_varying(aircraft, atm)
+    
+
 def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD = dragpolar(ac_obj, CL)
@@ -679,6 +701,116 @@ def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
         t += dt
     return t, x, W_F_used, h
 
+def loiter(ac_obj, atm_obj, h_loiter, t_loiter, W0, standardrate, shape, goback = True, result = False):
+    h_loiter *= 0.3048
+    CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD_opt  = dragpolar(ac_obj, CL_opt)
+    p, rho  = atm_parameters(atm_obj, h_loiter)[0], atm_parameters(atm_obj, h_loiter)[2]
+    heading_t0  = 0.0
+    heading     = 0.0
+    standardrate *= (3 * np.pi / 180)
+    x   = 0.0
+    t   = 0.0
+    dt  = 1.0
+    W   = W0
+    W_F_used = 0.0
+    patterns = 0
+    if shape == "circle":
+        while t <= t_loiter:
+            V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
+            R_turn    = V / standardrate
+            bankangle = np.arctan(V**2/(atm_obj.g * R_turn))
+            n   = 1/np.cos(bankangle)
+            Pr  = n * 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
+            Pbr = Pr/ac_obj.prop_eff
+            W   -= Pbr * ac_obj.SFC * dt
+            W_F_used += Pbr * ac_obj.SFC * dt
+            heading += standardrate * dt
+            if heading >= 2 * np.pi:
+                heading -= 2 * np.pi
+                patterns += 1
+            x   += V * dt
+            t   += dt
+        heading -= 2 * np.pi
+        if goback == True:
+            target_heading = heading_t0 + np.pi
+        else:
+            target_heading = heading_t0
+        while heading < target_heading:
+            V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
+            R_turn    = V / standardrate
+            bankangle = np.arctan(V**2/(atm_obj.g * R_turn))
+            n   = 1/np.cos(bankangle)
+            Pr  = n * 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
+            Pbr = Pr/ac_obj.prop_eff
+            W   -= Pbr * ac_obj.SFC * dt
+            W_F_used += Pbr * ac_obj.SFC * dt
+            heading += standardrate * dt
+            if heading >= 2 * np.pi:
+                patterns += 1
+            x   += V * dt
+            t   += dt
+    if shape == "oval":
+        intercenterdist = 2000
+        while t <= t_loiter:
+            while x <= intercenterdist:
+                V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
+                Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
+                Pbr = Pr/ac_obj.prop_eff
+                W   -= Pbr * ac_obj.SFC * dt
+                W_F_used += Pbr * ac_obj.SFC * dt
+                x   += V * dt
+                t   += dt
+            while np.abs(heading - heading_t0) < np.pi:
+                V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
+                R_turn    = V / standardrate
+                bankangle = np.arctan(V**2/(atm_obj.g * R_turn))
+                n   = 1/np.cos(bankangle)
+                Pr  = n * 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
+                Pbr = Pr/ac_obj.prop_eff
+                W   -= Pbr * ac_obj.SFC * dt
+                W_F_used += Pbr * ac_obj.SFC * dt
+                heading += standardrate * dt
+                if heading >= 2 * np.pi:
+                    heading -= 2 * np.pi
+                    patterns += 1
+                x   += V * dt
+                t   += dt
+            heading -= 2 * np.pi
+            if goback == True:
+                target_heading = heading_t0 + np.pi
+            else:
+                target_heading = heading_t0
+            while heading < target_heading:
+                V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
+                R_turn    = V / standardrate
+                bankangle = np.arctan(V**2/(atm_obj.g * R_turn))
+                n   = 1/np.cos(bankangle)
+                Pr  = n * 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
+                Pbr = Pr/ac_obj.prop_eff
+                W   -= Pbr * ac_obj.SFC * dt
+                W_F_used += Pbr * ac_obj.SFC * dt
+                heading += standardrate * dt
+                if heading >= 2 * np.pi:
+                    patterns+=1
+                x   += V * dt
+                t   += dt
+    if result:
+        print(f"======================== Loiter Summary ========================")
+        print(f"Loiter time: {t_loiter} [sec] | Standard turn rate: {np.round(standardrate*180/np.pi, 2)} [deg/s]")
+        print(f"Fuel used during loiter: {np.round(W_F_used, 2)} | Number of patterns completed: {patterns}")
+        print(f"================================================================")
+
+loiter(aircraft, atm, 7500, 350, 700, 1, "circle", goback=False, result=True)
+
+
+
+            
+
+        
+    
+
+
 def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Summary = False, plot = False):
     flight_profile = []
     # Define a number of arrays used for plotting
@@ -686,20 +818,20 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     x_array = np.empty(0)
     t_array = np.empty(0)
     W_F_used_array = np.empty(0)
-    # =========================================================================
-    starttime = time.time()
-    W_F_used = 0.0
-    x   = 0.0
-    x_plot = 0.0
-    t   = 0.0
-    dt  = 1.0
-    h   = 15.0                          #after screenheight
-    # Add start values to arrays
-    x_array = np.append(x_array, x)
-    h_array = np.append(h_array, h)
-    t_array = np.append(t_array, t)
-    W_F_used_array = np.append(W_F_used_array, W_F_used)
-    # =========================================================================
+    # ===========================================================================
+    starttime = time.time()                                                     #
+    W_F_used = 0.0                                                              #
+    x   = 0.0                                                                   #
+    x_plot = 0.0                                                                #
+    t   = 0.0                                                                   #
+    dt  = 1.0                                                                   #
+    h   = 15.0                                              #after screenheight #
+    # Add start values to arrays                                                #
+    x_array = np.append(x_array, x)                                             #
+    h_array = np.append(h_array, h)                                             #
+    t_array = np.append(t_array, t)                                             #
+    W_F_used_array = np.append(W_F_used_array, W_F_used)                        #
+    # =========================================================================== 
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD = dragpolar(ac_obj, CL)
     LD_max = CL / CD
@@ -727,7 +859,8 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     # print(f"W_F_used after take off: {W_F_used}")
     W_F -= W_F_used
     # Now comes climb to projected cruise
-    if dropregion == None:                      #either 1 drop or n evenly spaced drops
+    # if n_boxes == 0:                            # flight without payload, surveillance ??
+    if dropregion == None:                      # either 1 drop or n evenly spaced drops
         target_dist = Range / n_drops
         cruise_alt  = cruiseheight(target_dist, h_cruise)
         print(f"The cruising altitude for this sortie is {round(cruise_alt/0.3048)} [ft] (in between all drops)")
@@ -746,6 +879,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             W_F_used_array = np.append(W_F_used_array, W_F_used)
             # print(f"W_F_used after climb {i}: {W_F_used_climb} [kg] in {t_climb} [sec]")
             W -= W_F_used_climb
+            # print(f"Start weight cruise: {np.round(W, 2)} [kg]")
             # Cruise part - first calculate cruise distance
             dtt_remaining = target_dist - x_between_drop
             descent_dist = (cruise_alt-15.0) * LD_max
@@ -799,6 +933,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         dtt_remaining = target_dist - x
         descent_dist = (cruise_alt_tft - 15.0) * LD_max
         cruise_dist = dtt_remaining - descent_dist
+        # print(f"cruise dist to first target: {cruise_dist} [m]")
         t_cruise, W_F_used_cruise = cruisecalc(ac_obj, atm_obj, cruise_alt_tft, cruise_dist, W, V_cruise)
         t += t_cruise
         x += cruise_dist
@@ -842,6 +977,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             dtnd = interdropdist - x_indropregion
             d_des = LD_max * (cruise_alt_int_drop-15.0)
             cruise_dist_int_drop = dtnd - d_des
+            print(f"Cruise dist in dropzone: {cruise_dist_int_drop} [m]")
             # print(f'Inter-drop cruise distance {i}: {cruise_dist_int_drop} [m]')
             t_cr_indrop, W_F_used_cr_indrop = cruisecalc(ac_obj, atm_obj, cruise_alt_int_drop, cruise_dist_int_drop, W, V_cruise)
             t += t_cr_indrop
@@ -935,4 +1071,4 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     flight_profile.append(W_F_used) # fuel burnt
     return flight_profile
 
-fuelusesortie(aircraft, atm, 12, 1, 15000, 62.5, 60, Summary=True)
+# fuelusesortie(aircraft, atm, 12, 3, 15000, 62.5, 65, dropregion= 50, Summary=True)
