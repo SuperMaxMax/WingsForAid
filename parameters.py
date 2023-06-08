@@ -34,7 +34,7 @@ class UAV:
         self.d_eff = 1.241                  # Effective diameter [m]
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
         self.dihedral = 0
-        self.d_fuselage = 1.102                 # Effective fuselage diameter used for drag estimation (average of width and diagonal) in [m]
+        self.d_fuselage = 1.102                 # Fuselage diameter in [m]
         # E
         self.e = 0.776                        # Oswald factor [-]
         self.engine_cg = 0.267              # Engine cg location [m]
@@ -65,12 +65,10 @@ class UAV:
         self.LDG_dist = 750.0               # Landing distance [m]
         self.L_D = 14.1804                  # Lift to drag ratio [-]
         self.Lambda = -0.0065
-        self.l_fus_nose_cone = 0.9342       # Fuselage nose length [m]  
         self.l_fus_main_cone = 2.9          # Fuselage main cilindrical part length [m]
-        self.l_fus_tail_cone = 0.8          # Fuselage tail cone length [m]
         self.l_f = 4.3                      # Fuselage length [m]
         self.l_f_boom = 2                   # Boom length [m]
-        self.l_n = 0.8651                   # Nosecone length [m]
+        self.l_n = 0.9342                  # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
         self.lambda_co2 = -0.02736364725188103           # Half chord sweep angle [rad]
@@ -211,7 +209,7 @@ class UAV:
         self.AE_dihedral = 0                    # Updated wing dihedral angle [rad]
         self.AE_span_eff = 0.9940               # Updated Span eficiency factor (different from oswald) [-]
         self.AE_tau = 1                         # Factor used in prandtl glauert correction for airfoil curve slope to wing [-]
-        self.AE_e = 0.776                       # Updated oswald efficiency factor [-]
+        self.AE_e = 0.7778                       # Updated oswald efficiency factor [-]
         self.AE_i_w = 0.935 * np.pi / 180       # Updated incidence angle of wing wrt fuselage [rad]
         self.AE_wing_twist = -2.0 *np.pi/180    # Updated wing twist (difference root and chord) [rad]
         self.AE_sweep_co2 = -0.02736364725188103 # Updated half chord sweep angle [rad]
@@ -245,7 +243,7 @@ class UAV:
         self.AE_y_mac_h = 1
         self.AE_x_lemac_h = 0.2
         self.AE_lambda_co2_h = 0
-        self.AE_vertical_airfoil = '0012'      # Airfoil of horizontal tail (NACA)
+        self.AE_horizontal_airfoil = '0012'      # Airfoil of horizontal tail (NACA)
 
 
         # Vertical tailplane
@@ -377,6 +375,10 @@ class UAV:
         self.ST_W_eng = 65.7 #kg Rotax 912 plus clutch, exhaust, alternator, air guide hood, NO MOUNT
         self.ST_Torque_eng2 = 240 #Nm, UL 260 torque
         self.ST_l_strut = 2.563733275367119 #m strut lenght (single)
+        self.ST_d_strut = 0.015 #strut diameter (outer) [m]
+        self.ST_l_LG = 0.4 #m strut lenght (single)
+        self.ST_d_LG = 0.04 #strut diameter (outer) [m]
+        self.ST_d_boom = 0.05 #strut diameter (outer) [m]
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
         self.ST_W_fus = 40.3381 #kg mass of fuselage structure (only)
         self.ST_W_tb = 8.746397065450095 #kg mass of tail boom, given it is 2.8 m long
