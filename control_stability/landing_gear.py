@@ -97,7 +97,7 @@ def lateral_position_landing_gear(aircraft):
     
     # Pitch Angle limit NOTE: 15 degrees can change for our aircraft. 
 
-    angle_theta_max = 15 * (np.pi/180) 
+    angle_theta_max = 10 * (np.pi/180) 
     x_cg_aft_limit = aircraft.x_cg_position_aft + Z_position_cg * np.tan(angle_theta_max)
     line_3 = ax.plot([x_cg_aft_limit, x_cg_aft_limit], [-1, 1], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
 
@@ -201,8 +201,8 @@ cid = fig.canvas.mpl_connect('button_press_event', on_click)
 cid = fig.canvas.mpl_connect('key_press_event', on_key)
 
 # Set the plot limits
-x_cg_point = ax.scatter([aircraft.x_cg_position_aft], [0], color='black', label='2: c.g. aft')
 x_cg_point = ax.scatter([aircraft.x_cg_position_fwd], [0], color='black', label='1: c.g. fwd')
+x_cg_point = ax.scatter([aircraft.x_cg_position_aft], [0], color='black', label='2: c.g. aft')
 
 # Plotting fuselage
 ax.plot([0.4, 3+aircraft.x_cg_position_fwd], [aircraft.w_out/2, aircraft.w_out/2], color='0.25', linewidth=0.8)
@@ -217,7 +217,6 @@ ax.plot([0.4, 0.1], [-aircraft.w_out/2, -aircraft.w_out/4], color='0.25', linewi
 ax.set_xlim(-0.3, aircraft.l_f-1)
 ax.set_ylim(-1, aircraft.b/2+1)
 ax.axhline(0, color='blue', linestyle='dotted')
-# End plotting Fuselage
 
 # Plotting z-cg. max location in top right corner
 parameter_text = ax.text(0.95, 0.95, f'Max Z_position c.g.: {Z_position_cg:.2f} [m]',
@@ -227,7 +226,6 @@ plt.text(aircraft.x_cg_position_aft+0.03, 0.2, 2, fontsize=8, va='center')
 plt.text(aircraft.x_cg_position_fwd+0.03, 0.2, 1, fontsize=8, va='center')
 
 # Plot Wing Position and planform
-
 ax.plot([aircraft.X_LEMAC, aircraft.X_LEMAC+aircraft.MAC_length], [aircraft.y_mac, aircraft.y_mac],color='0.25', linewidth=0.8)
 
 ax.plot([aircraft.X_LEMAC - aircraft.x_lemac, aircraft.X_LEMAC - aircraft.x_lemac+aircraft.rootchord], [0, 0], color='0.25', linewidth=0.8)
@@ -240,8 +238,8 @@ ax.set_aspect('equal')
 
 plt.grid()
 plt.legend(loc="upper left")
-plt.xlabel("x-position")
-plt.ylabel("y_position")
+plt.xlabel("X-position [m]")
+plt.ylabel("Y-position [m]")
 
 
 # Show the plot

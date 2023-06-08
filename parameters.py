@@ -68,7 +68,7 @@ class UAV:
         self.l_fus_main_cone = 2.9          # Fuselage main cilindrical part length [m]
         self.l_fus_tail_cone = 0.8          # Fuselage tail cone length [m]
         self.l_f = 4.3                      # Fuselage length [m]
-        self.l_f_boom = 2                   # Boom length [m]
+        self.l_f_boom = 2.2                   # Boom length [m]
         self.l_n = 0.9342                  # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
