@@ -180,11 +180,12 @@ def flaps(aircraft):
 ################################################################################################################
 
 def controlability_curve(aircraft, xcgRange):
-    CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD = flaps(aircraft)
     """For the controllability curve, the CL_h, CL_Ah and Cm_ac of the aircraft needs to be found. 
     For CL_h: SEAD L8 S17
     For CL_Ah: L = W @ approach
     For Cm_ac: SEAD L8 S19"""
+    
+    CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD = flaps(aircraft)
 
     CL_h = -1  # Full moving tail
     CL_Ah = aircraft.W_TO * aircraft.g0 / (0.5 * aircraft.rho0 * (1.3 * aircraft.V_s_min)**2 * aircraft.Sw)
@@ -227,7 +228,7 @@ def stability_curve(aircraft, xcgRange):
 ##################################################################################################################
 
 def plot_scissor_plot(aircraft):
-    xcgRange                    = np.arange(-0.1005, 1.005, 0.005)
+    xcgRange = np.arange(-0.1005, 1.005, 0.005)
     ControlSh_s = controlability_curve(aircraft, xcgRange)
     StabilitySh_S, StabilitySh_S_margin, = stability_curve(aircraft, xcgRange)
 
@@ -267,7 +268,6 @@ def plot_scissor_plot(aircraft):
     
 
 def hor_run(aircraft):
-    
     Aerodynamic_centre_determination(aircraft)
     plot_scissor_plot(aircraft)
     C_m_alpha_calculation(aircraft, aircraft.X_cg_full)

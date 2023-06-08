@@ -12,7 +12,7 @@ class UAV:
         self.braced_wing         = True     # True if wing is braced
         self.boxweight = 23.0               # weight of a single box [kg]
         # C
-        self.CD0 =  0.02578                    # Zero lift coefficient [-]
+        self.CD0 =  0.027                    # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
         self.CL_TO = 1.2397                 # [-]
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
@@ -101,8 +101,6 @@ class UAV:
         self.rootchord = 1.490             # Root chord [m]
         # S
         self.S_G = 19.77                    # Gross shell area fuselage [m^2]
-        self.Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
-        self.Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
         self.Sw = 11.7113                   # Wing area [m^2]
         self.Sw_wetted = 23.4226            # Wetted area of the wing [m^2]
         self.s_tail = 2                     # Tail surface area [m]
@@ -119,12 +117,8 @@ class UAV:
         self.T0 = 288.15                    # Sea level temperature [K]
         self.TOP_req = 250 
         self.t_c = 0.12                     # Thickness to chord ratio [-]
-        self.taper = 0.65                   # Taper ratio [-]
-        self.tipchord = 0.9685              # Tip chord [m]
-        self.tire_nose_height = 0.35306     # Nose landing gear tire height [m]
-        self.tire_nose_width = 0.14478      # Nose landing gear tire width [m]
-        self.tire_main_height = 0.381       # Main landing gear tire height [m]
-        self.tire_main_width = 0.1524       # Main landing gear tire height [m]
+        self.taper = 0.65                    # Taper ratio [-]
+        self.tipchord = 0.9685             # Tip chord [m]
         self.top_clearance = 0.2            # Top clearance [m]
         self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility   
         # U
@@ -208,12 +202,12 @@ class UAV:
         self.AE_alpha_f = 0                     # Still to be updated angle of attack of the fuselage [rad]
 
         # Horizontal tailplane
-        self.AE_l_h = 4                      # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.AE_l_h = 4                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
         self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
-        self.AE_CL_a_h = 4.1923692363710074                 # Lift curve slope horizontal tailplane [1/rad] 
+        self.AE_CL_a_h = 4.1923692363710074    # Lift curve slope horizontal tailplane [1/rad] 
 
         self.AE_taper_h = 0.6                
         self.AE_b_h = 4                     
@@ -308,9 +302,9 @@ class UAV:
         self.OP_V_headwind = 15  # [m/s]
         self.OP_V_wind = max(self.OP_V_headwind,self.OP_V_crosswind,self.OP_V_tailwind)  # [m/s]
 
-        self.OP_Range = 262.5 # [km]
+        self.OP_Range = 250 # [km]
         self.OP_N_boxes_per_sortie = 12  # [-]
-        self.OP_MR_PL = 21000 # [kg/day]
+        self.OP_MR_PL = 22000 # [kg/day]
         self.OP_PL_per_box = 20 # [kg]
         self.OP_TTFD = 72 # [h]
 
@@ -323,14 +317,19 @@ class UAV:
 
         # cost breakdown inputs
         self.OP_T_ops = 28 # [days]
-        self.OP_N_ops = 659 # [operations]
-        self.OP_AC_per_op = 20 # [#AC] available on average
+        self.OP_N_ops = 142 # [operations]
+        self.OP_AC_per_op = 21 # [#AC] available on average
         self.OP_n_drops = 2 # [#] choice!
-        self.OP_TTFS = 66.712 # [h] from contract to finished assembly and first sortie starts
-        self.OP_T_ground = 2 # [h]
-        self.OP_T_pilot = 0.75 # [h]
-        self.OP_CST_nofuel = 217584726.5 # [euro]
-        self.OP_fuelprice = 1.1935 # [euro/L]
+        self.OP_TTFS = 68.96 # [h] from contract to finished assembly and first sortie starts
+        self.OP_T_sortie_gnd = 2.067 # [hr]
+
+        self.OP_CST_nofuel = 61565740.67 # [euro]
+        self.OP_fuelprice = 1.5 # [euro/L]
+
+        self.OP_T_taxi = 5/60 # [h]
+        self.OP_T_TO = 10 / 60  # [h]
+        self.OP_T_LDG = 10 / 60  # [h]
+        self.OP_T_clearance = 5 / 60  # [h]
 
         "Tim's coefficients:"
 
