@@ -97,8 +97,8 @@ def lateral_position_landing_gear(aircraft):
     
     # Pitch Angle limit NOTE: 15 degrees can change for our aircraft. 
 
-    angle_theta_max = 10 * (np.pi/180) 
-    x_cg_aft_limit = aircraft.x_cg_position_aft + Z_position_cg * np.tan(angle_theta_max)
+    angle_theta_max = 15 * (np.pi/180) 
+    x_cg_aft_limit = aircraft.x_cg_position_aft + aircraft.ST_z_cg_ground * np.tan(angle_theta_max)
     line_3 = ax.plot([x_cg_aft_limit, x_cg_aft_limit], [-1, 1], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
 
     # II - Limit for the main leg position for give N to attain stability against turnover NOTE: right now z_cg is assumed to be 0.8*z_cg_max. This should be an arbitrary value. 
