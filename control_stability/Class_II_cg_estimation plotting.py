@@ -15,13 +15,18 @@ fuel_first = False
 
 def cg_calc(obj):
     # Wing placement
+    obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
+
+    # Wing placement
     X_LEMAC = obj.X_LEMAC
+    # X_LEMAC = 0.42 * obj.l_f
+    # obj.X_LEMAC = X_LEMAC
 
     '''v Wing group v'''
     if obj.sweep_co4 == 0:
-        wing_cg = 0.45 * obj.rootchord                 # 40% of root chord plus Leading Edge location
+        wing_cg = 0.4 * obj.rootchord                 # 40% of root chord plus Leading Edge location
     else:
-        wing_cg = 0.45 * obj.rootchord                 # to be done later, depends on spar locations (table 8-15 Torenbeek)
+        wing_cg = 0.4 * obj.rootchord                 # to be done later, depends on spar locations (table 8-15 Torenbeek)
 
     # Control surfaces
     control_surfaces_cg = obj.x_lemac + 0.9*obj.MAC_length  # guess for now, control surface location wrt leading edge rootchord
@@ -50,7 +55,6 @@ def cg_calc(obj):
 
     W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
     X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
-    
     obj.X_FCG = X_FCG
     
     # xc_OEW = obj.xc_OEW_p*obj.MAC_length
@@ -58,8 +62,9 @@ def cg_calc(obj):
 
     # Final CG
     W_OEW = W_wing_gr+W_fus_gr
-    # X_OEW = ((X_LEMAC - obj.x_lemac + x_wcg) * W_wing_gr + X_FCG * W_fus_gr) / (W_OEW)
     X_OEW = X_LEMAC + obj.xc_OEW_p * obj.MAC_length
+    # X_OEW = ((X_LEMAC - obj.x_lemac + x_wcg) * W_wing_gr + X_FCG * W_fus_gr) / (W_OEW)
+
     # X_OEW = X_LEMAC-obj.x_lemac+( x_wcg) + xc_OEW
 
     # Fuel
@@ -89,40 +94,44 @@ def cg_calc(obj):
     W_OEW_box_frac = [W_OEW/obj.W_TO + i/obj.W_TO for i in box_weights]
 
     X_OEW_box = [(W_OEW*X_OEW + (i)*(X_box))/(W_OEW+i) for i, X_box in zip(box_weights, box_xcg_positions)]
-
     # Plot each point
     if fuel_first:
         Xs = [X_OEW, X_OEW_fuel] + X_OEW_fuel_box
         Xs = (np.array(Xs)-X_LEMAC)/obj.MAC_length
         w_fracs = [W_OEW/obj.W_TO, W_OEW_fuel_frac] + W_OEW_fuel_box_frac
-        labels = ['OEW', 'OEW + Fuel'] + labels
+        labels = [r'$W_{OE}$', r'$W_{OE}$ + Fuel'] + labels
 
     else:
         Xs = [X_OEW] + X_OEW_box + [X_OEW_fuel_box[-1]]
         Xs = np.array(Xs)
         Xs = (Xs-X_LEMAC)/obj.MAC_length
         w_fracs = [W_OEW/obj.W_TO] + W_OEW_box_frac + [W_OEW_fuel_box_frac[-1]]
-        labels = ['OEW'] + labels + ['OEW + Box + Fuel']
+        labels = [r'$W_{OE}$'] + labels + [r'$W_{TO}$']
         
     # plt.rcParams.update({'font.size': 14})
+    plt.figure(figsize=(14,7))
+
     for x, w, label, i in zip(Xs, w_fracs, labels, range(len(Xs))):
         plt.scatter(x, w)
         if i == 0 or i == len(Xs):
             rotation_t = 0
         else:
             rotation_t = 90
-        plt.annotate(label, (x, w), textcoords="offset points", xytext=(0,10), ha='center', rotation=rotation_t)
+        plt.annotate(label, (x, w), textcoords="offset points", xytext=(5,0))#, ha='center')#, rotation=rotation_t)
             
+    LimBoxConfigFwd = '022000'
+    LimBoxConfigAft = '000222'
+
     # Save most forward and most aft and fully loaded c.g. in object
     obj.X_cg_full = Xs[-1]
     obj.X_cg_range = max(Xs) - 0.22
-    obj.X_cg_fwd = 0.23 - obj.X_cg_range * 0.05
-    obj.X_cg_aft = max(Xs) + obj.X_cg_range * 0.05
+    obj.X_cg_fwd = Xs[labels.index(LimBoxConfigFwd)] - obj.X_cg_range * 0.05
+    obj.X_cg_aft = Xs[labels.index(LimBoxConfigAft)] + obj.X_cg_range * 0.05
 
     obj.AE_l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
 
     # Plot lines for forward and aft cg positions
-    fig1 = plt.figure()
+
     plt.axvline(x=obj.X_cg_fwd, linestyle='--', color='blue', label='most forward c.g. considered')
     plt.axvline(x=obj.X_cg_aft, linestyle='--', color='red', label='most aft c.g. considered')
     plt.xlim((0, 1))
@@ -133,7 +142,7 @@ def cg_calc(obj):
     plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
     # plt.show()
 
-    return max(Xs), min(Xs), obj.X_cg_range
+    return obj.X_cg_aft, obj.X_cg_fwd, obj.X_cg_range
 
 def iteration(aircraft):
 
@@ -141,7 +150,7 @@ def iteration(aircraft):
     X_min_array = []
     X_range_array = []
     X_cg_range_lim_array = []
-    wing_pos_array = np.arange(0.30, 0.45, 0.005)
+    wing_pos_array = np.arange(0.35, 0.55, 0.005)
 
     for i in wing_pos_array:
         aircraft.X_LEMAC = i * aircraft.l_f
@@ -153,8 +162,10 @@ def iteration(aircraft):
         X_range_array.append(X_range)
         X_cg_range_lim_array.append(X_cg_range_lim)
 
+    print(f"Wing LEMAC:{wing_pos_array[X_cg_range_lim_array.index(min(X_cg_range_lim_array))]}")
+    
     fig2 = plt.figure()
-    print(X_cg_range_lim_array[12])
+
     plt.plot(X_min_array, wing_pos_array)
     plt.plot(X_max_array, wing_pos_array)
     plt.text(0.9, 0.3, aircraft.X_LEMAC, fontsize=8, va='center')

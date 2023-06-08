@@ -14,6 +14,19 @@ V_c = aircraft.V_cruise
 rho = 0.904637
 MAC = aircraft.MAC_length
 
+#intermediate calculation for consistent updates in function
+l_fus_1 = aircraft.l_n
+l_fus_2 = aircraft.l_fus_main_cone
+l_fus_3 = aircraft.l_tc
+l_fus_total = l_fus_1 + l_fus_2 + l_fus_3
+d_fus = aircraft.d_fuselage
+
+l_boom = aircraft.l_f_boom
+d_boom = aircraft.ST_d_boom
+l_strut = aircraft.ST_l_strut
+d_strut = aircraft.ST_d_strut
+l_gear = aircraft.ST_l_LG
+d_gear = aircraft.ST_d_LG
 
 #Cf coefficients
 def Cf(section):
@@ -29,7 +42,7 @@ def Cf(section):
     if section == 'wing' or section == 'htail' or section == 'vtail':
         Cf = 0.1*Cf_lam + 0.9*Cf_turb
     elif section == 'landing' or section == 'fuselage' or section == 'strut' or section == 'boom':
-        Cf = Cf_turb
+        Cf = 0*Cf_lam + 1*Cf_turb 
     else: 
         print('wrong section imported')
 
@@ -42,32 +55,32 @@ def FF(section):
     M = V_c/speed_of_sound
     if section == 'wing':
         type = 'lifting'
-        t_c = 0.15
+        t_c = float(aircraft.airfoil[-2]+aircraft.airfoil[-1])/100
         x_c_max = 0.4
     elif section == 'htail':
         type = 'lifting'
-        t_c = 0.12
+        t_c = float(aircraft.AE_horizontal_airfoil[-2]+aircraft.AE_horizontal_airfoil[-1])/100
         x_c_max = 0.3
     elif section == 'vtail':
         type = 'lifting'
-        t_c = 0.09
+        t_c = float(aircraft.AE_vertical_airfoil[-2]+aircraft.AE_vertical_airfoil[-1])/100
         x_c_max = 0.3
     elif section == 'landing':
         type = 'fus'
-        l = 0.4
-        d = 0.04
+        l = l_gear
+        d = d_gear
     elif section == 'fuselage':
         type = 'fus'
-        l = 4.6342
-        d = 1.0
+        l = l_fus_total
+        d = d_fus
     elif section == 'strut':
         type = 'fus'
-        l = 2.56
-        d = 0.015
+        l = l_strut
+        d = d_strut
     elif section == 'boom':
         type = 'fus'
-        l = 2
-        d = 0.05
+        l = l_boom
+        d = d_boom
     else: 
         print('wrong section imported')
 
@@ -104,19 +117,19 @@ def Swet(section):
     elif section == 'vtail':
         Swet = 1.05 * 2 * aircraft.Sv_S * aircraft.Sw
     elif section == 'fuselage':
-        D = 1.0
-        L1 = 0.9342
-        L2 = 2.9
-        L3 = 0.8
+        D = d_fus
+        L1 = l_fus_1
+        L2 = l_fus_2
+        L3 = l_fus_3
         Swet = (np.pi * D / 4) * (1/(3*L1) * ((4*L1**2 + D**2 /4)**1.5 - D**3 /8) - D + 4*L2 + 2 * np.sqrt(L3**2 + D**2 /4))
     elif section == 'boom':
         #l*pi*r**2
-        Swet = 2 * np.pi * 0.05**2
+        Swet = l_boom * np.pi * d_boom**2
     elif section == 'strut':
         #2*l*pi*r**2 twice for both struts
-        Swet = 2 * 2.56 * np.pi * 0.015**2
+        Swet = 2 * l_strut * np.pi * d_strut**2
     elif section == 'landing':
-        Swet = 3 * 0.4*np.sqrt(2) * 0.04**2 * np.pi
+        Swet = 3 * l_gear*np.sqrt(2) * d_gear**2 * np.pi
     else: 
          print('wrong section imported')
 
@@ -124,7 +137,6 @@ def Swet(section):
 
 def Cd_misc(section):
     if section == 'landing':
-        #10.7639104 factor for m2 to ft2
         Cd = 2 * 0.55 *  aircraft.tire_main_height * aircraft.tire_main_width + 0.55 * aircraft.tire_nose_height * aircraft.tire_nose_width
     else:
         Cd = 0
@@ -138,7 +150,7 @@ Cf_list = []
 FF_list = []
 IF_list = []
 Swet_list = []
-sum1_list = []
+CD0_list = []
 Cd_misc_list = []
 
 for part in parts:
@@ -146,16 +158,31 @@ for part in parts:
     FF_list.append(FF(part))
     IF_list.append(IF(part))
     Swet_list.append(Swet(part))
-    sum1_list.append(Cf(part) * FF(part) * IF(part) * Swet(part) / aircraft.Sw)
     Cd_misc_list.append(Cd_misc(part))
+    CD0_list.append((Cf(part) * FF(part) * IF(part) * Swet(part) / aircraft.Sw + Cd_misc(part)))
+
+# first_sum = sum(sum1_list)
+# second_sum = sum(Cd_misc_list)
+# leakage = (first_sum + second_sum)*0.05
+# CD_0 = first_sum + second_sum + leakage
+CD_0 = sum(CD0_list)*1.05
+print(CD_0)
 
 #save data to data frame
-dataframe = {'Cf': Cf_list, "FF": FF_list, "IF": IF_list, "Swet": Swet_list, 'Sum': sum1_list, 'Cd_misc': Cd_misc_list}
+dataframe = {'Cf': Cf_list, "FF": FF_list, "IF": IF_list, "Swet": Swet_list, 'Cd_misc': Cd_misc_list, 'CD_0': CD0_list}
 drag_info = pd.DataFrame(data=dataframe, index=parts)
+#drag_info = drag_info.round(3)
 print(drag_info)
 
-#print(drag_info)
-first_sum = sum(sum1_list)
-second_sum = sum(Cd_misc_list)
-leakage = (first_sum + second_sum)*0.05
-print(first_sum + second_sum + leakage)
+drag_info.to_csv('drag_estimation.csv', index=True)
+
+#Plotting drag polar
+lift_induced_coef = 1/(aircraft.A * np.pi * aircraft.e)
+CL = np.linspace(0, 1.5, 100)
+CD = CD_0 + lift_induced_coef * CL**2
+plt.figure(figsize=(8, 6))
+plt.plot(CD, CL)
+plt.xlabel('Drag Coefficient CD [-]')
+plt.ylabel('Lift Coefficient CL [-]')
+plt.savefig('dragpolar.pdf')
+plt.show()

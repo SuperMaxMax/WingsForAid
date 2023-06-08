@@ -9,12 +9,15 @@ import math
 # Setting with which can be determined if first the aircraft is filled with fuel or with payload
 fuel_first = False
 
-def cg_calc(obj):
+def cg_calc(obj, plot):
     # Calculate MTOW
+    l_opt = 1.4 * np.sqrt(4 * obj.MAC_length * obj.Sw * 0.7 / (np.pi * obj.w_out))
+    print(f"l_opt:{l_opt}")
+
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement
-    X_LEMAC = 0.41 * obj.l_f
+    X_LEMAC = 0.39 * obj.l_f
     obj.X_LEMAC = X_LEMAC
 
     '''v Wing group v'''
@@ -50,8 +53,6 @@ def cg_calc(obj):
 
     W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
     X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
-    print(f"W_fus_gr:{W_fus_gr}")
-    print(f"X_W_gr:{X_LEMAC - obj.x_lemac + x_wcg}")
     obj.X_FCG = X_FCG
     
     # xc_OEW = obj.xc_OEW_p*obj.MAC_length
@@ -59,10 +60,9 @@ def cg_calc(obj):
 
     # Final CG
     W_OEW = W_wing_gr+W_fus_gr
-    print(f"W_OEW:{W_OEW}")
     X_OEW = X_LEMAC + obj.xc_OEW_p * obj.MAC_length
     # X_OEW = ((X_LEMAC - obj.x_lemac + x_wcg) * W_wing_gr + X_FCG * W_fus_gr) / (W_OEW)
-    print(f"X_OEW:{X_OEW}")
+
     # X_OEW = X_LEMAC-obj.x_lemac+( x_wcg) + xc_OEW
 
     # Fuel
@@ -92,57 +92,55 @@ def cg_calc(obj):
     W_OEW_box_frac = [W_OEW/obj.W_TO + i/obj.W_TO for i in box_weights]
 
     X_OEW_box = [(W_OEW*X_OEW + (i)*(X_box))/(W_OEW+i) for i, X_box in zip(box_weights, box_xcg_positions)]
-
     # Plot each point
     if fuel_first:
         Xs = [X_OEW, X_OEW_fuel] + X_OEW_fuel_box
         Xs = (np.array(Xs)-X_LEMAC)/obj.MAC_length
         w_fracs = [W_OEW/obj.W_TO, W_OEW_fuel_frac] + W_OEW_fuel_box_frac
-        labels = ['OEW', 'OEW + Fuel'] + labels
+        labels = [r'$W_{OE}$', r'$W_{OE}$ + Fuel'] + labels
 
     else:
         Xs = [X_OEW] + X_OEW_box + [X_OEW_fuel_box[-1]]
         Xs = np.array(Xs)
         Xs = (Xs-X_LEMAC)/obj.MAC_length
         w_fracs = [W_OEW/obj.W_TO] + W_OEW_box_frac + [W_OEW_fuel_box_frac[-1]]
-        labels = ['OEW'] + labels + ['OEW + Box + Fuel']
+        labels = [r'$W_{OE}$'] + labels + [r'$W_{TO}$']
         
     # plt.rcParams.update({'font.size': 14})
+    plt.figure(figsize=(14,7))
+
     for x, w, label, i in zip(Xs, w_fracs, labels, range(len(Xs))):
         plt.scatter(x, w)
         if i == 0 or i == len(Xs):
             rotation_t = 0
         else:
             rotation_t = 90
-        plt.annotate(label, (x, w), textcoords="offset points", xytext=(0,10), ha='center', rotation=rotation_t)
+        plt.annotate(label, (x, w), textcoords="offset points", xytext=(5,0))#, ha='center')#, rotation=rotation_t)
             
+    LimBoxConfigFwd = '022000'
+    LimBoxConfigAft = '000222'
+
     # Save most forward and most aft and fully loaded c.g. in object
     obj.X_cg_full = Xs[-1]
     obj.X_cg_range = max(Xs) - 0.22
-    obj.X_cg_fwd = 0.22 - obj.X_cg_range * 0.05
-    obj.X_cg_aft = max(Xs) + obj.X_cg_range * 0.05
+    obj.X_cg_fwd = Xs[labels.index(LimBoxConfigFwd)] - obj.X_cg_range * 0.05
+    obj.X_cg_aft = Xs[labels.index(LimBoxConfigAft)] + obj.X_cg_range * 0.05
 
     obj.AE_l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
-    print(f"l_f:{obj.l_f}")
-    print(f"X_LEMAC:{obj.X_LEMAC}")
-    print(f"X_cg_aft:{obj.X_cg_aft}")
-    print(f"MAC_length:{obj.MAC_length}")
-    print(f"l_f_boom:{obj.l_f_boom}")
-    print(f"obj.AE_rootchord_h:{obj.AE_rootchord_h}")
-    print(f"l_h:{obj.AE_l_h}")
-    print(f"l_aircraft:{obj.l_f + obj.l_f_boom}")
-    # Plot lines for forward and aft cg positions
-    # plt.axvline(x=0, linestyle='--', color='red', label='0% MAC')
-    # plt.axvline(x=1, linestyle=':', color='red', label='100% MAC')
 
-    plt.axvline(x=obj.X_cg_fwd, linestyle='--', color='blue', label='most forward c.g. considered')
-    plt.axvline(x=obj.X_cg_aft, linestyle='--', color='red', label='most aft c.g. considered')
-    plt.xlim((0, 1))
-    plt.xlabel('X_cg/MAC [-]', fontsize=12)
-    plt.ylabel('Mass fraction [-]', fontsize=12)
+    # Plot lines for forward and aft cg positions
+    plt.axvline(x=obj.X_cg_fwd, color='blue', label='most forward c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=135, length=1.1)])
+    plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])
+
+    plt.ylim(top = 1.03)
+    plt.xlim(left = 0.1, right = 0.5)
+    plt.xlabel(r"$\dfrac{x_{cg}}{\bar{c}}$", fontsize = 12, loc='right')
+    plt.ylabel(r"$\dfrac{1}{W_{TO}}$",rotation = 0, fontsize = 12, loc='top')
     plt.grid()
     plt.legend()
-    plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
-    plt.show()
+    # plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
+    
+    if plot:
+        plt.show()
 
     return max(Xs), min(Xs), obj.X_cg_range
