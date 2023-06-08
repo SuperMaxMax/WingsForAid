@@ -214,12 +214,13 @@ def horizontal_tail_planform(aircraft):
         Cli_elliptical = (8*area_lift_dist)/(np.pi*b) * np.sqrt(1-(2*y/b)**2)
         #plt.plot(y, Cli_elliptical, label = "Elliptical")
 
+        #print('lestgo')
         #General plot
         plt.grid()
         plt.xlabel('semi span [m]')
         plt.ylabel('C_L')
         plt.legend()
-        #plt.show()
+        plt.show()
         
         if not full_print:
             return abs(C_L_wing - C_L_h)
@@ -230,7 +231,7 @@ def horizontal_tail_planform(aircraft):
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
     initial_guess = required_lift(aircraft)[0]/C_l_alpha
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
-    print(a_h_optimal)
+    #print(a_h_optimal)
     AR, b, Lambda, alpha_twist, S, CL_a_h  = plot_lift_distr(a_h_optimal, full_print = True)
 
     #Adding effect of downwash
@@ -263,9 +264,9 @@ def horizontal_tail_planform(aircraft):
     aircraft.y_mac_h = 1/3*(aircraft.b_h/2)*(1+2*Lambda)/(1+Lambda)   
     aircraft.x_lemac_h = aircraft.y_mac_h*np.tan(aircraft.sweep_LE_h)
     aircraft.CL_a_h = CL_a_h
-    print("Afsd", CL_a_h)
-    print(b)
-    print(S)
+    #print("Afsd", CL_a_h)
+    #print(b)
+    #print(S)
     return 
 
 aircraft = UAV("aircraft")

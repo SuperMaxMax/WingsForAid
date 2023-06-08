@@ -36,7 +36,7 @@ def LiftRateCoefficient(aircraft, Mach, A, lambda_co2):  # lift rate coefficient
 def TaillessLiftRateCoefficient(aircraft, CLa): 
     """Lift rate coefficient of aircraft without tail
     Equation from SEAD Lecture 7, slide 42"""
-    CLa_Ah = aircraft.AE_cl_alpha * (1 + 2.15 * aircraft.w_out / aircraft.b) * aircraft.Sw / aircraft.Sw + (np.pi * aircraft.w_out ** 2) / (2 * aircraft.Sw)
+    CLa_Ah = CLa * (1 + 2.15 * aircraft.w_out / aircraft.b) * aircraft.Sw / aircraft.Sw + (np.pi * aircraft.w_out ** 2) / (2 * aircraft.Sw)
 
     return CLa_Ah
 
@@ -80,8 +80,7 @@ def Aerodynamic_centre_determination(aircraft):
 
 def C_m_alpha_calculation(aircraft, x_cg):
     aircraft.C_N_h_alpha = 2 * np.pi * aircraft.AE_A_h/(aircraft.AE_A_h + 2)
-
-    aircraft.C_m_alpha = aircraft.AE_cl_alpha * (x_cg - aircraft.CS_x_ac_w) - aircraft.C_N_h_alpha * (1 - aircraft.AE_dEpsilondA) * (aircraft.AE_Vh_V)**2 * aircraft.AE_Sh_S * aircraft.AE_l_h/aircraft.MAC_length
+    aircraft.C_m_alpha = aircraft.CLa_w_cruise * (x_cg - aircraft.CS_x_ac_w) - aircraft.C_N_h_alpha * (1 - aircraft.AE_dEpsilondA) * (aircraft.AE_Vh_V)**2 * aircraft.AE_Sh_S * aircraft.AE_l_h/aircraft.MAC_length
 
 #################################################################################################################
 "FIXME: Determine Control Surface Coefficients"
@@ -191,12 +190,12 @@ def controlability_curve(aircraft, xcgRange):
     CL_Ah = aircraft.W_TO * aircraft.g0 / (0.5 * aircraft.rho0 * (1.3 * aircraft.V_s_min)**2 * aircraft.Sw)
 
     #Calculation of Cm_ac starting here
-    Cm_ac_w = aircraft.AE_cm0 * (aircraft.A * (np.cos(aircraft.sweep_co4))**2 / (aircraft.A + 2 * np.cos(aircraft.sweep_co4)))
+    Cm_ac_w = aircraft.af_cm0 * (aircraft.A * (np.cos(aircraft.sweep_co4))**2 / (aircraft.A + 2 * np.cos(aircraft.sweep_co4)))
 
     dCm_ac_f = aircraft.CS_mu2 * ((-aircraft.CS_mu1) * CS_dClmax_LD * CS_cprime_c_LD - (CL_Ah + CS_dClmax_LD * (1 - CS_Swf / aircraft.Sw)) * (1/8) * CS_cprime_c_LD * (CS_cprime_c_LD - 1)) \
         + 0.7 * (aircraft.A / (1 + 2 / aircraft.A)) * aircraft.CS_mu3 * CS_dClmax_LD * np.tan(aircraft.sweep_co4) - CL_Ah * (0.25 - aircraft.x_ac_approach)
 
-    CL0_w = aircraft.AE_Cl0 * (np.cos(aircraft.lambda_co4)) ** 2 # CL0 of wing, ADSEE-II L1 slide 61
+    CL0_w = aircraft.af_Cl0 * (np.cos(aircraft.lambda_co4)) ** 2 # CL0 of wing, ADSEE-II L1 slide 61
     CL0_tot = CL0_w + CS_dCLmax_LD
 
     dCm_ac_fus = (-1.8) * (1 - 2.5 * aircraft.w_out / aircraft.l_f) * ((np.pi * aircraft.w_out * aircraft.h_out * aircraft.l_f)/(4 * aircraft.Sw * aircraft.MAC_length)) * (CL0_tot / aircraft.CLa_Ah_approach)
@@ -244,7 +243,7 @@ def plot_scissor_plot(aircraft, plot):
     else:
         aircraft.AE_Sh_S = MinStabSh_s
 
-    fig1, ax1 = plt.subplots(figsize=(15, 8))
+    fig1, ax1 = plt.subplots(figsize=(14, 7))
     # Stability lines
     ax1.plot(xcgRange, StabilitySh_S_margin, label = 'Stability Curve', color = 'black',
          path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
