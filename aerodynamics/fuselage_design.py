@@ -21,7 +21,7 @@ l_fus_3 = aircraft.l_fus_tail_cone
 l_fus_total = l_fus_1 + l_fus_2 + l_fus_3
 d_fus = aircraft.d_fuselage
 
-variable_list2 = np.arange(0,3,0.05)
+variable_list2 = np.arange(0.5,3,0.2)
 
 
 for j in range(2):

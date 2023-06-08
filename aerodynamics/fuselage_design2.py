@@ -24,9 +24,14 @@ d_fus = aircraft.d_fuselage
 
 variable_list2 = np.arange(0,3.5,0.05)
 
+
+fus1list = []
+fus2list = []
+cd00list = []
+
 min_CD0 = 1000
 for i in range(1000):
-    l_fus_1 = 0.9342
+    l_fus_1 = rd.uniform(0.2,3)
     l_fus_2 = 2.9
     l_fus_3 = rd.uniform(0.2,3)
     
@@ -184,6 +189,10 @@ for i in range(1000):
     print(l_fus_total / d_fus)
     plt.scatter(l_fus_total/d_fus, CD0_list[4], s = 4, color = 'black')
 
+    fus1list.append(l_fus_1)
+    fus2list.append(l_fus_3)
+    cd00list.append(CD0_list[4])
+
     new_CD0 = CD0_list[4]
 
     if new_CD0 < min_CD0:
@@ -197,4 +206,7 @@ drag_info.to_csv('drag_estimation.csv', index=True)
 
 print("minCD0, nose length, tail length, L/D, Swet", min_CD0,min_nose,min_tail,min_ld,minwet )
 
+#fig = plt.figure()
+#ax = fig.add_subplot(projection='3d')
+#ax.scatter(fus1list, fus2list, cd00list)
 plt.show()
