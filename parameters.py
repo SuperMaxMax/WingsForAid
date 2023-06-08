@@ -7,6 +7,7 @@ class UAV:
         # B
         self.BHP_cruise = 76.3436
         self.b = 9.527          # Wing span [m]
+        self.b_v = 1.60         # Vertical tail span [m] NOTE: Is this value updated during design vertical tail?
         self.boom                = True     # Boom, true if boom tail is implemented
         self.bot_clearance = 0.1            # Bottom clearance [m]
         self.braced_wing         = True     # True if wing is braced
@@ -229,7 +230,7 @@ class UAV:
         self.AE_A_v = None                     # [-] Aspect ratio vertical tail
         self.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane 
         self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
-
+        
         "-NACA4415"
         self.airfoil = "4415"
 
