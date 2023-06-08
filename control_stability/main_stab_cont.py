@@ -16,7 +16,7 @@ from control_surfaces import main_control_surface
 
 def main_stab_control(aircraft, plot, print_value):
 
-    # cg_calc(aircraft, plot)
+    cg_calc(aircraft, plot)
     hor_run(aircraft, plot)
     # ver_run(aircraft)
     # exec(open("landing_gear.py").read(), {'aircraft':aircraft, 'plot':plot})
