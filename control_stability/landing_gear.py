@@ -97,7 +97,7 @@ def lateral_position_landing_gear(aircraft):
     
     # Pitch Angle limit NOTE: 15 degrees can change for our aircraft. 
     angle_theta_max = np.arctan(aircraft.h_out/(aircraft.l_f+aircraft.l_f_boom-aircraft.X_cg_aft))
-    print(angle_theta_max)
+    # print(angle_theta_max)
     # angle_theta_max = 15 * (np.pi/180) 
     x_cg_aft_limit = aircraft.x_cg_position_aft + aircraft.ST_z_cg_ground * np.tan(angle_theta_max)
     line_3 = ax.plot([x_cg_aft_limit, x_cg_aft_limit], [-1, 1], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
@@ -180,9 +180,10 @@ def on_click(event):
 def on_key(event):
     if event.key == 'enter':
         # Print the values
-        print(f"Position Landing Fwd: {aircraft.position_landing_fwd}")
-        print(f"Position Landing Back: {aircraft.position_landing_back}")
-        print(f"Z_cg_position: {Z_position_cg}")       
+        print(f"\nNosewheel position:\nY-position: {round(aircraft.position_landing_fwd[0],3)} [m]")
+        print(f"\nMain landing gear position:\nY-position: {round(aircraft.position_landing_back[0],3)} [m],\
+        X-position:{round(aircraft.position_landing_back[1],3)} [m]")
+        print(f"\nCG position Z-axis: {Z_position_cg}")       
 
 ##########################################################################################################
 """Plotting"""
