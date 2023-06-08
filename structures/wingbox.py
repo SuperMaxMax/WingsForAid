@@ -206,6 +206,13 @@ def ks_values(filename):
 
     return ks, ks_y[-1]
 
+def increase_values(values, increase):
+    for i, value in enumerate(values):
+        values[i] += increase
+    
+    return values
+
+
 ac = UAV("aircraft")
 plot = True
 
@@ -213,12 +220,12 @@ plot = True
 airfoil_num = '4415'        # [-] NACA airfoil number (4 digit)
 
 f_spar = 0.25               # [-] location of front spar (as fraction of chord)
-t_f_spar = 0.000005            # [m] thickness of front spar
+t_f_spar = 0.005            # [m] thickness of front spar
 a_spar = 0.75               # [-] location of aft spar (as fraction of chord)
-t_a_spar = 0.000005            # [m] thickness of aft spar
+t_a_spar = 0.005            # [m] thickness of aft spar
 
-t_top = 0.000001               # [m] thickness of top panel
-t_bot = 0.000001               # [m] thickness of bottom panel
+t_top = 0.001               # [m] thickness of top panel
+t_bot = 0.001               # [m] thickness of bottom panel
 
 n_stringers = 2             # [-] this is additional to already having 4 stringers at the corners
 a = 0.015                   # [m] length of bottom flange
@@ -236,8 +243,8 @@ stringer_decr_x_ribs = 0    # [-] decrease stringers by n_stringer_decr_ribs eve
 # Material choice for strut weight, add column for material index: sqrt(E)/rho -> the higher the value the better -> False
 material_df['sqrt(E)/rho'] = np.sqrt(material_df['E'])/material_df['density']
 # density, raw cost, eco cost, co2, yield stress, E, Kc, sqrt(E)/rho
-prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4]
-mat = rank_material(prop_weights_strut, [False])[0]
+prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4, 0]
+mat = rank_material(prop_weights_strut, [False, False])[0]
 
 #### CALCULATIONS ####
 ### Spanwise position ###
@@ -433,10 +440,7 @@ while failure == False:
                     print(f"Front spar compressive strength failure, MOF: {MOF_sigma_f_spar_c:.2f}")
                     # increase all thicknesses by 0.1 mm
                     failure = True
-                    t_f_spar += 0.0001
-                    t_a_spar += 0.0001
-                    t_top += 0.0001
-                    t_bot += 0.0001
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
                     break
             
             if sigma_f_spar_t > 0:
@@ -445,15 +449,25 @@ while failure == False:
                 if MOF_sigma_f_spar_t < 1:
                     print(f"Front spar tensile strength failure, MOF: {MOF_sigma_f_spar_t:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
+
                 if MOF_fracture_f_spar < 1:
                     print(f"Front spar fracture failure, MOF: {MOF_fracture_f_spar:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
             
             if sigma_a_spar_c < 0:
                 MOF_sigma_a_spar = material[mat]['yield stress']*10**6/abs(sigma_a_spar_c)
                 if MOF_sigma_a_spar < 1:
                     print(f"Aft spar compressive strength failure, MOF: {MOF_sigma_a_spar:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
 
             if sigma_a_spar_t > 0:
                 MOF_sigma_a_spar_t = material[mat]['yield stress']*10**6/abs(sigma_a_spar_t)
@@ -461,15 +475,24 @@ while failure == False:
                 if MOF_sigma_a_spar_t < 1:
                     print(f"Aft spar tensile strength failure, MOF: {MOF_sigma_a_spar_t:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
                 if MOF_fracture_a_spar < 1:
                     print(f"Aft spar fracture failure, MOF: {MOF_fracture_a_spar:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
             
             if sigma_top_panel_c < 0:
                 MOF_sigma_top_panel = material[mat]['yield stress']*10**6/abs(sigma_top_panel_c)
                 if MOF_sigma_top_panel < 1:
                     print(f"Top panel compressive strength failure, MOF: {MOF_sigma_top_panel:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
             
             if sigma_bot_panel_t > 0:
                 MOF_sigma_bot_panel_t = material[mat]['yield stress']*10**6/abs(sigma_bot_panel_t)
@@ -477,15 +500,24 @@ while failure == False:
                 if MOF_sigma_bot_panel_t < 1:
                     print(f"Bottom panel tensile strength failure, MOF: {MOF_sigma_bot_panel_t:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
                 if MOF_fracture_bot_panel < 1:
                     print(f"Bottom panel fracture failure, MOF: {MOF_fracture_bot_panel:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
 
             if sigma_bot_panel_c < 0:
                 MOF_sigma_bot_panel = material[mat]['yield stress']*10**6/abs(sigma_bot_panel_c)
                 if MOF_sigma_bot_panel < 1:
                     print(f"Bottom panel compressive strength failure, MOF: {MOF_sigma_bot_panel:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
 
             if sigma_top_panel_t > 0:
                 MOF_sigma_top_panel_t = material[mat]['yield stress']*10**6/abs(sigma_top_panel_t)
@@ -493,9 +525,15 @@ while failure == False:
                 if MOF_sigma_top_panel_t < 1:
                     print(f"Top panel tensile strength failure, MOF: {MOF_sigma_top_panel_t:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
                 if MOF_fracture_top_panel < 1:
                     print(f"Top panel fracture failure, MOF: {MOF_fracture_top_panel:.2f}")
                     # increase all thicknesses by 0.1 mm
+                    failure = True
+                    t_f_spar, t_a_spar, t_top, t_bot = increase_values([t_f_spar, t_a_spar, t_top, t_bot], 0.0001)
+                    break
 
             if i == spanwise_pos_sec[rib_number][0]:
                 if plot == True:
@@ -536,12 +574,17 @@ while failure == False:
                 # check if wingbox meets buckling requirements
                 if abs(tau_f_spar) > tau_cr_f_spar:
                     print(f"Spar shear buckling, MOF: {abs(tau_cr_f_spar/tau_f_spar):.2f}")
-                    break
                     # increase thickness of front spar by 0.1 mm
+                    failure = True
+                    t_f_spar += 0.0001
+                    break
                 
                 if abs(tau_a_spar) > tau_cr_a_spar:
                     print(f"Spar shear buckling, MOF: {abs(tau_cr_a_spar/tau_a_spar):.2f}")
                     # increase thickness of aft spar by 0.1 mm
+                    failure = True
+                    t_a_spar += 0.0001
+                    break
 
                 ## Panel buckling (compression) -> look at section between centroids of stringers
                 # a/b values and their respective ks values
@@ -584,11 +627,17 @@ while failure == False:
                     if not np.all(abs(sigma_top_p_c) < sigma_cr_top):
                         print(f"Panel compression buckling top, MOF: {abs(sigma_cr_top/abs(sigma_top_p.min())):.2f}")
                         # increase thickness of top panel by 0.1 mm
+                        failure = True
+                        t_top += 0.0001
+                        break
                 
                 if len(sigma_bot_p_c) != 0:
                     if not np.all(abs(sigma_bot_p_c) < sigma_cr_bot):
                         print(f"Panel compression buckling bottom, MOF: {abs(sigma_cr_bot/abs(sigma_bot_p.min())):.2f}")
                         # increase thickness of bottom panel by 0.1 mm
+                        failure = True
+                        t_bot += 0.0001
+                        break
 
                 if i == spanwise_pos[0]:
                     ## Stringer column buckling (compression) ## , calculate this once for entire wingbox (stringers run entire length)
@@ -614,11 +663,17 @@ while failure == False:
                         if not max(abs(sigma_top_s[sigma_top_s < 0])) < sigma_cr_top_s:
                             print(f"Stringer column buckling top, MOF: {abs(sigma_cr_top_s/max(abs(sigma_top_s[sigma_top_s < 0]))):.2f}")
                             # increase b by 0.1 mm
+                            failure = True
+                            b += 0.0001
+                            break
                     
                     if len(sigma_bot_s_c) != 0:
                         if not max(abs(sigma_bot_s[sigma_bot_s < 0])) < sigma_cr_bot_s:
                             print(f"Stringer column buckling bottom, MOF: {abs(sigma_cr_bot_s/max(abs(sigma_bot_s[sigma_bot_s < 0]))):.2f}")
                             # increase b by 0.1 mm
+                            failure = True
+                            b += 0.0001
+                            break
 
                 # remove stringers if necessary
                 if stringer_decr_x_ribs != 0:
@@ -626,7 +681,7 @@ while failure == False:
                         n_stringers -= n_stringer_decr_ribs
 
     failure = True
-
+    
 # Calculate tip deflection
 d2v_dy2 = -loading_tension[2]/(material[mat]['E']*10**9*Ixs)
 dv_dy = cumulative_trapezoid(spanwise_pos, d2v_dy2, initial=0)
