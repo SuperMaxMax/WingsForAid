@@ -13,20 +13,20 @@ from parameters import UAV
 
 def required_lift(aircraft):
     #load in parameters from current design
-    AR = aircraft.AE_A
-    sweep_c4 = aircraft.AE_sweep_co4
-    taper = aircraft.AE_taper
-    C_m_af = aircraft.AE_cm0
-    alpha_t = aircraft.AE_wing_twist
+    AR = aircraft.A
+    sweep_c4 = aircraft.sweep_co4
+    taper = aircraft.taper
+    C_m_af = aircraft.af_cm0
+    alpha_t = aircraft.wing_twist
     V_c = aircraft.V_cruise
     rho_c = aircraft.rho_cruise
     W_TO = aircraft.W_TO * 9.80665
-    S = aircraft.AE_Sw
-    h0 = aircraft.AE_MAC_ac
-    MAC = aircraft.AE_MAC_length
+    S = aircraft.Sw
+    h0 = aircraft.MAC_ac
+    MAC = aircraft.MAC_length
     xcg_fwrd = aircraft.X_cg_fwd
     xcg_aft = aircraft.X_cg_aft
-    Sh_SW = aircraft.AE_Sh_S
+    Sh_SW = aircraft.Sh_S
 
     #test to verify code
     # AR = 28
@@ -43,7 +43,7 @@ def required_lift(aircraft):
 
     #temp values from book
     #V_H = 0.7 #table 6.4 "aircraft design synthesis a systems engineering approach"
-    V_H = Sh_SW * aircraft.AE_l_h / MAC
+    V_H = Sh_SW * aircraft.l_h / MAC
 
     #inbetween calculutions 
     C_L = 2*W_TO/(rho_c * (V_c**2) * S) #lift in cruise
@@ -127,7 +127,7 @@ def horizontal_tail_planform(aircraft):
 
             segments = 100
             N = segments - 1
-            S = aircraft.AE_Sw * aircraft.AE_Sh_S  #tail.S
+            S = aircraft.Sw * aircraft.Sh_S  #tail.S
             if variable == "AR":
                 AR = parameter
             else:
@@ -235,34 +235,34 @@ def horizontal_tail_planform(aircraft):
 
     #Adding effect of downwash
     C_L_W_c = required_lift(aircraft)[1]
-    AR_w = aircraft.AE_A
-    i_w = aircraft.AE_i_w
-    a_f = aircraft.AE_alpha_f
-    C_L_a_w = aircraft.AE_CL_a_w
+    AR_w = aircraft.A
+    i_w = aircraft.i_w
+    a_f = aircraft.alpha_f
+    C_L_a_w = aircraft.CL_a_w
     epsilon_0 = 2 * C_L_W_c / (np.pi * AR_w)
     epsilon_alpha = 2 * C_L_a_w / (np.pi * AR_w)
     epsilon = epsilon_0 + epsilon_alpha * i_w
     i_h = a_h_optimal - a_f + epsilon
     
     # Horizontal tailplane
-    aircraft.AE_S_h = S
-    aircraft.AE_A_h = AR                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
-    aircraft.AE_lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
-    aircraft.AE_dEpsilondA = epsilon_alpha              # Downwash [-] TODO: check this value, this is a pure guess
-    aircraft.AE_A_h = AR                        
-    aircraft.AE_b_h = b                     
-    aircraft.AE_i_w_h = i_h       
-    aircraft.AE_wing_twist_h = alpha_twist    
-    aircraft.AE_sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
-    aircraft.AE_sweep_co2_h = 1 / np.tan(np.tan(aircraft.AE_sweep_co4_h) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
-    aircraft.AE_sweep_LE_h = 1 / np.tan(np.tan(aircraft.AE_sweep_co4_h) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
-    aircraft.AE_taper_h = Lambda                
-    aircraft.AE_rootchord_h = 2 * aircraft.AE_S_h / (aircraft.AE_b_h * (1+Lambda))            
-    aircraft.AE_tipchord_h = aircraft.AE_rootchord_h*Lambda        
-    aircraft.AE_MAC_length_h = 2/3 * aircraft.AE_rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)        
-    aircraft.AE_y_mac_h = 1/3*(aircraft.AE_b_h/2)*(1+2*Lambda)/(1+Lambda)   
-    aircraft.AE_x_lemac_h = aircraft.AE_y_mac_h/np.tan(aircraft.AE_sweep_LE_h)
-    aircraft.AE_CL_a_h = CL_a_h
+    aircraft.S_h = S
+    aircraft.A_h = AR                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+    aircraft.lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
+    aircraft.dEpsilondA = epsilon_alpha              # Downwash [-] TODO: check this value, this is a pure guess
+    aircraft.A_h = AR                        
+    aircraft.b_h = b                     
+    aircraft.i_w_h = i_h       
+    aircraft.wing_twist_h = alpha_twist    
+    aircraft.sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
+    aircraft.sweep_co2_h = 1 / np.tan(np.tan(aircraft.sweep_co4_h) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.sweep_LE_h = 1 / np.tan(np.tan(aircraft.sweep_co4_h) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
+    aircraft.taper_h = Lambda                
+    aircraft.rootchord_h = 2 * aircraft.S_h / (aircraft.b_h * (1+Lambda))            
+    aircraft.tipchord_h = aircraft.rootchord_h*Lambda        
+    aircraft.MAC_length_h = 2/3 * aircraft.rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)        
+    aircraft.y_mac_h = 1/3*(aircraft.b_h/2)*(1+2*Lambda)/(1+Lambda)   
+    aircraft.x_lemac_h = aircraft.y_mac_h*np.tan(aircraft.sweep_LE_h)
+    aircraft.CL_a_h = CL_a_h
     print("Afsd", CL_a_h)
     print(b)
     print(S)
