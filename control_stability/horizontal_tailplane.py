@@ -118,7 +118,7 @@ def Flaplength(aircraft, taperratio, rootchord, span, HLDroot, flappedsurface):
 
 def flaps(aircraft):
     flaptype = 'fowler'              # Can be 'singleslotted' or 'fowler'
-    #CS_Swf = 0.7 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) NOTE: Used to calculate resulting dCLmax
+    CS_Swf = 0.7 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) NOTE: Used to calculate resulting dCLmax
     CS_lambda_hinge = 0.02                  # hinge line sweep angle, likely parallel to aft spar [rad] TODO: update value
 
     # Using data from Torenbeek aroung page 533
@@ -228,8 +228,14 @@ def stability_curve(aircraft, xcgRange):
 ##################################################################################################################
 
 def plot_scissor_plot(aircraft):
-    xcgRange = np.arange(-0.1005, 1.005, 0.005)
+    xcgRange = np.arange(-0.105, 1.005, 0.0005)
     ControlSh_s = controlability_curve(aircraft, xcgRange)
+
+    print(ControlSh_s)
+    print(aircraft.X_cg_fwd)
+    print(xcgRange)
+    print(min(aircraft.X_cg_fwd - xcgRange)) #FIXME
+
     StabilitySh_S, StabilitySh_S_margin, = stability_curve(aircraft, xcgRange)
 
     fig1, ax1 = plt.subplots(figsize=(15, 8))
@@ -241,7 +247,7 @@ def plot_scissor_plot(aircraft):
     ax1.plot(xcgRange, ControlSh_s, color = 'blue',
          path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
 
-    Sh_S_cont = controlability_curve(aircraft, aircraft.X_cg_fwd)
+    Sh_S_cont = controlability_curve(aircraft, aircraft.X_cg_fwd)  
     Sh_S_stab = stability_curve(aircraft, aircraft.X_cg_aft)[1]
 
     if Sh_S_cont > Sh_S_stab:
