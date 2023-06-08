@@ -4,6 +4,8 @@ class UAV:
         "=== Class I / Class II parameters ==="
         # A
         self.A = 7.75                       # Aspect ratio [-]
+        self.alpha_f = 0                     # Still to be updated angle of attack of the fuselage [rad]
+
         # B
         self.BHP_cruise = 76.3436
         self.b = 9.527          # Wing span [m]
@@ -19,17 +21,20 @@ class UAV:
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
         self.CL_max_clean = 1.5             # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.CL_max_land = 1.9              # Maximum lift coefficient at landing [-]
-        self.CLa = 4.2                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
+        self.CLa = 4.743                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         self.c_p = 72E-9                    # Specific fuel consumption [kg/J]
         self.climb_rate = 2.9889 
         self.cos_lambda_c04 = 1 
         self.cruise_frac = 0.8348           # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
+        self.CL_a_w = 4.743                  # Updated Lift curve slope [1/rad] 
+
+
         # D
         self.Drag_increase = 1.0126         # This is used for the calculations of the strut drag if applicable [-]
         self.d_eff = 1.241                  # Effective diameter [m]
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
         self.dihedral = 0
-        self.d_fuselage = 1.102                 # Fuselage diameter in [m]
+        self.d_fuselage = 1.102                 # Effective fuselage diameter used for drag estimation (average of width and diagonal) in [m]
         # E
         self.e = 0.776                        # Oswald factor [-]
         self.engine_cg = 0.267              # Engine cg location [m]
@@ -47,6 +52,8 @@ class UAV:
         self.h_in = 0.9                     # Inner fuselage height [m]
         self.h_out = 0.737                    # Outer fuselage height [m]
         # I
+        self.i_w = 0.935 * np.pi / 180       # Updated incidence angle of wing wrt fuselage [rad]
+
 
         # J
 
@@ -66,10 +73,12 @@ class UAV:
         self.l_n = 0.8651                   # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
-        self.lambda_co2 = -0.0428           # Half chord sweep angle [rad]
+        self.lambda_co2 = -0.02736364725188103           # Half chord sweep angle [rad]
         self.lambda_co4 = 0.0               # Quarter chord sweep angle [rad]
         self.lin_par1 = 0.5249              # [-]
         self.lin_par2 = 42.049              # [-]
+        self.l_h = 4                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+
         # M
         self.MAC_length = 1.2477198640078417            # Mean aerodynamic chord [m]
         self.MAC_ac = 0.24                  # Location of aerodynamic center relative to MAC [-]
@@ -123,14 +132,13 @@ class UAV:
         # T
         self.T0 = 288.15                    # Sea level temperature [K]
         self.TOP_req = 250 
-        self.t_c = 0.12                     # Thickness to chord ratio [-]
+        self.t_c = 0.15                     # Thickness to chord ratio [-]
         self.taper = 0.65                   # Taper ratio [-]
         self.tipchord = 0.9685              # Tip chord [m]
         self.tire_nose_height = 0.35306     # Nose landing gear tire height [m]
         self.tire_nose_width = 0.14478      # Nose landing gear tire width [m]
         self.tire_main_height = 0.381       # Main landing gear tire height [m]
         self.tire_main_width = 0.1524       # Main landing gear tire height [m]
-        self.taper = 0.65                    # Taper ratio [-]
         self.tipchord = 0.9685             # Tip chord [m]
         self.top_clearance = 0.2            # Top clearance [m]
         self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility   
@@ -166,6 +174,8 @@ class UAV:
         self.WfinalW10 = 0.993              # Landing, taxi & shut-down fraction [-]
         self.w_in = 1.2                     # Inner fuselage width [m]
         self.w_out = 1.1                    # Outer fuselage width [m]
+        self.wing_twist = -2.0 *np.pi/180    # Updated wing twist (difference root and chord) [rad]
+
         # X
         self.X_LEMAC = 2.276                # Leading edge mean aerodynamic chord [m]
         self.x_lemac = 0.06057988483270884  # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
@@ -186,7 +196,7 @@ class UAV:
         "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
         "Main wing and overall a/c"
         self.AE_A = 7.75                        # Updated aspect ratio [-]
-        self.AE_CD0 = 0.006                     # Still tp be updated Zero lift drag [-]
+        self.AE_CD0 = 0.02578                   # Zero lift drag [-]
         self.AE_CL_LDG = 1.5702                 # Still to be updated [-]
         self.AE_CL_max_TO = 1.5                 # Still to be updated maximum lift coefficient at take-off [-]
         self.AE_CL_max_clean = 1.5              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
@@ -249,31 +259,30 @@ class UAV:
         self.airfoil = "4415"
 
         if self.airfoil == "4415":
-            self.AE_Cl0 = 0.457                                 # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
-            self.AE_clcd_max = 163.5                            # Maximum clcd
-            self.AE_clcd32_max = 170.1                          # Maximum clcd**(3/2)
-            self.AE_clcd12_max = 165.7                          # 
-            self.AE_cl_max = 1.735                              # Maximum cl_max
-            self.AE_alpha_s = 18.0 * np.pi / 180                # Stall angle of attack
-            self.AE_cd0 = 0.00595                               # Drag coefficient at zero lift
-            self.AE_cl_alpha = 0.103 * 180 / np.pi              # Lift curve slope [1 / rad]    
-            self.AE_cm_alpha = 0.00748                          # Moment coefficient derivative [1/rad]
-            self.AE_cm0 = -0.0941                               # Moment coefficient at zero AoA
-            self.AE_alpha0 = -0.0774    # Angle of attack at zero lift
+            self.af_Cl0 = 0.457                                 # TODO: Change to real value - Lift coeff of airfoil @ 0 AOA, cruise velocity [-]
+            self.af_clcd_max = 163.5                            # Maximum clcd
+            self.af_clcd32_max = 170.1                          # Maximum clcd**(3/2)
+            self.af_clcd12_max = 165.7                          # 
+            self.af_cl_max = 1.735                              # Maximum cl_max
+            self.af_alpha_s = 18.0 * np.pi / 180                # Stall angle of attack
+            self.af_cd0 = 0.00595                               # Drag coefficient at zero lift
+            self.af_cl_alpha = 0.103 * 180 / np.pi              # Lift curve slope [1 / rad]    
+            self.af_cm_alpha = 0.00748                          # Moment coefficient derivative [1/rad]
+            self.af_cm0 = -0.0941                               # Moment coefficient at zero AoA
+            self.af_alpha0 = -0.0774    # Angle of attack at zero lift
 
         if self.airfoil == "clarky":
-            self.AE_clcd_max = 154.7
-            self.AE_clcd32_max = 150.9
-            self.AE_clcd12_max = 161.7
-            self.AE_cl_max = 1.786
-            self.AE_alpha_s = 16.5 * np.pi / 180
-            self.AE_cd0 = 0.00604
-            self.AE_Cl0 = 0.404                  
-            self.AE_cl_alpha = 0.113 * 180 / np.pi
-            self.AE_cm_alpha = 0.00627
-            self.AE_cm0 = -0.0844
-            self.AE_alpha0 = -self.AE_Cl0 / self.AE_cl_alpha 
-
+            self.af_clcd_max = 154.7
+            self.af_clcd32_max = 150.9
+            self.af_clcd12_max = 161.7
+            self.af_cl_max = 1.786
+            self.af_alpha_s = 16.5 * np.pi / 180
+            self.af_cd0 = 0.00604
+            self.af_Cl0 = 0.404                  
+            self.af_cl_alpha = 0.113 * 180 / np.pi
+            self.af_cm_alpha = 0.00627
+            self.af_cm0 = -0.0844
+            self.af_alpha0 = -self.AE_Cl0 / self.AE_cl_alphaaf
 
         "Flight Performance parameters"         # NOTE: Add identifier "FP_" before variable names
         self.screenheight   = 50*0.3048         # screen height of 50 ft (CS23)

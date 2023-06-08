@@ -43,10 +43,10 @@ def vertical_wing_design(aircraft):
     list_Cl_alpha = 0.098 * 180/np.pi
     list_tc = 0.09
     
-    Sv_Sw = aircraft.AE_Sv_S
-    b = aircraft.AE_b
-    l_v = aircraft.AE_l_h
-    Sw = aircraft.AE_Sw
+    Sv_Sw = aircraft.Sv_S
+    b = aircraft.b
+    l_v = aircraft.l_h
+    Sw = aircraft.Sw
 
     V_v = Sv_Sw * l_v / b
     S_v = Sv_Sw * Sw
@@ -74,8 +74,8 @@ def required_lift(aircraft, b):
 
     L_h = M / ver_dist
 
-    Sw = aircraft.AE_Sw
-    Sv_Sw = aircraft.AE_Sv_S
+    Sw = aircraft.Sw
+    Sv_Sw = aircraft.Sv_S
     S_v = Sv_Sw * Sw
 
     C_L_h = L_h / (0.5 * rho_c * V_c**2 * S_v)
@@ -155,7 +155,7 @@ def horizontal_tail_planform(aircraft):
 
             segments = 100
             N = segments - 1
-            S = aircraft.AE_Sw * aircraft.AE_Sv_S  #tail.S
+            S = aircraft.Sw * aircraft.Sv_S  #tail.S
             if variable == "AR":
                 AR = parameter
             else:

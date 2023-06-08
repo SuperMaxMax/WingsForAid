@@ -88,7 +88,7 @@ def main_wing_planform(aircraft):
         for parameter in variable_list2:
             segments = 30
             N = segments - 1
-            S = aircraft.AE_Sw #aircraft.Sw
+            S = aircraft.Sw #aircraft.Sw
             if variable == "AR":
                 AR = parameter
             else:
@@ -103,8 +103,8 @@ def main_wing_planform(aircraft):
                 alpha_twist = -2 * np.pi / 180
 
 
-            a_2d = aircraft.AE_cl_alpha       #iw(airfoil)[1]
-            alpha_0 = aircraft.AE_alpha0 #iw(airfoil)[2]
+            a_2d = aircraft.af_cl_alpha       #iw(airfoil)[1]
+            alpha_0 = aircraft.af_alpha0 #iw(airfoil)[2]
             b = (AR * S)**0.5
 
             Croot = 2/(1+Lambda) * S/b
@@ -250,30 +250,30 @@ def main_wing_planform(aircraft):
     #print(','.join([str(x) for x in y_s]))
     #print('========')
     #print(','.join([str(x) for x in l]))
-    aircraft.AE_A = AR                        
-    aircraft.AE_b = (AR*aircraft.AE_Sw)**0.5                      
-    aircraft.AE_span_eff = span_eff                     
+    aircraft.A = AR                        
+    aircraft.b = (AR*aircraft.Sw)**0.5                      
+    aircraft.span_eff = span_eff                     
     tau = 1/span_eff - 1
-    aircraft.AE_CL_a_w = CL_a_w  
-    aircraft.AE_tau = tau
-    aircraft.AE_i_w = i_w       
-    aircraft.AE_wing_twist = alpha_twist    
-    aircraft.AE_sweep_co2 = np.arctan(np.tan(aircraft.AE_sweep_co4) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
-    aircraft.AE_sweep_LE = np.arctan(np.tan(aircraft.AE_sweep_co4) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))        
-    aircraft.AE_taper = Lambda                
-    aircraft.AE_rootchord = 2 * aircraft.AE_Sw / (aircraft.AE_b * (1+Lambda))            
-    aircraft.AE_tipchord = aircraft.AE_rootchord*Lambda        
-    aircraft.AE_MAC_length = 2/3 * aircraft.AE_rootchord * (1 + Lambda + Lambda**2) / (1 + Lambda)        
-    aircraft.AE_y_mac = 1/3*(aircraft.AE_b/2)*(1+2*Lambda)/(1+Lambda)   
-    aircraft.AE_x_lemac = aircraft.AE_y_mac*np.tan(aircraft.AE_sweep_LE)
+    aircraft.CL_a_w = CL_a_w  
+    aircraft.tau = tau
+    aircraft.i_w = i_w       
+    aircraft.wing_twist = alpha_twist    
+    aircraft.sweep_co2 = np.arctan(np.tan(aircraft.sweep_co4) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.sweep_LE = np.arctan(np.tan(aircraft.sweep_co4) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))        
+    aircraft.taper = Lambda                
+    aircraft.rootchord = 2 * aircraft.Sw / (aircraft.b * (1+Lambda))            
+    aircraft.tipchord = aircraft.rootchord*Lambda        
+    aircraft.MAC_length = 2/3 * aircraft.rootchord * (1 + Lambda + Lambda**2) / (1 + Lambda)        
+    aircraft.y_mac = 1/3*(aircraft.b/2)*(1+2*Lambda)/(1+Lambda)   
+    aircraft.x_lemac = aircraft.y_mac*np.tan(aircraft.sweep_LE)
 
-    print('afoqwbqlbng', aircraft.AE_y_mac, aircraft.AE_x_lemac, aircraft.AE_sweep_LE, aircraft.AE_MAC_length)
+    print('afoqwbqlbng', aircraft.y_mac, aircraft.x_lemac, aircraft.sweep_LE, aircraft.MAC_length)
                
     return 
 
 aircraft =  UAV('aircraft')
 main_wing_planform(aircraft)
-#print(aircraft.AE_A)
+#print(aircraft.A)
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
