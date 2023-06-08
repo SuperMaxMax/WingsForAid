@@ -175,7 +175,7 @@ material_df['sqrt(E)/rho'] = np.sqrt(material_df['E'])/material_df['density']
 material_df['simga_yield/rho'] = material_df['yield stress']/material_df['density']
 # density, raw cost, eco cost, co2, yield stress, E, Kc, sqrt(E)/rho, sigma_yield/rho
 prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4, 0]
-possible_materials = rank_material(prop_weights_strut, [False])[:5]
+possible_materials = rank_material(prop_weights_strut, [False, False])[:5]
 ms = pd.DataFrame(index=possible_materials, columns=['Case 1', 'Case 2'])
 
 for k in range(2):

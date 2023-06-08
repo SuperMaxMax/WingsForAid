@@ -5,7 +5,7 @@ import numpy as np
 def rank_material(weights, asc):
     material_ranking = copy.deepcopy(material_df)
 
-    ascending_tf = [True, True, True, True, False, False, False,False] + asc
+    ascending_tf = [True, True, True, True, False, False, False] + asc
     for i, property in enumerate(material_ranking.columns):
         property_ranking = material_ranking[property].rank(ascending=ascending_tf[i])
         material_ranking[property] = property_ranking
