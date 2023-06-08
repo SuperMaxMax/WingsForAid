@@ -123,7 +123,7 @@ def rudder_design(aircraft):
         print(f"delta_r_required:{round(delta_r_value*180/pi, 3)}")
         print(f"sigma:{round(sigma_value, )}")
 
-    aircraft.S_r = aircraft.C_r_C_v * aircraft.C_v * aircraft.b_v
+    #aircraft.S_r = aircraft.C_r_C_v * aircraft.C_v * aircraft.b_v
 
 def main_control_surface(aircraft):
     aileron_design(aircraft)
