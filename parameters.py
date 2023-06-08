@@ -28,7 +28,7 @@ class UAV:
         self.d_eff = 1.241                  # Effective diameter [m]
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
         self.dihedral = 0
-        self.d_fuselage = 1                 # Fuselage diameter in [m]
+        self.d_fuselage = 1.102                 # Fuselage diameter in [m]
         # E
         self.e = 0.776                        # Oswald factor [-]
         self.engine_cg = 0.267              # Engine cg location [m]
