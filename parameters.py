@@ -7,6 +7,7 @@ class UAV:
         # B
         self.BHP_cruise = 76.3436
         self.b = 9.527          # Wing span [m]
+        self.b_v = 1.60         # Vertical tail span [m] NOTE: Is this value updated during design vertical tail?
         self.boom                = True     # Boom, true if boom tail is implemented
         self.bot_clearance = 0.1            # Bottom clearance [m]
         self.braced_wing         = True     # True if wing is braced

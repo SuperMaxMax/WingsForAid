@@ -118,7 +118,7 @@ def Flaplength(aircraft, taperratio, rootchord, span, HLDroot, flappedsurface):
 
 def flaps(aircraft):
     flaptype = 'fowler'              # Can be 'singleslotted' or 'fowler'
-    #CS_Swf = 0.7 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) NOTE: Used to calculate resulting dCLmax
+    CS_Swf = 0.7 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) NOTE: Used to calculate resulting dCLmax
     CS_lambda_hinge = 0.02                  # hinge line sweep angle, likely parallel to aft spar [rad] TODO: update value
 
     # Using data from Torenbeek aroung page 533
@@ -227,48 +227,52 @@ def stability_curve(aircraft, xcgRange):
 "Plotting and running"
 ##################################################################################################################
 
-def plot_scissor_plot(aircraft):
-    xcgRange = np.arange(-0.1005, 1.005, 0.005)
+def plot_scissor_plot(aircraft, plot):
+    xcgRange = np.arange(-0.105, 1.005, 0.0005)
     ControlSh_s = controlability_curve(aircraft, xcgRange)
+
     StabilitySh_S, StabilitySh_S_margin, = stability_curve(aircraft, xcgRange)
 
-    fig1, ax1 = plt.subplots(figsize=(15, 8))
-    ax1.plot(xcgRange, StabilitySh_S_margin, color = 'black',
-         path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
-    ax1.plot(xcgRange, StabilitySh_S, color = 'red',
-         path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
+    # Finding smallest Sh/s for control and stability lines
+    AbsXcgCont = abs(xcgRange - aircraft.X_cg_fwd)  # Array with distances between index and forward cg
+    MinControlSh_s = ControlSh_s[AbsXcgCont.argmin()-1]  # Sh/S for most forward cg of control line, -1 to account for step inaccuracy
+    AbsXcgStab = abs(xcgRange - aircraft.X_cg_aft)  # Array with distances between index and aft cg
+    MinStabSh_s = StabilitySh_S_margin[AbsXcgStab.argmin()+1]  # Sh/S for most aft cg of control line, +1 to account for step inaccuracy
 
-    ax1.plot(xcgRange, ControlSh_s, color = 'blue',
-         path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
-
-    Sh_S_cont = controlability_curve(aircraft, aircraft.X_cg_fwd)
-    Sh_S_stab = stability_curve(aircraft, aircraft.X_cg_aft)[1]
-
-    if Sh_S_cont > Sh_S_stab:
-        aircraft.AE_Sh_S = Sh_S_cont
+    if MinControlSh_s > MinStabSh_s:
+        aircraft.AE_Sh_S = MinControlSh_s
     else:
-        aircraft.AE_Sh_S = Sh_S_stab
+        aircraft.AE_Sh_S = MinStabSh_s
 
-    x_cg_limit = [aircraft.X_cg_fwd, aircraft.X_cg_aft]
-    S_h_S_array = [aircraft.AE_Sh_S, aircraft.AE_Sh_S]
+    fig1, ax1 = plt.subplots(figsize=(15, 8))
+    # Stability lines
+    ax1.plot(xcgRange, StabilitySh_S_margin, label = 'Stability Curve', color = 'black',
+         path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
+    ax1.plot(xcgRange, StabilitySh_S, label = 'Neutral Stability Curve', color = 'red',
+         path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
+    # Controllability line
+    ax1.plot(xcgRange, ControlSh_s, label = 'Controllability Curve', color = 'blue',
+         path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
+    # CG range
+    ax1.plot([aircraft.X_cg_fwd, aircraft.X_cg_aft], [aircraft.AE_Sh_S, aircraft.AE_Sh_S], '-o', markersize=4, label='CG range loading diagram', color = 'orange')
 
-    ax1.plot(x_cg_limit, S_h_S_array, color = 'orange')
-
-    plt.xlim([0, 1])
-    plt.ylim([0, 0.6])
-
-    plt.xlabel("x/c [-]")
-    plt.ylabel("S_h/S [-]")
-
+    ax1.spines['bottom'].set_position('zero')
+    ax1.set_ylim(bottom = 0., top=0.4)
+    ax1.set_xlim(left = 0., right=1.)
+    ax1.set_ylabel(r"$\dfrac{S_h}{S}$",rotation = 0, fontsize = 12)
+    ax1.set_xlabel(r"$\dfrac{x_{cg}}{\bar{c}}$", fontsize = 12)
+    ax1.yaxis.set_label_coords(-0.05, 0.95)
+    ax1.xaxis.set_label_coords(1.03, -0.00)
+    ax1.legend(loc='lower right')
     ax1.grid()
 
     # fig1.savefig("scissorplot")
-
-    plt.show()
+    if plot:
+        plt.show()
     
 
-def hor_run(aircraft):
+def hor_run(aircraft, plot):
     Aerodynamic_centre_determination(aircraft)
-    plot_scissor_plot(aircraft)
+    plot_scissor_plot(aircraft, plot)
     C_m_alpha_calculation(aircraft, aircraft.X_cg_full)
     
