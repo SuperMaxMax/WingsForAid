@@ -96,8 +96,9 @@ def lateral_position_landing_gear(aircraft):
 
     
     # Pitch Angle limit NOTE: 15 degrees can change for our aircraft. 
-
-    angle_theta_max = 15 * (np.pi/180) 
+    angle_theta_max = np.arctan(aircraft.h_out/(aircraft.l_f+aircraft.l_f_boom-aircraft.X_cg_aft))
+    print(angle_theta_max)
+    # angle_theta_max = 15 * (np.pi/180) 
     x_cg_aft_limit = aircraft.x_cg_position_aft + aircraft.ST_z_cg_ground * np.tan(angle_theta_max)
     line_3 = ax.plot([x_cg_aft_limit, x_cg_aft_limit], [-1, 1], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
 
@@ -108,7 +109,7 @@ def lateral_position_landing_gear(aircraft):
     e_s = 1/3 * d_wheel
     track_width = 2 * aircraft.position_landing_back[1]
 
-    r = n_y * 0.8*Z_position_cg * (1 + 4 * k_sg * e_s * 0.8*Z_position_cg/ track_width)
+    r = n_y * aircraft.ST_z_cg_ground * (1 + 4 * k_sg * e_s * aircraft.ST_z_cg_ground/ track_width)
 
     b = np.sqrt((aircraft.position_landing_fwd[0]-aircraft.x_cg_position_fwd)**2+(aircraft.position_landing_fwd[1]-0)**2)
     angle_theta = np.arccos(r/b)
