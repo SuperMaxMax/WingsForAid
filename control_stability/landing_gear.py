@@ -245,4 +245,5 @@ plt.ylabel("y_position")
 
 
 # Show the plot
-plt.show(block=True)
+if plot:
+    plt.show(block=True)

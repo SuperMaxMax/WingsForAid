@@ -14,6 +14,12 @@ V_c = aircraft.V_cruise
 rho = 0.904637
 MAC = aircraft.MAC_length
 
+#intermediate calculation for consistent updates in function
+l_fus_1 = aircraft.l_fus_nose_cone
+l_fus_2 = aircraft.l_fus_main_cone
+l_fus_3 = aircraft.l_fus_tail_cone     
+l_fus_total = l_fus_1 + l_fus_2 + l_fus_3
+d_fus = aircraft.d_fuselage
 
 #Cf coefficients
 def Cf(section):
@@ -29,7 +35,7 @@ def Cf(section):
     if section == 'wing' or section == 'htail' or section == 'vtail':
         Cf = 0.1*Cf_lam + 0.9*Cf_turb
     elif section == 'landing' or section == 'fuselage' or section == 'strut' or section == 'boom':
-        Cf = Cf_turb
+        Cf = 0*Cf_lam + 1*Cf_turb 
     else: 
         print('wrong section imported')
 
@@ -58,8 +64,8 @@ def FF(section):
         d = 0.04
     elif section == 'fuselage':
         type = 'fus'
-        l = 4.6342
-        d = 1.0
+        l = l_fus_total
+        d = d_fus
     elif section == 'strut':
         type = 'fus'
         l = 2.56
@@ -104,10 +110,10 @@ def Swet(section):
     elif section == 'vtail':
         Swet = 1.05 * 2 * aircraft.Sv_S * aircraft.Sw
     elif section == 'fuselage':
-        D = 1.0
-        L1 = 0.9342
-        L2 = 2.9
-        L3 = 0.8
+        D = d_fus
+        L1 = l_fus_1
+        L2 = l_fus_2
+        L3 = l_fus_3
         Swet = (np.pi * D / 4) * (1/(3*L1) * ((4*L1**2 + D**2 /4)**1.5 - D**3 /8) - D + 4*L2 + 2 * np.sqrt(L3**2 + D**2 /4))
     elif section == 'boom':
         #l*pi*r**2
@@ -124,7 +130,6 @@ def Swet(section):
 
 def Cd_misc(section):
     if section == 'landing':
-        #10.7639104 factor for m2 to ft2
         Cd = 2 * 0.55 *  aircraft.tire_main_height * aircraft.tire_main_width + 0.55 * aircraft.tire_nose_height * aircraft.tire_nose_width
     else:
         Cd = 0
@@ -138,7 +143,7 @@ Cf_list = []
 FF_list = []
 IF_list = []
 Swet_list = []
-sum1_list = []
+CD0_list = []
 Cd_misc_list = []
 
 for part in parts:
@@ -146,16 +151,20 @@ for part in parts:
     FF_list.append(FF(part))
     IF_list.append(IF(part))
     Swet_list.append(Swet(part))
-    sum1_list.append(Cf(part) * FF(part) * IF(part) * Swet(part) / aircraft.Sw)
     Cd_misc_list.append(Cd_misc(part))
+    CD0_list.append((Cf(part) * FF(part) * IF(part) * Swet(part) / aircraft.Sw + Cd_misc(part)))
+
+# first_sum = sum(sum1_list)
+# second_sum = sum(Cd_misc_list)
+# leakage = (first_sum + second_sum)*0.05
+# CD_0 = first_sum + second_sum + leakage
+CD_0 = sum(CD0_list)*1.05
+print(CD_0)
 
 #save data to data frame
-dataframe = {'Cf': Cf_list, "FF": FF_list, "IF": IF_list, "Swet": Swet_list, 'Sum': sum1_list, 'Cd_misc': Cd_misc_list}
+dataframe = {'Cf': Cf_list, "FF": FF_list, "IF": IF_list, "Swet": Swet_list, 'Cd_misc': Cd_misc_list, 'CD_0': CD0_list}
 drag_info = pd.DataFrame(data=dataframe, index=parts)
+#drag_info = drag_info.round(3)
 print(drag_info)
 
-#print(drag_info)
-first_sum = sum(sum1_list)
-second_sum = sum(Cd_misc_list)
-leakage = (first_sum + second_sum)*0.05
-print(first_sum + second_sum + leakage)
+drag_info.to_csv('drag_estimation.csv', index=True)

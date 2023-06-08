@@ -169,7 +169,8 @@ def subdivide(range,N):
 
 def PlotTraj(states, title):
 
-    plt.suptitle("Box drop")
+    #plt.suptitle("Box drop")
+    plt.suptitle("reference drop" + str(title))
 
     # trajectory
     plt.subplot(231)
@@ -209,7 +210,6 @@ def PlotTraj(states, title):
                         top=0.9,
                         wspace=0.3,
                         hspace=0.4)
-    plt.title("reference drop" + str(title))
     plt.show()
 
 def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score=0):
@@ -315,7 +315,7 @@ print("box default:", box.__dict__)
 dt_sim = 5 / 10E3  # [s] between simulation frames
 IT_max = 10E4
 DoVerif = False
-SingleTry = False
+SingleTry = True
 
 # Operational limits & requirements
 V_boxdrop_lim = 100/3.6 # [m/s] 100kph drop limit

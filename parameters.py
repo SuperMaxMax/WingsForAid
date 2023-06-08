@@ -7,12 +7,13 @@ class UAV:
         # B
         self.BHP_cruise = 76.3436
         self.b = 9.527          # Wing span [m]
+        self.b_v = 1.60         # Vertical tail span [m] NOTE: Is this value updated during design vertical tail?
         self.boom                = True     # Boom, true if boom tail is implemented
         self.bot_clearance = 0.1            # Bottom clearance [m]
         self.braced_wing         = True     # True if wing is braced
         self.boxweight = 23.0               # weight of a single box [kg]
         # C
-        self.CD0 =  0.02578                    # Zero lift coefficient [-]
+        self.CD0 =  0.02578                 # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
         self.CL_TO = 1.2397                 # [-]
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
@@ -28,6 +29,7 @@ class UAV:
         self.d_eff = 1.241                  # Effective diameter [m]
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
         self.dihedral = 0
+        self.d_fuselage = 1                 # Fuselage diameter in [m]
         # E
         self.e = 0.776                        # Oswald factor [-]
         self.engine_cg = 0.267              # Engine cg location [m]
@@ -56,7 +58,10 @@ class UAV:
         self.LDG_dist = 750.0               # Landing distance [m]
         self.L_D = 14.1804                  # Lift to drag ratio [-]
         self.Lambda = -0.0065
-        self.l_f = 4.3                   # Fuselage length [m]
+        self.l_fus_nose_cone = 0.9342       # Fuselage nose length [m]  
+        self.l_fus_main_cone = 2.9          # Fuselage main cilindrical part length [m]
+        self.l_fus_tail_cone = 0.8          # Fuselage tail cone length [m]
+        self.l_f = 4.3                      # Fuselage length [m]
         self.l_f_boom = 2                   # Boom length [m]
         self.l_n = 0.8651                   # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
@@ -101,7 +106,7 @@ class UAV:
         self.rootchord = 1.490             # Root chord [m]
         # S
         self.S_G = 19.77                    # Gross shell area fuselage [m^2]
-        self.Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
+        self.Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area wing
         self.Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
         self.Sw = 11.7113                   # Wing area [m^2]
         self.Sw_wetted = 23.4226            # Wetted area of the wing [m^2]
@@ -125,6 +130,8 @@ class UAV:
         self.tire_nose_width = 0.14478      # Nose landing gear tire width [m]
         self.tire_main_height = 0.381       # Main landing gear tire height [m]
         self.tire_main_width = 0.1524       # Main landing gear tire height [m]
+        self.taper = 0.65                    # Taper ratio [-]
+        self.tipchord = 0.9685             # Tip chord [m]
         self.top_clearance = 0.2            # Top clearance [m]
         self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility   
         # U
@@ -208,12 +215,12 @@ class UAV:
         self.AE_alpha_f = 0                     # Still to be updated angle of attack of the fuselage [rad]
 
         # Horizontal tailplane
-        self.AE_l_h = 4                      # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.AE_l_h = 4                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
         self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
-        self.AE_CL_a_h = 4.1923692363710074                 # Lift curve slope horizontal tailplane [1/rad] 
+        self.AE_CL_a_h = 4.1923692363710074    # Lift curve slope horizontal tailplane [1/rad] 
 
         self.AE_taper_h = 0.6                
         self.AE_b_h = 4                     
@@ -228,6 +235,7 @@ class UAV:
         self.AE_y_mac_h = 1
         self.AE_x_lemac_h = 0.2
         self.AE_lambda_co2_h = 0
+        self.AE_vertical_airfoil = '0012'      # Airfoil of horizontal tail (NACA)
 
 
         # Vertical tailplane
@@ -235,6 +243,7 @@ class UAV:
         self.AE_A_v = None                     # [-] Aspect ratio vertical tail
         self.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane 
         self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
+        self.AE_vertical_airfoil = '0009'      # Airfoil of vertical tail (NACA)
 
         "-NACA4415"
         self.airfoil = "4415"
@@ -327,10 +336,17 @@ class UAV:
         self.OP_AC_per_op = 20 # [#AC] available on average
         self.OP_n_drops = 2 # [#] choice!
         self.OP_TTFS = 66.712 # [h] from contract to finished assembly and first sortie starts
+        self.OP_T_sortie_gnd = 2.067 # [hr]
         self.OP_T_ground = 2 # [h]
         self.OP_T_pilot = 0.75 # [h]
+
         self.OP_CST_nofuel = 217584726.5 # [euro]
         self.OP_fuelprice = 1.1935 # [euro/L]
+
+        self.OP_T_taxi = 5/60 # [h]
+        self.OP_T_TO = 10 / 60  # [h]
+        self.OP_T_LDG = 10 / 60  # [h]
+        self.OP_T_clearance = 5 / 60  # [h]
 
         "Tim's coefficients:"
 
