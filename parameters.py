@@ -385,7 +385,7 @@ class UAV:
         self.ST_W_tb = 8.746397065450095 #kg mass of tail boom, given it is 2.8 m long
         self.ST_z_ground = 0.5 #m floor height
         self.ST_z_prop = 0.3 #m propeller clearance
-        self.ST_z_cg_ground = 0.92 #m estiamted center of gravity of boxes, fuselage, engine, boom, wing, fuel
+        self.ST_z_cg_ground =  0.92 #m estiamted center of gravity of boxes, fuselage, engine, boom, wing, fuel
 
 
 class airport:
