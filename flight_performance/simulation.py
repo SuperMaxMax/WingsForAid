@@ -193,7 +193,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
         S = [600]
         while max(S) <= 750:
             S_old = S.copy()
-            CL -= 0.1
+            CL -= 0.01
             V_LOF = 1.05 * np.sqrt(
                 dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max) - dic_constants[
                         'wind speed']
@@ -212,7 +212,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
                 break
 
         S = S_old
-        CL += 0.1
+        CL += 0.01
         CL_all.append(CL)
         if len(S) == 1:
             print('One or more of the flight conditions; runway slope, headwind, tailwind, airport altitude, '
@@ -221,6 +221,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             break
         else:
             CL_to = max(CL_all)
+            print(CL_to, CL_max)
             obj.FP_CL_max_TO = CL_max
             obj.FP_CL_TO = CL_to
 
@@ -261,7 +262,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
 
     return S
 
-# TO_eom(aircraft, airfield, atm, 5, 3000, 12, -15.4, 65)
+TO_eom(aircraft, airfield, atm, 5, 3000, 12, -15.4, 65)
 
 # ------------------------------------------------------------------------
 
@@ -486,7 +487,6 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             V_T = 1.2 * np.sqrt(
                 dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max) - dic_constants['wind speed']
             V_avg_sq = V_T ** 2 / 2
-            print(CL)
             CD = obj.CD0 + CL**2 / (np.pi * obj.A * obj.e)
             D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             L = CL * V_avg_sq * rho / 2 * dic_constants['wing surface area']
@@ -541,7 +541,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
 
     return CL_land
 
-LA_eom(aircraft, airfield, atm, 10, 3000, 12, -15.4, 70)
+# LA_eom(aircraft, airfield, atm, 10, 3000, 12, -15.4, 70)
 
 # ------------------------------------------------------------------------------
 def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
