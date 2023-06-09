@@ -399,6 +399,10 @@ class UAV:
         self.ST_z_ground = 0.5 #m floor height
         self.ST_z_prop = 0.3 #m propeller clearance
         self.ST_z_cg_ground =  0.92 #m estiamted center of gravity of boxes, fuselage, engine, boom, wing, fuel
+        self.ST_x_nw =0.4 #m x distance nose wheel
+        self.ST_x_mw =2.35 #m x distance main whee
+        self.ST_ax_g = 0.51 #- maximum horizontal breaking deceleration scaled by g0
+        self.ST_x_cg = 2.94 #max aft x_cg for nose wheel loading
 
 
 class airport:
