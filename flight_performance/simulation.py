@@ -205,6 +205,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             if np.max(T) > T_max:
                 T_max = np.max(T)
             D_g = ap.mu_ground * (dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])) - L)
+            print(L/dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])))
             a = atmos.g / dic_constants['weight'] * (
                         T - D - D_g - dic_constants['weight'] * np.sin(np.radians(dic_constants['runway slope'])))
             S = V_LOF ** 2 / (2 * a)
@@ -223,7 +224,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             CL_to = max(CL_all)
             print(CL_to, CL_max)
             obj.FP_CL_max_TO = CL_max
-            obj.FP_CL_TO = CL_to
+            obj.FP_CL_to = CL_to
 
 
         if Plot:
@@ -255,10 +256,6 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     plt.subplots_adjust(wspace=0.5)
     plt.suptitle('Take-Off')
     plt.show()
-    print("T", T_max)
-    V_P =  (dic_constants['propeller power'] * dic_constants['propeller efficiency']/T_max)** 2
-    x = np.sqrt(T_max/(0.00255*V_P*(0.85/0.6-1)))
-    print(x)
 
     return S
 
@@ -343,12 +340,15 @@ def cruiseperformance(ac_obj, atm_obj, n_boxes, W_F_TO, Range=None, V_cruise=Non
     t    = 0.0
     dt   = 0.1
     W    = W_cr * atm_obj.g
+    D_max = 0
     while r_it < R:
         CL_cr   = 2*W/(rho_cr*V_cruise**2*ac_obj.Sw)
         CD_cr   = dragpolar(ac_obj, CL_cr)
         r_it    += (V_cruise * dt)
         t       += dt
         D       = 1/2 * rho_cr * V_cruise**2 * ac_obj.Sw * CD_cr
+        if np.max(D) > D_max:
+            D_max = np.max(D)
         Pa      = ac_obj.power * ac_obj.prop_eff * p_cr/(atm_obj.p0) * hp_to_watt
         P_req   = D*V_cruise/ac_obj.prop_eff
         if t%10 <= 0.01:
@@ -363,8 +363,10 @@ def cruiseperformance(ac_obj, atm_obj, n_boxes, W_F_TO, Range=None, V_cruise=Non
     print(f"The cruise time is {np.round(t, 2)} seconds ({np.round(t/3600, 2)} hours)")
     print(f"The fuel used during the cruise is {np.round(W_F_used)} [kilograms] ({np.round(((W_cr-W)/0.7429), 2)} [L] @ {ac_obj.fueldensity} [kg/m^3])")
     print("---------------------------------------------------")
+    print("D", D_max)
+    print('V', (aircraft.power * hp_to_watt * aircraft.eta_p)/D_max)
     return None
-# cruiseperformance(aircraft, atm)
+# cruiseperformance(aircraft, atm, 12, 65)
 
 def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
     if V_cruise == None:
@@ -459,7 +461,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     CL_all = []
     for i in range(0, 4):
         if i == 0:
-            dic_constants = {'runway slope': np.arange(0, max_runwayslope),
+            dic_constants = {'runway slope': np.arange(0, max_runwayslope, -1),
                              'airport altitude': 0, 'wing surface area': obj.Sw,
                              'weight': (aircraft.W_OE + w_fuel) * atm.g,
                              'wind speed': 0, 'propeller power': aircraft.power * hp_to_watt,
@@ -491,6 +493,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             L = CL * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             D_g = ap.mu_ground * (dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])) - L)
+            # print(L/dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])))
             a = atmos.g / dic_constants['weight'] * (-D-D_g-dic_constants['weight']*np.sin(np.radians(dic_constants['runway slope'])))
             S = - V_T**2 / (2 * a)
             if abs(CL - (CL_max+0.01)) <= 0.0001:
@@ -539,9 +542,10 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
         plt.suptitle('Landing')
         plt.show()
 
+
     return CL_land
 
-# LA_eom(aircraft, airfield, atm, 10, 3000, 12, -15.4, 70)
+LA_eom(aircraft, airfield, atm, -10, 3000, 12, -15.4, 70)
 
 # ------------------------------------------------------------------------------
 def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):

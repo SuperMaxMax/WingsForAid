@@ -301,6 +301,10 @@ class UAV:
         self.turnrate_1     = 3.0               # deg/s
         self.turnrate_2     = 6.0               # deg/s
         self.accelheight    = 300*0.3048
+        self.FP_CL_max_land = 1.9
+        self.FP_CL_max_to = 1.5
+        self.FP_CL_land = 0.9
+        self.FP_CL_to = 1.1
 
 
         "Control and stability parameters"  # NOTE: Add identifier "CS_" before variable names
