@@ -19,7 +19,7 @@ class UAV:
         self.CL_LDG = 1.5702                # [-]
         self.CL_TO = 1.2397                 # [-]
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
-        self.CL_max_clean = 1.5             # Maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.CL_max_clean = 1.5615             # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.CL_max_land = 1.9              # Maximum lift coefficient at landing [-]
         self.CLa = 4.743                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         self.c_p = 72E-9                    # Specific fuel consumption [kg/J]
@@ -125,8 +125,7 @@ class UAV:
         self.structural_thickness = 0.2     # Structural thickness fuselage [m], this is for both sides
         self.sweep_co2 = -0.02736364725188103 # Updated half chord sweep angle [rad]
         self.sweep_co4 = 0.0                 # Updated half chord sweep [rad]
-        self.Sh_S = 0.237
-        self.Sv_S = 0.111
+
   
         # T
         self.T0 = 288.15                    # Sea level temperature [K]
@@ -198,7 +197,7 @@ class UAV:
         self.AE_CD0 = 0.02578                   # Zero lift drag [-]
         self.AE_CL_LDG = 1.5702                 # Still to be updated [-]
         self.AE_CL_max_TO = 1.5                 # Still to be updated maximum lift coefficient at take-off [-]
-        self.AE_CL_max_clean = 1.5              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.AE_CL_max_clean = 1.5615              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.AE_CL_max_land = 1.9               # Still to be updated maximum lift coefficient at landing [-]
         self.AE_CL_a_w = 4.743                  # Updated Lift curve slope [1/rad] 
         self.AE_L_D = 14.1804                   # Still to be updated lift to drag ratio [-]
@@ -226,24 +225,26 @@ class UAV:
         # Horizontal tailplane
         self.AE_l_h = 4                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
-        self.AE_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+        self.AE_A_h = 5.166666                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
         self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
-        self.AE_CL_a_h = 4.1923692363710074    # Lift curve slope horizontal tailplane [1/rad] 
+        self.AE_Sh = 2.57649
+        self.AE_CL_a_h = 4.18773706267545    # Lift curve slope horizontal tailplane [1/rad] 
 
-        self.AE_taper_h = 0.6                
-        self.AE_b_h = 4                     
-        self.AE_i_w_h = 0.04       
-        self.AE_wing_twist_h = 0.04    
+
+        self.AE_taper_h = 1                
+        self.AE_b_h = 3.649                     
+        self.AE_i_w_h = -1.8957       
+        self.AE_wing_twist_h = 0.0    
         self.AE_sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
-        self.AE_sweep_co2_h = -0.04 
-        self.AE_sweep_LE_h = 0.04
-        self.AE_rootchord_h = 0.895            
-        self.AE_tipchord_h = 0.6        
-        self.AE_MAC_length_h = 0.8       
-        self.AE_y_mac_h = 1
-        self.AE_x_lemac_h = 0.2
-        self.AE_lambda_co2_h = 0
+        self.AE_sweep_co2_h = 0.0 
+        self.AE_sweep_LE_h = 0
+        self.AE_rootchord_h = 0.7061            
+        self.AE_tipchord_h = 0.7061        
+        self.AE_MAC_length_h = 0.7061       
+        self.AE_y_mac_h = 0.91225       #Constant chord, so, quarter of span is taken such that MAC is at half the halfspan
+        self.AE_x_lemac_h = 0
+        self.AE_lambda_co2_h = 0.0
         self.AE_horizontal_airfoil = '0012'      # Airfoil of horizontal tail (NACA)
 
 
