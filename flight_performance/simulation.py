@@ -23,11 +23,11 @@ def takeoffweight(obj, W_F):
     TOW = ZFW + W_F
     return TOW
 
-def atm_parameters(atm_obj, h):
-    T    = atm_obj.T0 + atm_obj.lambd * h
-    rho  = atm_obj.rho0*np.power((T/atm_obj.T0), (-((atm_obj.g / (atm_obj.lambd * atm.R))+1)))
-    p    = atm_obj.p0*np.power((T/atm_obj.T0), (-(atm_obj.g / (atm_obj.lambd * atm.R))))
-    a    = np.sqrt(atm.gamma*atm_obj.R*T)
+def atm_parameters(obj, h):
+    T    = atm.T0 + atm.lambd * h
+    rho  = atm.rho0*np.power((T/obj.T0), (-((atm.g / (atm.lambd * atm.R))+1)))
+    p    = atm.p0*np.power((T/obj.T0), (-(atm.g / (atm.lambd * atm.R))))
+    a    = np.sqrt(atm.gamma*obj.R*T)
     return p, T, rho, a
 
 def dragpolar(ac_obj, CL):
@@ -161,75 +161,92 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
 # # Thrust and lift are taken as average values
 
 
-def TO_eom(obj, ap, atmos, Plot=True):
+def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, w_fuel, Plot=True):
 
     figure, axis = plt.subplots(2, 2)
-
+    CL_all = []
+    T_max = 0
     for i in range(0, 4):
         if i == 0:
-            dic_constants = {'runway slope': np.arange(0, 10),
-                             'airport altitude': 0, 'wing surface area': 11,
-                             'weight': takeoffweight(aircraft, 200) * atm.g,
+            dic_constants = {'runway slope': np.arange(0, max_runwayslope),
+                             'airport altitude': 0, 'wing surface area': obj.Sw,
+                             'weight': takeoffweight(aircraft, w_fuel) * atm.g,
                              'wind speed': 0, 'propeller power': aircraft.power * hp_to_watt,
                              'propeller efficiency': aircraft.eta_p}
             p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
 
         if i == 1:
             dic_constants['runway slope'] = 0
-            dic_constants['wind speed'] = np.arange(0, 10)
-            print(dic_constants, rho)
+            dic_constants['wind speed'] = np.arange(0, max_headwind)
 
         if i == 2:
-            dic_constants['wind speed'] = np.arange(0, -10, -1)
+            dic_constants['wind speed'] = np.arange(0, max_tailwind, -1)
 
         if i == 3:
             dic_constants['wind speed'] = 0
-            dic_constants['airport altitude'] = np.arange(0, 500)
+            dic_constants['airport altitude'] = np.arange(0, max_hairport)
             p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
 
-        V_avg_sq = 0.55125 * (np.sqrt(dic_constants['weight']/dic_constants['wing surface area'] * 2/rho * 1/obj.CL_max_TO) -
-                              dic_constants['wind speed']) ** 2
 
-        A = - dic_constants['wing surface area'] / (np.pi * obj.A * obj.e) * V_avg_sq * rho/2 * atmos.g / dic_constants['weight']
-        B = ap.mu_ground * dic_constants['wing surface area'] * V_avg_sq * rho/2 * atmos.g / dic_constants['weight']
-        C = (dic_constants['propeller power'] * dic_constants['propeller efficiency'] / np.sqrt(V_avg_sq) - ap.mu_ground *
-             dic_constants['weight'] *np.cos(np.radians(dic_constants['runway slope'])) - obj.CD0 * rho/2 * V_avg_sq
-             * dic_constants['wing surface area'] - dic_constants['weight']*np.sin(np.radians(dic_constants['runway slope']))) \
-             * atmos.g / dic_constants['weight'] - V_avg_sq/750
+        CL_max = 1.5
+        CL = CL_max
+        S = [600]
+        while max(S) <= 750:
+            S_old = S.copy()
+            CL -= 0.01
+            V_LOF = 1.05 * np.sqrt(
+                dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max) - dic_constants[
+                        'wind speed']
+            V_avg_sq = V_LOF ** 2 / 2
+            CD = obj.CD0 + CL ** 2 / (np.pi * obj.A * obj.e)
+            D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
+            L = CL * V_avg_sq * rho / 2 * dic_constants['wing surface area']
+            T = dic_constants['propeller power'] * dic_constants['propeller efficiency'] / np.sqrt(V_avg_sq)
+            if np.max(T) > T_max:
+                T_max = np.max(T)
+            D_g = ap.mu_ground * (dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])) - L)
+            a = atmos.g / dic_constants['weight'] * (
+                        T - D - D_g - dic_constants['weight'] * np.sin(np.radians(dic_constants['runway slope'])))
+            S = V_LOF ** 2 / (2 * a)
+            if CL <= 0.25:
+                break
 
-        sqrt = B**2 - 4*A*C
-        CL_TO_1 = (-B + sqrt) / (2*A)
-        CL_TO_2 = (-B - sqrt) / (2*A)
+        S = S_old
+        CL += 0.01
+        CL_all.append(CL)
+        if len(S) == 1:
+            print('One or more of the flight conditions; runway slope, headwind, tailwind, airport altitude, '
+                  'are not achievable')
+            Plot = False
+            break
+        else:
+            CL_to = max(CL_all)
+            print(CL_to, CL_max)
+            obj.FP_CL_max_TO = CL_max
+            obj.FP_CL_TO = CL_to
+
 
         if Plot:
             if i == 0:
-                print(i)
-                axis[0, 0].plot(dic_constants['runway slope'], CL_TO_1)
-                axis[0, 0].plot(dic_constants['runway slope'], CL_TO_2)
+                axis[0, 0].plot(dic_constants['runway slope'], S)
                 axis[0, 0].set_title('runway slope vs C_L take-off')
                 axis[0, 0].set_xlabel('runway slope[deg]')
                 axis[0, 0].set_ylabel('C_L take-off [-]')
 
             elif i == 1:
-                print(i)
-                axis[1, 0].plot(dic_constants['wind speed'], CL_TO_1, color='red')
-                axis[1, 0].plot(dic_constants['wind speed'], CL_TO_2, color='red')
+                axis[1, 0].plot(dic_constants['wind speed'], S, color='red')
                 axis[1, 0].set_title('headwind vs C_L take-off')
                 axis[1, 0].set_xlabel('headwind speed [m/sec]')
                 axis[1, 0].set_ylabel('C_L take-off [-]')
 
             elif i == 2:
-                print(i)
-                axis[1, 1].plot(dic_constants['wind speed'], CL_TO_1, color='green')
-                axis[1, 1].plot(dic_constants['wind speed'], CL_TO_2, color='green')
+                axis[1, 1].plot(dic_constants['wind speed'], S, color='green')
                 axis[1, 1].set_title('tailwind vs C_L take-off')
                 axis[1, 1].set_xlabel('tailwind speed [m/sec]')
                 axis[1, 1].set_ylabel('C_L take-off [-]')
 
             else:
-                print(i)
-                axis[0, 1].plot(dic_constants['airport altitude'], CL_TO_1, color='black')
-                axis[0, 1].plot(dic_constants['airport altitude'], CL_TO_2, color='black')
+                axis[0, 1].plot(dic_constants['airport altitude'], S, color='black')
                 axis[0, 1].set_title('airport altitude vs C_L take-off')
                 axis[0, 1].set_xlabel('airport altitude [m]')
                 axis[0, 1].set_ylabel('C_L take-off [-]')
@@ -238,8 +255,14 @@ def TO_eom(obj, ap, atmos, Plot=True):
     plt.subplots_adjust(wspace=0.5)
     plt.suptitle('Take-Off')
     plt.show()
+    print("T", T_max)
+    V_P =  (dic_constants['propeller power'] * dic_constants['propeller efficiency']/T_max)** 2
+    x = np.sqrt(T_max/(0.00255*V_P*(0.85/0.6-1)))
+    print(x)
 
-    return CL_TO_1, CL_TO_2
+    return S
+
+TO_eom(aircraft, airfield, atm, 5, 3000, 12, -15.4, 65)
 
 # ------------------------------------------------------------------------
 
@@ -430,82 +453,95 @@ def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
 
 
 # -------------------------------- LANDING -----------------------------------
-def LA_eom(obj, ap, atmos, Plot=True):
+def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, w_fuel, Plot=True):
 
     figure, axis = plt.subplots(2, 2)
-
+    CL_all = []
     for i in range(0, 4):
         if i == 0:
-            dic_constants = {'runway slope': np.arange(0, 10),
-                             'airport altitude': 0, 'wing surface area': 11,
-                             'weight': aircraft.W_OE * atm.g,
+            dic_constants = {'runway slope': np.arange(0, max_runwayslope),
+                             'airport altitude': 0, 'wing surface area': obj.Sw,
+                             'weight': (aircraft.W_OE + w_fuel) * atm.g,
                              'wind speed': 0, 'propeller power': aircraft.power * hp_to_watt,
                              'propeller efficiency': aircraft.eta_p}
             p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
 
         if i == 1:
-            print('1')
             dic_constants['runway slope'] = 0
-            dic_constants['wind speed'] = np.arange(0, 10)
+            dic_constants['wind speed'] = np.arange(0, max_headwind)
 
         if i == 2:
-            print('2')
-            dic_constants['wind speed'] = np.arange(0, -10, -1)
+            dic_constants['wind speed'] = np.arange(0, max_tailwind, -1)
 
         if i == 3:
-            print('3')
             dic_constants['wind speed'] = 0
-            dic_constants['airport altitude'] = np.arange(0, 500)
+            dic_constants['airport altitude'] = np.arange(0, max_hairport)
             p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
 
-        V_avg_sq = 0.72 * (np.sqrt(dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / obj.CL_max_land) -
-                              dic_constants['wind speed']) ** 2
-        A = - dic_constants['wing surface area'] / (np.pi * obj.A * obj.e) * V_avg_sq * rho / 2 * atmos.g / dic_constants['weight']
-        B = ap.mu_ground * dic_constants['wing surface area'] * V_avg_sq * rho / 2 * atmos.g / dic_constants['weight']
-        C = (800- ap.mu_ground * dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])) - obj.CD0 * rho / 2 * V_avg_sq
-             * dic_constants['wing surface area'] - dic_constants['weight'] * np.sin(np.radians(dic_constants['runway slope']))) \
-            * atmos.g / dic_constants['weight'] + V_avg_sq / 750
+        S = [600]
+        CL = 0.8
+        CL_max = 1.9
+        while max(S) <= 750:
+            S_old = S.copy()
+            CL += 0.01
+            V_T = 1.2 * np.sqrt(
+                dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max) - dic_constants['wind speed']
+            V_avg_sq = V_T ** 2 / 2
+            CD = obj.CD0 + CL**2 / (np.pi * obj.A * obj.e)
+            D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
+            L = CL * V_avg_sq * rho / 2 * dic_constants['wing surface area']
+            D_g = ap.mu_ground * (dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])) - L)
+            a = atmos.g / dic_constants['weight'] * (-D-D_g-dic_constants['weight']*np.sin(np.radians(dic_constants['runway slope'])))
+            S = - V_T**2 / (2 * a)
+            if abs(CL - (CL_max+0.01)) <= 0.0001:
+                break
 
-        sqrt = B ** 2 - 4 * A * C
-        CL_LA_1 = (-B + sqrt) / (2 * A)
-        CL_LA_2 = (-B - sqrt) / (2 * A)
+        S = S_old
+        CL -= 0.01
+        CL_all.append(CL)
+        if len(S) == 1:
+            print('One or more of the flight conditions; runway slope, headwind, tailwind, airport altitude, '
+                  'are not achievable')
+            Plot = False
+            break
+        else:
+            CL_land = min(CL_all)
+            print(CL_all, round(CL_land, 1))
+            obj.FP_CL_max_land = CL_max
+            obj.FP_CL_land = CL_land
 
-        if Plot:
-            if i == 0:
-                axis[0, 0].plot(dic_constants['runway slope'], CL_LA_1)
-                axis[0, 0].plot(dic_constants['runway slope'], CL_LA_2)
-                axis[0, 0].set_title('runway slope vs C_L landing')
-                axis[0, 0].set_xlabel('runway slope[deg]')
-                axis[0, 0].set_ylabel('C_L landing [-]')
+        if i == 0:
+            axis[0, 0].plot(dic_constants['runway slope'], S)
+            axis[0, 0].set_title('runway slope vs runway length')
+            axis[0, 0].set_xlabel('runway slope[deg]')
+            axis[0, 0].set_ylabel('runway length [m]')
 
-            elif i == 1:
-                axis[1, 0].plot(dic_constants['wind speed'], CL_LA_1, color='red')
-                axis[1, 0].plot(dic_constants['wind speed'], CL_LA_2, color='red')
-                axis[1, 0].set_title('headwind vs C_L landing')
-                axis[1, 0].set_xlabel('headwind speed [m/sec]')
-                axis[1, 0].set_ylabel('C_L landing [-]')
+        elif i == 1:
+            axis[1, 0].plot(dic_constants['wind speed'], S, color='red')
+            axis[1, 0].set_title('headwind vs runway length')
+            axis[1, 0].set_xlabel('headwind speed [m/sec]')
+            axis[1, 0].set_ylabel('runway length [m]')
 
-            elif i == 2:
-                axis[1, 1].plot(dic_constants['wind speed'], CL_LA_1, color='green')
-                axis[1, 1].plot(dic_constants['wind speed'], CL_LA_2, color='green')
-                axis[1, 1].set_title('tailwind vs C_L landing')
-                axis[1, 1].set_xlabel('tailwind speed [m/sec]')
-                axis[1, 1].set_ylabel('C_L landing [-]')
+        elif i == 2:
+            axis[1, 1].plot(dic_constants['wind speed'], S, color='green')
+            axis[1, 1].set_title('tailwind vs runway length')
+            axis[1, 1].set_xlabel('tailwind speed [m/sec]')
+            axis[1, 1].set_ylabel('runway length [m]')
 
-            else:
-                axis[0, 1].plot(dic_constants['airport altitude'], CL_LA_1, color='black')
-                axis[0, 1].plot(dic_constants['airport altitude'], CL_LA_2, color='black')
-                axis[0, 1].set_title('airport altitude vs C_L landing')
-                axis[0, 1].set_xlabel('airport altitude [m]')
-                axis[0, 1].set_ylabel('C_L landing [-]')
+        else:
+            axis[0, 1].plot(dic_constants['airport altitude'], S, color='black')
+            axis[0, 1].set_title('airport altitude vs C_L landing')
+            axis[0, 1].set_xlabel('airport altitude [m]')
+            axis[0, 1].set_ylabel('C_L landing [-]')
+    if Plot:
+        plt.subplots_adjust(hspace=0.6)
+        plt.subplots_adjust(wspace=0.5)
+        plt.suptitle('Landing')
+        plt.show()
 
-    plt.subplots_adjust(hspace=0.6)
-    plt.subplots_adjust(wspace=0.5)
-    plt.suptitle('Landing')
-    plt.show()
+    return CL_land
 
-    return CL_LA_1, CL_LA_2
-
+# LA_eom(aircraft, airfield, atm, 10, 3000, 12, -15.4, 70)
 
 # ------------------------------------------------------------------------------
 def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
@@ -517,11 +553,6 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
     h = h_descend
     h_sc = 15.24  # m
     P_br_d = obj.power * P_descend * hp_to_watt
-
-    # beginning of descend before approach: (same as climb but gamma is negative)
-    # P
-    # RC = (P_a - P_r) / W  # where P_a is less than P_r in descending
-
 
     # approach:
 
@@ -588,11 +619,11 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
     plt.show()
 
 
-# descend(aircraft, atm, 90, (aircraft.W_OE+100)*atm.g, 95, 500, 0.6)
+# descend(aircraft, atm, 90, (aircraft.W_OE+60)*atm.g, 95, 500, 0.6)
 
 def cruiseheight(distance, desired_alt):
     if 0.0 <= distance <= 10000.0:
-        h_cruise = 1000 * 0.3048                                                             
+        h_cruise = 1000 * 0.3048
     elif 10000.0 <= distance <= 50000.0:
         h_cruise = 1000 + (distance - 10000.0) * 0.1
     elif 50000.0 <= distance <= 100000.0:
@@ -645,10 +676,10 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
             CD  = dragpolar(ac_obj, CL)
             V   = V_cruise
         x += V * dt
-        Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD 
+        Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
         Pbr = Pr/ac_obj.prop_eff
         FF  = Pbr * ac_obj.SFC
-        W_F_used += FF * dt 
+        W_F_used += FF * dt
         W -= FF * dt
         t += dt
     return t, W_F_used
@@ -673,7 +704,7 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
 #     plt.show()
 
 # cruiseperf_varying(aircraft, atm)
-    
+
 
 def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
@@ -805,10 +836,10 @@ loiter(aircraft, atm, 7500, 350, 700, 1, "circle", goback=False, result=True)
 
 
 
-            
 
-        
-    
+
+
+
 
 
 def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Summary = False, plot = False):
@@ -831,7 +862,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     h_array = np.append(h_array, h)                                             #
     t_array = np.append(t_array, t)                                             #
     W_F_used_array = np.append(W_F_used_array, W_F_used)                        #
-    # =========================================================================== 
+    # ===========================================================================
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD = dragpolar(ac_obj, CL)
     LD_max = CL / CD
@@ -1005,7 +1036,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     x_plot = x
     print(f"W_F_used after dropping all boxes: {W_F_used} [kg]")
     # Return to base
-    x_return = 0.0 
+    x_return = 0.0
     cruise_alt_RTB = cruiseheight(Range, h_cruise)
     t_cl_RTB, x_cl_RTB, W_F_used_cl_RTB, h = climbmaneuver(ac_obj, atm_obj, h, cruise_alt_RTB, W)
     t += t_cl_RTB
