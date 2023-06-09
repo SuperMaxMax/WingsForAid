@@ -81,7 +81,7 @@ class UAV:
         self.lambda_co4 = 0.0               # Quarter chord sweep angle [rad]
         self.lin_par1 = 0.5249              # [-]
         self.lin_par2 = 42.049              # [-]
-        self.l_h = 4                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.l_h = 4.15                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
 
         # M
         self.MAC_length = 1.2477198640078417            # Mean aerodynamic chord [m]
@@ -233,7 +233,7 @@ class UAV:
         self.AE_A_h = 5.166666                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
         self.AE_Sh_S = 0.174                   # [-] Ratio between horizontal tailplane surface area and surface area win
-        self.AE_Sh = 2.57649
+        self.AE_Sh = 2.0377662
         self.AE_CL_a_h = 4.18773706267545    # Lift curve slope horizontal tailplane [1/rad] 
 
 
@@ -244,8 +244,8 @@ class UAV:
         self.AE_sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
         self.AE_sweep_co2_h = 0.0 
         self.AE_sweep_LE_h = 0
-        self.AE_rootchord_h = 0.7061            
-        self.AE_tipchord_h = 0.7061        
+        self.AE_rootchord_h = 0.931167            
+        self.AE_tipchord_h = 0.931167       
         self.AE_MAC_length_h = 0.7061       
         self.AE_y_mac_h = 0.91225       #Constant chord, so, quarter of span is taken such that MAC is at half the halfspan
         self.AE_x_lemac_h = 0
