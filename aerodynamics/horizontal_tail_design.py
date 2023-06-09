@@ -106,7 +106,7 @@ def horizontal_tail_planform(aircraft):
         variable = "Lambda"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
-            variable_list2 = [0.6]
+            variable_list2 = [0.7]
         elif variable == "AR":  
             variable_list2 = [5.1666666]
         elif variable == "Twist":
@@ -135,7 +135,7 @@ def horizontal_tail_planform(aircraft):
             if variable == "Lambda":
                 Lambda = parameter
             else:
-                Lambda = 0.8
+                Lambda = 1
             if variable == "Twist":
                 alpha_twist = parameter
             else:
@@ -197,6 +197,7 @@ def horizontal_tail_planform(aircraft):
             tau = 1/span_eff - 1
             
             CL_a_h = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
+            print("CLAH", CL_a_h)
 
 
             print('=====================================================================')
@@ -254,8 +255,8 @@ def horizontal_tail_planform(aircraft):
     aircraft.i_w_h = i_h       
     aircraft.wing_twist_h = alpha_twist    
     aircraft.sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
-    aircraft.sweep_co2_h = 1 / np.tan(np.tan(aircraft.sweep_co4_h) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
-    aircraft.sweep_LE_h = 1 / np.tan(np.tan(aircraft.sweep_co4_h) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
+    aircraft.sweep_co2_h = np.arctan(np.tan(aircraft.sweep_co4_h) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.sweep_LE_h = np.arctan(np.tan(aircraft.sweep_co4_h) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
     aircraft.taper_h = Lambda                
     aircraft.rootchord_h = 2 * aircraft.S_h / (aircraft.b_h * (1+Lambda))            
     aircraft.tipchord_h = aircraft.rootchord_h*Lambda        

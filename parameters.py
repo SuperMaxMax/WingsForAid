@@ -24,6 +24,7 @@ class UAV:
         self.CL_max_clean = 1.5             # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.CL_max_land = 1.9                # Maximum lift coefficient at landing [-]
         self.CLa = 4.2                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
+        self.CL_max_clean = 1.5615             # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.CL_max_land = 1.9              # Maximum lift coefficient at landing [-]
         self.CLa = 4.743                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         self.c_p = 72E-9                    # Specific fuel consumption [kg/J]
@@ -129,9 +130,8 @@ class UAV:
         self.structural_thickness = 0.2     # Structural thickness fuselage [m], this is for both sides
         self.sweep_co2 = -0.02736364725188103 # Updated half chord sweep angle [rad]
         self.sweep_co4 = 0.0                 # Updated half chord sweep [rad]
-        self.Sh_S = 0.237
-        self.Sv_S = 0.111
 
+  
         # T
         self.T0 = 288.15                    # Sea level temperature [K]
         self.TOP_req = 250 
@@ -202,7 +202,7 @@ class UAV:
         self.AE_CD0 = 0.02578                   # Zero lift drag [-]
         self.AE_CL_LDG = 1.5702                 # Still to be updated [-]
         self.AE_CL_max_TO = 1.5                 # Still to be updated maximum lift coefficient at take-off [-]
-        self.AE_CL_max_clean = 1.5              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.AE_CL_max_clean = 1.5615              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.AE_CL_max_land = 1.9               # Still to be updated maximum lift coefficient at landing [-]
         self.AE_CL_a_w = 4.743                  # Updated Lift curve slope [1/rad]
         self.AE_L_D = 14.1804                   # Still to be updated lift to drag ratio [-]
@@ -230,32 +230,36 @@ class UAV:
         # Horizontal tailplane
         self.AE_l_h = 4                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
-        self.AE_A_h = 4                        # Aspect ratio horizontal tail. NOTE: This is a guestimate
+        self.AE_A_h = 5.166666                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
         self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
-        self.AE_CL_a_h = 4.1923692363710074    # Lift curve slope horizontal tailplane [1/rad]
+        self.AE_Sh = 2.57649
+        self.AE_CL_a_h = 4.18773706267545    # Lift curve slope horizontal tailplane [1/rad] 
 
-        self.AE_taper_h = 0.6
-        self.AE_b_h = 4
-        self.AE_i_w_h = 0.04
-        self.AE_wing_twist_h = 0.04
+
+        self.AE_taper_h = 1                
+        self.AE_b_h = 3.649                     
+        self.AE_i_w_h = -1.8957       
+        self.AE_wing_twist_h = 0.0    
         self.AE_sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
-        self.AE_sweep_co2_h = -0.04
-        self.AE_sweep_LE_h = 0.04
-        self.AE_rootchord_h = 0.895
-        self.AE_tipchord_h = 0.6
-        self.AE_MAC_length_h = 0.8
-        self.AE_y_mac_h = 1
-        self.AE_x_lemac_h = 0.2
-        self.AE_lambda_co2_h = 0
+        self.AE_sweep_co2_h = 0.0 
+        self.AE_sweep_LE_h = 0
+        self.AE_rootchord_h = 0.7061            
+        self.AE_tipchord_h = 0.7061        
+        self.AE_MAC_length_h = 0.7061       
+        self.AE_y_mac_h = 0.91225       #Constant chord, so, quarter of span is taken such that MAC is at half the halfspan
+        self.AE_x_lemac_h = 0
+        self.AE_lambda_co2_h = 0.0
         self.AE_horizontal_airfoil = '0012'      # Airfoil of horizontal tail (NACA)
 
 
         # Vertical tailplane
         self.AE_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
-        self.AE_A_v = None                     # [-] Aspect ratio vertical tail
+        self.AE_A_v = 2                     # [-] Aspect ratio vertical tail
         self.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane
         self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
+        self.AE_Sv = 1.2824
+        self.AE_b_v = 1.6015
         self.AE_vertical_airfoil = '0009'      # Airfoil of vertical tail (NACA)
 
         "-NACA4415"
@@ -391,6 +395,7 @@ class UAV:
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
         self.ST_W_fus = 40.3381 #kg mass of fuselage structure (only)
         self.ST_W_tb = 8.746397065450095 #kg mass of tail boom, given it is 2.8 m long
+        self.ST_W_lg = 7.1 #kg mass of landing gear struts
         self.ST_z_ground = 0.5 #m floor height
         self.ST_z_prop = 0.3 #m propeller clearance
         self.ST_z_cg_ground =  0.92 #m estiamted center of gravity of boxes, fuselage, engine, boom, wing, fuel

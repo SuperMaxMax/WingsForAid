@@ -80,7 +80,7 @@ def Aerodynamic_centre_determination(aircraft):
 
 def C_m_alpha_calculation(aircraft, x_cg):
     aircraft.C_N_h_alpha = 2 * np.pi * aircraft.AE_A_h/(aircraft.AE_A_h + 2)
-    aircraft.C_m_alpha = aircraft.CLa_w_cruise * (x_cg - aircraft.CS_x_ac_w) - aircraft.C_N_h_alpha * (1 - aircraft.AE_dEpsilondA) * (aircraft.AE_Vh_V)**2 * aircraft.AE_Sh_S * aircraft.AE_l_h/aircraft.MAC_length
+    aircraft.C_m_alpha = aircraft.CLa_w_cruise * (x_cg - aircraft.CS_x_ac_w) - aircraft.C_N_h_alpha * (1 - aircraft.AE_dEpsilondA) * (aircraft.AE_Vh_V)**2 * aircraft.Sh_s * aircraft.AE_l_h/aircraft.MAC_length
 
 #################################################################################################################
 "FIXME: Determine Control Surface Coefficients"
@@ -239,9 +239,9 @@ def plot_scissor_plot(aircraft, plot):
     MinStabSh_s = StabilitySh_S_margin[AbsXcgStab.argmin()+1]  # Sh/S for most aft cg of control line, +1 to account for step inaccuracy
 
     if MinControlSh_s > MinStabSh_s:
-        aircraft.AE_Sh_S = MinControlSh_s
+        aircraft.Sh_s = MinControlSh_s
     else:
-        aircraft.AE_Sh_S = MinStabSh_s
+        aircraft.Sh_s = MinStabSh_s
 
     fig1, ax1 = plt.subplots(figsize=(14, 7))
     # Stability lines
@@ -253,7 +253,7 @@ def plot_scissor_plot(aircraft, plot):
     ax1.plot(xcgRange, ControlSh_s, label = 'Controllability Curve', color = 'blue',
          path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
     # CG range
-    ax1.plot([aircraft.X_cg_fwd, aircraft.X_cg_aft], [aircraft.AE_Sh_S, aircraft.AE_Sh_S], '-o', markersize=4, label='CG range loading diagram', color = 'orange')
+    ax1.plot([aircraft.X_cg_fwd, aircraft.X_cg_aft], [aircraft.Sh_s, aircraft.Sh_s], '-o', markersize=4, label='CG range loading diagram', color = 'orange')
 
     ax1.spines['bottom'].set_position('zero')
     ax1.set_ylim(bottom = 0., top=0.4)
