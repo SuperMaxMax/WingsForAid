@@ -479,7 +479,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
 
         S = [600]
         CL = 0.8
-        CL_max = 2
+        CL_max = 1.9
         while max(S) <= 750:
             S_old = S.copy()
             CL += 0.01
@@ -497,7 +497,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
                 break
 
         S = S_old
-        CL -= 0.1
+        CL -= 0.01
         CL_all.append(CL)
         if len(S) == 1:
             print('One or more of the flight conditions; runway slope, headwind, tailwind, airport altitude, '
