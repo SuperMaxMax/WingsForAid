@@ -46,7 +46,7 @@ def nacelle_influence(aircraft, CLa_Ah):
     Equation from SEAD Lecture 7, slide 38"""
     #dx_ac_n = (-4) * (aircraft.w_out ** 2 * (aircraft.X_LEMAC + 0.25 * aircraft.MAC_length)) / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)   
     l_p = aircraft.X_LEMAC + 0.25 * aircraft.MAC_length
-    dx_ac_n = -0.05 * aircraft.CS_n_blades * aircraft.CS_D_prop**2 * l_p / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)
+    dx_ac_n = -0.05 * aircraft.CS_n_blades * (aircraft.prop_radius * 2)**2 * l_p / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)
     return dx_ac_n
 
 
