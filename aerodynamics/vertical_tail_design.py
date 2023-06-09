@@ -58,7 +58,7 @@ vertical_wing_design(object)
 #All vertical tail volume things known so only influence planform sizing
 
 #Function that determines required lift based on counter torque
-def required_lift(aircraft, b):
+def required_lift(aircraft):
     V_c = aircraft.V_cruise
     rho_c = aircraft.rho_cruise
     W_TO = aircraft.W_TO * 9.80665
@@ -70,7 +70,8 @@ def required_lift(aircraft, b):
 
     M = power / omega
 
-    ver_dist = 0.3 + b/2 #Change to object variable, distance between centre of pressure vertical tail and vertical cg location
+    cg_vt_d = 1.16 - aircraft.ST_z_cg_ground
+    ver_dist = cg_vt_d  + aircraft.AE_b_v / 2 #Change to object variable, distance between centre of pressure vertical tail and vertical cg location
 
     L_h = M / ver_dist
 
@@ -136,11 +137,11 @@ def horizontal_tail_planform(aircraft):
         if variable == "Lambda":    
             variable_list2 = [0.6]
         elif variable == "AR":  
-            variable_list2 = [2.5]
+            variable_list2 = [2]
         elif variable == "Twist":
             variable_list2 = [0]
         
-        airfoildata_temp = airfoil_select(required_lift(aircraft, 1.9)[0], 0)
+        airfoildata_temp = airfoil_select(required_lift(aircraft)[0], 0)
         a_stall = airfoildata_temp['alpha_s'].tolist()[0] * np.pi /180
         
         for parameter in variable_list2:
@@ -163,7 +164,7 @@ def horizontal_tail_planform(aircraft):
             if variable == "Lambda":
                 Lambda = parameter
             else:
-                Lambda = 1
+                Lambda = 0.4 
             if variable == "Twist":
                 alpha_twist = parameter
             else:
@@ -171,9 +172,9 @@ def horizontal_tail_planform(aircraft):
 
             b = (AR * S)**0.5
             print(b, "b")
-            airfoildata = airfoil_select(required_lift(aircraft, b)[0], change)
+            airfoildata = airfoil_select(required_lift(aircraft)[0], change)
             
-            C_L_h = required_lift(aircraft, b)[0]
+            C_L_h = required_lift(aircraft)[0]
             #i_w = i_w[0]
             a_2d = airfoildata['C_l_alpha'].tolist()[0]         #AIRFOIL PARAMETER                                  
             alpha_0 = airfoildata['alpha_0'].tolist()[0]        #AIRFOIL PARAMETER
@@ -265,9 +266,9 @@ def horizontal_tail_planform(aircraft):
         elif full_print:
             return AR, b, Lambda, alpha_twist, S, CL_a_h  #choose whatever
 
-    airfoildata = airfoil_select(required_lift(aircraft, 1.9)[0], 0)
+    airfoildata = airfoil_select(required_lift(aircraft)[0], 0)
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
-    initial_guess = required_lift(aircraft, 1.9)[0]/C_l_alpha
+    initial_guess = required_lift(aircraft)[0]/C_l_alpha
 
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     #print('pppppppp', a_h_optimal,type(a_h_optimal))

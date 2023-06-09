@@ -255,9 +255,11 @@ class UAV:
 
         # Vertical tailplane
         self.AE_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
-        self.AE_A_v = None                     # [-] Aspect ratio vertical tail
+        self.AE_A_v = 2                     # [-] Aspect ratio vertical tail
         self.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane
         self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
+        self.AE_Sv = 1.2824
+        self.AE_b_v = 1.6015
         self.AE_vertical_airfoil = '0009'      # Airfoil of vertical tail (NACA)
 
         "-NACA4415"
