@@ -73,7 +73,7 @@ class UAV:
         self.l_fus_main_cone = 2.9          # Fuselage main cilindrical part length [m]
         self.l_fus_tail_cone = 0.8          # Fuselage tail cone length [m]
         self.l_f = 4.3                      # Fuselage length [m]
-        self.l_f_boom = 2.2                   # Boom length [m]
+        self.l_f_boom = 2.5                   # Boom length [m]
         self.l_n = 0.9342                  # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
@@ -320,7 +320,7 @@ class UAV:
         self.CS_x_ac_w = 0.24              # location of wing ac, divided by MAC [-] - SEAD L7, S34
         self.CS_Cm_0_airfoil = -0.083       # TODO: Update value - Moment coefficient of airfoil [-]
         self.CS_n_blades = 3                   # [-] number of propeller blades NOTE: Depends on chosen propeller
-        self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
+        # self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
         # inputs
         self.OP_fuel_energy_density = 44.65E6 # [J/kg]
