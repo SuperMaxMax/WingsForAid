@@ -47,7 +47,7 @@ def longitudinal_position_landing_gear(aircraft, x_point, y_point):
     weight_front_max = 0.15
     weight_front_min = 0.08
 
-    symmetry_point = ax.scatter([x_point], [-y_point], color='orange', marker='^')
+    symmetry_point = ax.scatter([x_point], [-y_point], s = 100, color='green', marker='x')
 
     def calc_x_front_max_and_min(x_cg_position):
         length_b_m = x_point - x_cg_position
@@ -92,12 +92,12 @@ def lateral_position_landing_gear(aircraft):
     c = (aircraft.x_cg_position_aft - aircraft.position_landing_fwd[0]) * np.sin(angle_alpha)
     angle_psi = 55 * (np.pi / 180)  # rad
     Z_position_cg = np.tan(angle_psi) * c
-    parameter_text.set_text(f'Max Z_position_c.g.: {Z_position_cg:.2f} [m]')
+    parameter_text.set_text(f'Max Z - position C.G.: {Z_position_cg:.2f} [m]')
 
     
     # Pitch Angle limit NOTE: 15 degrees can change for our aircraft. 
-    angle_theta_max = np.arctan(aircraft.h_out/(aircraft.l_f+aircraft.l_f_boom-aircraft.X_cg_aft))
-    # print(angle_theta_max)
+    angle_theta_max = np.arctan(aircraft.h_out/(aircraft.l_f+aircraft.l_f_boom-aircraft.position_landing_back[0]))
+    # print('HHHHHHH',angle_theta_max * 180 / np.pi)
     # angle_theta_max = 15 * (np.pi/180) 
     x_cg_aft_limit = aircraft.x_cg_position_aft + aircraft.ST_z_cg_ground * np.tan(angle_theta_max)
     line_3 = ax.plot([x_cg_aft_limit, x_cg_aft_limit], [-1, 1], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
@@ -140,9 +140,6 @@ def lateral_position_landing_gear(aircraft):
     return line_3, line_4, line_5
 
 ##########################################################################################################
-
-
-
 def on_click(event):
     """Clicking of position of forward and backward undercarriage"""
     global left_click_point
@@ -152,7 +149,7 @@ def on_click(event):
         if event.button == 1:  # Left-click
             if left_click_point is None:
                 # Add a new left-click point
-                left_click_point = ax.scatter([event.xdata], [event.ydata], color='orange', marker='^')
+                left_click_point = ax.scatter([event.xdata], [event.ydata], s = 100, color='green', marker='x')
                 
             else:
                 # Update the position of the left-click point
@@ -164,7 +161,7 @@ def on_click(event):
         elif event.button == 3:  # Right-click
             if right_click_point is None:
                 # Add a new right-click point
-                right_click_point = ax.scatter([event.xdata], [0], color='orange', marker='^')
+                right_click_point = ax.scatter([event.xdata], [0], s = 50, color='green', marker='^')
                 
             else:
                 # Update the position of the right-click point
@@ -180,66 +177,76 @@ def on_click(event):
 def on_key(event):
     if event.key == 'enter':
         # Print the values
-        print(f"\nNosewheel position:\nY-position: {round(aircraft.position_landing_fwd[0],3)} [m]")
-        print(f"\nMain landing gear position:\nY-position: {round(aircraft.position_landing_back[0],3)} [m],\
-        X-position:{round(aircraft.position_landing_back[1],3)} [m]")
-        print(f"\nCG position Z-axis: {Z_position_cg}")       
+        print(f"\nNosewheel position:\nX-position: {round(aircraft.position_landing_fwd[0],3)} [m]")
+        print(f"\nMain landing gear position:\nX-position: {round(aircraft.position_landing_back[0],3)} [m],\
+        Y-position:{round(aircraft.position_landing_back[1],3)} [m]")
+        print(f"\nMax CG position Z-axis: {round(Z_position_cg,3)}")       
 
 ##########################################################################################################
 """Plotting"""
 # Enable interactive mode
-
-
 plt.ion()
 
 # Create a figure and an axis
 fig, ax = plt.subplots(figsize=(8, 8))
 
 # Create a scatter plot with a single point
-point = ax.scatter([0], [0])
+# point = ax.scatter([0], [0])
 
 # Connect the 'button_press_event' to the 'on_click' function
 cid = fig.canvas.mpl_connect('button_press_event', on_click)
 cid = fig.canvas.mpl_connect('key_press_event', on_key)
 
-# Set the plot limits
-x_cg_point = ax.scatter([aircraft.x_cg_position_fwd], [0], color='black', label='1: c.g. fwd')
-x_cg_point = ax.scatter([aircraft.x_cg_position_aft], [0], color='black', label='2: c.g. aft')
 
-# Plotting fuselage
-ax.plot([0.4, 3+aircraft.x_cg_position_fwd], [aircraft.w_out/2, aircraft.w_out/2], color='0.25', linewidth=0.8)
-ax.plot([0.4, 3+aircraft.x_cg_position_fwd], [-aircraft.w_out/2, -aircraft.w_out/2], color='0.25', linewidth=0.8)
+# -- Plotting fuselage --
+# Fuselage wall
+ax.plot([0.4, aircraft.l_f-aircraft.l_fus_tail_cone], [aircraft.w_out/2, aircraft.w_out/2], color='0.25', linewidth=0.8)
+ax.plot([0.4, aircraft.l_f-aircraft.l_fus_tail_cone], [-aircraft.w_out/2, -aircraft.w_out/2], color='0.25', linewidth=0.8)
 
+# Fuselage nose
 ax.plot([0, 0.1], [0, aircraft.w_out/4], color='0.25', linewidth=0.8)
 ax.plot([0, 0.1], [0, -aircraft.w_out/4], color='0.25', linewidth=0.8)
 
 ax.plot([0.4, 0.1], [aircraft.w_out/2, aircraft.w_out/4], color='0.25', linewidth=0.8)
 ax.plot([0.4, 0.1], [-aircraft.w_out/2, -aircraft.w_out/4], color='0.25', linewidth=0.8)
 
-ax.set_xlim(-0.3, aircraft.l_f-1)
+# Fuselage tailcone
+ax.plot([aircraft.l_f-aircraft.l_fus_tail_cone, aircraft.l_f], [aircraft.w_out/2, 0], color='0.25', linewidth=0.8)
+ax.plot([aircraft.l_f-aircraft.l_fus_tail_cone, aircraft.l_f], [-aircraft.w_out/2, 0], color='0.25', linewidth=0.8)
+
+# Boom
+ax.plot([aircraft.l_f - 0.35, aircraft.l_f + aircraft.l_f_boom], [0.1, 0.1], color='0.25', linewidth=0.8)
+ax.plot([aircraft.l_f - 0.35, aircraft.l_f + aircraft.l_f_boom], [-0.1, -0.1], color='0.25', linewidth=0.8)
+
+ax.set_xlim(-0.3, aircraft.l_f+1)
 ax.set_ylim(-1, aircraft.b/2+1)
-ax.axhline(0, color='blue', linestyle='dotted')
+ax.axhline(0, color='blue', linestyle='dashdot', linewidth = 1)
 
 # Plotting z-cg. max location in top right corner
-parameter_text = ax.text(0.95, 0.95, f'Max Z_position c.g.: {Z_position_cg:.2f} [m]',
+parameter_text = ax.text(0.45, 0.98, f'Max Z - position C.G.: {Z_position_cg:.2f} [m]',
                         transform=ax.transAxes, ha='right', va='top')
 
-plt.text(aircraft.x_cg_position_aft+0.03, 0.2, 2, fontsize=8, va='center')
-plt.text(aircraft.x_cg_position_fwd+0.03, 0.2, 1, fontsize=8, va='center')
+plt.text(aircraft.x_cg_position_fwd - 0.07, -0.17, r'$x_{cg, fwd}$', fontsize=8, va='center', ha = 'left')
+plt.text(aircraft.x_cg_position_aft + 0.05, -0.17, r'$x_{cg, aft}$', fontsize=8, va='center', ha = 'left')
 
 # Plot Wing Position and planform
-ax.plot([aircraft.X_LEMAC, aircraft.X_LEMAC+aircraft.MAC_length], [aircraft.y_mac, aircraft.y_mac],color='0.25', linewidth=0.8)
+ax.plot([aircraft.X_LEMAC, aircraft.X_LEMAC+aircraft.MAC_length], [aircraft.y_mac + aircraft.w_out/2, aircraft.y_mac + aircraft.w_out/2],color='0.25', linewidth=0.8)
 
-ax.plot([aircraft.X_LEMAC - aircraft.x_lemac, aircraft.X_LEMAC - aircraft.x_lemac+aircraft.rootchord], [0, 0], color='0.25', linewidth=0.8)
+ax.plot([aircraft.X_LEMAC - aircraft.x_lemac, aircraft.X_LEMAC - aircraft.x_lemac+aircraft.rootchord], [aircraft.w_out/2, aircraft.w_out/2], color='0.25', linewidth=0.8)
 
 x_root_quart = aircraft.X_LEMAC-aircraft.x_lemac + 1/4*aircraft.rootchord
-ax.plot([x_root_quart-1/4*aircraft.tipchord, x_root_quart+3/4*aircraft.tipchord], [aircraft.b/2, aircraft.b/2], color='0.25', linewidth=0.8)
-ax.plot([aircraft.X_LEMAC-aircraft.x_lemac, x_root_quart-1/4*aircraft.tipchord], [0, aircraft.b/2], color='0.25', linewidth=0.8)
-ax.plot([aircraft.X_LEMAC-aircraft.x_lemac+aircraft.rootchord, x_root_quart+3/4*aircraft.tipchord], [0, aircraft.b/2], color='0.25', linewidth=0.8)
+ax.plot([x_root_quart-1/4*aircraft.tipchord, x_root_quart+3/4*aircraft.tipchord], [aircraft.b/2 + aircraft.w_out/2, aircraft.b/2 + aircraft.w_out/2], color='0.25', linewidth=0.8)
+ax.plot([aircraft.X_LEMAC-aircraft.x_lemac, x_root_quart-1/4*aircraft.tipchord], [aircraft.w_out/2, aircraft.b/2 + aircraft.w_out/2], color='0.25', linewidth=0.8)
+ax.plot([aircraft.X_LEMAC-aircraft.x_lemac+aircraft.rootchord, x_root_quart+3/4*aircraft.tipchord], [aircraft.w_out/2, aircraft.b/2 + aircraft.w_out/2], color='0.25', linewidth=0.8)
+
+# Plotting CG
+ax.plot([aircraft.x_cg_position_fwd, aircraft.x_cg_position_aft], [0, 0], \
+        color = 'black', linewidth = 2, marker = '|', markersize = 14, label = 'C.G. Range')
+ 
 ax.set_aspect('equal')
 
-plt.grid()
-plt.legend(loc="upper left")
+# plt.grid()
+plt.legend(loc="upper right")
 plt.xlabel("X-position [m]")
 plt.ylabel("Y-position [m]")
 
