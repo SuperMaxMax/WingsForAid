@@ -295,7 +295,7 @@ class UAV:
         self.screenheight   = 50*0.3048         # screen height of 50 ft (CS23)
         self.rpm_maxcont    = 5500              # rpm
         self.omega_prop     = 237               # rad/s, based on 5500 rpm max continuous power and 2.43 gearbox ratio
-        self.prop_radius    = 0.8255            # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
+        self.prop_radius    = 0.7237         # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
         self.ceiling        = 18000*0.3048      # [m] 18000 ft service ceiling
         self.th_ceil        = 30000*0.3048
         self.SFC            = 1.2*7.77777778e-8 # kg/J specific fuel consumption
@@ -305,9 +305,9 @@ class UAV:
         self.turnrate_1     = 3.0               # deg/s
         self.turnrate_2     = 6.0               # deg/s
         self.accelheight    = 300*0.3048
-        self.FP_CL_max_land = 1.9
+        self.FP_CL_max_land = 2
         self.FP_CL_max_to = 1.5
-        self.FP_CL_land = 0.9
+        self.FP_CL_land = 0.83
         self.FP_CL_to = 1.1
 
 
@@ -404,7 +404,8 @@ class UAV:
 class airport:
     def __init__(self, name):
         self.name       = name
-        self.mu_ground  = 0.4                  #buildingspeed.org
+        self.mu_ground = 0.08
+        self.mu_ground_break  = 0.2                  #buildingspeed.org
         self.rwyslope   = 1.0                   #runway slope in degrees --> CONVERT TO RADIANS
 
 class atmosphere:
