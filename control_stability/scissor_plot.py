@@ -155,43 +155,85 @@ def stability_curve(aircraft, xcgRange):
 ##################################################################################################################
 
 def plot_scissor_plot(aircraft):
-    xcgRange                    = np.arange(-0.1005, 1.005, 0.005)
-    ControlSh_s = controlability_curve(aircraft, xcgRange)
-    StabilitySh_S, StabilitySh_S_margin, = stability_curve(aircraft, xcgRange)
+    normal = 1
+    if normal == 0:
+        xcgRange                    = np.arange(-0.1005, 1.005, 0.005)
+        ControlSh_s = controlability_curve(aircraft, xcgRange)
+        StabilitySh_S, StabilitySh_S_margin, = stability_curve(aircraft, xcgRange)
 
-    fig1, ax1 = plt.subplots(figsize=(15, 8))
-    ax1.plot(xcgRange, StabilitySh_S_margin, color = 'black',
-         path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
-    ax1.plot(xcgRange, StabilitySh_S, color = 'red',
-         path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
+        fig1, ax1 = plt.subplots(figsize=(15, 8))
+        ax1.plot(xcgRange, StabilitySh_S_margin, color = 'black',
+            path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
+        ax1.plot(xcgRange, StabilitySh_S, color = 'red',
+            path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
 
-    ax1.plot(xcgRange, ControlSh_s, color = 'blue',
-         path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
+        ax1.plot(xcgRange, ControlSh_s, color = 'blue',
+            path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
 
-    Sh_S_cont = controlability_curve(aircraft, aircraft.X_cg_fwd)
-    Sh_S_stab = stability_curve(aircraft, aircraft.X_cg_aft)[1]
+        Sh_S_cont = controlability_curve(aircraft, aircraft.X_cg_fwd)
+        Sh_S_stab = stability_curve(aircraft, aircraft.X_cg_aft)[1]
 
-    if Sh_S_cont > Sh_S_stab:
-        aircraft.AE_Sh_S = Sh_S_cont
+        if Sh_S_cont > Sh_S_stab:
+            aircraft.AE_Sh_S = Sh_S_cont
+        else:
+            aircraft.AE_Sh_S = Sh_S_stab
+
+        x_cg_limit = [aircraft.X_cg_fwd, aircraft.X_cg_aft]
+        S_h_S_array = [aircraft.AE_Sh_S, aircraft.Sh_S]
+
+        ax1.plot(x_cg_limit, S_h_S_array, color = 'orange')
+
+        plt.xlim([0, 1])
+        plt.ylim([0, 0.6])
+
+        plt.xlabel("x/c [-]")
+        plt.ylabel("S_h/S [-]")
+
+        ax1.grid()
     else:
-        aircraft.AE_Sh_S = Sh_S_stab
+        from Class_II_cg_estimation_plotting import iteration
+        X_max_range, X_min_range, wing_pos_array = iteration(aircraft)
+        xcgRange = np.arange(-0.1005, 1.005, 0.005)
+        ControlSh_s = controlability_curve(aircraft, xcgRange)
+        StabilitySh_S, StabilitySh_S_margin, = stability_curve(aircraft, xcgRange)
 
-    x_cg_limit = [aircraft.X_cg_fwd, aircraft.X_cg_aft]
-    S_h_S_array = [aircraft.AE_Sh_S, aircraft.Sh_S]
+        fig1, ax1 = plt.subplots(figsize=(15, 8))
+        ax2 = ax1.twinx()
+        ax1.plot(xcgRange, StabilitySh_S_margin, color = 'black',
+            path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
+        ax1.plot(xcgRange, StabilitySh_S, color = 'red',
+            path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
 
-    ax1.plot(x_cg_limit, S_h_S_array, color = 'orange')
+        ax1.plot(xcgRange, ControlSh_s, color = 'blue',
+            path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
 
-    plt.xlim([0, 1])
-    plt.ylim([0, 0.6])
+        Sh_S_cont = controlability_curve(aircraft, aircraft.X_cg_fwd)
+        Sh_S_stab = stability_curve(aircraft, aircraft.X_cg_aft)[1]
 
-    plt.xlabel("x/c [-]")
-    plt.ylabel("S_h/S [-]")
+        if Sh_S_cont > Sh_S_stab:
+            aircraft.AE_Sh_S = Sh_S_cont
+        else:
+            aircraft.AE_Sh_S = Sh_S_stab
 
-    ax1.grid()
+        x_cg_limit = [aircraft.X_cg_fwd, aircraft.X_cg_aft]
+        S_h_S_array = [aircraft.AE_Sh_S, aircraft.Sh_S]
 
-    # fig1.savefig("scissorplot")
+        ax1.plot(x_cg_limit, S_h_S_array, color = 'orange')
+        
+        ax2.plot(X_min_array, wing_pos_array, 'b-', label='Line 1')
+        ax2.plot(X_max_array, wing_pos_array, 'b-', label='Line 1')
 
-    plt.show()
+        plt.xlim([0, 1])
+        plt.ylim([0, 0.6])
+
+        ax1.xlabel("x/c [-]")
+        ax1.ylabel("S_h/S [-]")
+        ax2.ylabel("Test")
+
+        ax1.grid()
+        # fig1.savefig("scissorplot")
+        print("test")
+        plt.show()
     
 
 def run(aircraft):
@@ -199,3 +241,21 @@ def run(aircraft):
     plot_scissor_plot(aircraft)
 
 run(aircraft)
+
+# fig, ax1 = plt.subplots()
+# ax2 = ax1.twiny()
+
+# # Plot the data on the first subplot
+
+# ax1.set_xlabel('X-axis 1')
+# ax1.set_ylabel('Y-axis')
+# ax1.legend(loc='upper left')
+
+# # Plot the data on the second subplot
+# ax2.plot(x, y2, 'r-', label='Line 2')
+# ax2.set_xlabel('X-axis 2')
+# ax2.legend(loc='upper right')
+
+# # Combine the two subplots
+# plt.title('Double X-axis Plot')
+# plt.show()
