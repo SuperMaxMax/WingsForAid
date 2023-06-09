@@ -651,7 +651,7 @@ def climbmaneuver(ac_obj, atm_obj, h, h_cruise, W0):
     while h < h_cruise:
         V   = np.sqrt(2*W*atm_obj.g / (rho*ac_obj.Sw*CL_opt))
         Pa  = ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt
-        CD  = dragpolar(ac_obj, CL_opt)
+        CD  = dragpolar(ac_obj, CL_opt) 
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
         ROC = (Pa-Pr)/(W*atm_obj.g)
         gamma = ROC / V
@@ -682,7 +682,12 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
             V   = V_cruise
         x += V * dt
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
+        print(Pr)
+        print(ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt)
         Pbr = Pr/ac_obj.prop_eff
+        if Pbr > ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt:
+            print("This cruise speed is not obtainable (Pr > Pa)")
+            break
         FF  = Pbr * ac_obj.SFC
         W_F_used += FF * dt
         W -= FF * dt
@@ -737,7 +742,7 @@ def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
         t += dt
     return t, x, W_F_used, h
 
-def loiter(ac_obj, atm_obj, h_loiter, t_loiter, W0, standardrate, shape, goback = True, result = False):
+def loiter(ac_obj, atm_obj, h_loiter, t_loiter, W0, standardrate, goback = True, result = False):
     h_loiter *= 0.3048
     CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD_opt  = dragpolar(ac_obj, CL_opt)
@@ -751,103 +756,53 @@ def loiter(ac_obj, atm_obj, h_loiter, t_loiter, W0, standardrate, shape, goback 
     W   = W0
     W_F_used = 0.0
     patterns = 0
-    if shape == "circle":
-        while t <= t_loiter:
-            V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
-            R_turn    = V / standardrate
-            bankangle = np.arctan(V**2/(atm_obj.g * R_turn))
-            n   = 1/np.cos(bankangle)
-            Pr  = n * 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
-            Pbr = Pr/ac_obj.prop_eff
-            W   -= Pbr * ac_obj.SFC * dt
-            W_F_used += Pbr * ac_obj.SFC * dt
-            heading += standardrate * dt
-            if heading >= 2 * np.pi:
-                heading -= 2 * np.pi
-                patterns += 1
-            x   += V * dt
-            t   += dt
-        heading -= 2 * np.pi
-        if goback == True:
-            target_heading = heading_t0 + np.pi
-        else:
-            target_heading = heading_t0
-        while heading < target_heading:
-            V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
-            R_turn    = V / standardrate
-            bankangle = np.arctan(V**2/(atm_obj.g * R_turn))
-            n   = 1/np.cos(bankangle)
-            Pr  = n * 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
-            Pbr = Pr/ac_obj.prop_eff
-            W   -= Pbr * ac_obj.SFC * dt
-            W_F_used += Pbr * ac_obj.SFC * dt
-            heading += standardrate * dt
-            if heading >= 2 * np.pi:
-                patterns += 1
-            x   += V * dt
-            t   += dt
-    if shape == "oval":
-        intercenterdist = 2000
-        while t <= t_loiter:
-            while x <= intercenterdist:
-                V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
-                Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
-                Pbr = Pr/ac_obj.prop_eff
-                W   -= Pbr * ac_obj.SFC * dt
-                W_F_used += Pbr * ac_obj.SFC * dt
-                x   += V * dt
-                t   += dt
-            while np.abs(heading - heading_t0) < np.pi:
-                V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
-                R_turn    = V / standardrate
-                bankangle = np.arctan(V**2/(atm_obj.g * R_turn))
-                n   = 1/np.cos(bankangle)
-                Pr  = n * 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
-                Pbr = Pr/ac_obj.prop_eff
-                W   -= Pbr * ac_obj.SFC * dt
-                W_F_used += Pbr * ac_obj.SFC * dt
-                heading += standardrate * dt
-                if heading >= 2 * np.pi:
-                    heading -= 2 * np.pi
-                    patterns += 1
-                x   += V * dt
-                t   += dt
+    while t <= t_loiter:
+        V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
+        R_turn    = V / standardrate
+        bankangle = np.arctan(V**2/(atm_obj.g * R_turn))
+        n   = 1/np.cos(bankangle)
+        Pr  = n * 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
+        Pbr = Pr/ac_obj.prop_eff
+        W   -= Pbr * ac_obj.SFC * dt
+        W_F_used += Pbr * ac_obj.SFC * dt
+        heading += standardrate * dt
+        if heading >= 2 * np.pi:
             heading -= 2 * np.pi
-            if goback == True:
-                target_heading = heading_t0 + np.pi
-            else:
-                target_heading = heading_t0
-            while heading < target_heading:
-                V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
-                R_turn    = V / standardrate
-                bankangle = np.arctan(V**2/(atm_obj.g * R_turn))
-                n   = 1/np.cos(bankangle)
-                Pr  = n * 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
-                Pbr = Pr/ac_obj.prop_eff
-                W   -= Pbr * ac_obj.SFC * dt
-                W_F_used += Pbr * ac_obj.SFC * dt
-                heading += standardrate * dt
-                if heading >= 2 * np.pi:
-                    patterns+=1
-                x   += V * dt
-                t   += dt
+            patterns += 1
+        x   += V * dt
+        t   += dt
+    heading -= 2 * np.pi
+    print(f"heading at t = t_loiter: {round(heading*180/np.pi, 2)}")
+    if goback == True:
+        target_heading = heading_t0 + np.pi
+    else:
+        target_heading = heading_t0
+    print(f"target heading: {round(target_heading*180/np.pi, 2)}")
+    while heading < target_heading:
+        V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
+        R_turn    = V / standardrate
+        bankangle = np.arctan(V**2/(atm_obj.g * R_turn))
+        n   = 1/np.cos(bankangle)
+        Pr  = n * 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
+        Pbr = Pr/ac_obj.prop_eff
+        W   -= Pbr * ac_obj.SFC * dt
+        W_F_used += Pbr * ac_obj.SFC * dt
+        heading += standardrate * dt
+        x   += V * dt
+        t   += dt
+    if not goback:
+        patterns += 1
+    else:
+        patterns += 1/2
     if result:
         print(f"======================== Loiter Summary ========================")
         print(f"Loiter time: {t_loiter} [sec] | Standard turn rate: {np.round(standardrate*180/np.pi, 2)} [deg/s]")
         print(f"Fuel used during loiter: {np.round(W_F_used, 2)} | Number of patterns completed: {patterns}")
         print(f"================================================================")
 
-loiter(aircraft, atm, 7500, 350, 700, 1, "circle", goback=False, result=True)
+# loiter(aircraft, atm, 7500, 1400, 700, 1, goback=True, result=True)
 
-
-
-
-
-
-
-
-
-def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Summary = False, plot = False):
+def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Summary = False, plot = False, savefig = False):
     flight_profile = []
     # Define a number of arrays used for plotting
     h_array = np.empty(0)
@@ -1039,7 +994,6 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             # Drop box
             W -= boxesperdrop * ac_obj.boxweight
     x_plot = x
-    print(f"W_F_used after dropping all boxes: {W_F_used} [kg]")
     # Return to base
     x_return = 0.0
     cruise_alt_RTB = cruiseheight(Range, h_cruise)
@@ -1095,6 +1049,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         print(f"Payload: {n_boxes} boxes ({np.round(n_boxes*ac_obj.boxweight, 2)} [kg]) | {n_drops} dropping maneuvers")
         print(f"Range: {np.round(Range/1000, 2)} [km] | Distance flown: {np.round(x/1000, 2)} [km] | Flight time: {np.round(t/3600, 2)} [hrs]")
         print(f"Fuel used: {np.round(W_F_used, 2)} [kg]")
+        print(f"W_F_used after dropping all boxes: {W_F_used} [kg]")
         print(f"======================================================================================")
         print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
         print(f"======================================================================================")
@@ -1102,9 +1057,16 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         plt.plot(x_array, h_array)
         plt.xlabel("Horizontal distance [m]")
         plt.ylabel("Altitude [m]")
+        if savefig:
+            if dropregion != None:
+                filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ str(Range) + str(n_drops) + str(dropregion)+ ".png"
+                plt.savefig(filepath)
+            else:
+                filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ str(Range) + str(n_drops) + ".png"
+                plt.savefig(filepath)
         plt.show()
     flight_profile.append(t) #total sortie time
     flight_profile.append(W_F_used) # fuel burnt
     return flight_profile
 
-# fuelusesortie(aircraft, atm, 12, 3, 15000, 62.5, 65, dropregion= 50, Summary=True)
+fuelusesortie(aircraft, atm, 12, 1, 12000, 55, 50, Summary=True, plot=True, savefig=True)

@@ -119,8 +119,8 @@ class UAV:
         self.rootchord = 1.490             # Root chord [m]
         # S
         self.S_G = 19.77                    # Gross shell area fuselage [m^2]
-        self.Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area wing
-        self.Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
+        self.Sh_S = 0.174                    # [-] Ratio between horizontal tailplane surface area and surface area wing
+        self.Sv_S = 0.083                  # [-] Ratio between vertical tailplane surface area and surface area wing
         self.Sw = 11.7113                   # Wing area [m^2]
         self.Sw_wetted = 23.4226            # Wetted area of the wing [m^2]
         self.s_tail = 2                     # Tail surface area [m]
@@ -232,7 +232,7 @@ class UAV:
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 5.166666                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
+        self.AE_Sh_S = 0.174                   # [-] Ratio between horizontal tailplane surface area and surface area win
         self.AE_Sh = 2.57649
         self.AE_CL_a_h = 4.18773706267545    # Lift curve slope horizontal tailplane [1/rad] 
 
