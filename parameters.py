@@ -73,7 +73,7 @@ class UAV:
         self.l_fus_main_cone = 2.9          # Fuselage main cilindrical part length [m]
         self.l_fus_tail_cone = 0.8          # Fuselage tail cone length [m]
         self.l_f = 4.3                      # Fuselage length [m]
-        self.l_f_boom = 2.2                   # Boom length [m]
+        self.l_f_boom = 2.5                   # Boom length [m]
         self.l_n = 0.9342                  # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
@@ -119,8 +119,8 @@ class UAV:
         self.rootchord = 1.490             # Root chord [m]
         # S
         self.S_G = 19.77                    # Gross shell area fuselage [m^2]
-        self.Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area wing
-        self.Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
+        self.Sh_S = 0.174                    # [-] Ratio between horizontal tailplane surface area and surface area wing
+        self.Sv_S = 0.083                  # [-] Ratio between vertical tailplane surface area and surface area wing
         self.Sw = 11.7113                   # Wing area [m^2]
         self.Sw_wetted = 23.4226            # Wetted area of the wing [m^2]
         self.s_tail = 2                     # Tail surface area [m]
@@ -232,7 +232,7 @@ class UAV:
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 5.166666                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.AE_Sh_S = 0.22                    # [-] Ratio between horizontal tailplane surface area and surface area win
+        self.AE_Sh_S = 0.174                   # [-] Ratio between horizontal tailplane surface area and surface area win
         self.AE_Sh = 2.57649
         self.AE_CL_a_h = 4.18773706267545    # Lift curve slope horizontal tailplane [1/rad] 
 
@@ -295,7 +295,7 @@ class UAV:
         self.screenheight   = 50*0.3048         # screen height of 50 ft (CS23)
         self.rpm_maxcont    = 5500              # rpm
         self.omega_prop     = 237               # rad/s, based on 5500 rpm max continuous power and 2.43 gearbox ratio
-        self.prop_radius    = 0.8255            # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
+        self.prop_radius    = 0.7237         # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
         self.ceiling        = 18000*0.3048      # [m] 18000 ft service ceiling
         self.th_ceil        = 30000*0.3048
         self.SFC            = 1.2*7.77777778e-8 # kg/J specific fuel consumption
@@ -305,9 +305,9 @@ class UAV:
         self.turnrate_1     = 3.0               # deg/s
         self.turnrate_2     = 6.0               # deg/s
         self.accelheight    = 300*0.3048
-        self.FP_CL_max_land = 1.9
+        self.FP_CL_max_land = 2
         self.FP_CL_max_to = 1.5
-        self.FP_CL_land = 0.9
+        self.FP_CL_land = 0.83
         self.FP_CL_to = 1.1
 
 
@@ -320,7 +320,7 @@ class UAV:
         self.CS_x_ac_w = 0.24              # location of wing ac, divided by MAC [-] - SEAD L7, S34
         self.CS_Cm_0_airfoil = -0.083       # TODO: Update value - Moment coefficient of airfoil [-]
         self.CS_n_blades = 3                   # [-] number of propeller blades NOTE: Depends on chosen propeller
-        self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
+        # self.CS_D_prop = 1.75                  # [m] Diameter of propeller NOTE: Depends on chosen propeller
         "Operations parameters"             # NOTE: Add identifier "OP_" before variable names
         # inputs
         self.OP_fuel_energy_density = 44.65E6 # [J/kg]
@@ -399,12 +399,17 @@ class UAV:
         self.ST_z_ground = 0.5 #m floor height
         self.ST_z_prop = 0.3 #m propeller clearance
         self.ST_z_cg_ground =  0.92 #m estiamted center of gravity of boxes, fuselage, engine, boom, wing, fuel
+        self.ST_x_nw =0.4 #m x distance nose wheel
+        self.ST_x_mw =2.35 #m x distance main whee
+        self.ST_ax_g = 0.51 #- maximum horizontal breaking deceleration scaled by g0
+        self.ST_x_cg = 2.94 #max aft x_cg for nose wheel loading
 
 
 class airport:
     def __init__(self, name):
         self.name       = name
-        self.mu_ground  = 0.4                  #buildingspeed.org
+        self.mu_ground = 0.08
+        self.mu_ground_break  = 0.2                  #buildingspeed.org
         self.rwyslope   = 1.0                   #runway slope in degrees --> CONVERT TO RADIANS
 
 class atmosphere:

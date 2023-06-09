@@ -23,7 +23,7 @@ def plot_diagrams(Ay, Az, By, Bz, load_case, normal, shear, moment, torque):
     f_ax1.plot(y_span, -spanwise_flap_weight(), label='Flap weight')
     f_ax1.plot(y_span, -spanwise_aileron_weight(), label='Aileron weight')
     f_ax1.plot(y_span, -spanwise_fuel_weight(y_span)*abs(load_case-1), label='Fuel weight')
-    f_ax1.plot(y_span, spanwise_wing_loading(y_span)*load_case, label='Wing loading')
+    f_ax1.plot(y_span, spanwise_wing_loading(y_span), label='Wing loading')
     # set axis limits such that all vector arrows are visible, vector are scaled based on axis limits
     if load_case == 1:
         f_ax1.set_title('Spanwise force diagram for full wing loading, no fuel')
@@ -115,7 +115,7 @@ def spanwise_wing_loading(y):
     # gamma_0 = (ac.W_TO-ac.W_F)*ac.g0*(4/np.pi)*(1/ac.rho_cruise)*(1/ac.V_cruise)*(1/ac.b)
     # return ac.rho_cruise*ac.V_cruise*gamma_0*np.sqrt(1-(2*y/ac.b)**2) # when inputting XFLR -> check for matching coordinate systems
     c = ac.lift_coefficients[::-1]
-    return np.polyval(c, y)
+    return np.polyval(c, y)*n_ult
 
 def spanwise_wing_loading_ty(y):
     # put if for worst case scenarios
@@ -152,7 +152,7 @@ def spanwise_func_1(y):
     return -spanwise_wing_weight(y)+spanwise_wing_loading(y)
 
 def spanwise_func_2(y):
-    return -spanwise_wing_weight(y)-spanwise_fuel_weight(y)
+    return -spanwise_wing_weight(y)-spanwise_fuel_weight(y)+spanwise_wing_loading(y)
 
 ac = UAV('aircraft')
 plot = False
@@ -168,6 +168,7 @@ ac.ail_s = 0.6                                                      # fraction o
 ac.ail_e = 0.8                                                      # fraction of b/2
 
 # Make an array for the span
+
 y_span = np.linspace(0, ac.b/2, 1000)
 
 # Material choice for strut weight, add column for material index: sqrt(E)/rho -> the higher the value the better -> False
@@ -175,18 +176,20 @@ material_df['sqrt(E)/rho'] = np.sqrt(material_df['E'])/material_df['density']
 material_df['simga_yield/rho'] = material_df['yield stress']/material_df['density']
 # density, raw cost, eco cost, co2, yield stress, E, Kc, sqrt(E)/rho, sigma_yield/rho
 prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4, 0]
-possible_materials = rank_material(prop_weights_strut, [False])[:5]
+possible_materials = rank_material(prop_weights_strut, [False, False])[:5]
 ms = pd.DataFrame(index=possible_materials, columns=['Case 1', 'Case 2'])
 
 for k in range(2):
     if k == 0:
         load_case = 1
+        n_ult = 6.6
     else:
         load_case = 0
+        n_ult = -2.78
 
     # Calculate reaction forces # important -> signs of the forces are with z is positive upwards and y is positive in spanwise direction (this is different from global coordinate system)
-    Bz = -1/ac.wing_strut_location*(quad(spanwise_wing_loading_ty, 0, ac.b/2)[0]*load_case-trapezoid(spanwise_flap_weight_ty(), y_span)-trapezoid(spanwise_aileron_weight_ty(), y_span)-quad(spanwise_fuel_weight_ty, 0, ac.b/2)[0]*abs(load_case-1)-quad(spanwise_wing_weight_ty, 0 , ac.b/2)[0]-ac.W_wl*ac.g0*ac.b/2)
-    Az = -(Bz+quad(spanwise_wing_loading, 0, ac.b/2)[0]*load_case - trapezoid(spanwise_flap_weight(), y_span) - trapezoid(spanwise_aileron_weight(), y_span) - quad(spanwise_fuel_weight, 0, ac.b/2)[0]*abs(load_case-1) - quad(spanwise_wing_weight, 0 ,ac.b/2)[0] - ac.W_wl*ac.g0)
+    Bz = -1/ac.wing_strut_location*(quad(spanwise_wing_loading_ty, 0, ac.b/2)[0]-trapezoid(spanwise_flap_weight_ty(), y_span)-trapezoid(spanwise_aileron_weight_ty(), y_span)-quad(spanwise_fuel_weight_ty, 0, ac.b/2)[0]*abs(load_case-1)-quad(spanwise_wing_weight_ty, 0 , ac.b/2)[0]-ac.W_wl*ac.g0*ac.b/2)
+    Az = -(Bz+quad(spanwise_wing_loading, 0, ac.b/2)[0] - trapezoid(spanwise_flap_weight(), y_span) - trapezoid(spanwise_aileron_weight(), y_span) - quad(spanwise_fuel_weight, 0, ac.b/2)[0]*abs(load_case-1) - quad(spanwise_wing_weight, 0 ,ac.b/2)[0] - ac.W_wl*ac.g0)
     By = Bz/tan(ac.strut_angle)
     Ay = -By
 
@@ -216,7 +219,7 @@ for k in range(2):
             torque.append(-trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
         else:
             shear.append(-(quad(spanwise_func_2, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.wing_strut_location, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
-            torque.append(-trapezoid(torque_flap[j:]+torque_ail[j:], y_span[j:]))
+            torque.append(-trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
     # get the bending moment by integrating the shear along the length
     moment = cumulative_trapezoid(shear, y_span, initial=0)
 
