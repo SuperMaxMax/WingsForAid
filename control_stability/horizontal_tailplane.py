@@ -30,7 +30,6 @@ def LiftRateCoefficient(aircraft, Mach, A, lambda_co2):  # lift rate coefficient
     Equation from SEAD Lecture 7, slide 41"""
     aircraft.CS_beta = np.sqrt(1 - Mach ** 2)
     CLa = 2 * np.pi * A / (2 + np.sqrt(4 + ((A * aircraft.CS_beta / aircraft.CS_eta)** 2) * (1 + np.tan(lambda_co2) ** 2  / aircraft.CS_beta ** 2)))
-    aircraft.CLa = CLa
     return CLa
 
 def TaillessLiftRateCoefficient(aircraft, CLa): 
@@ -46,7 +45,7 @@ def nacelle_influence(aircraft, CLa_Ah):
     Equation from SEAD Lecture 7, slide 38"""
     #dx_ac_n = (-4) * (aircraft.w_out ** 2 * (aircraft.X_LEMAC + 0.25 * aircraft.MAC_length)) / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)   
     l_p = aircraft.X_LEMAC + 0.25 * aircraft.MAC_length
-    dx_ac_n = -0.05 * aircraft.CS_n_blades * aircraft.CS_D_prop**2 * l_p / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)
+    dx_ac_n = -0.05 * aircraft.CS_n_blades * (aircraft.prop_radius * 2)**2 * l_p / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)
     return dx_ac_n
 
 

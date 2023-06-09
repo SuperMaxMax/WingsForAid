@@ -17,7 +17,7 @@ def cg_calc(obj, plot):
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement
-    X_LEMAC = 0.38 * obj.l_f
+    X_LEMAC = 0.35 * obj.l_f
     obj.X_LEMAC = X_LEMAC
 
     '''v Wing group v'''

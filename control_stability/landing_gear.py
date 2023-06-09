@@ -20,7 +20,6 @@ aircraft.position_landing_fwd = [2, 0]
 aircraft.position_landing_back = [4, 1]
 
 # Initial values for plotting
-
 left_click_point = None
 right_click_point = None
 
@@ -53,15 +52,15 @@ def longitudinal_position_landing_gear(aircraft, x_point, y_point):
         length_b_m = x_point - x_cg_position
         d_max = length_b_m / weight_front_min
         d_min = length_b_m / weight_front_max
-        x_front_min = x_point - d_max
-        x_front_max = x_point - d_min
+        x_front_min = x_point - d_max  # Smallest distance from the nose
+        x_front_max = x_point - d_min  # Largest distance from the nose
         return x_front_max, x_front_min
 
     x_front_max_aft, x_front_min_aft = calc_x_front_max_and_min(aircraft.x_cg_position_aft)
     x_front_max_fwd, x_front_min_fwd = calc_x_front_max_and_min(aircraft.x_cg_position_fwd)
 
-    x_front_max = x_front_max_fwd
-    x_front_min = x_front_min_aft
+    x_front_min = max(x_front_min_aft, x_front_min_fwd)
+    x_front_max = min(x_front_max_aft, x_front_max_fwd)
 
     # Plot limit for the front undercarriage
     line_1 = ax.plot([x_front_max, x_front_max], [-1, 1], color='red', linewidth="0.8", path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])[0]
