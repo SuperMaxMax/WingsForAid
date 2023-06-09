@@ -389,6 +389,7 @@ class UAV:
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
         self.ST_W_fus = 40.3381 #kg mass of fuselage structure (only)
         self.ST_W_tb = 8.746397065450095 #kg mass of tail boom, given it is 2.8 m long
+        self.ST_W_lg = 7.1 #kg mass of landing gear struts
         self.ST_z_ground = 0.5 #m floor height
         self.ST_z_prop = 0.3 #m propeller clearance
         self.ST_z_cg_ground =  0.92 #m estiamted center of gravity of boxes, fuselage, engine, boom, wing, fuel
