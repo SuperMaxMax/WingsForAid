@@ -11,9 +11,6 @@ fuel_first = False
 
 def cg_calc(obj, plot):
     # Calculate MTOW
-    l_opt = 1.4 * np.sqrt(4 * obj.MAC_length * obj.Sw * 0.7 / (np.pi * obj.w_out))
-    print(f"l_opt:{l_opt}")
-
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement
@@ -127,7 +124,6 @@ def cg_calc(obj, plot):
     obj.X_cg_aft = Xs[labels.index(LimBoxConfigAft)] + obj.X_cg_range * 0.05
 
     obj.AE_l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
-
     # Plot lines for forward and aft cg positions
     plt.axvline(x=obj.X_cg_fwd, color='blue', label='most forward c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=135, length=1.1)])
     plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])

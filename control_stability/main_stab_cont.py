@@ -45,7 +45,7 @@ def main_stab_control(aircraft, plot, print_value):
         print("--------------------Control Surfaces----------------------------")
 
         print("\n-------------------Aileron Design-----------------------------")
-        print(f"The aileron will span from {round(aircraft.y_a_0 - aircraft.w_out/2, 3)}m to {round(aircraft.y_a_1 - aircraft.w_out/2, 3)}m of the span of the wing with respect to the rootchord")
+        print(f"The aileron will span from {round(aircraft.ystart_ail, 3)}m to {round(aircraft.yend_ail, 3)}m of the span of the wing with respect to the rootchord")
         print(f"The area of the aileron on one wing will be {round(aircraft.S_aileron, 3)} m^2\n")
 
         print("--------------------Elevator Design------------------------------\n")

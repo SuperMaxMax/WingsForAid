@@ -177,18 +177,21 @@ class UAV:
         self.WfinalW10 = 0.993              # Landing, taxi & shut-down fraction [-]
         self.w_in = 1.2                     # Inner fuselage width [m]
         self.w_out = 1.1                    # Outer fuselage width [m]
-        self.wing_twist = -2.0 *np.pi/180    # Updated wing twist (difference root and chord) [rad]
+        self.wing_twist = -2.0 *np.pi/180   # Updated wing twist (difference root and chord) [rad]
 
         # X
         self.X_LEMAC = 2.276                # Leading edge mean aerodynamic chord [m]
         self.x_lemac = 0.06057988483270884  # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
-        self.xc_OEW_p = 0.25                 # Center of gravity of OEW as a fraction of the MAC [-]
+        self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
         self.X_cg_aft = 0.5335              # Aft cg location CG/MAC [-]
         self.X_cg_full = 0.4115             # MTOW cg location CG/MAC [-]
         self.X_cg_fwd = 0.1704              # Forward cg location CG/MAC [-]
         self.X_cg_range = 0.363             # Range of cg location CG/MAC [-]
         # Y
-        self.y_mac = 2.2133293637093265                    # Spanwise location of the MAC [m]
+        self.y_mac = 2.2133293637093265     # Spanwise location of the MAC [m]
+        self.ystart_ail = 3.308             # start location of aileron measured from rootchord
+        self.yend_ail = 3.975               # end location of aileron measured from rootchord
+        self.yend_flap = 1.5629             # end location of the HLD measured from rootchord
 
 
         "Structural parameters"             # NOTE: Add identifier "ST_" before variable names

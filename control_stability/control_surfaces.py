@@ -52,12 +52,12 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
             t = sqrt(2*phi_des/P_roll_rate)
         ystart_a_list.append(ystart_a)
       
-    aircraft.y_a_0 = min(ystart_a_list)
-    aircraft.y_a_1 = 0.95*aircraft.b/2
+    aircraft.ystart_ail = min(ystart_a_list) - aircraft.w_out/2  # to account for wing starting at fuselage border
+    aircraft.yend_ail = 0.95*aircraft.b/2 - aircraft.w_out/2  # to account for wing starting at fuselage border
 
-    aircraft.S_aileron = (aircraft.y_a_1 - aircraft.y_a_0) * (Chordlength(aircraft.y_a_0, aircraft) + Chordlength(aircraft.y_a_1, aircraft))/2
+    aircraft.S_aileron = (aircraft.yend_ail - aircraft.ystart_ail) * (Chordlength(aircraft.ystart_ail, aircraft) + Chordlength(aircraft.yend_ail, aircraft))/2
 
-    delta_L = L_a/2 /((aircraft.y_a_1 + aircraft.y_a_0)/2 * aircraft.b/2)
+    delta_L = L_a/2 /((aircraft.yend_ail + aircraft.ystart_ail)/2 * aircraft.b/2)
 
 def elevator_design(aircraft):
     
