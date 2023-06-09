@@ -15,7 +15,7 @@ def Chordlength(y, aircraft):
     return aircraft.rootchord * (1 - ((1-aircraft.taper) / (aircraft.b / 2)) * y)
 
 def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Approach, Ch 12.4
-    ''' '''
+    ''' ''' # NOTE FIXME: DO WE INCLUDE WING STARTING AFTER FUSELAGE ENDS? HAS INFLUENCE ON DISTANCE FROM CENTRE
     '''Roll performance requirments'''
     phi_des_list = [30* (pi/180), 45* (pi/180), 60* (pi/180)]   # Roll requirement
     t_lim_list = [1.3, 1.7, 1.3]  # Max time available to complete the roll requirement
@@ -84,7 +84,7 @@ def rudder_design(aircraft):
     C_d_y = 0.6 # Assumption
 
     F_w = 0.5 * atm.rho0 * C_d_y * V_w**2 * S_s
-
+    print(f"F_w:{F_w}")
     angle_beta = np.arctan(V_w/(1.3 * aircraft.V_s_min))
 
     C_L_alpha_v = 3

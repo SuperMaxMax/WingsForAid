@@ -16,7 +16,7 @@ rho = 0.904637
 MAC = aircraft.MAC_length
 
 #intermediate calculation for consistent updates in function
-l_fus_1 = aircraft.l_fus_nose_cone
+l_fus_1 = aircraft.l_n
 l_fus_2 = aircraft.l_fus_main_cone
 l_fus_3 = aircraft.l_fus_tail_cone     
 l_fus_total = l_fus_1 + l_fus_2 + l_fus_3

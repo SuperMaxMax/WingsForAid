@@ -106,7 +106,7 @@ def horizontal_tail_planform(aircraft):
         variable = "Lambda"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
-            variable_list2 = [0.6]
+            variable_list2 = [0.7]
         elif variable == "AR":  
             variable_list2 = [5.1666666]
         elif variable == "Twist":
@@ -131,11 +131,11 @@ def horizontal_tail_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 5.1666666
+                AR = 2.6
             if variable == "Lambda":
                 Lambda = parameter
             else:
-                Lambda = 0.6
+                Lambda = 1
             if variable == "Twist":
                 alpha_twist = parameter
             else:
@@ -197,13 +197,14 @@ def horizontal_tail_planform(aircraft):
             tau = 1/span_eff - 1
             
             CL_a_h = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
+            print("CLAH", CL_a_h)
 
 
-            #print('=====================================================================')
-            #print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
-            #print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
-            print(i_w*180/np.pi, C_L_wing - C_L_h, airfoildata.index.tolist())
-            #print("C_L", C_L_wing)
+            print('=====================================================================')
+            print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
+            print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
+            print("aircraft width, container is 2.40 = ", b)
+            #print(i_w*180/np.pi, C_L_wing - C_L_h, airfoildata.index.tolist())
 
         #Find integral current distribution
         area_lift_dist = -integrate.simps(CL1, y_s)
@@ -214,12 +215,13 @@ def horizontal_tail_planform(aircraft):
         Cli_elliptical = (8*area_lift_dist)/(np.pi*b) * np.sqrt(1-(2*y/b)**2)
         #plt.plot(y, Cli_elliptical, label = "Elliptical")
 
+        #print('lestgo')
         #General plot
-        plt.grid()
-        plt.xlabel('semi span [m]')
-        plt.ylabel('C_L')
-        plt.legend()
-        #plt.show()
+        # plt.grid()
+        # plt.xlabel('semi span [m]')
+        # plt.ylabel('C_L')
+        # plt.legend()
+        # plt.show()
         
         if not full_print:
             return abs(C_L_wing - C_L_h)
@@ -230,7 +232,7 @@ def horizontal_tail_planform(aircraft):
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
     initial_guess = required_lift(aircraft)[0]/C_l_alpha
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
-    print(a_h_optimal)
+    #print(a_h_optimal)
     AR, b, Lambda, alpha_twist, S, CL_a_h  = plot_lift_distr(a_h_optimal, full_print = True)
 
     #Adding effect of downwash
@@ -254,8 +256,8 @@ def horizontal_tail_planform(aircraft):
     aircraft.i_w_h = i_h       
     aircraft.wing_twist_h = alpha_twist    
     aircraft.sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
-    aircraft.sweep_co2_h = 1 / np.tan(np.tan(aircraft.sweep_co4_h) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
-    aircraft.sweep_LE_h = 1 / np.tan(np.tan(aircraft.sweep_co4_h) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
+    aircraft.sweep_co2_h = np.arctan(np.tan(aircraft.sweep_co4_h) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.sweep_LE_h = np.arctan(np.tan(aircraft.sweep_co4_h) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
     aircraft.taper_h = Lambda                
     aircraft.rootchord_h = 2 * aircraft.S_h / (aircraft.b_h * (1+Lambda))            
     aircraft.tipchord_h = aircraft.rootchord_h*Lambda        
@@ -263,9 +265,9 @@ def horizontal_tail_planform(aircraft):
     aircraft.y_mac_h = 1/3*(aircraft.b_h/2)*(1+2*Lambda)/(1+Lambda)   
     aircraft.x_lemac_h = aircraft.y_mac_h*np.tan(aircraft.sweep_LE_h)
     aircraft.CL_a_h = CL_a_h
-    print("Afsd", CL_a_h)
-    print(b)
-    print(S)
+    #print("Afsd", CL_a_h)
+    #print(b)
+    #print(S)
     return 
 
 aircraft = UAV("aircraft")
