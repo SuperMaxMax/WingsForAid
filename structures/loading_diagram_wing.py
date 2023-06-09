@@ -115,7 +115,7 @@ def spanwise_wing_loading(y):
     # gamma_0 = (ac.W_TO-ac.W_F)*ac.g0*(4/np.pi)*(1/ac.rho_cruise)*(1/ac.V_cruise)*(1/ac.b)
     # return ac.rho_cruise*ac.V_cruise*gamma_0*np.sqrt(1-(2*y/ac.b)**2) # when inputting XFLR -> check for matching coordinate systems
     c = ac.lift_coefficients[::-1]
-    return np.polyval(c, y)
+    return np.polyval(c, y)*n_ult
 
 def spanwise_wing_loading_ty(y):
     # put if for worst case scenarios
@@ -156,6 +156,7 @@ def spanwise_func_2(y):
 
 ac = UAV('aircraft')
 plot = False
+n_ult = 6.6
 
 # aircraft parameters -> to be connected with parameters.py later
 ac.wing_strut_location = 0.437277492*ac.b/2                         # [m] | based on statistical data, value is now based on half span running from middle fuselage
@@ -168,6 +169,7 @@ ac.ail_s = 0.6                                                      # fraction o
 ac.ail_e = 0.8                                                      # fraction of b/2
 
 # Make an array for the span
+
 y_span = np.linspace(0, ac.b/2, 1000)
 
 # Material choice for strut weight, add column for material index: sqrt(E)/rho -> the higher the value the better -> False
