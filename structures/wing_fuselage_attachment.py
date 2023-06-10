@@ -3,10 +3,16 @@ import matplotlib.pyplot as plt
 from parameters import UAV
 ac=UAV("aircraft")
 
-# steel 410 parameters
+# s steel 410 parameters
 sigma_yield = 1225*10**6 #Pa
 sigma_yield_shear = 0.58*sigma_yield
 density = 7800 #kg/m^3
+
+# steel 4130 parameters
+sigma_yield = 460*10**6
+sigma_yield_shear = 0.58*sigma_yield
+density = 7850
+E=205*10**9
 # check loads from drag
 
 D_load = (ac.W_TO*ac.g0/10*ac.b/2)/(ac.rootchord/2)
@@ -18,10 +24,10 @@ Ay_max=32251.284804626564 #+ D_load#N
 Ay_min= - 14930.31452182178 #- D_load#N
 Az_min = -759.779152495221#N
 Az_max= 232.43169183082978 #N
-Bz_min = -23142.254860289046
-By_min = -32251.284804626564
+Bz_min = -23142.254860289046 #n= 6.6
+By_min = -32251.284804626564 #n= 6.6
 B_min = np.sqrt(Bz_min**2 + By_min**2)
-Bz_max = 10713.407106147533
+Bz_max = 10713.407106147533 #n=-2.78
 By_max= 14930.31452182178
 B_max = np.sqrt(Bz_max**2 + By_max**2)
 
@@ -80,3 +86,56 @@ t_notch_w = max(t_notch_w,t_notch_w_1,t_notch_w_2)
 
 print('t notch fus final mm',t_notch_fus*1000)
 print('t notch wing final mm',t_notch_w*1000)
+
+
+################ Some truss update ################
+
+
+
+
+
+a_truss = 0.02      # semi_minor of ellipse [m]
+b_truss = 2*a_truss          # semi_major of ellipse [m]
+P = 2*np.pi*np.sqrt((a_truss**2+b_truss**2)/2) #perimeter
+
+A_tens = B_min / sigma_yield
+t_tens = P/A_tens
+m_tens = A_tens*density*ac.ST_l_strut
+
+I_min = B_max * ac.ST_l_strut**2 / (np.pi**2 * E)
+#t = 4*I_min/(np.pi*a**3 * (1+(3*b/a)))  # thickness of strut sheet [m]
+#A_comp = P*t
+#I_check = np.pi*a**3*t*(1+(3*b/a))/4
+#m_comp = A*mat_density*ac.l_strut
+
+t = np.linspace(0.0001,0.005,1000) #for multiple thichnesses
+I_min = [I_min]*len(t)
+#Iyy_min = [Iyy_min]*len(t)
+A_min = [A_tens]*len(t)
+a1=a_truss+t/2
+a2=a_truss-t/2
+b1=b_truss+t/2
+b2=b_truss-t/2
+
+Ixx = 0.25*np.pi*(a1**3*b1-a2**3*b2) #define Ixx for given thickness
+#Iyy = 0.25*np.pi*(a1*b1**3-a2*b2**3)
+#Ixx = 0.25*np.pi*(a1**4-a2**4)
+A = np.pi*(a1*b1-a2*b2) #define A for given thickness
+#sigma = M_h_max*a/Ixx #define max stress
+
+plt.plot(t,Ixx, label="Ixx")
+#plt.plot(t,Iyy,label='Iyy')
+plt.plot(t,A, label='A')
+#plt.plot(t,sigma, label="sigma")
+plt.plot(t,I_min, label='ixx_min')
+#plt.plot(t,Iyy_min,label='iyy min')
+plt.plot(t,A_min,label='A_min')
+plt.legend()
+plt.show()
+
+t=1.5/1000
+m_strut = density*ac.ST_l_strut*P*t
+print("mass of strut",m_strut)
+
+
+
