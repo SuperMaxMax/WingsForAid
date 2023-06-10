@@ -338,17 +338,17 @@ class UAV:
         self.OP_V_crosswind = 10  # [m/s]
         self.OP_V_tailwind = 15  # m/s]
         self.OP_V_headwind = 15  # [m/s]
-        self.OP_V_wind = max(self.OP_V_headwind,self.OP_V_crosswind,self.OP_V_tailwind)  # [m/s]
+        self.OP_V_wind = max(self.OP_V_headwind, self.OP_V_crosswind,self.OP_V_tailwind)  # [m/s]
 
-        self.OP_Range = 262.5 # [km]
+        self.OP_Range = 250 # [km]
         self.OP_N_boxes_per_sortie = 12  # [-]
-        self.OP_MR_PL = 21000 # [kg/day]
+        self.OP_MR_PL = 20000 # [kg/day]
         self.OP_PL_per_box = 20 # [kg]
         self.OP_TTFD = 72 # [h]
 
         # box drop maneuver
         self.OP_V_boxlim = 100 / 3.6 # [m/s] box drop max speed
-        self.OP_Vbox_LDG = 30 / 3.6  # [m/s] 40kph drop limit
+        self.OP_Vbox_LDG = 40 / 3.6  # [m/s] 40kph drop limit
         self.boxDX = 0.5  # [m]
         self.boxDY = 0.3  # [m]
         self.boxDZ = 0  # [m]
