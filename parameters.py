@@ -81,7 +81,7 @@ class UAV:
         self.lambda_co4 = 0.0               # Quarter chord sweep angle [rad]
         self.lin_par1 = 0.5249              # [-]
         self.lin_par2 = 42.049              # [-]
-        self.l_h = 4                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.l_h = 4.15                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
 
         # M
         self.MAC_length = 1.2477198640078417            # Mean aerodynamic chord [m]
@@ -106,7 +106,7 @@ class UAV:
         self.pos_main_carriage = 'fuselage' # Position of main carriage: "fuselage" or "wing"
         self.power = 95.8347                # Power at takeoff [hp]
         self.power_setting = 0.9            # Power setting in cruise [-]
-        self.prop_eff = 0.7                 # Propulsive efficiency [-]
+        self.prop_eff = 0.82                 # Propulsive efficiency [-]
         # Q
 
         # R
@@ -177,18 +177,21 @@ class UAV:
         self.WfinalW10 = 0.993              # Landing, taxi & shut-down fraction [-]
         self.w_in = 1.2                     # Inner fuselage width [m]
         self.w_out = 1.1                    # Outer fuselage width [m]
-        self.wing_twist = -2.0 *np.pi/180    # Updated wing twist (difference root and chord) [rad]
+        self.wing_twist = -2.0 *np.pi/180   # Updated wing twist (difference root and chord) [rad]
 
         # X
         self.X_LEMAC = 2.276                # Leading edge mean aerodynamic chord [m]
         self.x_lemac = 0.06057988483270884  # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
-        self.xc_OEW_p = 0.25                 # Center of gravity of OEW as a fraction of the MAC [-]
+        self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
         self.X_cg_aft = 0.5335              # Aft cg location CG/MAC [-]
         self.X_cg_full = 0.4115             # MTOW cg location CG/MAC [-]
         self.X_cg_fwd = 0.1704              # Forward cg location CG/MAC [-]
         self.X_cg_range = 0.363             # Range of cg location CG/MAC [-]
         # Y
-        self.y_mac = 2.2133293637093265                    # Spanwise location of the MAC [m]
+        self.y_mac = 2.2133293637093265     # Spanwise location of the MAC [m]
+        self.ystart_ail = 3.308             # start location of aileron measured from rootchord
+        self.yend_ail = 3.975               # end location of aileron measured from rootchord
+        self.yend_flap = 1.5629             # end location of the HLD measured from rootchord
 
 
         "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
@@ -233,7 +236,7 @@ class UAV:
         self.AE_A_h = 5.166666                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
         self.AE_Sh_S = 0.174                   # [-] Ratio between horizontal tailplane surface area and surface area win
-        self.AE_Sh = 2.57649
+        self.AE_Sh = 2.0377662
         self.AE_CL_a_h = 4.18773706267545    # Lift curve slope horizontal tailplane [1/rad] 
 
 
@@ -244,8 +247,8 @@ class UAV:
         self.AE_sweep_co4_h = 0.0                 # Updated half chord sweep [rad]
         self.AE_sweep_co2_h = 0.0 
         self.AE_sweep_LE_h = 0
-        self.AE_rootchord_h = 0.7061            
-        self.AE_tipchord_h = 0.7061        
+        self.AE_rootchord_h = 0.931167            
+        self.AE_tipchord_h = 0.931167       
         self.AE_MAC_length_h = 0.7061       
         self.AE_y_mac_h = 0.91225       #Constant chord, so, quarter of span is taken such that MAC is at half the halfspan
         self.AE_x_lemac_h = 0
@@ -335,17 +338,17 @@ class UAV:
         self.OP_V_crosswind = 10  # [m/s]
         self.OP_V_tailwind = 15  # m/s]
         self.OP_V_headwind = 15  # [m/s]
-        self.OP_V_wind = max(self.OP_V_headwind,self.OP_V_crosswind,self.OP_V_tailwind)  # [m/s]
+        self.OP_V_wind = max(self.OP_V_headwind, self.OP_V_crosswind,self.OP_V_tailwind)  # [m/s]
 
-        self.OP_Range = 262.5 # [km]
+        self.OP_Range = 250 # [km]
         self.OP_N_boxes_per_sortie = 12  # [-]
-        self.OP_MR_PL = 21000 # [kg/day]
+        self.OP_MR_PL = 20000 # [kg/day]
         self.OP_PL_per_box = 20 # [kg]
         self.OP_TTFD = 72 # [h]
 
         # box drop maneuver
         self.OP_V_boxlim = 100 / 3.6 # [m/s] box drop max speed
-        self.OP_Vbox_LDG = 30 / 3.6  # [m/s] 40kph drop limit
+        self.OP_Vbox_LDG = 40 / 3.6  # [m/s] 40kph drop limit
         self.boxDX = 0.5  # [m]
         self.boxDY = 0.3  # [m]
         self.boxDZ = 0  # [m]
@@ -399,6 +402,10 @@ class UAV:
         self.ST_z_ground = 0.5 #m floor height
         self.ST_z_prop = 0.3 #m propeller clearance
         self.ST_z_cg_ground =  0.92 #m estiamted center of gravity of boxes, fuselage, engine, boom, wing, fuel
+        self.ST_x_nw =0.4 #m x distance nose wheel
+        self.ST_x_mw =2.35 #m x distance main whee
+        self.ST_ax_g = 0.51 #- maximum horizontal breaking deceleration scaled by g0
+        self.ST_x_cg = 2.94 #max aft x_cg for nose wheel loading
 
 
 class airport:

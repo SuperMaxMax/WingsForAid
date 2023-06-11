@@ -259,8 +259,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
 
     return S
 
-
-#TO_eom(aircraft, airfield, atm, 5, 4000, 12, -15.4, 65)
+# TO_eom(aircraft, airfield, atm, 5, 3000, 12, -15.4, 65)
 
 # ------------------------------------------------------------------------
 
@@ -546,7 +545,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     return CL_max
 
 
-LA_eom(aircraft, airfield, atm, -8, 4000, 14, -15.4, 70)
+# LA_eom(aircraft, airfield, atm, -10, 3000, 12, -15.4, 70)
 
 # ------------------------------------------------------------------------------
 def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
@@ -664,6 +663,7 @@ def climbmaneuver(ac_obj, atm_obj, h, h_cruise, W0):
     return t, x, W_F_used, h
 
 def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
+    cruiseNAT = False
     x   = 0.0
     t   = 0.0
     dt  = 1.0
@@ -682,19 +682,16 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
             V   = V_cruise
         x += V * dt
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
-        print(Pr)
-        print(ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt)
         Pbr = Pr/ac_obj.prop_eff
         if Pbr > ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt:
             print("This cruise speed is not obtainable (Pr > Pa)")
+            cruiseNAT = True
             break
         FF  = Pbr * ac_obj.SFC
         W_F_used += FF * dt
         W -= FF * dt
         t += dt
-    return t, W_F_used
-
-
+    return t, W_F_used, cruiseNAT
 
 # def cruiseperf_varying(ac_obj, atm_obj):
 #     W_F_used = np.empty(0)
@@ -714,7 +711,6 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
 #     plt.show()
 
 # cruiseperf_varying(aircraft, atm)
-
 
 def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
@@ -799,10 +795,11 @@ def loiter(ac_obj, atm_obj, h_loiter, t_loiter, W0, standardrate, goback = True,
         print(f"Loiter time: {t_loiter} [sec] | Standard turn rate: {np.round(standardrate*180/np.pi, 2)} [deg/s]")
         print(f"Fuel used during loiter: {np.round(W_F_used, 2)} | Number of patterns completed: {patterns}")
         print(f"================================================================")
-
+    return t, W_F_used
 # loiter(aircraft, atm, 7500, 1400, 700, 1, goback=True, result=True)
 
 def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Summary = False, plot = False, savefig = False):
+    cruiseNAT = False
     flight_profile = []
     # Define a number of arrays used for plotting
     h_array = np.empty(0)
@@ -826,10 +823,11 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD = dragpolar(ac_obj, CL)
     LD_max = CL / CD
-    boxesperdrop = n_boxes / n_drops
-    if boxesperdrop % 2 != 0:
-        print(f"The amount of boxes ({n_boxes}) and the amount of drops ({n_drops}) are not compatible.")
-        print(f"The boxes need to be dropped in multiples of two to avoid a lateral C.O.G. shift")
+    if n_drops != 0:
+        boxesperdrop = n_boxes / n_drops
+        if boxesperdrop % 2 != 0:
+            print(f"The amount of boxes ({n_boxes}) and the amount of drops ({n_drops}) are not compatible.")
+            print(f"The boxes need to be dropped in multiples of two to avoid a lateral C.O.G. shift")
     # Enter h_cruise in feet
     if Range == None:
         Range = ac_obj.R / 2
@@ -850,8 +848,48 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     # print(f"W_F_used after take off: {W_F_used}")
     W_F -= W_F_used
     # Now comes climb to projected cruise
-    # if n_boxes == 0:                            # flight without payload, surveillance ??
-    if dropregion == None:                      # either 1 drop or n evenly spaced drops
+    if n_boxes == 0:                            # flight without payload, surveillance ??
+        cruise_alt = cruiseheight(Range, h_cruise)
+        t_climb, x_climb, W_F_used_climb, h = climbmaneuver(ac_obj, atm_obj, h, cruise_alt, W)
+        t += t_climb
+        x += x_climb
+        x_array = np.append(x_array, x)
+        h_array = np.append(h_array, h)
+        t_array = np.append(h_array, t)
+        W_F_used += W_F_used_climb
+        W_F_used_array = np.append(W_F_used_array, W_F_used)
+        W -= W_F_used_climb
+        # Assume loiter altitude 5000 ft
+        dtt_remaining = Range - x_climb
+        descent_dist = (cruise_alt-(5000*0.3048)) * LD_max
+        cruise_dist = dtt_remaining - descent_dist
+        t_cruise, W_F_used_cruise, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
+        t += t_cruise
+        x += cruise_dist
+        x_array = np.append(x_array, x)
+        h_array = np.append(h_array, h)
+        t_array = np.append(h_array, t)
+        x_between_drop = cruise_dist
+        W_F_used += W_F_used_cruise
+        W_F_used_array = np.append(W_F_used_array, W_F_used)
+        # print(f"W_F_used after cruise {i}: {W_F_used_cruise}")
+        W -= W_F_used_cruise
+        t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt, 15.0, W)
+        # print(f"Horizontal distance descent: {x_descent} [m]")
+        t += t_descent
+        x += x_descent
+        x_between_drop += x_descent
+        W_F_used += W_F_used_descent
+        x_array = np.append(x_array, x)
+        h_array = np.append(h_array, h)
+        t_array = np.append(h_array, t)
+        W_F_used_array = np.append(W_F_used_array, W_F_used)
+        # print(f"W_F_used after descent {i}: {W_F_used_descent} | time descent {i}: {t_descent}")
+        W -= W_F_used_descent
+        t_loiter, W_F_used_loiter = loiter(ac_obj, atm_obj, 5000, 1200, W, 1, goback=True)
+        t += t_loiter
+        W_F_used += W_F_used_loiter
+    elif dropregion == None:                      # either 1 drop or n evenly spaced drops
         target_dist = Range / n_drops
         cruise_alt  = cruiseheight(target_dist, h_cruise)
         print(f"The cruising altitude for this sortie is {round(cruise_alt/0.3048)} [ft] (in between all drops)")
@@ -876,7 +914,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             descent_dist = (cruise_alt-15.0) * LD_max
             cruise_dist = dtt_remaining - descent_dist
             # print(f"Climb distance: {x_climb} [m] | Cruise distance: {cruise_dist} [m] | Descent distance: {descent_dist} [m]")
-            t_cruise, W_F_used_cruise = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
+            t_cruise, W_F_used_cruise, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
             # print(f"cruise time: {t_cruise}")
             t += t_cruise
             x += cruise_dist
@@ -904,7 +942,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             # After each descent, a certain amount of boxes are dropped
             W -= boxesperdrop * ac_obj.boxweight
             if i == 0:
-                print(f"Time to first drop: {t} [sec] / {np.round(t/3600, 2)} [hrs]")
+                ttfd = t
                 flight_profile.append(t)
     else:
         target_dist = Range - dropregion*1000                           # distance to first target
@@ -925,7 +963,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         descent_dist = (cruise_alt_tft - 15.0) * LD_max
         cruise_dist = dtt_remaining - descent_dist
         # print(f"cruise dist to first target: {cruise_dist} [m]")
-        t_cruise, W_F_used_cruise = cruisecalc(ac_obj, atm_obj, cruise_alt_tft, cruise_dist, W, V_cruise)
+        t_cruise, W_F_used_cruise, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt_tft, cruise_dist, W, V_cruise)
         t += t_cruise
         x += cruise_dist
         W_F_used += W_F_used_cruise
@@ -945,7 +983,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         W_F_used_array = np.append(W_F_used_array, W_F_used)
         W -= W_F_used_descent
         W -= boxesperdrop * ac_obj.boxweight
-        print(f"Time to first drop: {t} [sec] / {np.round(t/3600, 2)} [hrs]")
+        ttfd = t
         flight_profile.append(t)
         # ============================================================================================================================
         # Drops in dropregion
@@ -970,7 +1008,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             cruise_dist_int_drop = dtnd - d_des
             print(f"Cruise dist in dropzone: {cruise_dist_int_drop} [m]")
             # print(f'Inter-drop cruise distance {i}: {cruise_dist_int_drop} [m]')
-            t_cr_indrop, W_F_used_cr_indrop = cruisecalc(ac_obj, atm_obj, cruise_alt_int_drop, cruise_dist_int_drop, W, V_cruise)
+            t_cr_indrop, W_F_used_cr_indrop, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt_int_drop, cruise_dist_int_drop, W, V_cruise)
             t += t_cr_indrop
             x += cruise_dist_int_drop
             x_indropregion += cruise_dist_int_drop
@@ -1013,7 +1051,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     dtb_remaining = Range - x_return
     desc_dist_RTB = LD_max * cruise_alt_RTB
     cruise_dist_RTB = dtb_remaining - desc_dist_RTB
-    t_cr_RTB, W_F_used_cr_RTB = cruisecalc(ac_obj, atm_obj, cruise_alt_RTB, cruise_dist_RTB, W, V_cruise)
+    t_cr_RTB, W_F_used_cr_RTB, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt_RTB, cruise_dist_RTB, W, V_cruise)
     t += t_cr_RTB
     x += cruise_dist_RTB
     x_plot -= cruise_dist_RTB
@@ -1045,14 +1083,16 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     print(f"The fuel used to transport one kg of payload over one km is {F_kg_km} [1/km]")
     endtime = time.time()
     if Summary:
-        print(f"=================================== Sortie Summary ===================================")
-        print(f"Payload: {n_boxes} boxes ({np.round(n_boxes*ac_obj.boxweight, 2)} [kg]) | {n_drops} dropping maneuvers")
-        print(f"Range: {np.round(Range/1000, 2)} [km] | Distance flown: {np.round(x/1000, 2)} [km] | Flight time: {np.round(t/3600, 2)} [hrs]")
-        print(f"Fuel used: {np.round(W_F_used, 2)} [kg]")
-        print(f"W_F_used after dropping all boxes: {W_F_used} [kg]")
-        print(f"======================================================================================")
-        print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
-        print(f"======================================================================================")
+        if cruiseNAT == False:
+            print(f"=================================== Sortie Summary ===================================")
+            print(f"Payload: {n_boxes} boxes ({np.round(n_boxes*ac_obj.boxweight, 2)} [kg]) | {n_drops} dropping maneuvers")
+            print(f"Range: {np.round(Range/1000, 2)} [km] | Distance flown: {np.round(x/1000, 2)} [km] | Flight time: {np.round(t/3600, 2)} [hrs]")
+            if n_drops != 0:
+                print(f"Time to first drop: {ttfd} [sec] / {np.round(t/3600, 2)} [hrs]")
+            print(f"Fuel used: {np.round(W_F_used, 2)} [kg]")
+            print(f"======================================================================================")
+            print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
+            print(f"======================================================================================")
     if plot:
         plt.plot(x_array, h_array)
         plt.xlabel("Horizontal distance [m]")
@@ -1065,8 +1105,8 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
                 filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ str(Range) + str(n_drops) + ".png"
                 plt.savefig(filepath)
         plt.show()
-    flight_profile.append(t) #total sortie time
-    flight_profile.append(W_F_used) # fuel burnt
+    flight_profile.append(t)                # total sortie time
+    flight_profile.append(W_F_used)         # fuel burnt
     return flight_profile
 
-fuelusesortie(aircraft, atm, 12, 1, 12000, 55, 50, Summary=True, plot=True, savefig=True)
+fuelusesortie(aircraft, atm, 0, 0, 12000, 45, 51.44, Range=150, Summary=True, plot=True, savefig=False)

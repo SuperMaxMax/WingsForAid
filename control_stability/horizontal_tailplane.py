@@ -30,7 +30,6 @@ def LiftRateCoefficient(aircraft, Mach, A, lambda_co2):  # lift rate coefficient
     Equation from SEAD Lecture 7, slide 41"""
     aircraft.CS_beta = np.sqrt(1 - Mach ** 2)
     CLa = 2 * np.pi * A / (2 + np.sqrt(4 + ((A * aircraft.CS_beta / aircraft.CS_eta)** 2) * (1 + np.tan(lambda_co2) ** 2  / aircraft.CS_beta ** 2)))
-    aircraft.CLa = CLa
     return CLa
 
 def TaillessLiftRateCoefficient(aircraft, CLa): 
@@ -93,13 +92,13 @@ def Flaplength(aircraft, taperratio, rootchord, span, HLDroot, flappedsurface):
     taperratio: taper ratio of the wing [m]
     rootchord: chord length of the wing root [m]
     span: total span of the wing [m]
-    HLDroot: starting point in span direction of the HLD [m]
+    HLDroot: starting point in span direction of the HLD measured from rootchord[m]
     flappedsurface: total area of wing that is flapped by HLDs [m^2]"""
 
     def Chordlength(y):
         return aircraft.rootchord * (1 - ((1-aircraft.taper) / (aircraft.b / 2)) * y)
     
-    AvailableArea = aircraft.Sw - 2 * quad(Chordlength, 0, HLDroot)[0]
+    AvailableArea = aircraft.Sw - 2 * quad(Chordlength, 0, HLDroot)[0]  # accounting for overlap of fuselage
     
     if flappedsurface > (AvailableArea):
         print(f"\nUnfeasible flap size, flapped area: {flappedsurface} > wing area not occupied by fuselage: {round(AvailableArea,5)}")
@@ -116,7 +115,7 @@ def Flaplength(aircraft, taperratio, rootchord, span, HLDroot, flappedsurface):
         return y1
 
 def flaps(aircraft):
-    flaptype = 'fowler'              # Can be 'singleslotted' or 'fowler'
+    flaptype = 'singleslotted'              # Can be 'singleslotted' or 'fowler'
     CS_Swf = 0.7 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) NOTE: Used to calculate resulting dCLmax
     CS_lambda_hinge = 0.02                  # hinge line sweep angle, likely parallel to aft spar [rad] TODO: update value
 
@@ -147,7 +146,7 @@ def flaps(aircraft):
         print('\nFowler flap')
         print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
 
-    #print(f"\nCLmax current wing in clean configuration: {aircraft.AE_CL_max_clean}")
+    print(f"\nCLmax current wing in clean configuration: {aircraft.AE_CL_max_clean}")
 
     calcCL = False # calculate dCLmax for a given Swf, or vice versa
 
@@ -157,8 +156,12 @@ def flaps(aircraft):
         print(f"CS_dCLmax_TO: {CS_dCLmax_TO}, CS_dCLmax_LD: {CS_dCLmax_LD}")
 
     else:
-        CS_dCLmax_TO = float(input("\ndCLmax_TO required: "))
-        CS_dCLmax_LD = float(input("dCLmax_LD required: "))
+        CS_dCLmax_TO = 0
+        CS_dCLmax_LD = 0
+
+        if (aircraft.FP_CL_max_to - aircraft.AE_CL_max_clean) > 0: CS_dCLmax_TO = (aircraft.FP_CL_max_to - aircraft.AE_CL_max_clean)
+        if (aircraft.FP_CL_max_land - aircraft.AE_CL_max_clean) > 0: CS_dCLmax_LD = (aircraft.FP_CL_max_land - aircraft.AE_CL_max_clean)
+
         CS_Swf_TO = CS_dCLmax_TO / (0.9 * CS_dClmax_TO * np.cos(CS_lambda_hinge)) * aircraft.Sw
         CS_Swf_LD = CS_dCLmax_LD / (0.9 * CS_dClmax_LD * np.cos(CS_lambda_hinge)) * aircraft.Sw
         
@@ -168,8 +171,8 @@ def flaps(aircraft):
         print(f"\nSwf_TO: {round(CS_Swf_TO / aircraft.Sw * 100, 3)}% Sw") 
         print(f"Swf_LD: {round(CS_Swf_LD / aircraft.Sw * 100, 3)}% Sw")
 
-    #CS_yend_f = Flaplength(aircraft, aircraft.taper, aircraft.rootchord, aircraft.b, aircraft.w_out / 2, CS_Swf)
-    return CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD
+    CS_yend_f = Flaplength(aircraft, aircraft.taper, aircraft.rootchord, aircraft.b, 0, CS_Swf)
+    return CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD, CS_yend_f
 
        
 
@@ -184,8 +187,9 @@ def controlability_curve(aircraft, xcgRange):
     For CL_Ah: L = W @ approach
     For Cm_ac: SEAD L8 S19"""
     
-    CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD = flaps(aircraft)
-
+    CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD, CS_yend_f = flaps(aircraft)
+    aircraft.yend_flap = CS_yend_f
+    
     CL_h = -1  # Full moving tail
     CL_Ah = aircraft.W_TO * aircraft.g0 / (0.5 * aircraft.rho0 * (1.3 * aircraft.V_s_min)**2 * aircraft.Sw)
 

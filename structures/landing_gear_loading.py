@@ -53,17 +53,28 @@ plt.plot(t,Ixx_min, label='ixx_min')
 #plt.plot(t,Iyy_min,label='iyy min')
 plt.plot(t,A_min,label='A_min')
 plt.legend()
-plt.show()
+# plt.show()
 
 t=1/1000
 a1=a+t/2
 a2=a-t/2
 b1=b+t/2
 b2=b-t/2
-print("mass kg",P*t*L*density)
-print("area mm^2", 2*np.pi*np.sqrt((a**2+b**2)/2)*t*1000**2)
-print('Ixx mm^4',0.25*np.pi*(a1**3*b1-a2**3*b2)*1000**4)
-print('Iyy mm^4',0.25*np.pi*(a1*b1**3-a2*b2**3)*1000**4)
+#print("mass kg",P*t*L*density)
+# print("area mm^2", 2*np.pi*np.sqrt((a**2+b**2)/2)*t*1000**2)
+# print('Ixx mm^4',0.25*np.pi*(a1**3*b1-a2**3*b2)*1000**4)
+# print('Iyy mm^4',0.25*np.pi*(a1*b1**3-a2*b2**3)*1000**4)
 
 #print('mass',t*2*np.pi*a*L*density)
 
+
+### tire loading ###
+x_cg = ac.X_cg_aft*ac.AE_MAC_length+ac.X_LEMAC
+l_m = ac.ST_x_mw-ac.ST_x_cg
+l_n = ac.ST_x_cg-ac.ST_x_nw
+P_n = ac.W_TO*ac.g0*((l_m+ac.ST_ax_g*ac.ST_z_ground)/(l_m+l_n))
+#print('x_cg',ac.X_cg_full*ac.AE_MAC_length+ac.X_LEMAC)
+print('nose wheel loading',P_n,l_m,l_n)
+
+w = 0.9/ac.g0*ac.WS**0.25 #vertical speed
+E = ac.W_TO*0.2*0.95/2*w**2 #energy to be absorbed by front wheel, if shock absorber used

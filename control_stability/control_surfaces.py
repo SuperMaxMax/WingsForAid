@@ -15,7 +15,7 @@ def Chordlength(y, aircraft):
     return aircraft.rootchord * (1 - ((1-aircraft.taper) / (aircraft.b / 2)) * y)
 
 def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Approach, Ch 12.4
-    ''' ''' # NOTE FIXME: DO WE INCLUDE WING STARTING AFTER FUSELAGE ENDS? HAS INFLUENCE ON DISTANCE FROM CENTRE
+    ''' '''
     '''Roll performance requirments'''
     phi_des_list = [30* (pi/180), 45* (pi/180), 60* (pi/180)]   # Roll requirement
     t_lim_list = [1.3, 1.7, 1.3]  # Max time available to complete the roll requirement
@@ -52,12 +52,12 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
             t = sqrt(2*phi_des/P_roll_rate)
         ystart_a_list.append(ystart_a)
       
-    aircraft.y_a_0 = min(ystart_a_list)
-    aircraft.y_a_1 = 0.95*aircraft.b/2
+    aircraft.ystart_ail = min(ystart_a_list) - aircraft.w_out/2  # to account for wing starting at fuselage border
+    aircraft.yend_ail = 0.95*aircraft.b/2 - aircraft.w_out/2  # to account for wing starting at fuselage border
 
-    aircraft.S_aileron = (aircraft.y_a_1 - aircraft.y_a_0) * (Chordlength(aircraft.y_a_0, aircraft) + Chordlength(aircraft.y_a_1, aircraft))/2
+    aircraft.S_aileron = (aircraft.yend_ail - aircraft.ystart_ail) * (Chordlength(aircraft.ystart_ail, aircraft) + Chordlength(aircraft.yend_ail, aircraft))/2
 
-    delta_L = L_a/2 /((aircraft.y_a_1 + aircraft.y_a_0)/2 * aircraft.b/2)
+    delta_L = L_a/2 /((aircraft.yend_ail + aircraft.ystart_ail)/2 * aircraft.b/2)
 
 def elevator_design(aircraft):
     
@@ -70,6 +70,40 @@ def elevator_design(aircraft):
 
     CL_h = -1
     L_h = 0.5 * 0.7 * CL_h * (aircraft.V_cruise)**2 * aircraft.AE_Sh_S * aircraft.Sw
+
+    T= 2800 
+    z_position_T = -(aircraft.ST_z_prop + aircraft.prop_radius - aircraft.ST_z_cg_ground)
+
+    eta_h = 0.96
+    V_range = np.arange(aircraft.V_s_min, aircraft.V_cruise*1.4, 2)
+    
+    color_r = ['black', 'steelblue']
+    e = 0
+    for X_cg in [aircraft.X_cg_fwd, aircraft.X_cg_aft]:
+        delta_eq_req_range = []
+        for V in V_range:
+            l_h = aircraft.l_f - (aircraft.X_LEMAC+ X_cg*aircraft.MAC_length) + aircraft.l_f_boom - 3/4 * aircraft.AE_rootchord_h
+            C_L1 = 2 * aircraft.W_TO * aircraft.g0 /(aircraft.rho_TO* V**2*aircraft.Sw)
+            tail_volume = l_h/aircraft.MAC_length * aircraft.Sh_S
+
+            C_L_delta_e = aircraft.CLa_Ah_cruise * eta_h * aircraft.Sh_S * 1
+            C_m_delta_e = -aircraft.CLa_Ah_cruise *eta_h * tail_volume * 1
+
+            delta_e_req = - ((T*z_position_T/(1/2 * aircraft.rho_TO * V**2 * aircraft.Sw * aircraft.MAC_length) + aircraft.af_cm0) * aircraft.CLa_w_cruise + (C_L1 - aircraft.af_Cl0)*aircraft.C_m_alpha)/(aircraft.CLa_w_cruise*C_m_delta_e - aircraft.C_m_alpha*C_L_delta_e)
+            delta_eq_req_range.append(delta_e_req*180/np.pi)
+        
+        
+        plt.scatter(V_range, delta_eq_req_range, marker='x', color=color_r[e])
+        
+        e = e +1
+    plt.xlabel(r"V [m/s]")
+    plt.ylabel(r"$\delta_E$ [deg]")
+
+    plt.axvline(x=aircraft.V_cruise, color='red', linestyle='--')
+    plt.text(aircraft.V_cruise - 2.5, min(delta_eq_req_range), r'$V_{cruise}$', rotation=90, color='red')
+
+    plt.grid()
+    plt.show(block=True)
 
 def rudder_design(aircraft):
     

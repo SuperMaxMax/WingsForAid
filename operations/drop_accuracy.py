@@ -256,18 +256,19 @@ def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score=0):
 
 # INITIALISE
 
-def PlotBar(ManTPM, TPMw, ManCases, concase, scores):
+def PlotBar(ManTPM, TPMw, Labels, Title, scores):
 
-    # cases = []
-    # for mancase in ManCases:
-    #     mancase_name = []
-    #     for val in mancase:
-    #         mancase_name.append(str(np.round(val,2)))
-    #     cases.append(str(mancase_name))
-    cases = list(np.argsort(scores))
+    labels = []
+    for lab in Labels:
+        # lab_name = []
+        # for val in lab:
+        #     lab_name.append(str(np.round(val,2)))
+        # labels.append(str(lab_name))
+        labels.append(str(lab))
+    #labels = list(np.argsort(scores))
 
     fig, ax = plt.subplots()
-    N = len(cases)
+    N = len(labels)
     bottom = np.zeros(N)
     width = 0.5
 
@@ -276,15 +277,16 @@ def PlotBar(ManTPM, TPMw, ManCases, concase, scores):
         tpm = np.array(tpm)
         w = TPMw[w_counter]
         bar = tpm * w
-        p = ax.bar(cases, bar, width, bottom=bottom,
+        p = ax.bar(labels, bar, width, bottom=bottom,
                    label=str(boolean+"|"+str(np.round(w, 2))))
         bottom += bar
         w_counter += 1
 
-    ax.set_title("TPM per case for condition " + str(concase))
-    plt.legend(loc='lower center', ncol=3, bbox_to_anchor=(0.5, +1.3))
+    dy = 0.5
+    ax.set_title("TPM per case for condition " + str(Title))
+    plt.legend(loc='lower center', ncol=3, bbox_to_anchor=(dy, +1.3))
     plt.subplots_adjust(left=0.1,
-                        bottom=0.5,
+                        bottom=dy,
                         right=0.95,
                         top=0.7,
                         wspace=0.3,
@@ -314,8 +316,8 @@ print("box default:", box.__dict__)
 # Simulation param
 dt_sim = 5 / 10E3  # [s] between simulation frames
 IT_max = 10E4
-DoVerif = False
-SingleTry = True
+DoVerif = True
+SingleTry = False
 
 # Operational limits & requirements
 V_boxdrop_lim = 100/3.6 # [m/s] 100kph drop limit
@@ -341,7 +343,7 @@ TPM_weights = np.array([
 C_Mbox = [10, 20] # [kg]
 C_Vw = [0, AC.OP_V_wind] # [kg]
 C_w_heading = [0, 180] # [deg]
-C_Nbox = 2 # [#]
+C_Nbox = 1 # [#]
 # c combinations
 N_div_C = 2
 if SingleTry:
@@ -385,7 +387,7 @@ M_pitch = [-45, 0] # [deg]
 M_heading = [0, 0] # [deg] not actually a free var
 M_Hmin = [Hmin, Hmin+1] # [m]
 # m combinations
-N_div_M = 0
+N_div_M = 3
 M_VAR = {
     "V_app": subdivide(M_V_app, min(N_div_M, 1)),
     "n_app": subdivide(M_n_app, N_div_M),
@@ -416,7 +418,7 @@ print("try maneuvers:", M_COMB)
 
 # Uncertainties
 # limits
-U_dt = 0.5 # [s] default time deviation
+U_dt = 0.1 # [s] default time deviation
 U_Mbox = [-0.5,0.5] # [kg]
 U_T_drop = [-U_dt, U_dt] # [s]
 U_T_brake = [-U_dt, U_dt] # [s]
@@ -443,8 +445,8 @@ else:
         "Mbox": subdivide(U_Mbox, N_div_U-1),
         "Vw": subdivide(U_Vw, N_div_U-1),
         "w_heading": subdivide(U_w_heading, N_div_U+1),
-        "T_drop": subdivide(U_T_drop, N_div_U-1),
-        "T_brake": subdivide(U_T_brake, N_div_U-1),
+        "T_drop": subdivide(U_T_drop, N_div_U-2),
+        "T_brake": subdivide(U_T_brake, N_div_U-2),
         "T_flap": subdivide(U_T_flap, N_div_U-1),
     }
 if SingleTry: U_VAR["w_heading"] = subdivide(U_w_heading, 4)
@@ -482,6 +484,16 @@ ConResults = {
     "states": [], # better Vi
     "TPM": []
 }
+ConditionTPM = {
+    "REQ passed": [],
+    "REQ_S": [],
+    "REQ_Vi": [],
+    "OPS_R": [],
+    "OPS_am": [],
+    "AC_na": [],
+    "AC_pa": [],
+    "AC_Va": []
+}
 
 N_Con = 1
 for DropCon in C_COMB:
@@ -511,6 +523,7 @@ for DropCon in C_COMB:
         "AC_Va": []
     }
     Scores = []
+    TPMs = []
 
     N_Man = 1
     for ManCase in M_COMB:
@@ -585,51 +598,45 @@ for DropCon in C_COMB:
         ManeuverTPM["REQ_S"].append(round(Sfit))
         ManeuverTPM["REQ_Vi"].append(round(Pvi))
         ManeuverTPM["OPS_R"].append(100*round(1-Dfit))
-        ManeuverTPM["OPS_am"].append(100*(1-(ManResults["worst a_max"][-1]/AC_nmax)))
-        ManeuverTPM["AC_na"].append(100*(1 - (ManCase[1] / AC_nmax)))
+        ManeuverTPM["OPS_am"].append(np.max(100*(1-(ManResults["worst a_max"][-1]/AC_nmax)),0))
+        ManeuverTPM["AC_na"].append(np.max(100*(1 - (ManCase[1] / AC_nmax)),0))
         ManeuverTPM["AC_pa"].append(100*(1 - (abs(ManCase[2]) / max(abs(M_pitch[0]), abs(M_pitch[1])))))
         ManeuverTPM["AC_Va"].append(100*max((ManCase[0]-AC_V_s)/AC_V_s,0))
 
         TPM = []
         for boolean, tpm in ManeuverTPM.items():
-            TPM.append(tpm)
-        print(TPM)
-        print(TPM_weights)
+            TPM.append(tpm[-1])
+        TPMs.append(TPM)
+
         Score = np.sum(np.vdot(
             np.array(TPM),
             np.array(TPM_weights)))
         Scores.append(Score)
-        PlotScatter(DropResults, ManResults, ManCase, DropCon, dropzone_poly, hull_poly, Score)
+        if SingleTry:
+            PlotScatter(DropResults, ManResults, ManCase, DropCon, dropzone_poly, hull_poly, Score)
 
         N_Man += 1
 
-    # Weighted criteria sum
-    # w_i = 0
-    # for boolean, tpm in ManeuverTPM.items():
-    #     tpm = np.array(tpm)
-    #     w = TPM_weights[w_i]
-    #     ds = tpm * w
-    #     Scores += ds
-    # rank & append best
     index = np.argsort(Scores)
 
     ConResults["Condition-Maneuver"].append([DropCon, M_COMB[index[-1]]])
     ConResults["Score"].append(Scores[index[-1]])
-    ConTPM = []
-    for tpm in ManeuverTPM:
-        ConResults["TPM"].append(tpm[index[-1]])
+    i = 0
+    for boolean, tpm in ConditionTPM.items():
+        ConditionTPM[boolean].append(TPMs[index[-1]][i])
+        i += 1
 
     # bar plot
     if not SingleTry and N_div_M > 0:
         print("Results from ", DropCon, "are:\n", ConResults)
-        PlotBar(ConResults["TPM"], TPM_weights, M_COMB, C_COMB, Scores)
+        PlotBar(ManeuverTPM, TPM_weights, M_COMB, DropCon, Scores)
     N_Con += 1
 
 # plot ref drop overlay
 # plot scatter overlay
 # plot bar (cond)
 if not SingleTry and N_div_C > 0:
-    PlotBar(ManeuverTPM, TPM_weights, ConResults["Condition-Maneuver"][0], ConResults["Condition-Maneuver"][1], ConResults["Score"])
+    PlotBar(ConditionTPM, TPM_weights, ConResults["Condition-Maneuver"][0], "all conditions", ConResults["Score"])
 
 # Sensitivity & Causality
 # Mparam = f(Case param)
