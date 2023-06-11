@@ -25,18 +25,18 @@ c_r = ac.rootchord                           # [m]
 c_t = ac.tipchord                            # [m]
 
 # For aileron
-y1_a = 0.7 * span/2                          # Start of aileron - [m]
-y2_a = 0.95 * span/2                         # End of aileron - [m]
-c_a = 0.2                                    # aileron chord - [c]
+y1_a = ac.ystart_ail              # Start of aileron - [m]
+y2_a = ac.yend_ail                # End of aileron - [m]
+c_a = 0.2                                    # aileron chord - [c]  # TODO: Same as in control surfaces?
 
 # For flaps
-y1_f = 0.1 * span/2                          # Start of flaps - [m]
-y2_f = 0.65 * span/2                         # End of flaps - [m]
+y1_f = 0                          # Start of flaps - [m]
+y2_f = ac.yend_flap              # End of flaps - [m]
 c_f = 0.25                                   # flap chord - [c]
 
 # Spars
 f_spar = 0.15                                 # front spar location - [c]
-a_spar = 0.55                                # aft spar location - [c]
+a_spar = 0.75                                # aft spar location - [c]
 
 # -------------------------------------------- Calculations --------------------------------------------
 
@@ -54,7 +54,7 @@ result, error = quad(function, ymin, ymax)
 
 # Apply formulas to find MAC and spanwise position
 mac = (2/S) * result
-spanwise_pos = (mac - c_r) / -((c_r-c_t)/(span/2))
+spanwise_pos = (mac - c_r) / -((c_r-c_t)/(span/2 + ac.w_out/2))
 
 # Root chord position
 q_c_r = 0
@@ -129,48 +129,55 @@ print("---------------------------------------------------")
 # Make plot
 plt.figure()
 plt.xlim(-span/2 - 2, span/2 + 2)
-plt.ylim()
+plt.ylim(te_c_r - 0.5, le_c_r + 0.5)
+
+# Fuselage
+plt.plot((-ac.w_out/2, -ac.w_out/2), (-3, 3), 'black', label = "Fuselage", linewidth = line_width)
+plt.plot((ac.w_out/2, ac.w_out/2), (-3, 3), 'black', linewidth = line_width)
 
 # Quarter chord line left side
-plt.plot((0,-span/2),(q_c_r,q_c_t), label="Quarter Chord line", linewidth=line_width)
+plt.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(q_c_r,q_c_t), label="Quarter Chord line", linewidth=line_width)
 
 # Spars
-plt.plot((0,span/2),(le_c_r-f_spar*c_r,le_c_t-f_spar*c_t), 'm', label="Spars", linewidth=line_width)
-plt.plot((0,-span/2),(le_c_r-f_spar*c_r,le_c_t-f_spar*c_t), 'm', linewidth=line_width)
-plt.plot((0,span/2),(le_c_r-a_spar*c_r,le_c_t-a_spar*c_t), 'm', linewidth=line_width)
-plt.plot((0,-span/2),(le_c_r-a_spar*c_r,le_c_t-a_spar*c_t), 'm', linewidth=line_width)
+plt.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r-f_spar*c_r,le_c_t-f_spar*c_t), 'm', label="Spars", linewidth=line_width)
+plt.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_r-f_spar*c_r,le_c_t-f_spar*c_t), 'm', linewidth=line_width)
+plt.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r-a_spar*c_r,le_c_t-a_spar*c_t), 'm', linewidth=line_width)
+plt.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_r-a_spar*c_r,le_c_t-a_spar*c_t), 'm', linewidth=line_width)
 
 # Aileron
-plt.plot((y1_a,y2_a),(ai1,ai3),'y', label="Ailerons", linewidth=line_width)
-plt.plot((y1_a,y1_a),(ai1,ai2),'y', linewidth=line_width)
-plt.plot((y2_a,y2_a),(ai3,ai4),'y', linewidth=line_width)
-plt.plot((-y1_a,-y2_a),(ai1,ai3),'y', linewidth=line_width)
-plt.plot((-y1_a,-y1_a),(ai1,ai2),'y', linewidth=line_width)
-plt.plot((-y2_a,-y2_a),(ai3,ai4),'y', linewidth=line_width) 
+plt.plot((y1_a + ac.w_out/2, y2_a + ac.w_out/2),(ai1,ai3),'y', label="Ailerons", linewidth=line_width)
+plt.plot((y1_a + ac.w_out/2, y1_a + ac.w_out/2),(ai1,ai2),'y', linewidth=line_width)
+plt.plot((y2_a + ac.w_out/2, y2_a + ac.w_out/2),(ai3,ai4),'y', linewidth=line_width)
+plt.plot((-y1_a - ac.w_out/2, -y2_a - ac.w_out/2),(ai1,ai3),'y', linewidth=line_width)
+plt.plot((-y1_a - ac.w_out/2, -y1_a - ac.w_out/2),(ai1,ai2),'y', linewidth=line_width)
+plt.plot((-y2_a - ac.w_out/2, -y2_a - ac.w_out/2),(ai3,ai4),'y', linewidth=line_width) 
 
 # Flaps
-plt.plot((y1_f,y2_f),(fl1,fl3),'c', label="Flaps", linewidth=line_width)
-plt.plot((y1_f,y1_f),(fl1,fl2),'c', linewidth=line_width)
-plt.plot((y2_f,y2_f),(fl3,fl4),'c', linewidth=line_width)
-plt.plot((-y1_f,-y2_f),(fl1,fl3),'c', linewidth=line_width)
-plt.plot((-y1_f,-y1_f),(fl1,fl2),'c', linewidth=line_width)
-plt.plot((-y2_f,-y2_f),(fl3,fl4),'c', linewidth=line_width) 
+plt.plot((y1_f + ac.w_out/2, y2_f + ac.w_out/2),(fl1,fl3),'c', label="Flaps", linewidth=line_width)
+plt.plot((y1_f + ac.w_out/2, y1_f + ac.w_out/2),(fl1,fl2),'c', linewidth=line_width)
+plt.plot((y2_f + ac.w_out/2, y2_f + ac.w_out/2),(fl3,fl4),'c', linewidth=line_width)
+plt.plot((-y1_f - ac.w_out/2, -y2_f - ac.w_out/2),(fl1,fl3),'c', linewidth=line_width)
+plt.plot((-y1_f - ac.w_out/2, -y1_f - ac.w_out/2),(fl1,fl2),'c', linewidth=line_width)
+plt.plot((-y2_f - ac.w_out/2, -y2_f - ac.w_out/2),(fl3,fl4),'c', linewidth=line_width) 
 
 # Root chord
-plt.plot((0,0),(le_c_r,te_c_r), label="Root chord", linewidth=line_width)
+plt.plot((0 + ac.w_out/2, 0 + ac.w_out/2),(le_c_r,te_c_r), 'limegreen', label="Root chord", linewidth=line_width)
+plt.plot((0 - ac.w_out/2, 0 - ac.w_out/2),(le_c_r,te_c_r), 'limegreen', linewidth=line_width)
 
 # Tip chords
-plt.plot((-span/2,-span/2),(le_c_t,te_c_t), 'r', label="Tip chord", linewidth=line_width)
-plt.plot((span/2,span/2),(le_c_t,te_c_t), 'r', linewidth=line_width)
+plt.plot((span/2 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_t,te_c_t), 'r', linewidth=line_width)
+plt.plot((-span/2 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_t,te_c_t), 'r', label="Tip chord", linewidth=line_width)
 
 # MAC on left side
-mac_plot = plt.plot((-spanwise_pos,-spanwise_pos),(te_mac,le_mac), label="MAC", linewidth=line_width)
+mac_plot = plt.plot((-spanwise_pos, -spanwise_pos),(te_mac,le_mac), label="MAC", linewidth=line_width)
 
 # Connecting
-plt.plot((-span/2,0),(le_c_t,le_c_r), 'b', linewidth=line_width)
-plt.plot((0,span/2),(le_c_r,le_c_t), 'b', linewidth=line_width)
-plt.plot((-span/2,0),(te_c_t,te_c_r), 'b', linewidth=line_width)
-plt.plot((0,span/2),(te_c_r,te_c_t), 'b', linewidth=line_width)
+plt.plot((-span/2 - ac.w_out/2, 0 - ac.w_out/2),(le_c_t,le_c_r), 'b', linewidth=line_width)
+plt.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r,le_c_t), 'b', linewidth=line_width)
+plt.plot((-span/2 - ac.w_out/2, 0 - ac.w_out/2),(te_c_t,te_c_r), 'b', linewidth=line_width)
+plt.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(te_c_r,te_c_t), 'b', linewidth=line_width)
+
+plt.text(-3, -0.46, "NOT SURE ABOUT MAC POSITION", color = 'red')
 
 # Finalizing
 plt.gca().set_aspect('equal', adjustable='box')
