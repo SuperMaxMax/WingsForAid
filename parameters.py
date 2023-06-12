@@ -55,7 +55,7 @@ class UAV:
         self.h_TO = 0                       # Take-off altitude, airport altitude [m]
         self.h_cruise = 3048.0              # Cruise altitude [m]
         self.h_in = 0.9                     # Inner fuselage height [m]
-        self.h_out = 0.67                    # Outer fuselage height [m]
+        self.h_out = 0.7                    # Outer fuselage height [m]
         # I
         self.i_w = 0.935 * np.pi / 180       # Updated incidence angle of wing wrt fuselage [rad]
 
@@ -178,7 +178,7 @@ class UAV:
         self.W_w = 55.5897                  # Wing weight [kg]
         self.WfinalW10 = 0.993              # Landing, taxi & shut-down fraction [-]
         self.w_in = 1.2                     # Inner fuselage width [m]
-        self.w_out = 1                    # Outer fuselage width [m]
+        self.w_out = 1.1                    # Outer fuselage width [m]
         self.wing_twist = -2.0 *np.pi/180   # Updated wing twist (difference root and chord) [rad]
 
         # X

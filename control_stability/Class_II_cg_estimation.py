@@ -28,7 +28,7 @@ def cg_calc(obj, plot):
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement
-    X_LEMAC = 0.35 * obj.l_f
+    X_LEMAC = 0.39 * obj.l_f
     obj.X_LEMAC = X_LEMAC
 
     '''v Wing group v'''
@@ -76,7 +76,7 @@ def cg_calc(obj, plot):
     # For now: cg assumed to be at aircraft cg -> not taken into account for X_FCG, but is part of OEW
 
     W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
-    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
+    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + uc_cg * obj.W_uc + boom_cg*obj.W_boom)/(W_fus_gr)
     obj.X_FCG = X_FCG
 
     name_list += ['fuselage', 'engine', 'tail', 'boom', 'equipment', 'nacelle', 'undercarriage']
