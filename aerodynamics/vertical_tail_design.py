@@ -265,7 +265,7 @@ def horizontal_tail_planform(aircraft):
         if not full_print:
             return abs(C_L_wing - C_L_h)
         elif full_print:
-            return AR, b, Lambda, alpha_twist, S, CL_a_h  #choose whatever
+            return AR, b, Lambda, alpha_twist, S, CL_a_h, i_w  #choose whatever
 
     airfoildata = airfoil_select(required_lift(aircraft)[0], 0)
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
@@ -273,7 +273,20 @@ def horizontal_tail_planform(aircraft):
 
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     #print('pppppppp', a_h_optimal,type(a_h_optimal))
-    AR, b, Lambda, alpha_twist, S, CL_a_v  = plot_lift_distr(a_h_optimal, full_print = True)
+    AR, b, Lambda, alpha_twist, S, CL_a_v, i_w_v  = plot_lift_distr(a_h_optimal, full_print = True)
+
+    # Vertical tailplane
+        #self.AE_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
+    aircraft.AE_A_v = AR                     # [-] Aspect ratio vertical tail
+    #aircraft.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane
+    #aircraft.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
+    aircraft.AE_Sv = S
+    aircraft.AE_b_v = b
+    #aircraft.AE_vertical_airfoil = '0009'      # Airfoil of vertical tail (NACA)
+    aircraft.AE_rootchord_v = 2 * S / (b * (1+Lambda)) 
+    aircraft.AE_tipchord_v = aircraft.AE_rootchord_v*Lambda
+    aircraft.AE_lambda_LE_v = 35 * np.pi / 180
+    aircraft.AE_i_w_v = i_w_v
 
 
 horizontal_tail_planform(object)

@@ -74,7 +74,7 @@ def cg_calc(obj, plot):
         labels = ['200000', '020000', '002000', '000200', '000020', '000002', '220000', '022000', '002200', '000220', '000022', '222000', '022200', '002220', '000222', '222200', '022220', '002222', '222220', '022222', '222222']
         box_xs = [dist_front+0.2, dist_front+0.65, dist_front+1.15, dist_front+1.65, dist_front+2.15, dist_front+2.6]   
 
-    box_weights = [sum(i)*20 for i in box_configs]
+    box_weights = [sum(i)*obj.boxweight for i in box_configs]
     box_xcg_positions = [np.dot(i, box_xs)/sum(i) for i in box_configs]
 
     # cg of OEW + fuel

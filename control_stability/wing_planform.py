@@ -25,18 +25,18 @@ def WingPlanform(ac, plot):
     c_t = ac.tipchord                            # [m]
 
     # For aileron
-    y1_a = ac.ystart_ail              # Start of aileron - [m]
-    y2_a = ac.yend_ail                # End of aileron - [m]
-    c_a = 0.2                                    # aileron chord - [c]  # TODO: Same as in control surfaces?
+    y1_a = ac.ystart_ail             # Start of aileron - [m]
+    y2_a = ac.yend_ail               # End of aileron - [m]
+    c_a = 1 - ac.xc_aft_spar                        # aileron chord - [c]
 
     # For flaps
-    y1_f = 0                          # Start of flaps - [m]
+    y1_f = 0                         # Start of flaps - [m]
     y2_f = ac.yend_flap              # End of flaps - [m]
-    c_f = 0.25                                   # flap chord - [c]
+    c_f = 1 - ac.xc_aft_spar         # flap chord - [c]
 
     # Spars
-    f_spar = 0.15                                 # front spar location - [c]
-    a_spar = 0.75                                # aft spar location - [c]
+    f_spar = 0.15                    # front spar location - [c]
+    a_spar = ac.xc_aft_spar          # aft spar location - [c]
 
     # -------------------------------------------- Calculations --------------------------------------------
 
@@ -54,7 +54,7 @@ def WingPlanform(ac, plot):
 
     # Apply formulas to find MAC and spanwise position
     mac = (2/S) * result
-    spanwise_pos = (mac - c_r) / -((c_r-c_t)/(span/2 + ac.w_out/2))
+    spanwise_pos = (mac - c_r) / -((c_r-c_t)/(span/2))
 
     # Root chord position
     q_c_r = 0
@@ -127,7 +127,9 @@ def WingPlanform(ac, plot):
     # ---------------------------------------------- Plotting ----------------------------------------------
 
     # Make plot
-    fig1, ax1 = plt.subplots(figsize=(15, 8))
+    fig1, ax1 = plt.subplots(figsize=(10,6))
+    # plt.subplots_adjust(left = 0, bottom = 0, right = 1, top = 1)
+    
     ax1.set_xlim(-span/2 - 2, span/2 + 2)
     ax1.set_ylim(te_c_r - 0.5, le_c_r + 0.5)
 
@@ -169,7 +171,7 @@ def WingPlanform(ac, plot):
     ax1.plot((-span/2 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_t,te_c_t), 'r', label="Tip chord", linewidth=line_width)
 
     # MAC on left side
-    mac_plot = ax1.plot((-spanwise_pos, -spanwise_pos),(te_mac,le_mac), label="MAC", linewidth=line_width)
+    mac_plot = ax1.plot((-spanwise_pos - ac.w_out/2, -spanwise_pos - ac.w_out/2),(te_mac,le_mac), label="MAC", linewidth=line_width)
 
     # Connecting
     ax1.plot((-span/2 - ac.w_out/2, 0 - ac.w_out/2),(le_c_t,le_c_r), 'b', linewidth=line_width)
@@ -177,15 +179,15 @@ def WingPlanform(ac, plot):
     ax1.plot((-span/2 - ac.w_out/2, 0 - ac.w_out/2),(te_c_t,te_c_r), 'b', linewidth=line_width)
     ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(te_c_r,te_c_t), 'b', linewidth=line_width)
 
-    ax1.text(-2.45, -0.5, "NOT SURE ABOUT MAC POSITION AND AILERON END LOCATION", color = 'red')
-
     # Finalizing
     fig1.gca().set_aspect('equal', adjustable='box')
-    ax1.set_title("Wing planform")
+    # ax1.set_title("Wing planform")
     ax1.set_xlabel("Spanwise position [m]")
     ax1.set_ylabel("Longitudinal position [m]")
-    ax1.legend(loc = "lower right", fontsize = "xx-small")
+    ax1.legend(loc = "upper center", fontsize = "medium", bbox_to_anchor = (0.5, 1.4), ncol = 4)
     ax1.grid()
+
+    plt.savefig("WingPlanform.png", bbox_inches = "tight")
 
     if plot:
         plt.show(block=True)

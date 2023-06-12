@@ -1,0 +1,164 @@
+Wings For Aid
+
+0.1842                   !   Mach
+0     0     0.0          !   iYsym  iZsym  Zsym
+11.7113 1.248  9.527     !   Sref   Cref   Bref   reference area, chord, span
+0.00  0.0   0.0          !   Xref   Yref   Zref   moment reference location (arb.)
+0.02595                  !   CDp
+
+#
+#==============================================================
+#
+SURFACE
+wing
+#Horseshoe Vortex Distribution
+101.0201.0   ! Nchord   Cspace   Nspan  Sspace
+#
+# reflect image wing about y=0 plane
+YDUPLICATE
+     0.0 
+#
+# twist angle bias for whole surface
+ANGLE
+    0.016318828506146982    
+
+# x,y,z bias for whole surface
+TRANSLATE
+    2.2760.00.0
+
+# Here the section starts
+#---------------Root Section-------------------------------------------
+#    Xle         Yle         Zle         chord       angle   
+SECTION
+    0.00.00.01.490.0 
+
+NACA
+4415
+
+CONTROL
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+flap     1.00.80.01.00.01.0
+
+#---------------End Flap Section-------------------------------------------
+#    Xle         Yle         Zle         chord       angle   
+SECTION
+    0.0427773216031280551.56290.01.31892282000966190.011452818675099981   
+
+NACA
+4415
+
+CONTROL
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+flap     1.00.80.01.00.01.0
+
+
+#---------------Begin Aileron Section-------------------------------------------
+#    Xle         Yle         Zle         chord       angle   
+SECTION
+    0.090541544477028353.3080.01.12786835767442260.024240785832254613   
+
+NACA
+4415
+
+CONTROL
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+aileron  1.00.80.01.00.0-1.0
+
+#---------------End Aileron Section-------------------------------------------
+#    Xle         Yle         Zle         chord       angle   
+SECTION
+    0.108797653958944283.9750.01.05484484820355860.029128513809919012   
+
+NACA
+4415
+
+CONTROL
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+aileron  1.00.80.01.00.0-1.0
+
+#-----------Tip Section------------------
+SECTION
+    0.130379276637341144.76350.00.96850.03490658503988659   
+
+NACA
+4415
+
+#
+#==============================================================
+#
+SURFACE
+H-Stab
+81.051.0  !  Nchord   Cspace
+#
+# reflect image wing about y=0 plane
+YDUPLICATE
+     0.0 
+
+# twist angle bias for whole surface
+ANGLE
+     -1.8957  
+
+# x,y,z bias for whole surface
+TRANSLATE
+   6.5657082500000010.00.0
+
+#-----------------------Root Section-----------------------------------
+#    Xle         Yle         Zle         chord       angle 
+SECTION
+   0.00.00.00.9311670.0   
+
+NACA
+0012
+
+CONTROL
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+elevator  1.00.0010.01.00.01.0
+
+#-------------------Tip Section-------------------------
+#    Xle         Yle         Zle         chord       angle 
+SECTION
+     0.01.82450.00.9311670.0  
+
+NACA
+0012
+
+CONTROL
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+elevator  1.00.0010.01.00.01.0
+
+#
+#==============================================================
+#
+SURFACE
+V-Stab
+81.0100.8  ! Nchord   Cspace
+
+# twist angle bias for whole surface
+ANGLE
+     0.07  
+
+# x,y,z bias for whole surface
+TRANSLATE
+   6.5657082500000010.00.0
+#-------------------Lower Section-------------------------------------------
+#    Xle         Yle         Zle         chord       angle   
+SECTION
+   0.00.00.00.9530.0   
+
+NACA 
+0012
+
+#CONTROL
+#rudder    1.00.40.00.01.0
+#-----------------Upper Section----------------------
+SECTION
+   1.12033206113553560.01.60.66710.0  
+
+NACA
+0012
+
+#CONTROL
+#rudder    1.00.40.00.01.0
+#==============================================================
+
+#Created by Jan Vonken 10-06-2023

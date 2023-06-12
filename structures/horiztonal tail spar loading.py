@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from parameters import UAV
 ac=UAV("aircraft")
 from fuselage_truss_loading import dF_h_man
+from parameters import atmosphere
+at=atmosphere()
 
 # # s-steel 410
 yield_stress = 1225*10**6
@@ -14,8 +16,11 @@ E = 200*10**9
 r_h_tail_spar = 0.025
 l_h_tail_spar = ac.AE_b_h
 F_h_max = abs(dF_h_man)
+T_max = 0.25*ac.AE_MAC_length_h*max(0.5*at.rho0*ac.V_A**2*ac.AE_Sh*ac.AE_CL_a_h*(2/360*2*np.pi),0.5*at.rho0*ac.V_cruise**2*ac.AE_Sh*ac.AE_CL_a_h*(1/360*2*np.pi),F_h_max)
 arm = ac.AE_b_h/2*1/3 #5/2*1/3 # conservative, assuming hor tail up to 5m
 M_h_max = abs(F_h_max*arm)
+A_m = np.pi*r_h_tail_spar**2
+
 
 Ixx_min = M_h_max*r_h_tail_spar/yield_stress
 A_min = F_h_max/yield_stress_shear
@@ -44,9 +49,11 @@ plt.legend()
 plt.show()
 
 t=1/1000
-print("mass kg",P*t*l_h_tail_spar*density)
+print("mass kg",P*t*1.2*density)
 print("area", 2*np.pi*r_h_tail_spar*t)
 print('min area', A_min[0])
 print('Ixx',1/8*np.pi*(r_h_tail_spar*2)**3*t)
 print('min Ixx',Ixx_min[0])
+print("T_max req",T_max)
+print("T_max allowed", 2*t*yield_stress_shear*A_m)
 #print('Iyy mm^4',0.25*np.pi*(a1*b1**3-a2*b2**3)*1000**4)
