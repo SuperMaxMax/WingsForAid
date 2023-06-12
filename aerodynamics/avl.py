@@ -62,7 +62,7 @@ NACA
 
 CONTROL
 #Cname   Cgain  Xhinge  HingeVec       SgnDup
-flap     """,1.0,    0.75,    0.0, 1.0, 0.0,    1.0,"""
+flap     """,1.0,    aircraft.aft,    0.0, 1.0, 0.0,    1.0,"""
 
 #---------------End Flap Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
@@ -193,7 +193,11 @@ for i in range(len(avl_file)):
 
 print(string)
 
-f = open(r"WFA.avl", "w")
+path = r"C:\Users\jarno\OneDrive\Documenten\WingsForAid\aerodynamics\WFA.avl"
+
+#r"C:\Users\jarno\OneDrive\Documenten\WingsForAid\aerodynamics\WFA.avl"
+""
+f = open(path, "w")
 
 f.write(string)
 
