@@ -16,12 +16,50 @@ import horizontal_tail_design as htd
 import vertical_tail_design as vtd
 
 
-
 wp.main_wing_planform(aircraft)
 htd.horizontal_tail_planform(aircraft)
 vtd.horizontal_tail_planform(aircraft)
 
+avl_mass = """#-------------------------------------------------
+#  Wings For Aid Aircraft
+#
+#  Dimensional unit and parameter data.
+#  Mass & Inertia breakdown.
+#-------------------------------------------------
 
+#  Names and scalings for units to be used for trim and eigenmode calculations.
+#  The Lunit and Munit values scale the mass, xyz, and inertia table data below.
+#  Lunit value will also scale all lengths and areas in the AVL input file.
+Lunit = 1.0   m
+Munit = 1.0   kg
+Tunit = 1.0   s
+
+#------------------------- 
+#  Gravity and density to be used as default values in trim setup (saves runtime typing).
+#  Must be in the unit names given above (m,kg,s).
+g   = 9.81
+rho = 0.904637
+
+#-------------------------
+#  Mass & Inertia breakdown.
+#  x y z  is location of item's own CG.
+#  Ixx... are item's inertias about item's own CG.
+#
+#  x,y,z system here must be exactly the same one used in the .avl input file
+#     (same orientation, same origin location, same length units)
+#
+#  mass      x      y        z       Ixx   Iyy   Izz    Ixy  Ixz  Iyz
+#
+   27.7949   2.723  1.9054   1.27    0.0   0.0   0.0    ! right wing       
+   27.7949   2.723  -1.9054  1.27    0.0   0.0   0.0    ! left wing  
+   95.9102   2.384  0.0      0.84    0.0   0.0   0.0    ! fuselage
+   17.0451   6.839  0.0      0.3     0.0   0.0   0.0    ! tail
+   
+
+# Created by Jan Vonken, 11-06-2023"""
+
+df = pd.read_csv("AVL_mass.csv")
+print(df)
 
 avl_file = """Wings For Aid
 
