@@ -21,6 +21,7 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Polygon, MultiPoint
 import shapely
+import winsound
 
 # FUNCTIONS
 def SimuDrop(DropCon, DropMan, DropUnc, DropResults):
@@ -212,14 +213,15 @@ def PlotTraj(states, title):
                         hspace=0.4)
     plt.show()
 
-def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score=0):
-    points = Stats["bounds"][-1]
+def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score=0, plot=True):
     cmap = plt.get_cmap('hot')
+    plt.grid(visible=None, which='major', axis='both', color='black', linestyle='-', linewidth=0.1)
 
     # possible landing (combinatory uncertainties)
+    Vmax = 30 # AC.OP_Vbox_LDG
     plt.scatter(Drops["impact DX [m]"][1:] - Drops["impact DX [m]"][0],
                 Drops["impact DY [m]"][1:] - Drops["impact DY [m]"][0],
-                c=Drops["impact velocity [m/s]"][1:], ec='k', cmap=cmap,label='possible', vmin=-50, vmax=0)
+                c=Drops["impact velocity [m/s]"][1:], ec='k', cmap=cmap,label='possible', vmin=-Vmax, vmax=0)
     plt.colorbar(label='impact velocity [m/s]')
 
     # reference drop
@@ -245,13 +247,60 @@ def PlotScatter(Drops,Stats, mancase, concase, poly1, poly2, score=0):
     for var in mancase: mc_r.append(np.round(var, 2))
     cc_r = []
     for var in concase: cc_r.append(np.round(var, 2))
-    plt.title("landing spots for:" +
-            "\ncondition:"+ str(cc_r) +
-            " & maneuver:"+ str(mc_r) +
-            "\nSfit=" + str(round(Stats["Sfit"][-1])) + "%" +
-              " and Dfit=" + str(round(Stats["Dfit"][-1]))
-              + "% | Score:" + str(np.round(score,1))
-    )
+    if plot:
+        plt.title("landing spots for:" +
+                "\ncondition:"+ str(cc_r) +
+                " & maneuver:"+ str(mc_r) +
+                "\nSfit=" + str(round(Stats["Sfit"][-1])) + "%" +
+                  " and Dfit=" + str(round(Stats["Dfit"][-1]))
+                  + "% | Score:" + str(np.round(score,1))
+        )
+    else:
+        plt.title("landing spots for all conditions, single maneuver, all uncertainties")
+
+    plt.xlabel('length [m]')
+    plt.ylabel('width [m]')
+    plt.show()
+
+def PlotBounds(ConDrops, droppoly):
+    cmap = plt.get_cmap('hot')
+    plt.grid(visible=None, which='major', axis='both', color='black', linestyle='-', linewidth=0.1)
+
+    for cat, var in ConDrops.items():
+        NDrops = len(var)
+    NDrops -= 1
+    Vmax = 30
+    while NDrops >= 0:
+        # average drop
+        plt.scatter(ConDrops["Xavg"][NDrops] - ConDrops["Xref"][NDrops],
+                    ConDrops["Yavg"][NDrops] - ConDrops["Yref"][NDrops],
+                    marker='x',
+                    c=ConDrops["Vimax"][NDrops], ec='k', cmap=cmap, vmin=-Vmax, vmax=0
+                    )
+        # bounds
+        points = ConDrops["bounds"][NDrops]
+        mpt = MultiPoint(points)
+        hull_poly = shapely.wkt.loads(mpt.convex_hull.wkt)
+        plt.plot(*hull_poly.exterior.xy, linewidth=1,
+                 #c=ConDrops["Vimax"][NDrops], ec='k', cmap=cmap, vmin=-Vmax, vmax=0
+                 )
+        NDrops -= 1
+
+    # dropzone
+    plt.plot(*droppoly.exterior.xy, color='b', label='required zone')
+
+    # plot surronding thingies
+    plt.colorbar(label='worst impact velocity [m/s]')
+    plt.legend(loc='lower center', ncol=3, bbox_to_anchor=(0.5, -0.3))
+    plt.subplots_adjust(left=0.1,
+                        bottom=0.1,
+                        right=0.95,
+                        top=0.85,
+                        wspace=0.3,
+                        hspace=0.4)
+    plt.title("landing spots for all conditions, all uncertainties")
+    plt.xlabel('length [m]')
+    plt.ylabel('width [m]')
     plt.show()
 
 # INITIALISE
@@ -260,12 +309,10 @@ def PlotBar(ManTPM, TPMw, Labels, Title, scores):
 
     labels = []
     for lab in Labels:
-        # lab_name = []
-        # for val in lab:
-        #     lab_name.append(str(np.round(val,2)))
-        # labels.append(str(lab_name))
-        labels.append(str(lab))
-    #labels = list(np.argsort(scores))
+        lab_name = str()
+        for val in lab:
+            lab_name += str(round(val)) + " "
+        labels.append(lab_name)
 
     fig, ax = plt.subplots()
     N = len(labels)
@@ -282,9 +329,9 @@ def PlotBar(ManTPM, TPMw, Labels, Title, scores):
         bottom += bar
         w_counter += 1
 
-    dy = 0.5
+    dy = 0.25
     ax.set_title("TPM per case for condition " + str(Title))
-    plt.legend(loc='lower center', ncol=3, bbox_to_anchor=(dy, +1.3))
+    plt.legend(loc='lower center', ncol=3, bbox_to_anchor=(0.5, 1+dy))
     plt.subplots_adjust(left=0.1,
                         bottom=dy,
                         right=0.95,
@@ -316,8 +363,9 @@ print("box default:", box.__dict__)
 # Simulation param
 dt_sim = 5 / 10E3  # [s] between simulation frames
 IT_max = 10E4
-DoVerif = True
-SingleTry = False
+SingleTry = False # 1 maneuver, full uncertainties
+SingleTryGNC = True # 1 maneuver, all conditions with some uncertainty
+DoVerif = False
 
 # Operational limits & requirements
 V_boxdrop_lim = 100/3.6 # [m/s] 100kph drop limit
@@ -354,15 +402,23 @@ if SingleTry:
         "w_heading": subdivide([0,0], 0),
         "box_number": [C_Nbox]
     }
+elif SingleTryGNC:
+    C_Nbox = 1
+    C_VAR = {
+        "Mbox": subdivide(C_Mbox, 1),
+        "Vw": subdivide(C_Vw, 2),
+        "w_heading": subdivide(C_w_heading, 4),
+        "box_number": [C_Nbox]
+    }
 else:
     C_VAR = {
         "Mbox": subdivide(C_Mbox, min(N_div_C,1)),
-        "Vw": subdivide(C_Vw, min(N_div_C,2)),
+        "Vw": subdivide(C_Vw, min(N_div_C,1)),
         "w_heading": subdivide(C_w_heading, N_div_C),
         "box_number": [C_Nbox]
     }
     if N_div_C == 0: # case with no distrubances, just box variations
-        C_Nbox = 4
+        C_Nbox = 1
         C_VAR = {
             "Mbox": subdivide([10,10], 0), # use min box == max var
             "Vw": subdivide([0,0], 0),
@@ -385,15 +441,15 @@ M_V_app = [AC_V_s, V_boxdrop_lim] # [m/s]
 M_n_app = [0, AC_nmax] # [g]
 M_pitch = [-45, 0] # [deg]
 M_heading = [0, 0] # [deg] not actually a free var
-M_Hmin = [Hmin, Hmin+1] # [m]
+M_Hmin = [Hmin, 2*Hmin] # [m]
 # m combinations
-N_div_M = 3
+N_div_M = 2
 M_VAR = {
     "V_app": subdivide(M_V_app, min(N_div_M, 1)),
     "n_app": subdivide(M_n_app, N_div_M),
     "pitch": subdivide(M_pitch, N_div_M),
     "heading": subdivide(M_heading, 0),
-    "Hmin": subdivide(M_Hmin, 0)
+    "Hmin": subdivide(M_Hmin, N_div_M)
 }
 if N_div_M == 0: # use standard W4A maneuver
     M_VAR = {
@@ -413,7 +469,8 @@ for m_comb in M_COMB:
         m_comb[2] = 0
     M_COMB_red.append(m_comb)
 M_COMB = unique(M_COMB_red)
-if SingleTry:M_COMB = [[AC_V_s,0,0,0,Hmin]]
+if SingleTry or SingleTryGNC:
+    M_COMB = [[AC_V_s, 0, 0, 0, Hmin]]
 print("try maneuvers:", M_COMB)
 
 # Uncertainties
@@ -427,29 +484,28 @@ U_pos = [0.25, 0.25] # [m]
 U_Vw = [-5, 5] # [m/s]
 U_w_heading = [-10, 10] # [deg]
 # U combinations
-N_div_U = 2
+N_div_U = 1
 if SingleTry:
-    U_Mbox = [-5,5]
-    U_Vw = [-AC.OP_V_wind,AC.OP_V_wind]
-    U_w_heading = [0, 180]
+    U_Mbox = [-5, 5]
+    U_Vw = [-AC.OP_V_wind, AC.OP_V_wind]
+    U_w_heading = [10, 170]
     U_VAR = {
         "Mbox": subdivide(U_Mbox, 1),
         "Vw": subdivide(U_Vw, 2),
-        "w_heading": subdivide(U_w_heading, 7),
-        "T_drop": subdivide(U_T_drop, 2),
+        "w_heading": subdivide(U_w_heading, 8),
+        "T_drop": subdivide(U_T_drop, 1),
         "T_brake": subdivide(U_T_brake, 1),
         "T_flap": subdivide(U_T_flap, 1),
     }
 else:
     U_VAR = {
-        "Mbox": subdivide(U_Mbox, N_div_U-1),
-        "Vw": subdivide(U_Vw, N_div_U-1),
+        "Mbox": subdivide(U_Mbox, 1),
+        "Vw": subdivide(U_Vw, 1),
         "w_heading": subdivide(U_w_heading, N_div_U+1),
-        "T_drop": subdivide(U_T_drop, N_div_U-2),
-        "T_brake": subdivide(U_T_brake, N_div_U-2),
-        "T_flap": subdivide(U_T_flap, N_div_U-1),
+        "T_drop": subdivide(U_T_drop, 1),
+        "T_brake": subdivide(U_T_brake, 0),
+        "T_flap": subdivide(U_T_flap, 0),
     }
-if SingleTry: U_VAR["w_heading"] = subdivide(U_w_heading, 4)
 allNames = U_VAR
 U_COMB = list(it.product(*(U_VAR[Name] for Name in allNames)))
 U_COMB = unique(U_COMB)
@@ -468,7 +524,7 @@ dropzone_poly = Polygon(dropzone)
 
 # Trial summary
 Ntot = len(M_COMB)*len(C_COMB)*len(U_COMB)*C_Nbox
-print("total simulations:", len(C_COMB), len(M_COMB), len(U_COMB), "=", Ntot, "in about", ((136.966/60)/1440)*Ntot, "[min]")
+print("total simulations:", len(C_COMB), len(M_COMB), len(U_COMB), C_Nbox,"=", Ntot, "in about", ((136.966/60)/1440)*Ntot, "[min]")
 time_start = time.time()
 
 # START TRYING COMBINATIONS
@@ -478,11 +534,10 @@ ConResults = {
     "Score": [], # weighted TPM sum
     "Xavg": [],
     "Yavg": [],
-    "Dfit": [],
-    "Sfit": [],
+    "Xref": [],
+    "Yref": [],
     "bounds": [], # better bounds
-    "states": [], # better Vi
-    "TPM": []
+    "Vimax": []
 }
 ConditionTPM = {
     "REQ passed": [],
@@ -543,7 +598,7 @@ for DropCon in C_COMB:
         DropUncRef = np.zeros(len(U_COMB[0]))
         DropCon[-1] = 0
         state = SimuDrop(DropCon, ManCase, DropUncRef, DropResults)
-        if SingleTry: PlotTraj(state, ManCase)
+        if SingleTry or True: PlotTraj(state, ManCase)
 
         # simulate drop uncertainties
         Racc = []
@@ -566,13 +621,15 @@ for DropCon in C_COMB:
         mpt = MultiPoint(points)
         hull_poly = shapely.wkt.loads(mpt.convex_hull.wkt)
         if hull_poly.intersection(dropzone_poly):
-            Sfit = (hull_poly.intersection(dropzone_poly).area/hull_poly.area)*100
-            Dfit = (dropzone_poly.intersection(hull_poly).area / dropzone_poly.area) * 100
-        else: Sfit = Dfit =0
+            Sfit = (hull_poly.intersection(dropzone_poly).area/hull_poly.area)
+            Dfit = (dropzone_poly.intersection(hull_poly).area / dropzone_poly.area)
+        else:
+            Sfit = 0
+            Dfit = 0
         ManResults["Dfit"].append(Dfit)
         ManResults["Sfit"].append(Sfit)
 
-        Pvi *= 100/N_Unc
+        Pvi *= 1/N_Unc
         ManResults["PVi95"].append(Pvi)
         ManResults["Racc"].append(max(Racc))
         ManResults["bounds"].append(points)
@@ -582,37 +639,39 @@ for DropCon in C_COMB:
         ManResults["Yavg"].append(
             np.mean(DropResults["impact DY [m]"]))
         ManResults["DXdev"].append(
-            max(DropResults["impact DX [m]"])-DropResults["impact DX [m]"][0])
+            DropResults["impact DX [m]"][0])
         ManResults["DYdev"].append(
-            max(DropResults["impact DY [m]"])-DropResults["impact DY [m]"][0])
+            DropResults["impact DY [m]"][0])
         ManResults["worst a_max"].append(
             max(DropResults["max acceleration [g]"]))
         ManResults["worst V_impact"].append(
             max(DropResults["impact velocity [m/s]"]))
 
         # normalize & prep TPM
-        if Sfit == 100 and Pvi >= 95:
-            ManeuverTPM["REQ passed"].append(100)
+        if Sfit >= 100:
+            ManeuverTPM["REQ passed"].append(1)
+        if Pvi >= 95:
+            ManeuverTPM["REQ passed"].append(1)
         else:
             ManeuverTPM["REQ passed"].append(0)
         ManeuverTPM["REQ_S"].append(round(Sfit))
         ManeuverTPM["REQ_Vi"].append(round(Pvi))
-        ManeuverTPM["OPS_R"].append(100*round(1-Dfit))
-        ManeuverTPM["OPS_am"].append(np.max(100*(1-(ManResults["worst a_max"][-1]/AC_nmax)),0))
-        ManeuverTPM["AC_na"].append(np.max(100*(1 - (ManCase[1] / AC_nmax)),0))
-        ManeuverTPM["AC_pa"].append(100*(1 - (abs(ManCase[2]) / max(abs(M_pitch[0]), abs(M_pitch[1])))))
-        ManeuverTPM["AC_Va"].append(100*max((ManCase[0]-AC_V_s)/AC_V_s,0))
+        ManeuverTPM["OPS_R"].append(round(1-Dfit))
+        ManeuverTPM["OPS_am"].append(1-(ManResults["worst a_max"][-1]/AC_nmax))
+        ManeuverTPM["AC_na"].append(1 - (ManCase[1] / AC_nmax))
+        ManeuverTPM["AC_pa"].append(1 - (abs(ManCase[2]) / max(abs(M_pitch[0]), abs(M_pitch[1]))))
+        ManeuverTPM["AC_Va"].append((ManCase[0]-AC_V_s)/AC_V_s)
 
         TPM = []
         for boolean, tpm in ManeuverTPM.items():
-            TPM.append(tpm[-1])
+            TPM.append(100*max(tpm[-1], 0))
         TPMs.append(TPM)
 
         Score = np.sum(np.vdot(
             np.array(TPM),
             np.array(TPM_weights)))
         Scores.append(Score)
-        if SingleTry:
+        if SingleTry or SingleTryGNC:
             PlotScatter(DropResults, ManResults, ManCase, DropCon, dropzone_poly, hull_poly, Score)
 
         N_Man += 1
@@ -621,21 +680,28 @@ for DropCon in C_COMB:
 
     ConResults["Condition-Maneuver"].append([DropCon, M_COMB[index[-1]]])
     ConResults["Score"].append(Scores[index[-1]])
+    ConResults["Vimax"].append(ManResults["worst V_impact"][index[-1]])
+    ConResults["Xavg"].append(ManResults["Xavg"][index[-1]])
+    ConResults["Yavg"].append(ManResults["Yavg"][index[-1]])
+    ConResults["Xref"].append(ManResults["DXdev"][index[-1]])
+    ConResults["Yref"].append(ManResults["DYdev"][index[-1]])
+    ConResults["bounds"].append(ManResults["bounds"][index[-1]])
     i = 0
     for boolean, tpm in ConditionTPM.items():
         ConditionTPM[boolean].append(TPMs[index[-1]][i])
         i += 1
 
     # bar plot
-    if not SingleTry and N_div_M > 0:
-        print("Results from ", DropCon, "are:\n", ConResults)
+    if not (SingleTry or SingleTryGNC) and N_div_M > 0:
+        #print("Results from ", DropCon, "are:\n", ConResults)
         PlotBar(ManeuverTPM, TPM_weights, M_COMB, DropCon, Scores)
     N_Con += 1
 
 # plot ref drop overlay
 # plot scatter overlay
+PlotBounds(ConResults, dropzone_poly)
 # plot bar (cond)
-if not SingleTry and N_div_C > 0:
+if not (SingleTry or SingleTryGNC) and N_div_C > 0 and False:
     PlotBar(ConditionTPM, TPM_weights, ConResults["Condition-Maneuver"][0], "all conditions", ConResults["Score"])
 
 # Sensitivity & Causality
@@ -707,7 +773,7 @@ if DoVerif: # optional Verification
         mpt = MultiPoint(points)
         hull_poly = shapely.wkt.loads(mpt.convex_hull.wkt)
         if hull_poly.intersection(dropzone_poly):
-            if hull_poly.area == 0: Sfit = 101
+            if hull_poly.area == 0: Sfit = 100
             else:Sfit = (hull_poly.intersection(dropzone_poly).area / hull_poly.area)*100
             Dfit = (dropzone_poly.intersection(hull_poly).area / dropzone_poly.area) * 100
         else: Sfit = Dfit =0
@@ -728,6 +794,9 @@ if DoVerif: # optional Verification
 # PROGRAM END
 print("\n================= ================= =================")
 time_end = time.time()
+frequency = 5000  # Set Frequency To 2500 Hertz
+duration = 1*1000  # Set Duration To 1000 ms == 1 second
+winsound.Beep(frequency, duration)
 print(Ntot, "simulations took:",
-      (time_end-time_start), "=[s] or",
+      (time_end-time_start), "[s] or",
       (time_end-time_start)/60,  "[min]")
