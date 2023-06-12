@@ -406,6 +406,11 @@ class UAV:
         self.ST_x_mw =2.35 #m x distance main whee
         self.ST_ax_g = 0.51 #- maximum horizontal breaking deceleration scaled by g0
         self.ST_x_cg = 2.94 #max aft x_cg for nose wheel loading
+        self.ST_tail_boom_2a=0.15 #height of tail boom
+        self.ST_tail_boom_2b=0.1 #width of tail boom
+        self.ST_tail_boom_t=0.001 #thinckness of tail boom (steel 410)
+        self.ST_h_tail_spar_r=0.025 #radius of h tail spar
+        self.ST_h_tail_spar_t=0.001 #thickness of h tail spar (steel 410)
 
 
 class airport:

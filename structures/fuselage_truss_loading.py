@@ -14,7 +14,7 @@ E = 205*10**9
 
 
 
-# # s-steel 410
+# # # s-steel 410
 # yield_stress = 1225*10**6
 # density=7800
 # E = 200*10**9
