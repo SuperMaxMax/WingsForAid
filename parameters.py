@@ -81,7 +81,9 @@ class UAV:
         self.lambda_co4 = 0.0               # Quarter chord sweep angle [rad]
         self.lin_par1 = 0.5249              # [-]
         self.lin_par2 = 42.049              # [-]
-        self.l_h = 4.15                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.l_h = 4.15       # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.position_landing_fwd = [0.2, 0]  # Nose landing gear position [x, y] in [m]
+        self.position_landing_back = [2.33, 0.8]  # Main landing gear position [x, y] in [m]
 
         # M
         self.MAC_length = 1.2477198640078417            # Mean aerodynamic chord [m]
