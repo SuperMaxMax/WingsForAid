@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 from matplotlib import patches
 
 def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load):
-
     def plot_wingbox(spanwise_pos):
         """
         Plot the wingbox of the aircraft
@@ -190,8 +189,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
         dy_c_c2 = c[1]-c2[1]
 
         # Second moment of area about centroid
-        Ix_s_a = a*t_stringer*(t_stringer**2*np.cos(angle)+a**2*np.sin(angle))/12+a*t_stringer*(dy_c_c1)**2+(b-t_stringer)*t_stringer*(t_stringer**2*np.cos(angle)+(b-t_stringer)**2*np.sin(angle))/12+(b-t_stringer)*t_stringer*(dy_c_c2)**2
-        Iy_s_a = a*t_stringer*(a**2*np.cos(angle)+t_stringer**2*np.sin(angle))/12+a*t_stringer*(dx_c_c1)**2+(b-t_stringer)*t_stringer*((b-t_stringer)**2*np.cos(angle)+t_stringer**2*np.sin(angle))/12+(b-t_stringer)*t_stringer*(dx_c_c2)**2
+        Ix_s_a = a*t_stringer*(t_stringer**2*np.cos(angle)+a**2*np.sin(angle))/12+a*t_stringer*(dy_c_c1)**2+(b-t_stringer)*t_stringer*((b-t_stringer)**2*np.cos(angle)+t_stringer**2*np.sin(angle))/12+(b-t_stringer)*t_stringer*(dy_c_c2)**2
+        Iy_s_a = a*t_stringer*(a**2*np.cos(angle)+t_stringer**2*np.sin(angle))/12+a*t_stringer*(dx_c_c1)**2+(b-t_stringer)*t_stringer*(t_stringer**2*np.cos(angle)+(b-t_stringer)**2*np.sin(angle))/12+(b-t_stringer)*t_stringer*(dx_c_c2)**2
 
         return A_s, xc_s_a, yc_s_a, Ix_s_a, Iy_s_a
 
@@ -206,7 +205,7 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
 
         ks = interpolate.interp1d(ks_x, ks_y, kind='cubic',fill_value="extrapolate")
 
-        return ks, ks_y[-1]
+        return ks, [ks_x[-1], ks_y[-1]], [ks_x[0], ks_y[0]]
 
     def increase_values(values, increase):
         for i, value in enumerate(values):
@@ -218,26 +217,23 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     plot = False
 
     #### INPUT ####
-    airfoil_num = '4415'        # [-] NACA airfoil number (4 digit)
+    airfoil_num = '4415'            # [-] NACA airfoil number (4 digit)
 
-    f_spar = 0.25               # [-] location of front spar (as fraction of chord) 
-    t_f_spar = t_f_spar_func           # [m] thickness of front spar 0.0001, 0.0001, 0.0001, 0.0001, 0.00015, 0.0003, 0.00001
-    a_spar = 0.75               # [-] location of aft spar (as fraction of chord)
-    t_a_spar = t_a_spar_func           # [m] thickness of aft spar
+    f_spar = 0.25                   # [-] location of front spar (as fraction of chord) 
+    t_f_spar = t_f_spar_func        # [m] thickness of front spar
+    a_spar = 0.75                   # [-] location of aft spar (as fraction of chord)
+    t_a_spar = t_a_spar_func        # [m] thickness of aft spar
 
     t_top = t_top_func              # [m] thickness of top panel
     t_bot = t_bot_func              # [m] thickness of bottom panel
 
-    # n_stringers = 0             # [-] this is additional to already having 4 stringers at the corners
-    a = a_func                 # [m] length of bottom flange
-    b = b_func                  # [m] length of side flange
-    t_stringer = t_stringer_func        # [m] thickness of stringer (both flanges)
+    # n_stringers = 18                # [-] this is additional to already having 4 stringers at the corners
+    a = a_func                      # [m] length of bottom flange
+    b = b_func                      # [m] length of side flange
+    t_stringer = t_stringer_func    # [m] thickness of stringer (both flanges)
 
-    n_ribs = n_ribs_func         # [-] number of ribs
-    t_ribs = 0.001              # [m] thickness of ribs
-
-    n_stringer_decr_ribs = 1    # [-] decrease in number of stringers per x ribs
-    stringer_decr_x_ribs = 1    # [-] decrease stringers by n_stringer_decr_ribs every x ribs
+    n_ribs = n_ribs_func            # [-] number of ribs
+    t_ribs = 0.001                  # [m] thickness of ribs
 
     #### MATERIAL PROPERTIES ####
     # Material choice for strut weight, add column for material index: sqrt(E)/rho -> the higher the value the better -> False
@@ -245,7 +241,7 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     # density, raw cost, eco cost, co2, yield stress, E, Kc, sqrt(E)/rho
     prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4, 0]
     mat = rank_material(prop_weights_strut, [False, False])[0]
-    # print(mat)
+    print(mat)
 
     #### CALCULATIONS ####
     step_size = 0.0001          # [m] step size for integration
@@ -264,468 +260,549 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     MOFs = np.ones(18)*1.1
 
     ### Ks values buckling ###
-    ks_A_clamped, ks_A_clamped_min = ks_values('ks_A_clamped')
-    ks_A_ss, ks_A_ss_min = ks_values('ks_A_ss')
-    ks_clamped, ks_clamped_min = ks_values('ks_clamped')
+    ks_A_clamped, ks_A_clamped_min, ks_A_clamped_max = ks_values('ks_A_clamped')
+    ks_A_ss, ks_A_ss_min, ks_A_ss_max = ks_values('ks_A_ss')
+    ks_clamped, ks_clamped_min, ks_clamped_max = ks_values('ks_clamped')
 
-    failure_tot = True
-    run_once_more = 0
+    ### Stringer numbers
+    # create array containing number of stringers per rib, all ribs up until wing strut location have all ribs, after that it decreases
+    wing_strut = 0.437277492*ac.b/2
+    n_stringers_ribs = np.ones(n_ribs+1)*n_stringers_func
+    for i in range(len(n_stringers_ribs)):
+        if spanwise_pos_sec[i][0] > wing_strut:
+            n_left = n_ribs-(i-1)
+            n_stringers_ribs[i:] = [int(n_stringers_func-i*n_stringers_func/n_left) for i in range(1, n_left+1)]
+            break
+    
+    print(n_stringers_ribs)
 
-    while failure_tot == True:
-        failure_ele = False
+    failure_ele = True
+    w_ribs = 0
+
+    for runs in range(2):
         n_stringers = n_stringers_func
-        w_ribs = 0
         for rib_number, j in enumerate(spanwise_pos_sec):
             for i in j:
-                ### Airfoil ###
-                # xp and yp are the 4 corner points -> [top left, top right, bot right, bot left]
-                x, y_u, y_l, xp, yp = airfoil(f_spar, a_spar, i)
+                n_stringers = int(n_stringers_ribs[rib_number])
+                failure_ele = True
+                while failure_ele:
+                    failure_ele = False
+                    ### Airfoil ###
+                    # get spar sizes at tip -> for stringer size limitation
+                    x_tip, y_u_tip, y_l_tip, xp_tip, yp_tip = airfoil(f_spar, a_spar, ac.b/2)
 
-                ### Stringer ###
-                # calculate properties of L-stringer (no angle)
-                A_s, xc_s, yc_s, Ix_s, Iy_s = L_stringer(a, b, t_stringer, 0)
+                    # xp and yp are the 4 corner points -> [top left, top right, bot right, bot left]
+                    x, y_u, y_l, xp, yp = airfoil(f_spar, a_spar, i)
 
-                ### Centroid ###
-                ## Spar contributions
-                # spar lenghts
-                l_f_spar = yp[0]-yp[3]
-                l_a_spar = yp[1]-yp[2]
+                    ### Stringer ###
+                    # calculate properties of L-stringer (no angle)
+                    A_s, xc_s, yc_s, Ix_s, Iy_s = L_stringer(a, b, t_stringer, 0)
 
-                # spar centroids
-                xc_f_spar = xp[0]
-                yc_f_spar = yp[3]+l_f_spar/2
-                xc_a_spar = xp[1]
-                yc_a_spar = yp[2]+l_a_spar/2
+                    ### Centroid ###
+                    ## Spar contributions
+                    # spar lengths
+                    l_f_spar = yp[0]-yp[3]
+                    l_a_spar = yp[1]-yp[2]
 
-                ## Panel contributions
-                # top and bottom panel length
-                l_top = ((xp[1]-xp[0])**2+(yp[1]-yp[0])**2)**0.5
-                l_bot = ((xp[2]-xp[3])**2+(yp[2]-yp[3])**2)**0.5
+                    # spar centroids
+                    xc_f_spar = xp[0]
+                    yc_f_spar = yp[3]+l_f_spar/2
+                    xc_a_spar = xp[1]
+                    yc_a_spar = yp[2]+l_a_spar/2
 
-                # top and bottom panel angles
-                angle_top = np.arctan((yp[1]-yp[0])/(xp[1]-xp[0]))
-                angle_bot = np.arctan((yp[2]-yp[3])/(xp[2]-xp[3]))
+                    ## Panel contributions
+                    # top and bottom panel length
+                    l_top = ((xp[1]-xp[0])**2+(yp[1]-yp[0])**2)**0.5
+                    l_bot = ((xp[2]-xp[3])**2+(yp[2]-yp[3])**2)**0.5
 
-                # top and bottom panel centroids
-                xc_top = xp[0]+(xp[1]-xp[0])/2
-                yc_top = yp[0]+(yp[1]-yp[0])/2
-                xc_bot = xp[3]+(xp[2]-xp[3])/2
-                yc_bot = yp[3]+(yp[2]-yp[3])/2
+                    # top and bottom panel angles
+                    angle_top = np.arctan((yp[1]-yp[0])/(xp[1]-xp[0]))
+                    angle_bot = np.arctan((yp[2]-yp[3])/(xp[2]-xp[3]))
 
-                ## Stringer contributions
-                # number of stringers on top and bottom
-                n_stringers_top = int(2*n_stringers/3)
-                n_stringers_bot = n_stringers - n_stringers_top
+                    # top and bottom panel centroids
+                    xc_top = xp[0]+(xp[1]-xp[0])/2
+                    yc_top = yp[0]+(yp[1]-yp[0])/2
+                    xc_bot = xp[3]+(xp[2]-xp[3])/2
+                    yc_bot = yp[3]+(yp[2]-yp[3])/2
 
-                # y-distance between cornerpoint (xp[0], yp[0]) and intersection of inner edge of the front spar and top panel, this point coincides with the cornerpoint of the first stringer
-                dy_stringer_left_top = -(t_top/2)/np.cos(angle_top)+np.tan(angle_top)*t_f_spar/2
+                    ## Stringer contributions
+                    # number of stringers on top and bottom
+                    n_stringers_top = int(2*n_stringers/3)
+                    n_stringers_bot = n_stringers - n_stringers_top
 
-                # get cornerpoints (xco, yco) of all stringers on top, stringer will be placed with bottom left corner at this point, and then rotated such that it aligns with the top panel
-                x_stringer_spacing_top = (xp[1]-xp[0]-t_f_spar/2-t_a_spar/2)/(n_stringers_top+1)
-                y_stringer_spacing_top = x_stringer_spacing_top*np.tan(angle_top)
-                xco_stringer_top = [i*x_stringer_spacing_top+xp[0]+t_f_spar/2 for i in range(n_stringers_top+2)]
-                yco_stringer_top = [i*y_stringer_spacing_top+yp[0]+dy_stringer_left_top for i in range(n_stringers_top+2)]
+                    # y-distance between cornerpoint (xp[0], yp[0]) and intersection of inner edge of the front spar and top panel, this point coincides with the cornerpoint of the first stringer
+                    dy_stringer_left_top = -(t_top/2)/np.cos(angle_top)+np.tan(angle_top)*t_f_spar/2
 
-                # convert the cornerpoints to centroids, this is done by rotating the centroid of a straight L-stringer around the bottom left corner, the first stringer is a special case because of the corner
-                xc_stringer_top = [xp[0]+t_f_spar/2+rotate_centroid(np.pi+angle_top)[0]+2*xc_s*np.cos(angle_top)] + [i*x_stringer_spacing_top+xp[0]+t_f_spar/2+rotate_centroid(np.pi+angle_top)[0] for i in range(1, n_stringers_top+2)]
-                yc_stringer_top = [yp[0]+dy_stringer_left_top+rotate_centroid(np.pi+angle_top)[1]-2*yc_s*np.sin(angle_top)] + [i*y_stringer_spacing_top+yp[0]+dy_stringer_left_top+rotate_centroid(np.pi+angle_top)[1] for i in range(1, n_stringers_top+2)]
+                    # get cornerpoints (xco, yco) of all stringers on top, stringer will be placed with bottom left corner at this point, and then rotated such that it aligns with the top panel
+                    x_stringer_spacing_top = (xp[1]-xp[0]-t_f_spar/2-t_a_spar/2)/(n_stringers_top+1)
+                    y_stringer_spacing_top = x_stringer_spacing_top*np.tan(angle_top)
+                    xco_stringer_top = [i*x_stringer_spacing_top+xp[0]+t_f_spar/2 for i in range(n_stringers_top+2)]
+                    yco_stringer_top = [i*y_stringer_spacing_top+yp[0]+dy_stringer_left_top for i in range(n_stringers_top+2)]
 
-                # y-distance between cornerpoint (xp[3], yp[3]) and intersection of inner edge of the front spar and bottom panel, this point coincides with the cornerpoint of the first stringer
-                dy_stringer_left_bot = (t_bot/2)/np.cos(angle_bot)+np.tan(angle_bot)*t_f_spar/2
+                    # convert the cornerpoints to centroids, this is done by rotating the centroid of a straight L-stringer around the bottom left corner, the first stringer is a special case because of the corner
+                    xc_stringer_top = [xp[0]+t_f_spar/2+rotate_centroid(np.pi+angle_top)[0]+2*xc_s*np.cos(angle_top)] + [i*x_stringer_spacing_top+xp[0]+t_f_spar/2+rotate_centroid(np.pi+angle_top)[0] for i in range(1, n_stringers_top+2)]
+                    yc_stringer_top = [yp[0]+dy_stringer_left_top+rotate_centroid(np.pi+angle_top)[1]-2*yc_s*np.sin(angle_top)] + [i*y_stringer_spacing_top+yp[0]+dy_stringer_left_top+rotate_centroid(np.pi+angle_top)[1] for i in range(1, n_stringers_top+2)]
 
-                # get cornerpoints (xco, yco) of all stringers on bottom, stringer will be placed with bottom left corner at this point, and then rotated such that it aligns with the bottom panel
-                x_stringer_spacing_bot = (xp[2]-xp[3]-t_f_spar/2-t_a_spar/2)/(n_stringers_bot+1)
-                y_stringer_spacing_bot = x_stringer_spacing_bot*np.tan(angle_bot)
-                xco_stringer_bot = [i*x_stringer_spacing_bot+xp[3]+t_f_spar/2 for i in range(n_stringers_bot+2)]
-                yco_stringer_bot = [i*y_stringer_spacing_bot+yp[3]+dy_stringer_left_bot for i in range(n_stringers_bot+2)]
+                    # y-distance between cornerpoint (xp[3], yp[3]) and intersection of inner edge of the front spar and bottom panel, this point coincides with the cornerpoint of the first stringer
+                    dy_stringer_left_bot = (t_bot/2)/np.cos(angle_bot)+np.tan(angle_bot)*t_f_spar/2
 
-                # convert the cornerpoints to centroids, this is done by rotating the centroid of a straight L-stringer around the bottom left corner, the last stringer is a special case because of the corner
-                xc_stringer_bot = [i*x_stringer_spacing_bot+xp[3]+t_f_spar/2+rotate_centroid(angle_bot)[0] for i in range(n_stringers_bot+1)] + [(n_stringers_bot+1)*x_stringer_spacing_bot+xp[3]+t_f_spar/2+rotate_centroid(angle_bot)[0]-2*xc_s*np.cos(angle_bot)]
-                yc_stringer_bot = [i*y_stringer_spacing_bot+yp[3]+dy_stringer_left_bot+rotate_centroid(angle_bot)[1] for i in range(n_stringers_bot+1)] + [(n_stringers_bot+1)*y_stringer_spacing_bot+yp[3]+dy_stringer_left_bot+rotate_centroid(angle_bot)[1]-2*xc_s*np.sin(angle_bot)]
+                    # get cornerpoints (xco, yco) of all stringers on bottom, stringer will be placed with bottom left corner at this point, and then rotated such that it aligns with the bottom panel
+                    x_stringer_spacing_bot = (xp[2]-xp[3]-t_f_spar/2-t_a_spar/2)/(n_stringers_bot+1)
+                    y_stringer_spacing_bot = x_stringer_spacing_bot*np.tan(angle_bot)
+                    xco_stringer_bot = [i*x_stringer_spacing_bot+xp[3]+t_f_spar/2 for i in range(n_stringers_bot+2)]
+                    yco_stringer_bot = [i*y_stringer_spacing_bot+yp[3]+dy_stringer_left_bot for i in range(n_stringers_bot+2)]
 
-                ## Final centroid | (xc*A)/(A_tot) = (x1*A1+x2*A2+...+xn*An)/(A1+A2+...+An)
-                A_tot = (l_f_spar*t_f_spar+l_a_spar*t_a_spar+l_top*t_top+l_bot*t_bot+sum([A_s for i in range(n_stringers_top+2)])+sum([A_s for i in range(n_stringers_bot+2)]))
-                xc = (xc_f_spar*l_f_spar*t_f_spar+xc_a_spar*l_a_spar*t_a_spar+xc_top*l_top*t_top+xc_bot*l_bot*t_bot+sum([xc_stringer_top[i]*A_s for i in range(n_stringers_top+2)])+sum([xc_stringer_bot[i]*A_s for i in range(n_stringers_bot+2)]))/A_tot
-                yc = (yc_f_spar*l_f_spar*t_f_spar+yc_a_spar*l_a_spar*t_a_spar+yc_top*l_top*t_top+yc_bot*l_bot*t_bot+sum([yc_stringer_top[i]*A_s for i in range(n_stringers_top+2)])+sum([yc_stringer_bot[i]*A_s for i in range(n_stringers_bot+2)]))/A_tot
+                    # convert the cornerpoints to centroids, this is done by rotating the centroid of a straight L-stringer around the bottom left corner, the last stringer is a special case because of the corner
+                    xc_stringer_bot = [i*x_stringer_spacing_bot+xp[3]+t_f_spar/2+rotate_centroid(angle_bot)[0] for i in range(n_stringers_bot+1)] + [(n_stringers_bot+1)*x_stringer_spacing_bot+xp[3]+t_f_spar/2+rotate_centroid(angle_bot)[0]-2*xc_s*np.cos(angle_bot)]
+                    yc_stringer_bot = [i*y_stringer_spacing_bot+yp[3]+dy_stringer_left_bot+rotate_centroid(angle_bot)[1] for i in range(n_stringers_bot+1)] + [(n_stringers_bot+1)*y_stringer_spacing_bot+yp[3]+dy_stringer_left_bot+rotate_centroid(angle_bot)[1]-2*xc_s*np.sin(angle_bot)]
 
-                xcs[np.where(spanwise_pos == i)] = xc
-                ycs[np.where(spanwise_pos == i)] = yc
-                As[np.where(spanwise_pos == i)] = A_tot
+                    ## Final centroid | (xc*A)/(A_tot) = (x1*A1+x2*A2+...+xn*An)/(A1+A2+...+An)
+                    A_tot = (l_f_spar*t_f_spar+l_a_spar*t_a_spar+l_top*t_top+l_bot*t_bot+(n_stringers_top+2)*A_s+(n_stringers_bot+2)*A_s)
+                    xc = (xc_f_spar*l_f_spar*t_f_spar+xc_a_spar*l_a_spar*t_a_spar+xc_top*l_top*t_top+xc_bot*l_bot*t_bot+sum([xc_stringer_top[i]*A_s for i in range(n_stringers_top+2)])+sum([xc_stringer_bot[i]*A_s for i in range(n_stringers_bot+2)]))/A_tot
+                    yc = (yc_f_spar*l_f_spar*t_f_spar+yc_a_spar*l_a_spar*t_a_spar+yc_top*l_top*t_top+yc_bot*l_bot*t_bot+sum([yc_stringer_top[i]*A_s for i in range(n_stringers_top+2)])+sum([yc_stringer_bot[i]*A_s for i in range(n_stringers_bot+2)]))/A_tot
 
-                ### Second moment of area ###
-                ## Spar contributions
-                # spar second moments of area
-                Ix_f_spar = t_f_spar*l_f_spar**3/12
-                Iy_f_spar = l_f_spar*t_f_spar**3/12
-                Ix_a_spar = t_a_spar*l_a_spar**3/12
-                Iy_a_spar = l_a_spar*t_a_spar**3/12
+                    ### Second moment of area ###
+                    ## Spar contributions
+                    # spar second moments of area
+                    Ix_f_spar = t_f_spar*l_f_spar**3/12
+                    Iy_f_spar = l_f_spar*t_f_spar**3/12
+                    Ix_a_spar = t_a_spar*l_a_spar**3/12
+                    Iy_a_spar = l_a_spar*t_a_spar**3/12
 
-                # spar parallel axis terms
-                Ix_f_spar += l_f_spar*t_f_spar*(yc_f_spar-yc)**2
-                Iy_f_spar += t_f_spar*l_f_spar*(xc_f_spar-xc)**2
-                Ix_a_spar += l_a_spar*t_a_spar*(yc_a_spar-yc)**2
-                Iy_a_spar += t_a_spar*l_a_spar*(xc_a_spar-xc)**2
+                    # spar parallel axis terms
+                    Ix_f_spar += l_f_spar*t_f_spar*(yc_f_spar-yc)**2
+                    Iy_f_spar += t_f_spar*l_f_spar*(xc_f_spar-xc)**2
+                    Ix_a_spar += l_a_spar*t_a_spar*(yc_a_spar-yc)**2
+                    Iy_a_spar += t_a_spar*l_a_spar*(xc_a_spar-xc)**2
 
-                ## Panel contributions
-                # top and bottom panel second moments of area
-                Ix_top = t_top*l_top*(l_top**2*np.cos(angle_top)+t_top**2*np.cos(angle_top))/12
-                Iy_top = t_top*l_top*(l_top**2*np.sin(angle_top)+t_top**2*np.sin(angle_top))/12
-                Ix_bot = t_bot*l_bot*(l_bot**2*np.cos(angle_bot)+t_bot**2*np.cos(angle_bot))/12
-                Iy_bot = t_bot*l_bot*(l_bot**2*np.sin(angle_bot)+t_bot**2*np.sin(angle_bot))/12
+                    ## Panel contributions
+                    # top and bottom panel second moments of area
+                    Ix_top = t_top*l_top*(t_top**2*np.cos(angle_top)+l_top**2*np.cos(angle_top))/12
+                    Iy_top = t_top*l_top*(t_top**2*np.sin(angle_top)+l_top**2*np.sin(angle_top))/12
+                    Ix_bot = t_bot*l_bot*(t_bot**2*np.cos(angle_bot)+l_bot**2*np.cos(angle_bot))/12
+                    Iy_bot = t_bot*l_bot*(t_bot**2*np.sin(angle_bot)+l_bot**2*np.sin(angle_bot))/12
 
-                # top and bottom panel parallel axis terms
-                Ix_top += t_top*l_top*(yc_top-yc)**2
-                Iy_top += t_top*l_top*(xc_top-xc)**2
-                Ix_bot += t_bot*l_bot*(yc_bot-yc)**2
-                Iy_bot += t_bot*l_bot*(xc_bot-xc)**2
+                    # top and bottom panel parallel axis terms
+                    Ix_top += t_top*l_top*(yc_top-yc)**2
+                    Iy_top += t_top*l_top*(xc_top-xc)**2
+                    Ix_bot += t_bot*l_bot*(yc_bot-yc)**2
+                    Iy_bot += t_bot*l_bot*(xc_bot-xc)**2
 
-                ## Stringer contributions
-                # stringer second moments of area
-                Ix_s_t, Iy_s_t  = L_stringer(a, b, t_stringer, angle_top)[3:5]
-                Ix_s_b, Iy_s_b  = L_stringer(a, b, t_stringer, angle_bot)[3:5]
-                Ix_s = (n_stringers_top+2)*Ix_s_t+(n_stringers_bot+2)*Ix_s_b
-                Iy_s = (n_stringers_top+2)*Iy_s_t+(n_stringers_bot+2)*Iy_s_b
+                    ## Stringer contributions
+                    # stringer second moments of area
+                    Ix_s_t, Iy_s_t  = L_stringer(a, b, t_stringer, angle_top)[3:5]
+                    Ix_s_b, Iy_s_b  = L_stringer(a, b, t_stringer, angle_bot)[3:5]
+                    Ix_s = (n_stringers_top+2)*Ix_s_t+(n_stringers_bot+2)*Ix_s_b
+                    Iy_s = (n_stringers_top+2)*Iy_s_t+(n_stringers_bot+2)*Iy_s_b
 
-                # stringer parallel axis terms
-                Ix_s += sum([A_s*(yc_stringer_top[i]-yc)**2 for i in range(n_stringers_top+2)])+sum([A_s*(yc_stringer_bot[i]-yc)**2 for i in range(n_stringers_bot+2)])
-                Iy_s += sum([A_s*(xc_stringer_top[i]-xc)**2 for i in range(n_stringers_top+2)])+sum([A_s*(xc_stringer_bot[i]-xc)**2 for i in range(n_stringers_bot+2)])
+                    # stringer parallel axis terms
+                    Ix_s += sum([A_s*(yc_stringer_top[i]-yc)**2 for i in range(n_stringers_top+2)])+sum([A_s*(yc_stringer_bot[i]-yc)**2 for i in range(n_stringers_bot+2)])
+                    Iy_s += sum([A_s*(xc_stringer_top[i]-xc)**2 for i in range(n_stringers_top+2)])+sum([A_s*(xc_stringer_bot[i]-xc)**2 for i in range(n_stringers_bot+2)])
 
-                ## Final second moment of area
-                Ix = Ix_f_spar+Ix_a_spar+Ix_top+Ix_bot+Ix_s
-                Iy = Iy_f_spar+Iy_a_spar+Iy_top+Iy_bot+Iy_s
+                    ## Final second moment of area
+                    Ix = Ix_f_spar+Ix_a_spar+Ix_top+Ix_bot+Ix_s
+                    Iy = Iy_f_spar+Iy_a_spar+Iy_top+Iy_bot+Iy_s
 
-                Ixs[np.where(spanwise_pos == i)] = Ix
-                Iys[np.where(spanwise_pos == i)] = Iy
-
-                ### Torsional constant ###
-                # horizontal length wingbox
-                l_wb = (xp[1]-xp[0])
-                
-                # enclosed area | stringers not taken into account -> conservative
-                A_enc = l_a_spar*l_wb+abs(yp[2]-yp[3])*l_wb/2+abs(yp[0]-yp[1])*l_wb/2
-                J = (4*A_enc**2)/(l_f_spar/t_f_spar+l_top/t_top+l_a_spar/t_a_spar+l_bot/t_bot)
-
-                Js[np.where(spanwise_pos == i)] = J
-
-                ### Failure analysis ###
-                ## Compressive and tensile strength failure ##
-                # stress due to normal force
-                sigma_n = load[0][np.where(spanwise_pos == i)[0][0]]/(l_top*t_top+l_bot*t_bot+l_f_spar*t_f_spar+l_a_spar*t_a_spar+(n_stringers+4)*A_s)
-
-                # stress due to bending (always taking worst case scenario)
-                # front spar | calculate at both ends of the spar
-                sigma_b_f_spar_top = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_f_spar+l_f_spar/2-yc)/Ix
-                sigma_b_f_spar_bot = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_f_spar-l_f_spar/2-yc)/Ix
-                # calculate minimum and maximum stress from bending and add normal stress
-                sigma_f_spar_c = min(sigma_b_f_spar_top, sigma_b_f_spar_bot)+sigma_n
-                sigma_f_spar_t = max(sigma_b_f_spar_top, sigma_b_f_spar_bot)+sigma_n
-
-                # aft spar | calculate at both ends of the spar
-                sigma_b_a_spar_top = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_a_spar+l_a_spar/2-yc)/Ix
-                sigma_b_a_spar_bot = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_a_spar-l_a_spar/2-yc)/Ix
-                # calculate minimum and maximum stress from bending and add normal stress
-                sigma_a_spar_c = min(sigma_b_a_spar_top, sigma_b_a_spar_bot)+sigma_n
-                sigma_a_spar_t = max(sigma_b_a_spar_top, sigma_b_a_spar_bot)+sigma_n
-
-                # top panel | calculate at both ends of the panel
-                sigma_b_top_panel_1 = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_top+(yp[0]-yp[1])/2-yc)/Ix
-                sigma_b_top_panel_2 = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_top-(yp[0]-yp[1])/2-yc)/Ix
-                # calculate minimum and maximum stress from bending and add normal stress
-                sigma_top_panel_c = min(sigma_b_top_panel_1, sigma_b_top_panel_2)+sigma_n
-                sigma_top_panel_t = max(sigma_b_top_panel_1, sigma_b_top_panel_2)+sigma_n
-
-                # bottom panel | calculate at both ends of the panel
-                sigma_b_bot_panel_1 = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_bot+(yp[2]-yp[3])/2-yc)/Ix
-                sigma_b_bot_panel_2 = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_bot-(yp[2]-yp[3])/2-yc)/Ix
-                # calculate minimum and maximum stress from bending and add normal stress
-                sigma_bot_panel_c = min(sigma_b_bot_panel_1, sigma_b_bot_panel_2)+sigma_n
-                sigma_bot_panel_t = max(sigma_b_bot_panel_1, sigma_b_bot_panel_2)+sigma_n
-
-                if sigma_f_spar_c < 0:
-                    MOF_sigma_f_spar_c = material[mat]['yield stress']*10**6/abs(sigma_f_spar_c)
-                    MOFs[0] = MOF_sigma_f_spar_c
-                    if MOF_sigma_f_spar_c < 1:
-                        # print(f"Front spar compressive strength failure, MOF: {MOF_sigma_f_spar_c:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-                
-                if sigma_f_spar_t > 0:
-                    MOF_sigma_f_spar_t = material[mat]['yield stress']*10**6/abs(sigma_f_spar_t)
-                    MOFs[1] = MOF_sigma_f_spar_t
-                    MOF_fracture_f_spar = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_f_spar_t)
-                    MOFs[2] = MOF_fracture_f_spar
-                    if MOF_sigma_f_spar_t < 1:
-                        # print(f"Front spar tensile strength failure, MOF: {MOF_sigma_f_spar_t:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-
-                    if MOF_fracture_f_spar < 1:
-                        # print(f"Front spar fracture failure, MOF: {MOF_fracture_f_spar:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-                
-                if sigma_a_spar_c < 0:
-                    MOF_sigma_a_spar = material[mat]['yield stress']*10**6/abs(sigma_a_spar_c)
-                    MOFs[3] = MOF_sigma_a_spar
-                    if MOF_sigma_a_spar < 1:
-                        # print(f"Aft spar compressive strength failure, MOF: {MOF_sigma_a_spar:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-
-                if sigma_a_spar_t > 0:
-                    MOF_sigma_a_spar_t = material[mat]['yield stress']*10**6/abs(sigma_a_spar_t)
-                    MOFs[4] = MOF_sigma_a_spar_t
-                    MOF_fracture_a_spar = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_a_spar_t)
-                    MOFs[5] = MOF_fracture_a_spar
-                    if MOF_sigma_a_spar_t < 1:
-                        # print(f"Aft spar tensile strength failure, MOF: {MOF_sigma_a_spar_t:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-                    if MOF_fracture_a_spar < 1:
-                        # print(f"Aft spar fracture failure, MOF: {MOF_fracture_a_spar:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-                
-                if sigma_top_panel_c < 0:
-                    MOF_sigma_top_panel = material[mat]['yield stress']*10**6/abs(sigma_top_panel_c)
-                    MOFs[6] = MOF_sigma_top_panel
-                    if MOF_sigma_top_panel < 1:
-                        # print(f"Top panel compressive strength failure, MOF: {MOF_sigma_top_panel:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-                
-                if sigma_bot_panel_t > 0:
-                    MOF_sigma_bot_panel_t = material[mat]['yield stress']*10**6/abs(sigma_bot_panel_t)
-                    MOFs[7] = MOF_sigma_bot_panel_t
-                    MOF_fracture_bot_panel = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_bot_panel_t)
-                    MOFs[8] = MOF_fracture_bot_panel
-                    if MOF_sigma_bot_panel_t < 1:
-                        # print(f"Bottom panel tensile strength failure, MOF: {MOF_sigma_bot_panel_t:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-                    if MOF_fracture_bot_panel < 1:
-                        # print(f"Bottom panel fracture failure, MOF: {MOF_fracture_bot_panel:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-
-                if sigma_bot_panel_c < 0:
-                    MOF_sigma_bot_panel = material[mat]['yield stress']*10**6/abs(sigma_bot_panel_c)
-                    MOFs[9] = MOF_sigma_bot_panel
-                    if MOF_sigma_bot_panel < 1:
-                        # print(f"Bottom panel compressive strength failure, MOF: {MOF_sigma_bot_panel:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-
-                if sigma_top_panel_t > 0:
-                    MOF_sigma_top_panel_t = material[mat]['yield stress']*10**6/abs(sigma_top_panel_t)
-                    MOFs[10] = MOF_sigma_top_panel_t
-                    MOF_fracture_top_panel = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_top_panel_t)
-                    MOFs[11] = MOF_fracture_top_panel
-                    if MOF_sigma_top_panel_t < 1:
-                        # print(f"Top panel tensile strength failure, MOF: {MOF_sigma_top_panel_t:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-                    if MOF_fracture_top_panel < 1:
-                        # print(f"Top panel fracture failure, MOF: {MOF_fracture_top_panel:.2f}")
-                        failure_ele = True
-                        t_f_spar, t_a_spar, t_top, t_bot, a = increase_values([t_f_spar, t_a_spar, t_top, t_bot, a], step_size)
-                        b = 2*a
-                        break
-
-                if i == spanwise_pos_sec[rib_number][0]:
-                    w_ribs += A_enc*t_ribs*material[mat]['density']
-                    if plot == True and run_once_more == 1:
-                        # plot provided is how the wingbox will look up until the next cross section
-                        plot_wingbox(i)
-
-                    # this is done for every section between ribs, values used for failure analysis are the values at the end of the section (most critical)
-                    ## Define poisson's ratio
-                    v = 0.33
-                    ## Spar buckling (shear)
-                    # a/b values and their respective ks values
-                    ab_f_spar = (spanwise_pos_sec[rib_number][-1]-spanwise_pos_sec[rib_number][0])/l_f_spar
-                    if ab_f_spar < 5:
-                        ks_f_spar = ks_clamped(ab_f_spar)
-                    else:
-                        ks_f_spar = ks_clamped_min
-                    ab_a_spar = (spanwise_pos_sec[rib_number][-1]-spanwise_pos_sec[rib_number][0])/l_a_spar
-                    if ab_a_spar < 5:
-                        ks_a_spar = ks_clamped(ab_a_spar)
-                    else:
-                        ks_a_spar = ks_clamped_min
-
-                    # critical shear buckling stress
-                    tau_cr_f_spar = ((np.pi**2*material[mat]['E']*10**9*ks_f_spar)/(12*(1-v**2)))*(t_f_spar/l_f_spar)**2
-                    tau_cr_a_spar = ((np.pi**2*material[mat]['E']*10**9*ks_a_spar)/(12*(1-v**2)))*(t_a_spar/l_a_spar)**2
-
-                    # shear flow
-                    tau_avg = load[1][np.where(spanwise_pos == i)[0][0]]/(l_f_spar*t_f_spar+l_a_spar*t_a_spar)
-                    tau_max = 1.5*tau_avg
-
-                    # shear flow due to torsion
-                    q = load[3][np.where(spanwise_pos == i)[0][0]]/(2*A_enc)
-
-                    # combine | sign convention -> positive shear force -> positive shear stress (pointing downwards), 
-                    tau_f_spar = tau_max - q/t_f_spar
-                    tau_a_spar = tau_max + q/t_a_spar
-
-                    # check for failure
-                    MOFs[12] = abs(tau_cr_f_spar/tau_f_spar)
-                    if abs(tau_f_spar) > tau_cr_f_spar:
-                        # print(f"Front spar shear buckling, MOF: {abs(tau_cr_f_spar/tau_f_spar):.2f}")
-                        failure_ele = True
-                        t_f_spar += step_size
-                        break
+                    ### Torsional constant ###
+                    # horizontal length wingbox
+                    l_wb = (xp[1]-xp[0])
                     
-                    MOFs[13] = abs(tau_cr_a_spar/tau_a_spar)
-                    if abs(tau_a_spar) > tau_cr_a_spar:
-                        # print(f"Aft spar shear buckling, MOF: {abs(tau_cr_a_spar/tau_a_spar):.2f}")
-                        failure_ele = True
-                        t_a_spar += step_size
-                        break
+                    # enclosed area | stringers not taken into account -> conservative
+                    A_enc = l_a_spar*l_wb+abs(yp[2]-yp[3])*l_wb/2+abs(yp[0]-yp[1])*l_wb/2
+                    J = (4*A_enc**2)/(l_f_spar/t_f_spar+l_top/t_top+l_a_spar/t_a_spar+l_bot/t_bot)
 
-                    ## Panel buckling (compression) -> look at section between centroids of stringers
-                    # a/b values and their respective ks values
-                    ab_top = (spanwise_pos_sec[rib_number][-1]-spanwise_pos_sec[rib_number][0])/(x_stringer_spacing_top**2+y_stringer_spacing_top**2)**0.5
-                    if ab_top < 5:
-                        ks_top = ks_A_clamped(ab_top)
-                    else:
-                        ks_top = ks_A_clamped_min
-                    ab_bot = (spanwise_pos_sec[rib_number][-1]-spanwise_pos_sec[rib_number][0])/(x_stringer_spacing_bot**2+y_stringer_spacing_bot**2)**0.5
-                    if ab_bot < 5:
-                        ks_bot = ks_A_clamped(ab_bot)
-                    else:
-                        ks_bot = ks_A_clamped_min
+                    if runs == 1:
+                        index = np.where(spanwise_pos == i)[0][0]
+                        xcs[index] = xc
+                        ycs[index] = yc
+                        As[index] = A_tot
+                        Ixs[index] = Ix
+                        Iys[index] = Iy
+                        Js[index] = J
 
-                    # critical compression buckling stress
-                    sigma_cr_top = ((np.pi**2*material[mat]['E']*10**9*ks_top)/(12*(1-v**2)))*(t_top/l_top)**2
-                    sigma_cr_bot = ((np.pi**2*material[mat]['E']*10**9*ks_bot)/(12*(1-v**2)))*(t_bot/l_bot)**2
-                    # points to evaluate stress at top and bottom
-                    x_mid_top = np.array([(xc_stringer_top[i-1]+xc_stringer_top[i])/2+(yc_s+t_top/2)*np.sin(angle_top) for i in range(1, n_stringers_top+2)])
-                    y_mid_top = np.array([(yc_stringer_top[i-1]+yc_stringer_top[i])/2+(yc_s+t_top/2)*np.cos(angle_top) for i in range(1, n_stringers_top+2)])
-                    x_mid_bot = np.array([(xc_stringer_bot[i-1]+xc_stringer_bot[i])/2+(yc_s+t_bot/2)*np.sin(angle_bot) for i in range(1, n_stringers_bot+2)])
-                    y_mid_bot = np.array([(yc_stringer_bot[i-1]+yc_stringer_bot[i])/2-(yc_s+t_bot/2)*np.cos(angle_bot) for i in range(1, n_stringers_bot+2)])
+                    ### Failure analysis ###
+                    ## Compressive and tensile strength failure ##
+                    # stress due to normal force
+                    sigma_n = load[0][np.where(spanwise_pos == i)[0][0]]/(l_top*t_top+l_bot*t_bot+l_f_spar*t_f_spar+l_a_spar*t_a_spar+(n_stringers+4)*A_s)
 
-                    # stress due to bending
-                    sigma_top_b_p = -load[2][np.where(spanwise_pos == i)[0][0]]*(y_mid_top-yc)/Ix
-                    sigma_bot_b_p = -load[2][np.where(spanwise_pos == i)[0][0]]*(y_mid_bot-yc)/Ix
+                    # stress due to bending (always taking worst case scenario)
+                    # front spar | calculate at both ends of the spar
+                    sigma_b_f_spar_top = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_f_spar+l_f_spar/2-yc)/Ix
+                    sigma_b_f_spar_bot = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_f_spar-l_f_spar/2-yc)/Ix
+                    # calculate minimum and maximum stress from bending and add normal stress
+                    sigma_f_spar_c = min(sigma_b_f_spar_top, sigma_b_f_spar_bot)+sigma_n
+                    sigma_f_spar_t = max(sigma_b_f_spar_top, sigma_b_f_spar_bot)+sigma_n
 
-                    sigma_top_p = sigma_n + sigma_top_b_p
-                    sigma_bot_p = sigma_n + sigma_bot_b_p
+                    # aft spar | calculate at both ends of the spar
+                    sigma_b_a_spar_top = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_a_spar+l_a_spar/2-yc)/Ix
+                    sigma_b_a_spar_bot = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_a_spar-l_a_spar/2-yc)/Ix
+                    # calculate minimum and maximum stress from bending and add normal stress
+                    sigma_a_spar_c = min(sigma_b_a_spar_top, sigma_b_a_spar_bot)+sigma_n
+                    sigma_a_spar_t = max(sigma_b_a_spar_top, sigma_b_a_spar_bot)+sigma_n
 
-                    # # print if wingbox meets buckling requirements, in future wingbox should automatically update if it does not meet requirements
-                    sigma_top_p_c = sigma_top_p[sigma_top_p < 0]
-                    sigma_bot_p_c = sigma_bot_p[sigma_bot_p < 0]
+                    # top panel | calculate at both ends of the panel
+                    sigma_b_top_panel_1 = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_top+(yp[0]-yp[1])/2-yc)/Ix
+                    sigma_b_top_panel_2 = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_top-(yp[0]-yp[1])/2-yc)/Ix
+                    # calculate minimum and maximum stress from bending and add normal stress
+                    sigma_top_panel_c = min(sigma_b_top_panel_1, sigma_b_top_panel_2)+sigma_n
+                    sigma_top_panel_t = max(sigma_b_top_panel_1, sigma_b_top_panel_2)+sigma_n
 
-                    # check for failure
-                    if len(sigma_top_p_c) != 0:
-                        MOFs[14] = abs(sigma_cr_top/abs(sigma_top_p.min()))
-                        if not np.all(abs(sigma_top_p_c) < sigma_cr_top):
-                            # print(f"Panel compression buckling top, MOF: {abs(sigma_cr_top/abs(sigma_top_p.min())):.2f}")
+                    # bottom panel | calculate at both ends of the panel
+                    sigma_b_bot_panel_1 = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_bot+(yp[2]-yp[3])/2-yc)/Ix
+                    sigma_b_bot_panel_2 = -load[2][np.where(spanwise_pos == i)[0][0]]*(yc_bot-(yp[2]-yp[3])/2-yc)/Ix
+                    # calculate minimum and maximum stress from bending and add normal stress
+                    sigma_bot_panel_c = min(sigma_b_bot_panel_1, sigma_b_bot_panel_2)+sigma_n
+                    sigma_bot_panel_t = max(sigma_b_bot_panel_1, sigma_b_bot_panel_2)+sigma_n
+
+                    if sigma_f_spar_c < 0:
+                        MOF_sigma_f_spar_c = material[mat]['yield stress']*10**6/abs(sigma_f_spar_c)
+                        MOFs[0] = MOF_sigma_f_spar_c
+                        if MOF_sigma_f_spar_c < 1:
+                            # print(f"Front spar compressive strength failure, MOF: {MOF_sigma_f_spar_c:.2f}")
                             failure_ele = True
-                            t_top += step_size
-                            break
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+                    
+                    if sigma_f_spar_t > 0:
+                        MOF_sigma_f_spar_t = material[mat]['yield stress']*10**6/abs(sigma_f_spar_t)
+                        MOFs[1] = MOF_sigma_f_spar_t
+                        MOF_fracture_f_spar = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_f_spar_t)
+                        MOFs[2] = MOF_fracture_f_spar
+                        if MOF_sigma_f_spar_t < 1:
+                            # print(f"Front spar tensile strength failure, MOF: {MOF_sigma_f_spar_t:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+
+                        if MOF_fracture_f_spar < 1:
+                            # print(f"Front spar fracture failure, MOF: {MOF_fracture_f_spar:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+                    
+                    if sigma_a_spar_c < 0:
+                        MOF_sigma_a_spar = material[mat]['yield stress']*10**6/abs(sigma_a_spar_c)
+                        MOFs[3] = MOF_sigma_a_spar
+                        if MOF_sigma_a_spar < 1:
+                            # print(f"Aft spar compressive strength failure, MOF: {MOF_sigma_a_spar:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+
+                    if sigma_a_spar_t > 0:
+                        MOF_sigma_a_spar_t = material[mat]['yield stress']*10**6/abs(sigma_a_spar_t)
+                        MOFs[4] = MOF_sigma_a_spar_t
+                        MOF_fracture_a_spar = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_a_spar_t)
+                        MOFs[5] = MOF_fracture_a_spar
+                        if MOF_sigma_a_spar_t < 1:
+                            # print(f"Aft spar tensile strength failure, MOF: {MOF_sigma_a_spar_t:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+                        if MOF_fracture_a_spar < 1:
+                            # print(f"Aft spar fracture failure, MOF: {MOF_fracture_a_spar:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+                    
+                    if sigma_top_panel_c < 0:
+                        MOF_sigma_top_panel = material[mat]['yield stress']*10**6/abs(sigma_top_panel_c)
+                        MOFs[6] = MOF_sigma_top_panel
+                        if MOF_sigma_top_panel < 1:
+                            # print(f"Top panel compressive strength failure, MOF: {MOF_sigma_top_panel:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+                    
+                    if sigma_bot_panel_t > 0:
+                        MOF_sigma_bot_panel_t = material[mat]['yield stress']*10**6/abs(sigma_bot_panel_t)
+                        MOFs[7] = MOF_sigma_bot_panel_t
+                        MOF_fracture_bot_panel = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_bot_panel_t)
+                        MOFs[8] = MOF_fracture_bot_panel
+                        if MOF_sigma_bot_panel_t < 1:
+                            # print(f"Bottom panel tensile strength failure, MOF: {MOF_sigma_bot_panel_t:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+                        if MOF_fracture_bot_panel < 1:
+                            # print(f"Bottom panel fracture failure, MOF: {MOF_fracture_bot_panel:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+
+                    if sigma_bot_panel_c < 0:
+                        MOF_sigma_bot_panel = material[mat]['yield stress']*10**6/abs(sigma_bot_panel_c)
+                        MOFs[9] = MOF_sigma_bot_panel
+                        if MOF_sigma_bot_panel < 1:
+                            # print(f"Bottom panel compressive strength failure, MOF: {MOF_sigma_bot_panel:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+
+                    if sigma_top_panel_t > 0:
+                        MOF_sigma_top_panel_t = material[mat]['yield stress']*10**6/abs(sigma_top_panel_t)
+                        MOFs[10] = MOF_sigma_top_panel_t
+                        MOF_fracture_top_panel = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_top_panel_t)
+                        MOFs[11] = MOF_fracture_top_panel
+                        if MOF_sigma_top_panel_t < 1:
+                            # print(f"Top panel tensile strength failure, MOF: {MOF_sigma_top_panel_t:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+                        if MOF_fracture_top_panel < 1:
+                            # print(f"Top panel fracture failure, MOF: {MOF_fracture_top_panel:.2f}")
+                            failure_ele = True
+                            t_f_spar, t_a_spar, t_top, t_bot= increase_values([t_f_spar, t_a_spar, t_top, t_bot], step_size)
+                            inc = (b+step_size)/b
+                            if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                b *= inc
+                                a *= inc
+                                t_stringer *= inc
+                            else:
+                                t_stringer *= inc
+                            continue
+
+                    if i == spanwise_pos_sec[rib_number][0]:
+                        if runs == 1 and n_ribs != 0:
+                            w_ribs += A_enc*t_ribs*material[mat]['density']
+                        if plot == True and runs == 1:
+                            # plot provided is how the wingbox will look up until the next cross section
+                            plot_wingbox(i)
+
+                        # this is done for every section between ribs, values used for failure analysis are the values at the end of the section (most critical)
+                        ## Define poisson's ratio
+                        v = 0.33
+                        ## Spar buckling (shear)
+                        # a/b values and their respective ks values
+                        ab_f_spar = (spanwise_pos_sec[rib_number][-1]-spanwise_pos_sec[rib_number][0])/l_f_spar
+                        if ks_clamped_max[0] < ab_f_spar < ks_clamped_min[0]:
+                            ks_f_spar = ks_clamped(ab_f_spar)
+                        elif ab_f_spar > ks_clamped_min[0]:
+                            ks_f_spar = ks_clamped_min[1]
+                        else:
+                            ks_f_spar = ks_clamped_max[1]
+                        ab_a_spar = (spanwise_pos_sec[rib_number][-1]-spanwise_pos_sec[rib_number][0])/l_a_spar
+                        if ks_clamped_max[0] < ab_a_spar < ks_clamped_min[0]:
+                            ks_a_spar = ks_clamped(ab_a_spar)
+                        elif ab_a_spar > ks_clamped_min[0]:
+                            ks_a_spar = ks_clamped_min[1]
+                        else:
+                            ks_a_spar = ks_clamped_max[1]
+
+                        # critical shear buckling stress
+                        tau_cr_f_spar = ((np.pi**2*material[mat]['E']*10**9*ks_f_spar)/(12*(1-v**2)))*(t_f_spar/l_f_spar)**2
+                        tau_cr_a_spar = ((np.pi**2*material[mat]['E']*10**9*ks_a_spar)/(12*(1-v**2)))*(t_a_spar/l_a_spar)**2
+
+                        # shear flow
+                        tau_avg = load[1][np.where(spanwise_pos == i)[0][0]]/(l_f_spar*t_f_spar+l_a_spar*t_a_spar)
+                        tau_max = 1.5*tau_avg
+
+                        # shear flow due to torsion
+                        q = load[3][np.where(spanwise_pos == i)[0][0]]/(2*A_enc)
+
+                        # combine | sign convention -> positive shear force -> positive shear stress (pointing downwards), 
+                        tau_f_spar = tau_max - q/t_f_spar
+                        tau_a_spar = tau_max + q/t_a_spar
+
+                        # check for failure
+                        MOFs[12] = abs(tau_cr_f_spar/tau_f_spar)
+                        if abs(tau_f_spar) > tau_cr_f_spar:
+                            # print(f"Front spar shear buckling, MOF: {abs(tau_cr_f_spar/tau_f_spar):.2f}")
+                            failure_ele = True
+                            t_f_spar += step_size
+                            continue
+                        
+                        MOFs[13] = abs(tau_cr_a_spar/tau_a_spar)
+                        if abs(tau_a_spar) > tau_cr_a_spar:
+                            # print(f"Aft spar shear buckling, MOF: {abs(tau_cr_a_spar/tau_a_spar):.2f}")
+                            failure_ele = True
+                            t_a_spar += step_size
+                            continue
+
+                        ## Panel buckling (compression) -> look at section between centroids of stringers
+                        # a/b values and their respective ks values
+                        b_top = (x_stringer_spacing_top**2+y_stringer_spacing_top**2)**0.5
+                        ab_top = (spanwise_pos_sec[rib_number][-1]-spanwise_pos_sec[rib_number][0])/b_top
+                        if ks_A_clamped_max[0] < ab_top < ks_A_clamped_min[0]:
+                            ks_top = ks_A_clamped(ab_top)
+                        elif ab_top > ks_A_clamped_min[0]:
+                            ks_top = ks_A_clamped_min[1]
+                        else:
+                            ks_top = ks_A_clamped_max[1]
+                        b_bot = (x_stringer_spacing_bot**2+y_stringer_spacing_bot**2)**0.5
+                        ab_bot = (spanwise_pos_sec[rib_number][-1]-spanwise_pos_sec[rib_number][0])/b_bot
+                        if ks_A_clamped_max[0] < ab_bot < ks_A_clamped_min[0]:
+                            ks_bot = ks_A_clamped(ab_bot)
+                        elif ab_bot > ks_A_clamped_min[0]:
+                            ks_bot = ks_A_clamped_min[1]
+                        else:
+                            ks_bot = ks_A_clamped_max[1]
+
+                        # critical compression buckling stress
+                        sigma_cr_top = ((np.pi**2*material[mat]['E']*10**9*ks_top)/(12*(1-v**2)))*(t_top/b_top)**2
+                        sigma_cr_bot = ((np.pi**2*material[mat]['E']*10**9*ks_bot)/(12*(1-v**2)))*(t_bot/b_bot)**2
+
+                        # points to evaluate stress at top and bottom
+                        x_mid_top = np.array([(xc_stringer_top[i-1]+xc_stringer_top[i])/2+(yc_s+t_top/2)*np.sin(angle_top) for i in range(1, n_stringers_top+2)])
+                        y_mid_top = np.array([(yc_stringer_top[i-1]+yc_stringer_top[i])/2+(yc_s+t_top/2)*np.cos(angle_top) for i in range(1, n_stringers_top+2)])
+                        x_mid_bot = np.array([(xc_stringer_bot[i-1]+xc_stringer_bot[i])/2+(yc_s+t_bot/2)*np.sin(angle_bot) for i in range(1, n_stringers_bot+2)])
+                        y_mid_bot = np.array([(yc_stringer_bot[i-1]+yc_stringer_bot[i])/2-(yc_s+t_bot/2)*np.cos(angle_bot) for i in range(1, n_stringers_bot+2)])
+
+                        # stress due to bending
+                        sigma_top_b_p = -load[2][np.where(spanwise_pos == i)[0][0]]*(y_mid_top-yc)/Ix
+                        sigma_bot_b_p = -load[2][np.where(spanwise_pos == i)[0][0]]*(y_mid_bot-yc)/Ix
+
+                        sigma_top_p = sigma_n + sigma_top_b_p
+                        sigma_bot_p = sigma_n + sigma_bot_b_p
+
+                        # print if wingbox meets buckling requirements, in future wingbox should automatically update if it does not meet requirements
+                        sigma_top_p_c = sigma_top_p[sigma_top_p < 0]
+                        sigma_bot_p_c = sigma_bot_p[sigma_bot_p < 0]
+
+                        # check for failure
+                        if len(sigma_top_p_c) != 0:
+
+                            MOFs[14] = abs(sigma_cr_top/abs(sigma_top_p.min()))
+                            if not np.all(abs(sigma_top_p_c) < sigma_cr_top):
+                                # print(f"Panel compression buckling top, MOF: {abs(sigma_cr_top/abs(sigma_top_p.min())):.2f}")
+                                failure_ele = True
+                                t_top += step_size
+                                continue
+                                
+                        if len(sigma_bot_p_c) != 0:
+                            MOFs[15] = abs(sigma_cr_bot/abs(sigma_bot_p.min()))
+                            if not np.all(abs(sigma_bot_p_c) < sigma_cr_bot):
+                                # print(f"Panel compression buckling bottom, MOF: {abs(sigma_cr_bot/abs(sigma_bot_p.min())):.2f}")
+                                failure_ele = True
+                                t_bot += step_size
+                                continue
+
+                        ## Stringer column buckling (compression) ## , calculate this once for entire wingbox (stringers run entire length)
+                        # K factor for end conditions
+                        if n_stringers != 0:
+                            K = 1/4
+                            d_rib = spanwise_pos_sec[rib_number][-1]-spanwise_pos_sec[rib_number][0]
                             
-                    if len(sigma_bot_p_c) != 0:
-                        MOFs[15] = abs(sigma_cr_bot/abs(sigma_bot_p.min()))
-                        if not np.all(abs(sigma_bot_p_c) < sigma_cr_bot):
-                            # print(f"Panel compression buckling bottom, MOF: {abs(sigma_cr_bot/abs(sigma_bot_p.min())):.2f}")
-                            failure_ele = True
-                            t_bot += step_size
-                            break
+                            # critical compression buckling stress, assumption: all stringers run full length (will not be true, but it is the worst case)
+                            sigma_cr_top_s = K*np.pi**2*material[mat]['E']*10**9*((n_stringers_top+2)*Ix_s_t)/((d_rib)**2*(n_stringers_top+2)*A_s)
+                            sigma_cr_bot_s = K*np.pi**2*material[mat]['E']*10**9*((n_stringers_bot+2)*Ix_s_b)/((d_rib)**2*(n_stringers_bot+2)*A_s)
 
-                    ## Stringer column buckling (compression) ## , calculate this once for entire wingbox (stringers run entire length)
-                    # K factor for end conditions
-                    K = 1/4
-                    d_rib = spanwise_pos_sec[rib_number][-1]-spanwise_pos_sec[rib_number][0]
-                    
-                    # critical compression buckling stress, assumption: all stringers run full length (will not be true, but it is the worst case)
-                    sigma_cr_top_s = K*np.pi**2*material[mat]['E']*10**9*((n_stringers_top+2)*Ix_s_t)/((d_rib)**2*(n_stringers_top+2)*A_s)
-                    sigma_cr_bot_s = K*np.pi**2*material[mat]['E']*10**9*((n_stringers_bot+2)*Ix_s_b)/((d_rib)**2*(n_stringers_bot+2)*A_s)
+                            # stress due to bending
+                            sigma_top_b_s = -load[2][np.where(spanwise_pos == i)[0][0]]*(np.array(yc_stringer_top)-yc)/Ix
+                            sigma_bot_b_s = -load[2][np.where(spanwise_pos == i)[0][0]]*(np.array(yc_stringer_bot)-yc)/Ix
 
-                    # stress due to bending
-                    sigma_top_b_s = -load[2][np.where(spanwise_pos == i)[0][0]]*(np.array(yc_stringer_top)-yc)/Ix
-                    sigma_bot_b_s = -load[2][np.where(spanwise_pos == i)[0][0]]*(np.array(yc_stringer_bot)-yc)/Ix
+                            sigma_top_s = sigma_n + sigma_top_b_s
+                            sigma_bot_s = sigma_n + sigma_bot_b_s
 
-                    sigma_top_s = sigma_n + sigma_top_b_s
-                    sigma_bot_s = sigma_n + sigma_bot_b_s
+                            # print if stringers meets column buckling requirements, in future wingbox should automatically update if it does not meet requirements
+                            sigma_top_s_c = sigma_top_s[sigma_top_s < 0]
+                            sigma_bot_s_c = sigma_bot_s[sigma_bot_s < 0]
 
-                    # # print if stringers meets column buckling requirements, in future wingbox should automatically update if it does not meet requirements
-                    sigma_top_s_c = sigma_top_s[sigma_top_s < 0]
-                    sigma_bot_s_c = sigma_bot_s[sigma_bot_s < 0]
-
-                    # check for failure
-                    if len(sigma_top_s_c) != 0:
-                        MOFs[16] = abs(sigma_cr_top_s/min(sigma_top_s_c))
-                        if MOFs[16] < 1:
-                            # print(f"Stringer column buckling top, MOF: {abs(sigma_cr_top_s/min(sigma_top_s_c)):.2f}")
-                            failure_ele = True
-                            inc = (b+step_size)/b
-                            b *= inc
-                            a *= inc
-                            t_stringer *= inc
-                            break
-                    
-                    if len(sigma_bot_s_c) != 0:
-                        MOFs[17] = abs(sigma_cr_bot_s/min(sigma_bot_s_c))
-                        if MOFs[17] < 1:
-                            # print(f"Stringer column buckling bottom, MOF: {abs(sigma_cr_bot_s/max(abs(sigma_bot_s[sigma_bot_s < 0]))):.2f}")
-                            failure_ele = True
-                            inc = (b+step_size)/b
-                            b *= inc
-                            a *= inc
-                            t_stringer *= inc
-                            break
-
-                if failure_ele == True:
-                    break
-
-            # remove stringers if necessary
-            if stringer_decr_x_ribs != 0:
-                if (rib_number+1) % stringer_decr_x_ribs == 0:
-                    n_stringers -= n_stringer_decr_ribs
-
-        if np.all(MOFs > 1) and i == spanwise_pos[-1]:
-            if run_once_more == 1:
-                failure_tot = False
-            elif n_ribs != 0:
-                failure_tot = True
-                run_once_more += 1
-            else:
-                failure_tot = False
-
-    # print(f"t_f_spar: {t_f_spar:.5f} m")
-    # print(f"t_a_spar: {t_a_spar:.5f} m")
-    # print(f"t_top: {t_top:.5f} m")
-    # print(f"t_bot: {t_bot:.5f} m")
-    # print(f"a: {a:.5f} m")
-    # print(f"b: {b:.5f} m")
-    # print(f"t_stringer: {t_stringer:.5f} m")
-
-    if plot == True:
-        plot_wingbox(i)
+                            # check for failure
+                            if len(sigma_top_s_c) != 0:
+                                MOFs[16] = abs(sigma_cr_top_s/min(sigma_top_s_c))
+                                if MOFs[16] < 1:
+                                    # print(f"Stringer column buckling top, MOF: {abs(sigma_cr_top_s/min(sigma_top_s_c)):.2f}")
+                                    failure_ele = True
+                                    inc = (b+step_size)/b
+                                    if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                        b *= inc
+                                        a *= inc
+                                        t_stringer *= inc
+                                    else:
+                                        t_stringer *= inc
+                                    continue
+                            
+                            if len(sigma_bot_s_c) != 0:
+                                MOFs[17] = abs(sigma_cr_bot_s/min(sigma_bot_s_c))
+                                if MOFs[17] < 1:
+                                    # print(f"Stringer column buckling bottom, MOF: {abs(sigma_cr_bot_s/max(abs(sigma_bot_s[sigma_bot_s < 0]))):.2f}")
+                                    failure_ele = True
+                                    inc = (b+step_size)/b
+                                    if 2*(b+t_stringer) < min(yp_tip[0]-yp_tip[3], yp_tip[1]-yp_tip[2]):
+                                        b *= inc
+                                        a *= inc
+                                        t_stringer *= inc
+                                    else:
+                                        t_stringer *= inc
+                                    continue
 
     # Calculate tip deflection
     d2v_dy2 = -load[2]/(material[mat]['E']*10**9*Ixs)
@@ -740,11 +817,11 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
 
     # Calculate weight
     weight = trapezoid(As, spanwise_pos)*material[mat]['density'] + w_ribs
-    # weight = ((As[0]+As[-1])/2)*(ac.b/2)*material[mat]['density']
-    # print(f"Weight: {weight:.2f} kg")
 
     # Plotting
     if plot == True:
+        plot_wingbox(i)
+
         plt.figure()
         plt.subplot(221)
         plt.plot(spanwise_pos, Ixs, label='Ix')
@@ -779,43 +856,45 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     return weight, t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer
 
 # create 3D surface plot, with n_stringers, n_ribs and weight
-n_stringers = np.arange(25, 26, 1)
-n_ribs = np.arange(6, 7, 1)
-n_stringers, n_ribs = np.meshgrid(n_stringers, n_ribs)
+n_stringers = np.arange(25, 50, 5)
+n_ribs = np.arange(5, 20, 5)
+
+# n_stringers = np.arange(35, 36, 1)
+# n_ribs = np.arange(15, 16, 1)
+
 weights = np.zeros((len(n_ribs), len(n_stringers)))
+n_stringers_g, n_ribs_g = np.meshgrid(n_stringers, n_ribs)
 for i in range(len(n_ribs)):
     for j in range(len(n_stringers)):
         t_f_spar_func = 0.0001
         t_a_spar_func = 0.0001
         t_top_func = 0.0001
         t_bot_func = 0.0001
-        a_func = 0.00015
-        b_func = 0.0003
+        a_func = 0.0015
+        b_func = 0.003
         t_stringer_func = 0.0001
+
         load = loading_compression
-        weights[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func = full_wingbox(n_stringers[i][j], n_ribs[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load)
-        print(weights[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func)
+
+        weights[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load)
+        # print(t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func)
 
         load = loading_tension
-        weights[i][j], t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2 = full_wingbox(n_stringers[i][j], n_ribs[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load)
-        print(weights[i][j], t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2)
 
-        t_f_spar = max(t_f_spar_func, t_f_spar_func_2)
-        t_a_spar = max(t_a_spar_func, t_a_spar_func_2)
-        t_top = max(t_top_func, t_top_func_2)
-        t_bot = max(t_bot_func, t_bot_func_2)
-        a = max(a_func, a_func_2)
-        b = max(b_func, b_func_2)
-        t_stringer = max(t_stringer_func, t_stringer_func_2)
+        weights[i][j], t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2 = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load) 
+        # print(t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2)
 
-        print(weights[i][j], t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer)
-        print(f"Done: {i*len(n_stringers)+j+1}/{len(n_ribs)*len(n_stringers)}")
+        print(f"Done: {i*len(n_stringers)+j+1}/{len(n_ribs)*len(n_stringers)}")   
 
 print(weights)
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-# ax.plot_surface(n_stringers, n_ribs, weights)
-# ax.set_xlabel('Number of stringers')
-# ax.set_ylabel('Number of ribs')
-# ax.set_zlabel('Weight [kg]')
-# plt.show()
+print(f"Minimum weight: {np.min(weights)} kg")
+print(f"Number of stringers: {n_stringers_g[np.where(weights == np.min(weights))[0][0]][np.where(weights == np.min(weights))[1][0]]}")
+print(f"Number of ribs: {n_ribs_g[np.where(weights == np.min(weights))[0][0]][np.where(weights == np.min(weights))[1][0]]}")
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(n_stringers_g, n_ribs_g, weights)
+ax.set_xlabel('Number of stringers')
+ax.set_ylabel('Number of ribs')
+ax.set_zlabel('Weight [kg]')
+plt.show()

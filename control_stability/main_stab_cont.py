@@ -13,6 +13,7 @@ from Class_II_cg_estimation import cg_calc
 from horizontal_tailplane import hor_run
 from vertical_tailplane import ver_run
 from control_surfaces import main_control_surface
+from wing_planform import WingPlanform
 
 def main_stab_control(aircraft, plot, print_value):
 
@@ -21,6 +22,7 @@ def main_stab_control(aircraft, plot, print_value):
     ver_run(aircraft)
     exec(open("landing_gear.py").read(), {'aircraft':aircraft, 'plot':plot})
     main_control_surface(aircraft)
+    WingPlanform(aircraft, plot)
 
     if print_value:
         print("\n-----------------Summary-Stabily-&-Control----------------\n")
