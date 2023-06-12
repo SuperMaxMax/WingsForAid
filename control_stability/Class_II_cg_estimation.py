@@ -1,15 +1,29 @@
-import numpy as np
 import sys
+import os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+
+from parameters import UAV
+import numpy as np
+#import sys
 import matplotlib.pyplot as plt
 from matplotlib import patheffects
 from scipy.integrate import quad
 import math
-
+import pandas as pd 
 
 # Setting with which can be determined if first the aircraft is filled with fuel or with payload
 fuel_first = False
 
 def cg_calc(obj, plot):
+    name_list = []
+    list_mass = []
+    x_list = []
+    y_list = []
+    z_list = []
+    ixx_list = [0,0,0,0,0,0,0,0,0,0,0]
+    iyy_list = [0,0,0,0,0,0,0,0,0,0,0]
+    izz_list = [0,0,0,0,0,0,0,0,0,0,0]
+    
     # Calculate MTOW
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
@@ -22,10 +36,22 @@ def cg_calc(obj, plot):
         wing_cg = 0.4 * obj.rootchord                 # 40% of root chord plus Leading Edge location
     else:
         wing_cg = 0.4 * obj.rootchord                 # to be done later, depends on spar locations (table 8-15 Torenbeek)
+    
+    name_list.append('wing left', 'wing right')
+    list_mass.append(obj.W_w/2, obj.W_w/2)
+    x_list.append(wing_cg+obj.X_LEMAC, wing_cg+obj.X_LEMAC)
+    y_list.append(obj.b*0.175, obj.b*0.175)
+    z_list.append(1.27, 1.27) #add jan's parameters later
 
     # Control surfaces
     control_surfaces_cg = obj.x_lemac + 0.9*obj.MAC_length  # guess for now, control surface location wrt leading edge rootchord
-    
+   
+    name_list.append('control surfaces')
+    list_mass.append(obj.W_sc)
+    x_list.append(control_surfaces_cg+obj.X_LEMAC)
+    y_list.append(obj.yend_flap/4 + (obj.yend_ail-obj.start_ail)/4)
+    z_list.append(1.27) #add jan's parameters later
+
     W_wing_gr = obj.W_w + obj.W_sc
     x_wcg = (wing_cg*obj.W_w + control_surfaces_cg*obj.W_sc)/(W_wing_gr)  # cg distance of wing group wrt leading edge rootchord
 
@@ -34,9 +60,9 @@ def cg_calc(obj, plot):
     prop_correction = 0.06          # correction for propeller weight
     fus_cg = 0.48 * obj.l_f         # educated guess
     engine_cg = obj.engine_cg - prop_correction     # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
-
+        
     # Boom & tail
-    tail_cg = obj.l_f + 0.75*obj.l_f_boom    # educated guess
+    tail_cg = obj.X_LEMAC+obj.l_h+0.2*obj.AE_rootchord_h   # educated guess
     boom_cg = obj.l_f + 0.5*obj.l_f_boom    # educated guess
    
     # Equipment
@@ -46,12 +72,19 @@ def cg_calc(obj, plot):
     nacelle_cg = engine_cg                      # nacelle cg assumed to be at engine cg
 
     # Undercarriage
+    uc_cg = 
     # For now: cg assumed to be at aircraft cg -> not taken into account for X_FCG, but is part of OEW
 
     W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
     X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
     obj.X_FCG = X_FCG
     
+    name_list.append('fuselage', 'engine', 'tail', 'boom', 'equipment', 'nacelle', 'undercarriage')
+    list_mass.append(obj.W_fus, obj.W_pg, obj.W_t, obj.W_boom, obj.W_eq, obj.W_n + obj.W_uc)
+    x_list.append(fus_cg, engine_cg, tail_cg, boom_cg, eq_cg,nacelle_cg, uc_cg)
+    y_list.append(0, 0, 0, 0, 0, 0, 0)
+    z_list.append(0.84, 1.0, 1.27, 1.27, 0.84, 0.84, 0.15) #add jan's parameters later
+
     # xc_OEW = obj.xc_OEW_p*obj.MAC_length
     #X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
 
@@ -139,4 +172,13 @@ def cg_calc(obj, plot):
     if plot:
         plt.show()
 
+    
+    df = {'mass': list_mass, "x": x_list, "y": y_list, "z": z_list, "Ixx": ixx_list, "Iyy": iyy_list, "Izz": izz_list, "name": name_list}
+    df_mass = pd.DataFrame(data=df)
+
+    df_mass.to_csv('airfoil_data_XFLR5.csv', index=False)
+
     return max(Xs), min(Xs), obj.X_cg_range
+
+aircraft =  UAV('aircraft')
+print(cg_calc(aircraft, False))
