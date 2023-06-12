@@ -55,7 +55,7 @@ class UAV:
         self.h_TO = 0                       # Take-off altitude, airport altitude [m]
         self.h_cruise = 3048.0              # Cruise altitude [m]
         self.h_in = 0.9                     # Inner fuselage height [m]
-        self.h_out = 0.737                    # Outer fuselage height [m]
+        self.h_out = 0.67                    # Outer fuselage height [m]
         # I
         self.i_w = 0.935 * np.pi / 180       # Updated incidence angle of wing wrt fuselage [rad]
 
@@ -81,7 +81,9 @@ class UAV:
         self.lambda_co4 = 0.0               # Quarter chord sweep angle [rad]
         self.lin_par1 = 0.5249              # [-]
         self.lin_par2 = 42.049              # [-]
-        self.l_h = 4.15                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.l_h = 4.15       # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.position_landing_fwd = [0.2, 0]  # Nose landing gear position [x, y] in [m]
+        self.position_landing_back = [2.33, 0.8]  # Main landing gear position [x, y] in [m]
 
         # M
         self.MAC_length = 1.2477198640078417            # Mean aerodynamic chord [m]
@@ -176,10 +178,11 @@ class UAV:
         self.W_w = 55.5897                  # Wing weight [kg]
         self.WfinalW10 = 0.993              # Landing, taxi & shut-down fraction [-]
         self.w_in = 1.2                     # Inner fuselage width [m]
-        self.w_out = 1.1                    # Outer fuselage width [m]
+        self.w_out = 1                    # Outer fuselage width [m]
         self.wing_twist = -2.0 *np.pi/180   # Updated wing twist (difference root and chord) [rad]
 
         # X
+        self.xc_aft_spar = 0.8              # Aft spar location as fraction of MAC
         self.X_LEMAC = 2.276                # Leading edge mean aerodynamic chord [m]
         self.x_lemac = 0.06057988483270884  # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
@@ -262,8 +265,12 @@ class UAV:
         self.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane
         self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
         self.AE_Sv = 1.2824
-        self.AE_b_v = 1.6015
+        self.AE_b_v = 1.2015
         self.AE_vertical_airfoil = '0009'      # Airfoil of vertical tail (NACA)
+        self.AE_rootchord_v = 0.9530
+        self.AE_tipchord_v = 0.6671
+        self.AE_lambda_LE_v = 35 * np.pi / 180
+        self.AE_i_w_v = 0.07
 
         "-NACA4415"
         self.airfoil = "4415"
@@ -357,7 +364,7 @@ class UAV:
         self.OP_T_ops = 28 # [days]
         self.OP_N_ops = 659 # [operations]
         self.OP_AC_per_op = 20 # [#AC] available on average
-        self.OP_n_drops = 2 # [#] choice!
+        self.n_drops = 2 # [#] choice!
         self.OP_TTFS = 66.712 # [h] from contract to finished assembly and first sortie starts
         self.OP_T_sortie_gnd = 2.067 # [hr]
         self.OP_T_ground = 2 # [h]
@@ -386,26 +393,45 @@ class UAV:
         self.ST_n_m = 3.8 # positive limit maneuvering load factor (from Vn)
         self.ST_n_ult_pos = 6.6 #positive ultimate load factor
         self.ST_n_ult_neg = -2.78 #negative ultimate load factor
+
         self.ST_Torque_eng = 128 #Nm, Rotax 912 torque
         self.ST_Thrust_eng = 2800 #N Rotax 912 thrust
         self.ST_W_eng = 65.7 #kg Rotax 912 plus clutch, exhaust, alternator, air guide hood, NO MOUNT
         self.ST_Torque_eng2 = 240 #Nm, UL 260 torque
+
         self.ST_l_strut = 2.563733275367119 #m strut lenght (single)
         self.ST_d_strut = 0.015 #strut diameter (outer) [m]
         self.ST_l_LG = 0.4 #m strut lenght (single)
         self.ST_d_LG = 0.04 #strut diameter (outer) [m]
         self.ST_d_boom = 0.05 #strut diameter (outer) [m]
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
-        self.ST_W_fus = 40.3381 #kg mass of fuselage structure (only)
-        self.ST_W_tb = 8.746397065450095 #kg mass of tail boom, given it is 2.8 m long
-        self.ST_W_lg = 7.1 #kg mass of landing gear struts
+
+        self.ST_W_fus = 40.224 #kg mass of fuselage structure (only)
+        self.ST_W_tb = 11.52 #kg mass of tail boom, given it is 2.8 m long
+        self.ST_W_lg = 7.75 #kg mass of landing gear struts
+
         self.ST_z_ground = 0.5 #m floor height
         self.ST_z_prop = 0.3 #m propeller clearance
+        self.ST_h_fus = 0.67 #m fuselage height ##KEEP IN MIND THAT THE ATTACHMENT OF THE WING IS ABOVE THE FUSELAGE CEILING
+        self.ST_w_fus = 1.0 #m fuselage width
+        self.ST_h_prop_axis = 1.1 #m height of the propeller axis above the ground
+        self.ST_top_eng = 1.87 #m ceiling of the engine above the ground
+        self.ST_eng_w = 0.56 #m width of engine box
+        self.ST_eng_h = 0.335 #m height of engine box (NOT INCLUDING PROP obviously)
+        self.ST_eng_l = 0.534 #m lenght of engine (excluding gas exhaust piping)
+
         self.ST_z_cg_ground =  0.92 #m estiamted center of gravity of boxes, fuselage, engine, boom, wing, fuel
         self.ST_x_nw =0.4 #m x distance nose wheel
         self.ST_x_mw =2.35 #m x distance main whee
         self.ST_ax_g = 0.51 #- maximum horizontal breaking deceleration scaled by g0
         self.ST_x_cg = 2.94 #max aft x_cg for nose wheel loading
+
+
+        self.ST_tail_boom_2a=0.15 #height of tail boom
+        self.ST_tail_boom_2b=0.1 #width of tail boom
+        self.ST_tail_boom_t=0.001 #thinckness of tail boom (steel 410)
+        self.ST_h_tail_spar_r=0.025 #radius of h tail spar
+        self.ST_h_tail_spar_t=0.001 #thickness of h tail spar (steel 410)
 
 
 class airport:
