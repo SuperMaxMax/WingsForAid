@@ -40,7 +40,7 @@ def cg_calc(obj, plot):
     name_list += ['wing left', 'wing right']
     list_mass += [obj.W_w/2, obj.W_w/2]
     x_list += [wing_cg+obj.X_LEMAC, wing_cg+obj.X_LEMAC]
-    y_list += [obj.b*0.175, obj.b*0.175]
+    y_list += [-obj.b*0.175, obj.b*0.175]
     z_list += [obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord, obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord] 
 
     # Control surfaces
@@ -184,6 +184,6 @@ def cg_calc(obj, plot):
     df_mass = pd.DataFrame(data=df)
 
     df_mass.to_csv('AVL_mass.csv', index=False)
-    print(df_mass)
+    #print(df_mass)
 
     return max(Xs), min(Xs), obj.X_cg_range

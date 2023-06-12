@@ -1,5 +1,6 @@
 import sys
-sys.path.append("..")
+import os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 # Start your import below this
 from parameters import UAV

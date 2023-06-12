@@ -131,7 +131,7 @@ def horizontal_tail_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 2.35
+                AR = 4
             if variable == "Lambda":
                 Lambda = parameter
             else:

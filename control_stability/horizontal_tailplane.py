@@ -115,19 +115,30 @@ def Flaplength(aircraft, taperratio, rootchord, span, HLDroot, flappedsurface):
         return y1
 
 def flaps(aircraft):
-    flaptype = 'singleslotted'              # Can be 'singleslotted' or 'fowler'
+    flaptype = 'plain'              # Can be 'plain', 'singleslotted' or 'fowler'
     CS_Swf = 0.7 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) NOTE: Used to calculate resulting dCLmax
     CS_lambda_hinge = 0.05468               # hinge line sweep angle, likely parallel to aft spar [rad] NOTE: For aft spar @ 0.8 chord
 
     # Using data from Torenbeek aroung page 533
+    if flaptype == 'plain':  # FIXME values independent of flap chord, check if logical
+        CS_deltaf_TO                   = 20  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S14)
+        CS_deltaf_LD                   = 60  # flap deflection angle at landing [deg]
+        CS_fc_c                        = aircraft.xc_aft_spar  # flap chord length / wing chord length [-] (ADSEE-II, L3 S32) NOTE: This influences aft spar position
+        CS_cprime_c_TO = 1  # wing chord length with take-off extended flaps / chord [-]
+        CS_cprime_c_LD = 1  # wing chord length with landing extended flaps / chord [-]
+        CS_dClmax_TO = 0.9 * 0.7  # Additional airfoil lift at take-off due to plain flap (ADSEE-II, L3 S36)
+        CS_dClmax_LD = 0.9  # Additional airfoil lift at landing due to plain flap
+        print("\nPlain flap")
+        print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
+
     if flaptype == 'singleslotted':
         CS_deltaf_TO                   = 20  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S14)
         CS_deltaf_LD                   = 40  # flap deflection angle at landing [deg]
         CS_fc_c                        = aircraft.xc_aft_spar  # flap chord length / wing chord length [-] (ADSEE-II, L3 S32) NOTE: This influences aft spar position
         CS_dc_cf_TO                    = 0.2  # increase in chord length / flap chord length [-] (ADSEE-II, L3 S37)
         CS_dc_cf_LD                    = 0.3  # increase in chord length / flap chord length [-]
-        CS_cprime_c_TO = 1 + CS_dc_cf_TO * CS_fc_c # wing chord length with take-off extended flaps / chord [-] (Using notes of ADSEE-II, L3 S37)
-        CS_cprime_c_LD = 1 + CS_dc_cf_LD * CS_fc_c # wing chord length with landing extended flaps / chord [-]
+        CS_cprime_c_TO = 1  # wing chord length with take-off extended flaps / chord [-]
+        CS_cprime_c_LD = 1  # wing chord length with landing extended flaps / chord [-]
         CS_dClmax_TO = 1.3 * 0.7  # Additional airfoil lift at take-off due to single slotted flap (ADSEE-II, L3 S36)
         CS_dClmax_LD = 1.3  # Additional airfoil lift at landing due to single slotted flap
         print("\nSingle slotted flap")
