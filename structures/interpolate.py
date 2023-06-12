@@ -33,4 +33,3 @@ plt.show()
 print(np.min(weights[weights != 0]))
 # print stringer and rib number for minimum weight
 print(np.where(weights == np.min(weights[weights != 0])))
-print(weights[10][16])

@@ -938,6 +938,7 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
 # ax.set_zlabel('Weight [kg]')
 # plt.show()
 
+
 # ratio based on n_ult
 # check if wingbox tip twist meets reqs (at given n, not more than 1 deg)
 
@@ -945,18 +946,18 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
 lower_start, upper_start, step_s, step_r = 0, 30, 10, 10
 n_stringers = np.arange(lower_start, upper_start+step_s, step_s)
 n_ribs = np.arange(lower_start, upper_start+step_r, step_r)
-weights = np.zeros((n_ribs[-1]+1, n_stringers[-1]+1))
+weights = np.zeros((n_stringers[-1]+1, n_ribs[-1]+1))
 
 solution =  True
 last = 0
 
 while solution:
-    for i, val_ribs in enumerate(n_ribs):
-        for j, val_str in enumerate(n_stringers):
-            if weights[val_ribs][val_str] != 0:
+    for row, val_str in enumerate(n_stringers):
+        for col, val_rib in enumerate(n_ribs):
+            if weights[val_str][val_rib] != 0:
                 continue
-            print(val_ribs, val_str)
-            print(i,j)
+            print(val_str, val_rib)
+            print(row, col)
             t_f_spar_func = 0.0005
             t_a_spar_func = 0.0005
             t_top_func = 0.0005
@@ -967,27 +968,25 @@ while solution:
 
             load = loading_compression
 
-            weights[val_ribs][val_str], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func = full_wingbox(val_str, val_ribs, t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load)
+            weights[val_str][val_rib], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func = full_wingbox(val_str, val_rib, t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load)
             # print(t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func)
 
             load = loading_tension
 
-            weights[val_ribs][val_str], t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2 = full_wingbox(val_str, val_ribs, t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load) 
+            weights[val_str][val_rib], t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2 = full_wingbox(val_str, val_rib, t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load) 
             # print(t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2)
 
             load = loading_custom
 
-            weights[val_ribs][val_str], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3 = full_wingbox(val_str, val_ribs, t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2, load, True)
+            weights[val_str][val_rib], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3 = full_wingbox(val_str, val_rib, t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2, load, True)
             # print(t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3)
 
-            print(f"Done: {i*len(n_stringers)+j+1}/{len(n_ribs)*len(n_stringers)}") 
+            print(f"Done: {row*len(n_stringers)+col+1}/{len(n_ribs)*len(n_stringers)}") 
     
     # get the stringers and ribs that give the minimum weight
-    n_stringers_min, n_ribs_min = np.argwhere(weights == np.min(weights[weights != 0]))[0] #n_stringers_g[np.where(weights == np.min(weights[weights != 0]))[0][0]][np.where(weights == np.min(weights[weights != 0]))[1][0]]
-    # n_ribs_min = n_ribs_g[np.where(weights == np.min(weights[weights != 0]))[0][0]][np.where(weights == np.min(weights[weights != 0]))[1][0]]
+    n_stringers_min, n_ribs_min = np.argwhere(weights == np.min(weights[weights != 0]))[0]
 
     # create new n_stringers and n_ribs arrays, with the minimum value in the middle
-    print(n_stringers_min, n_ribs_min, step_s, step_r)
     lower_start_s = n_stringers_min - step_s
     lower_start_r = n_ribs_min - step_r
     upper_start_s = n_stringers_min + step_s
@@ -997,7 +996,7 @@ while solution:
 
     if last == 1:
         solution =  False
-    print(n_stringers[1], n_stringers[0], 'asdasd')
+
     if n_stringers[1]-n_stringers[0] == 2:
         n_stringers = np.arange(int(lower_start_s), int(upper_start_s)+1, 1)
         n_ribs = np.arange(int(lower_start_r), int(upper_start_r)+1, 1)
@@ -1008,9 +1007,33 @@ while solution:
     
     n_stringers_g, n_ribs_g = np.meshgrid(n_stringers, n_ribs)
 
-    print(n_ribs, n_stringers)
-
-print(weights)
-
 # save weights array
 np.save('weights.npy', weights)
+
+n_stringers = np.arange(lower_start, upper_start+1, 1)
+n_ribs = np.arange(lower_start, upper_start+1, 1)
+n_stringers_g, n_ribs_g = np.meshgrid(n_stringers, n_ribs)
+
+# get data points to interpolate, which are the nonzero weight, together with the corresponding n_stringers and n_ribs
+data_points = []
+for i in range(len(weights)):
+    for j in range(len(weights[i])):
+        if weights[i][j] != 0:
+            data_points.append([n_stringers[i], n_ribs[j], weights[i][j]])
+
+# interpolate the data points
+from scipy.interpolate import griddata
+data_points = np.array(data_points)
+weights_2 = griddata(data_points[:, :2], data_points[:, 2], (n_stringers_g, n_ribs_g), method='linear')
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(n_stringers_g, n_ribs_g, weights_2)
+ax.scatter(data_points[:, 0], data_points[:, 1], data_points[:, 2], c='r', s=50)
+ax.set_xlabel('Number of stringers')
+ax.set_ylabel('Number of ribs')
+ax.set_zlabel('Weight [kg]')
+plt.show()
+
+print(np.min(weights[weights != 0]))
+print(np.where(weights == np.min(weights[weights != 0])))
