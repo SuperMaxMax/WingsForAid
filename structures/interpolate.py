@@ -30,4 +30,7 @@ ax.set_ylabel('Number of ribs')
 ax.set_zlabel('Weight [kg]')
 plt.show()
 
-print(weights)
+print(np.min(weights[weights != 0]))
+# print stringer and rib number for minimum weight
+print(np.where(weights == np.min(weights[weights != 0])))
+print(weights[10][16])
