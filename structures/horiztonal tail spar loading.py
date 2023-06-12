@@ -14,6 +14,7 @@ E = 200*10**9
 r_h_tail_spar = 0.025
 l_h_tail_spar = ac.AE_b_h
 F_h_max = abs(dF_h_man)
+T_max = max(0.5*
 arm = ac.AE_b_h/2*1/3 #5/2*1/3 # conservative, assuming hor tail up to 5m
 M_h_max = abs(F_h_max*arm)
 
@@ -44,7 +45,7 @@ plt.legend()
 plt.show()
 
 t=1/1000
-print("mass kg",P*t*l_h_tail_spar*density)
+print("mass kg",P*t*1.2*density)
 print("area", 2*np.pi*r_h_tail_spar*t)
 print('min area', A_min[0])
 print('Ixx',1/8*np.pi*(r_h_tail_spar*2)**3*t)
