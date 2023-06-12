@@ -37,7 +37,7 @@ NACA
 
 CONTROL
 #Cname   Cgain  Xhinge  HingeVec       SgnDup
-flap     1.00.750.01.00.01.0
+flap     1.00.80.01.00.01.0
 
 #---------------End Flap Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
@@ -49,7 +49,7 @@ NACA
 
 CONTROL
 #Cname   Cgain  Xhinge  HingeVec       SgnDup
-flap     1.00.750.01.00.01.0
+flap     1.00.80.01.00.01.0
 
 
 #---------------Begin Aileron Section-------------------------------------------
@@ -62,7 +62,7 @@ NACA
 
 CONTROL
 #Cname   Cgain  Xhinge  HingeVec       SgnDup
-aileron  1.00.750.01.00.0-1.0
+aileron  1.00.80.01.00.0-1.0
 
 #---------------End Aileron Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
@@ -74,7 +74,7 @@ NACA
 
 CONTROL
 #Cname   Cgain  Xhinge  HingeVec       SgnDup
-aileron  1.00.750.01.00.0-1.0
+aileron  1.00.80.01.00.0-1.0
 
 #-----------Tip Section------------------
 SECTION
@@ -131,7 +131,7 @@ elevator  1.00.0010.01.00.01.0
 #
 SURFACE
 V-Stab
-81.0100.75  ! Nchord   Cspace
+81.0100.8  ! Nchord   Cspace
 
 # twist angle bias for whole surface
 ANGLE

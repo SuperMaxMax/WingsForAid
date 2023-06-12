@@ -11,15 +11,15 @@ from scipy import integrate, optimize
 from parameters import UAV
 aircraft = UAV('aircraft')
 
-#import wing_planform as wp
-#import horizontal_tail_design as htd
-#import vertical_tail_design as vtd
+import wing_planform as wp
+import horizontal_tail_design as htd
+import vertical_tail_design as vtd
 
 
 
-#wp.main_wing_planform(aircraft)
-##htd.horizontal_tail_planform(aircraft)
-#vtd.horizontal_tail_planform(aircraft)
+wp.main_wing_planform(aircraft)
+htd.horizontal_tail_planform(aircraft)
+vtd.horizontal_tail_planform(aircraft)
 
 
 
@@ -62,7 +62,7 @@ NACA
 
 CONTROL
 #Cname   Cgain  Xhinge  HingeVec       SgnDup
-flap     """,1.0,    aircraft.aft,    0.0, 1.0, 0.0,    1.0,"""
+flap     """,1.0,    aircraft.xc_aft_spar,    0.0, 1.0, 0.0,    1.0,"""
 
 #---------------End Flap Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
@@ -74,7 +74,7 @@ NACA
 
 CONTROL
 #Cname   Cgain  Xhinge  HingeVec       SgnDup
-flap     """,1.0,    0.75,    0.0, 1.0, 0.0,    1.0,"""
+flap     """,1.0,    aircraft.xc_aft_spar,    0.0, 1.0, 0.0,    1.0,"""
 
 
 #---------------Begin Aileron Section-------------------------------------------
@@ -87,7 +87,7 @@ NACA
 
 CONTROL
 #Cname   Cgain  Xhinge  HingeVec       SgnDup
-aileron  """,1.0,    0.75,    0.0, 1.0, 0.0,   -1.0,"""
+aileron  """,1.0,    aircraft.xc_aft_spar,    0.0, 1.0, 0.0,   -1.0,"""
 
 #---------------End Aileron Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
@@ -99,7 +99,7 @@ NACA
 
 CONTROL
 #Cname   Cgain  Xhinge  HingeVec       SgnDup
-aileron  """,1.0,    0.75,    0.0, 1.0, 0.0,  -1.0,"""
+aileron  """,1.0,    aircraft.xc_aft_spar,    0.0, 1.0, 0.0,  -1.0,"""
 
 #-----------Tip Section------------------
 SECTION
@@ -156,7 +156,7 @@ elevator  """,1.0,    0.001,    0.0, 1.0, 0.0,    1.0,"""
 #
 SURFACE
 V-Stab
-""",8,  1.0,  10,  0.75,"""  ! Nchord   Cspace
+""",8,  1.0,  10,  aircraft.xc_aft_spar,"""  ! Nchord   Cspace
 
 # twist angle bias for whole surface
 ANGLE
