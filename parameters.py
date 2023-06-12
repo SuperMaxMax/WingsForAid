@@ -54,8 +54,8 @@ class UAV:
         # H
         self.h_TO = 0                       # Take-off altitude, airport altitude [m]
         self.h_cruise = 3048.0              # Cruise altitude [m]
-        self.h_in = 0.9                     # Inner fuselage height [m]
-        self.h_out = 0.737                    # Outer fuselage height [m]
+        # self.h_in = 0.9                     # Inner fuselage height [m]
+        # self.h_out = 0.737                    # Outer fuselage height [m]
         # I
         self.i_w = 0.935 * np.pi / 180       # Updated incidence angle of wing wrt fuselage [rad]
 
@@ -390,26 +390,40 @@ class UAV:
         self.ST_n_m = 3.8 # positive limit maneuvering load factor (from Vn)
         self.ST_n_ult_pos = 6.6 #positive ultimate load factor
         self.ST_n_ult_neg = -2.78 #negative ultimate load factor
+
         self.ST_Torque_eng = 128 #Nm, Rotax 912 torque
         self.ST_Thrust_eng = 2800 #N Rotax 912 thrust
         self.ST_W_eng = 65.7 #kg Rotax 912 plus clutch, exhaust, alternator, air guide hood, NO MOUNT
         self.ST_Torque_eng2 = 240 #Nm, UL 260 torque
+
         self.ST_l_strut = 2.563733275367119 #m strut lenght (single)
         self.ST_d_strut = 0.015 #strut diameter (outer) [m]
         self.ST_l_LG = 0.4 #m strut lenght (single)
         self.ST_d_LG = 0.04 #strut diameter (outer) [m]
         self.ST_d_boom = 0.05 #strut diameter (outer) [m]
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
-        self.ST_W_fus = 40.3381 #kg mass of fuselage structure (only)
-        self.ST_W_tb = 8.746397065450095 #kg mass of tail boom, given it is 2.8 m long
-        self.ST_W_lg = 7.1 #kg mass of landing gear struts
+
+        self.ST_W_fus = 40.224 #kg mass of fuselage structure (only)
+        self.ST_W_tb = 11.52 #kg mass of tail boom, given it is 2.8 m long
+        self.ST_W_lg = 7.75 #kg mass of landing gear struts
+
         self.ST_z_ground = 0.5 #m floor height
         self.ST_z_prop = 0.3 #m propeller clearance
+        self.ST_h_fus = 0.67 #m fuselage height ##KEEP IN MIND THAT THE ATTACHMENT OF THE WING IS ABOVE THE FUSELAGE CEILING
+        self.ST_w_fus = 1.0 #m fuselage width
+        self.ST_h_prop_axis = 1.1 #m height of the propeller axis above the ground
+        self.ST_top_eng = 1.87 #m ceiling of the engine above the ground
+        self.ST_eng_w = 0.56 #m width of engine box
+        self.ST_eng_h = 0.335 #m height of engine box (NOT INCLUDING PROP obviously)
+        self.ST_eng_l = 0.534 #m lenght of engine (excluding gas exhaust piping)
+
         self.ST_z_cg_ground =  0.92 #m estiamted center of gravity of boxes, fuselage, engine, boom, wing, fuel
         self.ST_x_nw =0.4 #m x distance nose wheel
         self.ST_x_mw =2.35 #m x distance main whee
         self.ST_ax_g = 0.51 #- maximum horizontal breaking deceleration scaled by g0
         self.ST_x_cg = 2.94 #max aft x_cg for nose wheel loading
+
+
         self.ST_tail_boom_2a=0.15 #height of tail boom
         self.ST_tail_boom_2b=0.1 #width of tail boom
         self.ST_tail_boom_t=0.001 #thinckness of tail boom (steel 410)
