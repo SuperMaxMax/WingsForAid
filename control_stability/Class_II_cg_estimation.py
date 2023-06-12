@@ -20,9 +20,9 @@ def cg_calc(obj, plot):
     x_list = []
     y_list = []
     z_list = []
-    ixx_list = [0,0,0,0,0,0,0,0,0,0,0]
-    iyy_list = [0,0,0,0,0,0,0,0,0,0,0]
-    izz_list = [0,0,0,0,0,0,0,0,0,0,0]
+    ixx_list = [0,0,0,0,0,0,0,0,0,0,0,0]
+    iyy_list = [0,0,0,0,0,0,0,0,0,0,0,0]
+    izz_list = [0,0,0,0,0,0,0,0,0,0,0,0]
     
     # Calculate MTOW
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
@@ -37,20 +37,20 @@ def cg_calc(obj, plot):
     else:
         wing_cg = 0.4 * obj.rootchord                 # to be done later, depends on spar locations (table 8-15 Torenbeek)
     
-    name_list.append('wing left', 'wing right')
-    list_mass.append(obj.W_w/2, obj.W_w/2)
-    x_list.append(wing_cg+obj.X_LEMAC, wing_cg+obj.X_LEMAC)
-    y_list.append(obj.b*0.175, obj.b*0.175)
-    z_list.append(1.27, 1.27) #add jan's parameters later
+    name_list += ['wing left', 'wing right']
+    list_mass += [obj.W_w/2, obj.W_w/2]
+    x_list += [wing_cg+obj.X_LEMAC, wing_cg+obj.X_LEMAC]
+    y_list += [obj.b*0.175, obj.b*0.175]
+    z_list += [obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord, obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord] 
 
     # Control surfaces
     control_surfaces_cg = obj.x_lemac + 0.9*obj.MAC_length  # guess for now, control surface location wrt leading edge rootchord
    
-    name_list.append('control surfaces')
-    list_mass.append(obj.W_sc)
-    x_list.append(control_surfaces_cg+obj.X_LEMAC)
-    y_list.append(obj.yend_flap/4 + (obj.yend_ail-obj.start_ail)/4)
-    z_list.append(1.27) #add jan's parameters later
+    name_list += ['control surfaces']
+    list_mass += [obj.W_sc]
+    x_list += [control_surfaces_cg+obj.X_LEMAC]
+    y_list += [0]
+    z_list += [obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord] 
 
     W_wing_gr = obj.W_w + obj.W_sc
     x_wcg = (wing_cg*obj.W_w + control_surfaces_cg*obj.W_sc)/(W_wing_gr)  # cg distance of wing group wrt leading edge rootchord
@@ -72,19 +72,19 @@ def cg_calc(obj, plot):
     nacelle_cg = engine_cg                      # nacelle cg assumed to be at engine cg
 
     # Undercarriage
-    uc_cg = 
+    uc_cg =  obj.l_f * 0.25
     # For now: cg assumed to be at aircraft cg -> not taken into account for X_FCG, but is part of OEW
 
     W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
     X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
     obj.X_FCG = X_FCG
-    
-    name_list.append('fuselage', 'engine', 'tail', 'boom', 'equipment', 'nacelle', 'undercarriage')
-    list_mass.append(obj.W_fus, obj.W_pg, obj.W_t, obj.W_boom, obj.W_eq, obj.W_n + obj.W_uc)
-    x_list.append(fus_cg, engine_cg, tail_cg, boom_cg, eq_cg,nacelle_cg, uc_cg)
-    y_list.append(0, 0, 0, 0, 0, 0, 0)
-    z_list.append(0.84, 1.0, 1.27, 1.27, 0.84, 0.84, 0.15) #add jan's parameters later
 
+    name_list += ['fuselage', 'engine', 'tail', 'boom', 'equipment', 'nacelle', 'undercarriage']
+    list_mass += [obj.W_fus, obj.W_pg, obj.W_t, obj.W_boom, obj.W_eq, obj.W_n, obj.W_uc]
+    x_list += [fus_cg, engine_cg, tail_cg, boom_cg, eq_cg,nacelle_cg, uc_cg]
+    y_list += [0, 0, 0, 0, 0, 0, 0]
+    z_list += [obj.ST_z_ground+0.5*obj.ST_h_fus, obj.ST_h_prop_axis, obj.ST_z_ground+obj.ST_h_fus, obj.ST_z_ground+obj.ST_h_fus, obj.ST_h_prop_axis, obj.ST_h_prop_axis, obj.ST_z_ground*0.35] #add jan's parameters later
+    
     # xc_OEW = obj.xc_OEW_p*obj.MAC_length
     #X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
 
@@ -98,6 +98,12 @@ def cg_calc(obj, plot):
     # Fuel
     W_fuel_wi = obj.W_F
     X_fuel_wi = X_LEMAC + 0.5*obj.MAC_length
+
+    name_list += ['fuel', 'payload']
+    list_mass += [obj.W_F, obj.boxweight*12]
+    x_list += [X_fuel_wi, obj.engine_length + 1.85]
+    y_list += [0, 0]
+    z_list += [obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord, obj.ST_z_ground+0.3]
 
     # Payload
     dist_front = obj.engine_length + 0.45  # [m]
@@ -172,11 +178,13 @@ def cg_calc(obj, plot):
     if plot:
         plt.show()
 
-    
+    name_list = ['!' + name for name in name_list]
+
     df = {'mass': list_mass, "x": x_list, "y": y_list, "z": z_list, "Ixx": ixx_list, "Iyy": iyy_list, "Izz": izz_list, "name": name_list}
     df_mass = pd.DataFrame(data=df)
 
-    df_mass.to_csv('airfoil_data_XFLR5.csv', index=False)
+    df_mass.to_csv('AVL_mass.csv', index=False)
+    print(df_mass)
 
     return max(Xs), min(Xs), obj.X_cg_range
 
