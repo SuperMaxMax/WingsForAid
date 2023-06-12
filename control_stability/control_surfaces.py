@@ -11,6 +11,7 @@ sys.path.append('..')
 from parameters import atmosphere
 atm      = atmosphere()
 
+
 def Chordlength(y, aircraft):
     return aircraft.rootchord * (1 - ((1-aircraft.taper) / (aircraft.b / 2)) * y)
 
@@ -69,8 +70,8 @@ def elevator_design(aircraft):
     # M_ac_wf = 1/2*atm.rho0 * aircraft.Cm_ac_w * aircraft.Vs_min**2 * aircraft.Sw * aircraft.MAC_length
 
     CL_h = -1
-    L_h = 0.5 * 0.7 * CL_h * (aircraft.V_cruise)**2 * aircraft.AE_Sh_S * aircraft.Sw
-
+    aircraft.L_h = 0.5 * 0.7 * CL_h * (aircraft.V_cruise)**2 * aircraft.AE_Sh_S * aircraft.Sw
+    
     T= 2800 
     z_position_T = -(aircraft.ST_z_prop + aircraft.prop_radius - aircraft.ST_z_cg_ground)
 
@@ -79,6 +80,7 @@ def elevator_design(aircraft):
     
     color_r = ['black', 'steelblue']
     e = 0
+    plt.figure()
     for X_cg in [aircraft.X_cg_fwd, aircraft.X_cg_aft]:
         delta_eq_req_range = []
         for V in V_range:
@@ -96,6 +98,7 @@ def elevator_design(aircraft):
         plt.scatter(V_range, delta_eq_req_range, marker='x', color=color_r[e])
         
         e = e +1
+    
     plt.xlabel(r"V [m/s]")
     plt.ylabel(r"$\delta_E$ [deg]")
 
@@ -105,7 +108,7 @@ def elevator_design(aircraft):
     plt.grid()
     plt.show(block=True)
 
-def rudder_design(aircraft):
+def rudder_design(aircraft, tau_r):
     
     V_w = 20 * (0.51444444444) # [m/s] side wind
 
@@ -132,7 +135,7 @@ def rudder_design(aircraft):
     C_y_beta = -1.35 * C_L_alpha_v * (1 - dsigma_dalpha) * eta_v * aircraft.AE_Sv_S
 
     aircraft.C_r_C_v = 0.4
-    tau_r = 0.6
+    # tau_r = 0.6
     C_Y_delta_r = C_L_alpha_v * eta_v * tau_r * 1 * aircraft.AE_Sv_S 
     C_n_delta_r = -C_L_alpha_v * vertical_tail_volume * eta_v * tau_r * 1
 
@@ -150,14 +153,40 @@ def rudder_design(aircraft):
     delta_r_value = solution[0]
     sigma_value = solution[1]
     
-    aircraft.delta_r_value = delta_r_value
+    aircraft.delta_r_value = delta_r_value*(180/np.pi)
 
     if delta_r_value*180/pi > 30:
-        print(f"\nRequired rudder deflection ({round(delta_r_value*180/pi, 3)} degrees) exceeds maximum rudder deflection (30 degrees)\n")
+        print(f"\nRequired rudder deflection ({round(delta_r_value, 3)} degrees) exceeds maximum rudder deflection (30 degrees)\n")
 
     #aircraft.S_r = aircraft.C_r_C_v * aircraft.C_v * aircraft.b_v
 
+def rudder_iteration(aircraft):
+    delta_r_value_array = []
+    c_array = np.arange(0.10, 0.75, 0.05)
+    tau_array = [0.27, 0.35, 0.41, 0.47, 0.52, 0.56, 0.6, 0.64, 0.68, 0.71, 0.74, 0.77, 0.8]
+    plt.figure()
+    for i in tau_array:
+        tau_r = i
+        rudder_design(aircraft, tau_r)
+
+        delta_r_value_array.append(aircraft.delta_r_value)
+
+    
+    plt.scatter(c_array, delta_r_value_array, marker='x', color='black')
+    plt.axhline(y=30, color= 'red')
+    plt.text(0.6, 30.5, r"$\delta_{r_{max}}$", rotation=0, color='red')
+    plt.axhline(y=27, color= 'darkorange')
+    plt.text(0.6, 27.5, r"$\delta_{r_{max}}$ + margin", rotation=0, color='red')
+
+    index = np.where(np.array(delta_r_value_array) < 27)[0][0]
+    plt.scatter(c_array[index], delta_r_value_array[index], color='r')
+
+
+    plt.xlabel(r"$\frac{C_r}{C_v}$")
+    plt.ylabel(r"$\delta_{r_{max}}$ [deg]")
+    plt.show(block=True)
 def main_control_surface(aircraft):
     aileron_design(aircraft)
-    rudder_design(aircraft)
+    rudder_iteration(aircraft)
+    # rudder_design(aircraft)
     elevator_design(aircraft)

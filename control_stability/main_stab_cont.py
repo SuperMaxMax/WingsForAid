@@ -36,6 +36,7 @@ def main_stab_control(aircraft, plot, print_value):
         print("--------------------Horizontal tailplane----------------------\n")
 
         print(f"Sh_S is {round(aircraft.Sh_S, 3)}\n")
+        print(f"L_h is {round(aircraft.L_h, 3)}N")
 
         print("--------------------Vertical tailplane-------------------------\n")
 
