@@ -72,7 +72,7 @@ def cg_calc(obj, plot):
     nacelle_cg = engine_cg                      # nacelle cg assumed to be at engine cg
 
     # Undercarriage
-    uc_cg =  obj.l_f * 0.25
+    uc_cg =  uc_cg =  0.2*obj.position_landing_fwd[0] + 0.8*obj.position_landing_back[0]
     # For now: cg assumed to be at aircraft cg -> not taken into account for X_FCG, but is part of OEW
 
     W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
