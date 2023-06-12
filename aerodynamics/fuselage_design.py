@@ -187,7 +187,7 @@ for j in range(2):
         print("Wetted area fuselage:", Swet_list[4])
         print("Zero lift drag fuselage:", CD0_list[4])
         print(l_fus_total / d_fus)
-        plt.scatter(Swet_list[4], CD0_list[4], s = 4, color = 'black')
+        plt.scatter(l_fus_total / d_fus, CD0_list[4], s = 4, color = 'black')
 
     plt.show()
 drag_info.to_csv('drag_estimation.csv', index=True)
