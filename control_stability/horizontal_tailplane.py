@@ -123,7 +123,7 @@ def flaps(aircraft):
     if flaptype == 'singleslotted':
         CS_deltaf_TO                   = 20  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S14)
         CS_deltaf_LD                   = 40  # flap deflection angle at landing [deg]
-        CS_fc_c                        = 0.2  # flap chord length / wing chord length [-] (ADSEE-II, L3 S32) NOTE: This influences aft spar position
+        CS_fc_c                        = aircraft.xc_aft_spar  # flap chord length / wing chord length [-] (ADSEE-II, L3 S32) NOTE: This influences aft spar position
         CS_dc_cf_TO                    = 0.2  # increase in chord length / flap chord length [-] (ADSEE-II, L3 S37)
         CS_dc_cf_LD                    = 0.3  # increase in chord length / flap chord length [-]
         CS_cprime_c_TO = 1 + CS_dc_cf_TO * CS_fc_c # wing chord length with take-off extended flaps / chord [-] (Using notes of ADSEE-II, L3 S37)

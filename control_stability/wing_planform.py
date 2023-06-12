@@ -25,18 +25,18 @@ def WingPlanform(ac, plot):
     c_t = ac.tipchord                            # [m]
 
     # For aileron
-    y1_a = ac.ystart_ail #+ ac.w_out/2              # Start of aileron - [m]
-    y2_a = ac.yend_ail #+ ac.w_out/2                # End of aileron - [m]
-    c_a = 0.2                         # aileron chord - [c]
+    y1_a = ac.ystart_ail             # Start of aileron - [m]
+    y2_a = ac.yend_ail               # End of aileron - [m]
+    c_a = 1 - ac.xc_aft_spar                        # aileron chord - [c]
 
     # For flaps
     y1_f = 0                         # Start of flaps - [m]
     y2_f = ac.yend_flap              # End of flaps - [m]
-    c_f = 0.2                        # flap chord - [c]
+    c_f = 1 - ac.xc_aft_spar         # flap chord - [c]
 
     # Spars
-    f_spar = 0.15                                 # front spar location - [c]
-    a_spar = 0.8                                # aft spar location - [c]
+    f_spar = 0.15                    # front spar location - [c]
+    a_spar = ac.xc_aft_spar          # aft spar location - [c]
 
     # -------------------------------------------- Calculations --------------------------------------------
 
