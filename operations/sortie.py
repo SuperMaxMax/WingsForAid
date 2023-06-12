@@ -42,19 +42,19 @@ def operations_eval(ac):
     print(str("PL per day: "+str(np.round(PL_per_day,1))+"[kg/24h]"))
 
     # REQ-chack: cost per kg
-    N_sortie_tot = (N_sortie_per_day * AC.OP_T_ops) * ac.OP_AC_per_op * ac.OP_N_ops
+    N_sortie_tot = (N_sortie_per_day * ac.OP_T_ops) * ac.OP_AC_per_op * ac.OP_N_ops
     # payload total
     PL_tot =  N_sortie_tot * PL_per_AC
     # fuel volume per sortie
     M_Fs = Wf # (t*P)*SFC [Ws*kg/J] = kg fuel required
-    Vol_Fs = M_Fs / (AC.fueldensity)# kg/(kg/L) = L
+    Vol_Fs = M_Fs / (ac.fueldensity)# kg/(kg/L) = L
     print("fuel per sortie:"+str(np.round(Vol_Fs,1))+"[L]")
     # fuel cost
-    CST_Fs = Vol_Fs * AC.OP_fuelprice
+    CST_Fs = Vol_Fs * ac.OP_fuelprice
     CST_Ftot = CST_Fs * N_sortie_tot
     print("total fuel cost:" + str(np.round(CST_Ftot, 1)) + "[euro]")
     #euro/kg (over tot operations, incl. fuel)
-    CST_TOT = AC.OP_CST_nofuel + CST_Ftot
+    CST_TOT = ac.OP_CST_nofuel + CST_Ftot
     CST_per_kg = CST_TOT / PL_tot
     print("cost per kg:"+str(np.round(CST_per_kg,3))+"[euro/kg]")
 
@@ -62,6 +62,8 @@ def operations_eval(ac):
     ac.N_sortie_per_day = N_sortie_per_day
     ac.OP_TTFD = TTFD
     ac.T_sortie = T_sortie
+    ac.T_fh_sortie = T_s/3600
+    ac.Vol_F_per_sortie = Wf
     return CST_per_kg, N_sortie_per_day, TTFD
 
 if __name__ == '__main__':

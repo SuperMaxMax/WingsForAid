@@ -4,6 +4,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+# import scripts
+import control_stability.Class_II_cg_estimation as Class_II_cg_estimation
+
+from aerodynamics.wing_planform import main_wing_planform
+from aerodynamics.horizontal_tail_design import horizontal_tail_planform
+
+#from control_stability.main_stab_cont import main_stab_control
+
+from operations.sortie import operations_eval
+
 # DET_CON_1 = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
 # DET_CON_1_braced = UAV('DET_CON_1_braced', 'tractor', boom=False, braced_wing=True)
 # DET_CON_2 = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=False)
@@ -86,6 +96,15 @@ import numpy as np
 if __name__ == '__main__':
     AC = UAV('aircraft')
     print("AC default:", AC.__dict__)
+
+    # Run all programs once
+    Run = True
+    if Run:
+        main_wing_planform(AC)
+        horizontal_tail_planform(AC)
+
+        # main_stab_control(AC, False, False)
+        operations_eval(AC)
 
     # --- saving
     df = pd.DataFrame()
