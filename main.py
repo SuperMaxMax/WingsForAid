@@ -99,6 +99,7 @@ if __name__ == '__main__':
 
     # Run all programs once
     Run = True
+    AC.n_drops = 3
     if Run:
         main_wing_planform(AC)
         horizontal_tail_planform(AC)

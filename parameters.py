@@ -362,7 +362,7 @@ class UAV:
         self.OP_T_ops = 28 # [days]
         self.OP_N_ops = 659 # [operations]
         self.OP_AC_per_op = 20 # [#AC] available on average
-        self.OP_n_drops = 2 # [#] choice!
+        self.n_drops = 2 # [#] choice!
         self.OP_TTFS = 66.712 # [h] from contract to finished assembly and first sortie starts
         self.OP_T_sortie_gnd = 2.067 # [hr]
         self.OP_T_ground = 2 # [h]
