@@ -11,9 +11,9 @@ from scipy import integrate, optimize
 from parameters import UAV
 aircraft = UAV('aircraft')
 
-import wing_planform as wp
-import horizontal_tail_design as htd
-import vertical_tail_design as vtd
+#import wing_planform as wp
+#import horizontal_tail_design as htd
+#import vertical_tail_design as vtd
 
 
 
@@ -44,8 +44,8 @@ YDUPLICATE
      """,0.0,""" 
 #
 # twist angle bias for whole surface
-ANGLE""",
-     aircraft.i_w, """    
+ANGLE
+    """,aircraft.i_w, """    
 
 # x,y,z bias for whole surface
 TRANSLATE
@@ -187,9 +187,15 @@ NACA
 #==============================================================
 
 #Created by Jan Vonken 10-06-2023"""
+string = str()
+for i in range(len(avl_file)):
+    string = string + str(avl_file[i])
 
+print(string)
 
 f = open(r"WFA.avl", "w")
 
-f.write(avl_file)
+f.write(string)
+
+
 
