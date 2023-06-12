@@ -179,13 +179,16 @@ prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4, 0]
 possible_materials = rank_material(prop_weights_strut, [False, False])[:5]
 ms = pd.DataFrame(index=possible_materials, columns=['Case 1', 'Case 2'])
 
-for k in range(2):
+for k in range(3):
     if k == 0:
         load_case = 1
         n_ult = 6.6
-    else:
+    elif k == 1:
         load_case = 0
         n_ult = -2.78
+    else:
+        load_case = 1
+        n_ult = 2
 
     # Calculate reaction forces # important -> signs of the forces are with z is positive upwards and y is positive in spanwise direction (this is different from global coordinate system)
     Bz = -1/ac.wing_strut_location*(quad(spanwise_wing_loading_ty, 0, ac.b/2)[0]-trapezoid(spanwise_flap_weight_ty(), y_span)-trapezoid(spanwise_aileron_weight_ty(), y_span)-quad(spanwise_fuel_weight_ty, 0, ac.b/2)[0]*abs(load_case-1)-quad(spanwise_wing_weight_ty, 0 , ac.b/2)[0]-ac.W_wl*ac.g0*ac.b/2)
@@ -253,7 +256,9 @@ for k in range(2):
 
     if k == 0:
         loading_tension = [normal, shear, moment, torque]
-    else:
+    elif k == 1:
         loading_compression = [normal, shear, moment, torque]
+    else:
+        loading_custom = [normal, shear, moment, torque]
 
 # print(ms)
