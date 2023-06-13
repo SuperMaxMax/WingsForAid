@@ -247,7 +247,7 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     print(mat)
 
     #### CALCULATIONS ####
-    step_size = 0.0001          # [m] step size for integration
+    step_size = 0.0002          # [m] step size for integration
     ### Spanwise position ###
     spanwise_pos = np.linspace(0, ac.b/2, 1000)
     # split spanwise position in multiple parts based on ribs
@@ -269,10 +269,9 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
 
     ### Stringer numbers
     # create array containing number of stringers per rib, all ribs up until wing strut location have all ribs, after that it decreases
-    wing_strut = 0.437277492*ac.b/2
     n_stringers_ribs = np.ones(n_ribs+1)*n_stringers_func
     for i in range(len(n_stringers_ribs)):
-        if spanwise_pos_sec[i][0] > wing_strut:
+        if spanwise_pos_sec[i][0] > ac.ST_y_strut:
             n_left = n_ribs-(i-1)
             n_stringers_ribs[i:] = [int(n_stringers_func-i*n_stringers_func/n_left) for i in range(1, n_left+1)]
             break
@@ -880,7 +879,7 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     
     return weight, t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer
 
-n_stringers = np.arange(35, 36, 1)
+n_stringers = np.arange(20, 21, 1)
 n_ribs = np.arange(15, 16, 1)
 
 weights = np.zeros((len(n_ribs), len(n_stringers)))
