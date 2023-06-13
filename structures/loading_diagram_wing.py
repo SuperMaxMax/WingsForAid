@@ -159,7 +159,7 @@ plot = False
 
 # aircraft parameters -> to be connected with parameters.py later
 ac.wing_strut_location = 0.437277492*ac.b/2                         # [m] | based on statistical data, value is now based on half span running from middle fuselage
-ac.strut_angle = atan(ac.ST_h_fus/(ac.wing_strut_location-ac.w_out/2))      # [rad]
+ac.strut_angle = atan(ac.ST_h_fus/(ac.wing_strut_location-ac.ST_w_fus/2))      # [rad]
 ac.l_strut = ac.wing_strut_location/np.cos(ac.strut_angle)          # [m]
 ac.W_wl = 0.5                                                       # [kg] for 1 winglet
 ac.flap_s = 0.2                                                     # fraction of b/2
