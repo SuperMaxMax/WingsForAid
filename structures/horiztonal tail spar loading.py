@@ -13,7 +13,19 @@ density=7800
 E = 200*10**9
 
 
-r_h_tail_spar = 0.025
+# # # steel 4130 parameters
+# sigma_yield = 460*10**6
+# sigma_yield_shear = 0.58*sigma_yield
+# density = 7850
+# E=205*10**9
+
+
+
+v=0.33
+G = E/(2*(1+v))
+
+
+r_h_tail_spar = 0.035
 l_h_tail_spar = ac.AE_b_h
 F_h_max = abs(dF_h_man)
 T_max = 0.25*ac.AE_MAC_length_h*max(0.5*at.rho0*ac.V_A**2*ac.AE_Sh*ac.AE_CL_a_h*(2/360*2*np.pi),0.5*at.rho0*ac.V_cruise**2*ac.AE_Sh*ac.AE_CL_a_h*(1/360*2*np.pi),F_h_max)
@@ -48,7 +60,7 @@ plt.plot(t,A_min,label='A_min')
 plt.legend()
 plt.show()
 
-t=1/1000
+t=1./1000
 print("mass kg",P*t*1.2*density)
 print("area", 2*np.pi*r_h_tail_spar*t)
 print('min area', A_min[0])
@@ -56,4 +68,5 @@ print('Ixx',1/8*np.pi*(r_h_tail_spar*2)**3*t)
 print('min Ixx',Ixx_min[0])
 print("T_max req",T_max)
 print("T_max allowed", 2*t*yield_stress_shear*A_m)
+print("Max twist, deg",(T_max/(4*A_m**2*G)*P/t*1.2/2)/(2*np.pi)*360)
 #print('Iyy mm^4',0.25*np.pi*(a1*b1**3-a2*b2**3)*1000**4)
