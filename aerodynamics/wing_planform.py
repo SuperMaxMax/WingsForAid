@@ -71,7 +71,6 @@ def iw(airfoil):
     
     return Iw, cl_alpha, alpha_zero_lift
 
-#iw(airfoil)
 
 def main_wing_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
@@ -271,9 +270,6 @@ def main_wing_planform(aircraft):
                
     return 
 
-aircraft =  UAV('aircraft')
-main_wing_planform(aircraft)
-#print(aircraft.A)
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 

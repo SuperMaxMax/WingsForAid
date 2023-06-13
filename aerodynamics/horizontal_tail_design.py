@@ -270,5 +270,3 @@ def horizontal_tail_planform(aircraft):
     #print(S)
     return 
 
-aircraft = UAV("aircraft")
-horizontal_tail_planform(aircraft)

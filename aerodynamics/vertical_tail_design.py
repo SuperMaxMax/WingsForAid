@@ -296,4 +296,3 @@ def horizontal_tail_planform(aircraft):
 
 
 
-horizontal_tail_planform(object)
