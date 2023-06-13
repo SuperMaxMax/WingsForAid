@@ -23,7 +23,7 @@ def iw(airfoil):
         for row in reader:
             if row:    
                 #skip first line with explanation of columns
-                if linecount == 0:
+                if linecount == 0: 
                     linecount += 1
                 else:
                     cd_list.append(float(row[0]))
@@ -270,6 +270,8 @@ def main_wing_planform(aircraft):
                
     return 
 
+aircraft = UAV("aircraft")
+main_wing_planform(aircraft)
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
