@@ -31,7 +31,8 @@ class UAV:
         self.climb_rate = 2.9889
         self.cos_lambda_c04 = 1
         self.cruise_frac = 0.8348           # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
-        self.CL_a_w = 4.743                  # Updated Lift curve slope [1/rad]
+        self.CL_a_w = 4.743                 # Updated Lift curve slope [1/rad]
+        self.C_r_C_v = 0.4                  # Rudder chord over vertical tail chord
 
 
         # D
@@ -164,8 +165,8 @@ class UAV:
         self.WS = 607.8751                  # Wing Loading [N/m^2]
         self.W_F = 59.8091                  # Fuel weight [kg]
         self.W_OE = 429.1354                # Operational empty weight [kg]
-        self.W_PL = 240                     # Payload weight [kg]
-        self.W_TO = 752                    # Take-off weight [kg]
+        self.W_PL = 276                     # Payload weight [kg]
+        self.W_TO = 752                     # Take-off weight [kg]
         self.W_boom = 20                    # Boom weight [kg]
         self.W_e = 62.6                     # Definitive weight per engine [kg]
         self.W_eq = 58.075                  # Equipment weight [kg]

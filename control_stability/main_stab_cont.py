@@ -54,5 +54,5 @@ def main_stab_control(aircraft, plot, print_value):
         print("--------------------Elevator Design------------------------------\n")
 
         print("---------------------Rudder Design--------------------------------\n")
-        print(f"The maximum required rudder deflection will be {round(aircraft.delta_r_value*180/np.pi, 3)}")
+        print(f"The maximum required rudder deflection will be {round(aircraft.delta_r_value, 3)} [deg]")
 main_stab_control(aircraft, True, True)
