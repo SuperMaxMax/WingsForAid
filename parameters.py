@@ -250,6 +250,7 @@ class UAV:
         self.AE_MAC_length_h = 0.7061       
         self.AE_y_mac_h = 0.91225       #Constant chord, so, quarter of span is taken such that MAC is at half the halfspan
         self.AE_x_lemac_h = 0
+        
         self.AE_lambda_co2_h = 0.0
         self.AE_horizontal_airfoil = '0012'      # Airfoil of horizontal tail (NACA)
 
@@ -257,7 +258,9 @@ class UAV:
         # Vertical tailplane
         self.AE_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
         self.AE_A_v = 2                     # [-] Aspect ratio vertical tail
-        self.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane
+        self.AE_sweep_co4_v = 35 / 180 * np.pi                 # Updated half chord sweep [rad]
+        self.AE_sweep_LE_v = 0.685533470761878  # Updated leading edge sweep [rad]
+        self.AE_lambda_c02_v = 0.5274976173187572            # [rad] Half chord sweep of vertical tailplane
         self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
         self.AE_Sv = 1.2824
         self.AE_b_v = 1.2015

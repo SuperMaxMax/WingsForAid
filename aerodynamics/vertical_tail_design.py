@@ -290,7 +290,10 @@ def horizontal_tail_planform(aircraft):
     aircraft.AE_i_w_v = i_w_v
     aircraft.AE_CL_a_v = CL_a_v
 
-    aircraft.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane
+    aircraft.AE_sweep_co4_v = 35 / 180 * np.pi                 # Updated half chord sweep [rad]
+    aircraft.AE_sweep_LE_v = np.arctan(np.tan(aircraft.AE_sweep_co4_v) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.AE_lambda_c02_v = np.arctan(np.tan(aircraft.AE_sweep_co4_v) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
+
 
 
 horizontal_tail_planform(object)
