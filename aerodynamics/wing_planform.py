@@ -15,7 +15,7 @@ def iw(airfoil):
     file_path_clcd = "aerodynamics/" + file_name_clcd + ".csv"
     
     cd_list = [] 
-    cl_list = []
+    cl_list = [] 
 
     with open(file_path_clcd) as f:
         reader = csv.reader(f, delimiter=',', quotechar='"')
@@ -23,7 +23,7 @@ def iw(airfoil):
         for row in reader:
             if row:    
                 #skip first line with explanation of columns
-                if linecount == 0:
+                if linecount == 0: 
                     linecount += 1
                 else:
                     cd_list.append(float(row[0]))
@@ -71,7 +71,6 @@ def iw(airfoil):
     
     return Iw, cl_alpha, alpha_zero_lift
 
-#iw(airfoil)
 
 def main_wing_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
@@ -271,9 +270,7 @@ def main_wing_planform(aircraft):
                
     return 
 
-aircraft =  UAV('aircraft')
-main_wing_planform(aircraft)
-#print(aircraft.A)
+
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 

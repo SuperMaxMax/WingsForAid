@@ -10,6 +10,7 @@ from scipy import integrate, optimize
 
 from parameters import UAV
 
+aircraft = UAV("aircraft")
 
 def required_lift(aircraft):
     #load in parameters from current design
@@ -270,5 +271,4 @@ def horizontal_tail_planform(aircraft):
     #print(S)
     return 
 
-aircraft = UAV("aircraft")
 horizontal_tail_planform(aircraft)

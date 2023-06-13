@@ -29,7 +29,7 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
         t_lim = t_lim_list[i]
         delta_a_max = 20 * (pi/180) # max aileron deflection
         tau = 0.41  # factor based on the fraction of chord that is the aileron
-        Ixx = 1400  # mass moment of inertia x-axis [kg m^2] TODO Update value 
+        Ixx = aircraft.Ixx  # mass moment of inertia x-axis [kg m^2]
         ystart_a = 0.95 * (aircraft.b/2 + aircraft.w_out/2)  # staring location of aileron
         yend_a = 0.95 * (aircraft.b/2 + aircraft.w_out/2)  # end location of aileron
         y_d = 0.4 * (aircraft.b/2 + aircraft.w_out/2)  # average distance between the centre of gravity of the aircraft and the centre of drag [m] 
@@ -108,7 +108,7 @@ def elevator_design(aircraft):
     plt.grid()
     plt.show(block=True)
 
-def rudder_design(aircraft, tau_r):
+def rudder_design(aircraft):
     
     V_w = 20 * (0.51444444444) # [m/s] side wind
 
@@ -121,7 +121,7 @@ def rudder_design(aircraft, tau_r):
     C_d_y = 0.6 # Assumption
 
     F_w = 0.5 * atm.rho0 * C_d_y * V_w**2 * S_s
-    print(f"F_w:{F_w}")
+    # print(f"F_w:{F_w}")
     angle_beta = np.arctan(V_w/(1.3 * aircraft.V_s_min))
 
     C_L_alpha_v = 3
@@ -134,12 +134,18 @@ def rudder_design(aircraft, tau_r):
     C_n_beta = 0.75 * C_L_alpha_v * (1 - dsigma_dalpha) * eta_v * vertical_tail_volume
     C_y_beta = -1.35 * C_L_alpha_v * (1 - dsigma_dalpha) * eta_v * aircraft.AE_Sv_S
 
-    aircraft.C_r_C_v = 0.4
-    # tau_r = 0.6
+    # aircraft.C_r_C_v = 0.4  # Aircraft design, table 12.12
+    tau_r = 0.6  # Update this if above variable changes
+
     C_Y_delta_r = C_L_alpha_v * eta_v * tau_r * 1 * aircraft.AE_Sv_S 
     C_n_delta_r = -C_L_alpha_v * vertical_tail_volume * eta_v * tau_r * 1
 
+    # print("beta", C_n_beta)
+    # print("beta", C_y_beta)
+    # print("deltar", C_Y_delta_r)
+    # print("deltar", C_n_delta_r)
     # Define the equations
+    
     def equations(x):
         delta_r, sigma = x
         equation1 = 0.5 * atm.rho0 * V_t**2 * aircraft.Sw * aircraft.b * (C_n_beta*(angle_beta - sigma) + C_n_delta_r * delta_r) + F_w * cos(sigma) * d_ca
@@ -155,8 +161,8 @@ def rudder_design(aircraft, tau_r):
     
     aircraft.delta_r_value = delta_r_value*(180/np.pi)
 
-    if delta_r_value*180/pi > 30:
-        print(f"\nRequired rudder deflection ({round(delta_r_value, 3)} degrees) exceeds maximum rudder deflection (30 degrees)\n")
+    if (delta_r_value*180/pi) > 30:
+        print(f"\nRequired rudder deflection ({round(delta_r_value*180/np.pi, 3)} degrees) exceeds maximum rudder deflection (30 degrees)\n")
 
     #aircraft.S_r = aircraft.C_r_C_v * aircraft.C_v * aircraft.b_v
 
@@ -187,6 +193,6 @@ def rudder_iteration(aircraft):
     plt.show(block=True)
 def main_control_surface(aircraft):
     aileron_design(aircraft)
-    rudder_iteration(aircraft)
-    # rudder_design(aircraft)
+    # rudder_iteration(aircraft)
+    rudder_design(aircraft)
     elevator_design(aircraft)

@@ -31,7 +31,8 @@ class UAV:
         self.climb_rate = 2.9889
         self.cos_lambda_c04 = 1
         self.cruise_frac = 0.8348           # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
-        self.CL_a_w = 4.743                  # Updated Lift curve slope [1/rad]
+        self.CL_a_w = 4.743                 # Updated Lift curve slope [1/rad]
+        self.C_r_C_v = 0.4                  # Rudder chord over vertical tail chord
 
 
         # D
@@ -164,8 +165,8 @@ class UAV:
         self.WS = 607.8751                  # Wing Loading [N/m^2]
         self.W_F = 59.8091                  # Fuel weight [kg]
         self.W_OE = 429.1354                # Operational empty weight [kg]
-        self.W_PL = 240                     # Payload weight [kg]
-        self.W_TO = 752                    # Take-off weight [kg]
+        self.W_PL = 276                     # Payload weight [kg]
+        self.W_TO = 752                     # Take-off weight [kg]
         self.W_boom = 20                    # Boom weight [kg]
         self.W_e = 62.6                     # Definitive weight per engine [kg]
         self.W_eq = 58.075                  # Equipment weight [kg]
@@ -250,6 +251,7 @@ class UAV:
         self.AE_MAC_length_h = 0.7061       
         self.AE_y_mac_h = 0.91225       #Constant chord, so, quarter of span is taken such that MAC is at half the halfspan
         self.AE_x_lemac_h = 0
+        
         self.AE_lambda_co2_h = 0.0
         self.AE_horizontal_airfoil = '0012'      # Airfoil of horizontal tail (NACA)
 
@@ -257,7 +259,9 @@ class UAV:
         # Vertical tailplane
         self.AE_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
         self.AE_A_v = 2                     # [-] Aspect ratio vertical tail
-        self.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane
+        self.AE_sweep_co4_v = 35 / 180 * np.pi                 # Updated half chord sweep [rad]
+        self.AE_sweep_LE_v = 0.685533470761878  # Updated leading edge sweep [rad]
+        self.AE_lambda_c02_v = 0.5274976173187572            # [rad] Half chord sweep of vertical tailplane
         self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
         self.AE_Sv = 1.2824
         self.AE_b_v = 1.2015
@@ -266,6 +270,7 @@ class UAV:
         self.AE_tipchord_v = 0.6671
         self.AE_lambda_LE_v = 35 * np.pi / 180
         self.AE_i_w_v = 0.07
+        self.AE_CL_a_v = 2.57
 
         "-NACA4415"
         self.airfoil = "4415"

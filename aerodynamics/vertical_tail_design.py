@@ -135,9 +135,9 @@ def horizontal_tail_planform(aircraft):
         variable = "Twist"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
-            variable_list2 = [0.6]
+            variable_list2 = [0.7]
         elif variable == "AR":  
-            variable_list2 = [2]
+            variable_list2 = [1.5]
         elif variable == "Twist":
             variable_list2 = [0]
         
@@ -280,6 +280,7 @@ def horizontal_tail_planform(aircraft):
     aircraft.AE_A_v = AR                     # [-] Aspect ratio vertical tail
     #aircraft.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane
     #aircraft.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
+    
     aircraft.AE_Sv = S
     aircraft.AE_b_v = b
     #aircraft.AE_vertical_airfoil = '0009'      # Airfoil of vertical tail (NACA)
@@ -287,6 +288,11 @@ def horizontal_tail_planform(aircraft):
     aircraft.AE_tipchord_v = aircraft.AE_rootchord_v*Lambda
     aircraft.AE_lambda_LE_v = 35 * np.pi / 180
     aircraft.AE_i_w_v = i_w_v
+    aircraft.AE_CL_a_v = CL_a_v
+
+    aircraft.AE_sweep_co4_v = 35 / 180 * np.pi                 # Updated half chord sweep [rad]
+    aircraft.AE_sweep_LE_v = np.arctan(np.tan(aircraft.AE_sweep_co4_v) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.AE_lambda_c02_v = np.arctan(np.tan(aircraft.AE_sweep_co4_v) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
 
 
-horizontal_tail_planform(object)
+

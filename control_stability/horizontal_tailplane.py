@@ -218,8 +218,8 @@ def controlability_curve(aircraft, xcgRange):
     Cm_ac = Cm_ac_w + dCm_ac_f + dCm_ac_fus
 
     ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.AE_l_h / aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
-    print(f'Cm_ac:{Cm_ac}')
-    print(f"CL_Ah:{CL_Ah}")
+    # print(f'Cm_ac:{Cm_ac}')
+    # print(f"CL_Ah:{CL_Ah}")
     ControlSh_S = ControlFrac * (xcgRange + Cm_ac / CL_Ah - aircraft.x_ac_approach)
 
     return ControlSh_S

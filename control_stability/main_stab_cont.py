@@ -25,34 +25,31 @@ def main_stab_control(aircraft, plot, print_value):
     WingPlanform(aircraft, plot)
 
     if print_value:
-        print("\n-----------------Summary-Stabily-&-Control----------------\n")
+        print("\n-----------------Summary-Stabily-&-Control----------------")
 
-        print("-------------------C.G. Estimation---------------------------\n")
-
+        print("-------------------C.G. Estimation---------------------------")
         print(f"CG_range is from {round(aircraft.X_cg_fwd, 3)} to {round(aircraft.X_cg_aft, 3)}")
-        print(f"X_LEMAC is {round(aircraft.X_LEMAC, 3)} m\n")
+        print(f"X_LEMAC is {round(aircraft.X_LEMAC, 3)} [m]\n")
         print(f"l_h:{aircraft.AE_l_h}")
 
-        print("--------------------Horizontal tailplane----------------------\n")
-
+        print("--------------------Horizontal tailplane----------------------")
         print(f"Sh_S is {round(aircraft.Sh_S, 3)}\n")
         print(f"L_h is {round(aircraft.L_h, 3)}N")
 
-        print("--------------------Vertical tailplane-------------------------\n")
-
+        print("--------------------Vertical tailplane-------------------------")
         print(f"Sv_V is {round(aircraft.AE_Sv_S, 3)}\n")
         print(f"\nC_m_alpha is {round(aircraft.C_m_alpha, 3)} [1/rad]\n")
 
-        print("--------------------Landing Gear Design------------------------\n")
+        print("--------------------Landing Gear Design------------------------")
 
         print("--------------------Control Surfaces----------------------------")
 
         print("\n-------------------Aileron Design-----------------------------")
-        print(f"The aileron will span from {round(aircraft.ystart_ail, 3)}m to {round(aircraft.yend_ail, 3)}m of the span of the wing with respect to the rootchord")
-        print(f"The area of the aileron on one wing will be {round(aircraft.S_aileron, 3)} m^2\n")
+        print(f"The aileron will span from {round(aircraft.ystart_ail, 3)}m to {round(aircraft.yend_ail, 3)}[m] of the span of the wing with respect to the rootchord")
+        print(f"The area of the aileron on one wing will be {round(aircraft.S_aileron, 3)} [m^2]\n")
 
-        print("--------------------Elevator Design------------------------------\n")
+        print("--------------------Elevator Design------------------------------")
 
-        print("---------------------Rudder Design--------------------------------\n")
-        print(f"The maximum required rudder deflection will be {round(aircraft.delta_r_value*180/np.pi, 3)}")
+        print("---------------------Rudder Design--------------------------------")
+        print(f"The maximum required rudder deflection will be {round(aircraft.delta_r_value, 3)} [deg]")
 main_stab_control(aircraft, True, True)

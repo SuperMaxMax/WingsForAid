@@ -28,7 +28,7 @@ def cg_calc(obj, plot):
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement
-    X_LEMAC = 0.39 * obj.l_f
+    X_LEMAC = 0.42 * obj.l_f
     obj.X_LEMAC = X_LEMAC
 
     '''v Wing group v'''
@@ -153,8 +153,8 @@ def cg_calc(obj, plot):
             rotation_t = 90
         plt.annotate(label, (x, w), textcoords="offset points", xytext=(5,0))#, ha='center')#, rotation=rotation_t)
             
-    LimBoxConfigFwd = '022000'
-    LimBoxConfigAft = '000222'
+    LimBoxConfigFwd = '220000'
+    LimBoxConfigAft = '022222'
 
     # Save most forward and most aft and fully loaded c.g. in object
     obj.X_cg_full = Xs[-1]
