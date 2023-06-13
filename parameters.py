@@ -20,10 +20,7 @@ class UAV:
         self.CD0 =  0.02578                 # Zero lift coefficient [-]
         self.CL_LDG = 1.5702                # [-]
         self.CL_TO = 1.2397                 # [-]
-        self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
-        self.CL_max_land = 1.9                # Maximum lift coefficient at landing [-]
         self.CL_max_clean = 1.5615             # Maximum lift coefficient [-] | Range: 1.3 - 1.9
-        self.CL_max_land = 1.9              # Maximum lift coefficient at landing [-]
         self.CLa = 4.743                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         self.c_p = 72E-9                    # Specific fuel consumption [kg/J]
         self.climb_rate = 2.9889
@@ -201,9 +198,7 @@ class UAV:
         self.AE_A = 7.75                        # Updated aspect ratio [-]
         self.AE_CD0 = 0.02578                   # Zero lift drag [-]
         self.AE_CL_LDG = 1.5702                 # Still to be updated [-]
-        self.AE_CL_max_TO = 1.5                 # Still to be updated maximum lift coefficient at take-off [-]
         self.AE_CL_max_clean = 1.5615              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
-        self.AE_CL_max_land = 1.9               # Still to be updated maximum lift coefficient at landing [-]
         self.AE_CL_a_w = 4.743                  # Updated Lift curve slope [1/rad]
         self.AE_L_D = 14.1804                   # Still to be updated lift to drag ratio [-]
         self.AE_MAC_length = 1.2477198640078417 # Updated mean aerodynamic chord [m]

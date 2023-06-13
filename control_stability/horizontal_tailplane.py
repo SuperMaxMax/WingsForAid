@@ -157,7 +157,7 @@ def flaps(aircraft):
         print('\nFowler flap')
         print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
 
-    print(f"\nCLmax current wing in clean configuration: {aircraft.AE_CL_max_clean}")
+    print(f"\nCLmax current wing in clean configuration: {aircraft.CL_max_clean}")
 
     calcCL = False # calculate dCLmax for a given Swf, or vice versa
 
@@ -170,15 +170,15 @@ def flaps(aircraft):
         CS_dCLmax_TO = 0
         CS_dCLmax_LD = 0
 
-        if (aircraft.FP_CL_max_to - aircraft.AE_CL_max_clean) > 0: CS_dCLmax_TO = (aircraft.FP_CL_max_to - aircraft.AE_CL_max_clean)
-        if (aircraft.FP_CL_max_land - aircraft.AE_CL_max_clean) > 0: CS_dCLmax_LD = (aircraft.FP_CL_max_land - aircraft.AE_CL_max_clean)
+        if (aircraft.FP_CL_max_to - aircraft.CL_max_clean) > 0: CS_dCLmax_TO = (aircraft.FP_CL_max_to - aircraft.CL_max_clean)
+        if (aircraft.FP_CL_max_land - aircraft.CL_max_clean) > 0: CS_dCLmax_LD = (aircraft.FP_CL_max_land - aircraft.CL_max_clean)
 
         CS_Swf_TO = CS_dCLmax_TO / (0.9 * CS_dClmax_TO * np.cos(CS_lambda_hinge)) * aircraft.Sw
         CS_Swf_LD = CS_dCLmax_LD / (0.9 * CS_dClmax_LD * np.cos(CS_lambda_hinge)) * aircraft.Sw
         
         CS_Swf = max(CS_Swf_TO, CS_Swf_LD) # most constraining case becomes required flapped area
         
-        print(f"\nNew CLmax during take-off: {aircraft.AE_CL_max_clean + CS_dCLmax_TO}\nNew CLmax during landing: {aircraft.AE_CL_max_clean + CS_dCLmax_LD}")
+        print(f"\nNew CLmax during take-off: {aircraft.CL_max_clean + CS_dCLmax_TO}\nNew CLmax during landing: {aircraft.CL_max_clean + CS_dCLmax_LD}")
         print(f"\nSwf_TO: {round(CS_Swf_TO / aircraft.Sw * 100, 3)}% Sw") 
         print(f"Swf_LD: {round(CS_Swf_LD / aircraft.Sw * 100, 3)}% Sw")
 
