@@ -271,6 +271,7 @@ class UAV:
         self.AE_tipchord_v = 0.6671
         self.AE_lambda_LE_v = 35 * np.pi / 180
         self.AE_i_w_v = 0.07
+        self.AE_CL_a_v = 2.57
 
         "-NACA4415"
         self.airfoil = "4415"

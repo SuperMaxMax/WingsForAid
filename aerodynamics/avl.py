@@ -83,7 +83,7 @@ YDUPLICATE
 #
 # twist angle bias for whole surface
 ANGLE
-    """,aircraft.i_w, """    
+    """,aircraft.i_w*180/np.pi, """    
 
 # x,y,z bias for whole surface
 TRANSLATE
@@ -93,7 +93,7 @@ TRANSLATE
 #---------------Root Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
 SECTION
-    """,0.0, ' ' ,           0.0, ' ' ,          0.0, ' ' ,          aircraft.rootchord, ' ' ,        0.000, """ 
+    """,0.0, ' ' ,           0.0, ' ' ,          0.0, ' ' ,          aircraft.rootchord, ' ' ,        0.000*180/np.pi, """ 
 
 NACA
 4415
@@ -105,7 +105,7 @@ flap     """,1.0, ' ' ,     aircraft.xc_aft_spar, ' ' ,     0.0, ' ' ,  1.0, ' '
 #---------------End Flap Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
 SECTION
-    """,np.tan(aircraft.AE_sweep_LE)*aircraft.yend_flap, ' ' ,       aircraft.yend_flap, ' ' ,       0.0, ' ' ,         2*aircraft.Sw/(1+aircraft.taper)/aircraft.b*(1-(1-aircraft.taper)/aircraft.b*abs(2*aircraft.yend_flap)), ' ' ,     -aircraft.yend_flap/(aircraft.b/2) * aircraft.wing_twist,"""   
+    """,np.tan(aircraft.AE_sweep_LE)*aircraft.yend_flap, ' ' ,       aircraft.yend_flap, ' ' ,       0.0, ' ' ,         2*aircraft.Sw/(1+aircraft.taper)/aircraft.b*(1-(1-aircraft.taper)/aircraft.b*abs(2*aircraft.yend_flap)), ' ' ,     -aircraft.yend_flap/(aircraft.b/2) * aircraft.wing_twist*180/np.pi,"""   
 
 NACA
 4415
@@ -118,7 +118,7 @@ flap     """,1.0, ' ' ,     aircraft.xc_aft_spar, ' ' ,     0.0, ' ' ,  1.0, ' '
 #---------------Begin Aileron Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
 SECTION
-    """,np.tan(aircraft.AE_sweep_LE)*aircraft.ystart_ail, ' ' ,       aircraft.ystart_ail, ' ' ,        0.0, ' ' ,          2*aircraft.Sw/(1+aircraft.taper)/aircraft.b*(1-(1-aircraft.taper)/aircraft.b*abs(2*aircraft.ystart_ail)), ' ' ,       -aircraft.ystart_ail/(aircraft.b/2) * aircraft.wing_twist,"""   
+    """,np.tan(aircraft.AE_sweep_LE)*aircraft.ystart_ail, ' ' ,       aircraft.ystart_ail, ' ' ,        0.0, ' ' ,          2*aircraft.Sw/(1+aircraft.taper)/aircraft.b*(1-(1-aircraft.taper)/aircraft.b*abs(2*aircraft.ystart_ail)), ' ' ,       -aircraft.ystart_ail/(aircraft.b/2) * aircraft.wing_twist*180/np.pi,"""   
 
 NACA
 4415
@@ -130,7 +130,7 @@ aileron  """,1.0, ' ' ,     aircraft.xc_aft_spar, ' ' ,     0.0, ' ' ,  1.0, ' '
 #---------------End Aileron Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
 SECTION
-    """,np.tan(aircraft.AE_sweep_LE)*aircraft.yend_ail, ' ' ,       aircraft.yend_ail, ' ' ,        0.0, ' ' ,          2*aircraft.Sw/(1+aircraft.taper)/aircraft.b*(1-(1-aircraft.taper)/aircraft.b*abs(2*aircraft.yend_ail)), ' ' ,       -aircraft.yend_ail/(aircraft.b/2) * aircraft.wing_twist,"""   
+    """,np.tan(aircraft.AE_sweep_LE)*aircraft.yend_ail, ' ' ,       aircraft.yend_ail, ' ' ,        0.0, ' ' ,          2*aircraft.Sw/(1+aircraft.taper)/aircraft.b*(1-(1-aircraft.taper)/aircraft.b*abs(2*aircraft.yend_ail)), ' ' ,       -aircraft.yend_ail/(aircraft.b/2) * aircraft.wing_twist*180/np.pi,"""   
 
 NACA
 4415
@@ -141,7 +141,7 @@ aileron  """,1.0, ' ' ,     aircraft.xc_aft_spar, ' ' ,     0.0, ' ' ,  1.0, ' '
 
 #-----------Tip Section------------------
 SECTION
-    """,np.tan(aircraft.AE_sweep_LE)*aircraft.b/2, ' ' ,     aircraft.b/2, ' ' ,     0.0, ' ' ,         aircraft.tipchord, ' ' ,         -aircraft.wing_twist,"""   
+    """,np.tan(aircraft.AE_sweep_LE)*aircraft.b/2, ' ' ,     aircraft.b/2, ' ' ,     0.0, ' ' ,         aircraft.tipchord, ' ' ,         -aircraft.wing_twist*180/np.pi,"""   
 
 NACA
 4415
@@ -159,7 +159,7 @@ YDUPLICATE
 
 # twist angle bias for whole surface
 ANGLE
-     """,aircraft.AE_i_w_h,"""  
+     """,aircraft.AE_i_w_h*180/np.pi,"""  
 
 # x,y,z bias for whole surface
 TRANSLATE
@@ -168,7 +168,7 @@ TRANSLATE
 #-----------------------Root Section-----------------------------------
 #    Xle         Yle         Zle         chord       angle 
 SECTION
-   """,0.0, ' ' ,           0.0, ' ' ,         0.0, ' ' ,          aircraft.AE_rootchord_h, ' ' ,       0.000,"""   
+   """,0.0, ' ' ,           0.0, ' ' ,         0.0, ' ' ,          aircraft.AE_rootchord_h, ' ' ,       0.000*180/np.pi,"""   
 
 NACA
 0012
@@ -180,7 +180,7 @@ elevator  """,1.0, ' ' ,     0.001, ' ' ,     0.0, ' ' ,  1.0, ' ' ,  0.0, ' ' ,
 #-------------------Tip Section-------------------------
 #    Xle         Yle         Zle         chord       angle 
 SECTION
-     """,0.0, ' ' ,          aircraft.AE_b_h/2, ' ' ,        0.0, ' ' ,        aircraft.AE_tipchord_h, ' ' ,      0.000,"""  
+     """,0.0, ' ' ,          aircraft.AE_b_h/2, ' ' ,        0.0, ' ' ,        aircraft.AE_tipchord_h, ' ' ,      0.000*180/np.pi,"""  
 
 NACA
 0012
@@ -198,7 +198,7 @@ V-Stab
 
 # twist angle bias for whole surface
 ANGLE
-     """,aircraft.AE_i_w_v,"""  
+     """,aircraft.AE_i_w_v*180/np.pi,"""  
 
 # x,y,z bias for whole surface
 TRANSLATE
@@ -206,7 +206,7 @@ TRANSLATE
 #-------------------Lower Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
 SECTION
-   """,0.0, ' ' ,            0.0, ' ' ,          0.0, ' ' ,         aircraft.AE_rootchord_v, ' ' ,        0.000,"""   
+   """,0.0, ' ' ,            0.0, ' ' ,          0.0, ' ' ,         aircraft.AE_rootchord_v, ' ' ,        0.000*180/np.pi,"""   
 
 NACA 
 0012
@@ -215,7 +215,7 @@ NACA
 #rudder    """,1.0, ' ' ,     0.40, ' ' ,    0.0, ' ' ,  0.0, ' ' ,  1.0,"""
 #-----------------Upper Section----------------------
 SECTION
-   """,np.tan(aircraft.AE_lambda_LE_v) * aircraft.b_v, ' ' ,           0.0, ' ' ,         aircraft.b_v, ' ' ,         aircraft.AE_tipchord_v, ' ' ,       0.000,"""  
+   """,np.tan(aircraft.AE_lambda_LE_v) * aircraft.b_v, ' ' ,           0.0, ' ' ,         aircraft.b_v, ' ' ,         aircraft.AE_tipchord_v, ' ' ,       0.000*180/np.pi,"""  
 
 NACA
 0012
