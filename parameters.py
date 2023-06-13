@@ -58,7 +58,7 @@ class UAV:
         self.h_out = 0.7                    # Outer fuselage height [m]
         # I
         self.i_w = 0.935 * np.pi / 180       # Updated incidence angle of wing wrt fuselage [rad]
-
+        self.Ixx = 1300                      # mass moment of inertia x-axis [kg m^2]
 
         # J
 
@@ -182,7 +182,7 @@ class UAV:
         self.wing_twist = -2.0 *np.pi/180   # Updated wing twist (difference root and chord) [rad]
 
         # X
-        self.xc_aft_spar = 0.8              # Aft spar location as fraction of MAC
+        self.xc_aft_spar = 0.80             # Aft spar location as fraction of MAC
         self.X_LEMAC = 2.276                # Leading edge mean aerodynamic chord [m]
         self.x_lemac = 0.06057988483270884  # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
@@ -194,13 +194,8 @@ class UAV:
         self.y_mac = 2.2133293637093265     # Spanwise location of the MAC [m]
         self.ystart_ail = 3.308             # start location of aileron measured from rootchord
         self.yend_ail = 3.975               # end location of aileron measured from rootchord
+        self.ystart_flap = 0                # start location of flap measured from rootchord
         self.yend_flap = 1.5629             # end location of the HLD measured from rootchord
-
-
-        "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
-        self.something = 1 # add units
-        #self.y_mac = 2                      # Spanwise location of the MAC [m]
-        self.ST_SF = 1.5
 
         "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
         "Main wing and overall a/c"
@@ -379,14 +374,14 @@ class UAV:
         self.OP_T_LDG = 10 / 60  # [h]
         self.OP_T_clearance = 5 / 60  # [h]
 
-        "Tim's coefficients:"
 
+        "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
+        "Tim's coefficients:"
         self.lift_coefficients = [1.02549983e+03,  3.40489460e+02, -2.62539473e+03,  6.99194179e+03,     #Coefficents of a polynomial fit for the
                             -9.67481071e+03,  7.76224418e+03, -3.81444542e+03,  1.16482541e+03,     #lift distribution over the half span
                             -2.15539510e+02,  2.21217522e+01, -9.66193857e-01]                      #Highest order coefficient first
 
         "Jan W's coefficinets:"
-
         self.ST_U_de = 50 #derived gust velocity (ft/s)
         self.ST_n_nw = 2.25 #load factor for nose wheel load
         self.ST_n_imp = 3.0 #impact inertia load factor
@@ -394,6 +389,7 @@ class UAV:
         self.ST_n_m = 3.8 # positive limit maneuvering load factor (from Vn)
         self.ST_n_ult_pos = 6.6 #positive ultimate load factor
         self.ST_n_ult_neg = -2.78 #negative ultimate load factor
+        self.ST_SF = 1.5
 
         self.ST_Torque_eng = 128 #Nm, Rotax 912 torque
         self.ST_Thrust_eng = 2800 #N Rotax 912 thrust

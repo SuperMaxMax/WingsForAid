@@ -45,13 +45,13 @@ def plot_diagrams(Ay, Az, By, Bz, load_case, normal, shear, moment, torque):
     if np.sign(Ay) == 1:
         f_ax1.arrow(-np.sign(Ay)*0.5, 0, np.sign(Ay)*0.5, 0, color='r', length_includes_head=True, width=w1, head_length=hl1, head_width=hw1)
         plt.annotate(f'{round(abs(Ay),1)} N', xy=(-np.sign(Ay)*0.5, 0), xytext=(-np.sign(Ay)*0.5, hw1))
-        f_ax1.arrow(ac.wing_strut_location-np.sign(By)*0.5, 0, np.sign(By)*0.5, 0, color='r', length_includes_head=True, width=w1, head_length=hl1, head_width=hw1)
-        plt.annotate(f'{round(abs(By),1)} N', xy=(ac.wing_strut_location-np.sign(By)*0.5, 0), xytext=(ac.wing_strut_location-np.sign(By)*0.5, hw1))
+        f_ax1.arrow(ac.ST_y_strut-np.sign(By)*0.5, 0, np.sign(By)*0.5, 0, color='r', length_includes_head=True, width=w1, head_length=hl1, head_width=hw1)
+        plt.annotate(f'{round(abs(By),1)} N', xy=(ac.ST_y_strut-np.sign(By)*0.5, 0), xytext=(ac.ST_y_strut-np.sign(By)*0.5, hw1))
     else:
         f_ax1.arrow(-np.sign(Ay)*0.5, 0, np.sign(Ay)*0.5, 0, color='r', length_includes_head=True, width=w1, head_length=hl1, head_width=hw1)
         plt.annotate(f'{round(abs(Ay),1)} N', xy=(-np.sign(Ay)*0.5, 0), xytext=(-np.sign(Ay)*0.5, hw1))
-        f_ax1.arrow(ac.wing_strut_location-np.sign(By)*0.5, 0, np.sign(By)*0.5, 0, color='r', length_includes_head=True, width=w1, head_length=hl1, head_width=hw1)
-        plt.annotate(f'{round(abs(By),1)} N', xy=(ac.wing_strut_location-np.sign(By)*0.5, 0), xytext=(ac.wing_strut_location-np.sign(By)*0.5, hw1))
+        f_ax1.arrow(ac.ST_y_strut-np.sign(By)*0.5, 0, np.sign(By)*0.5, 0, color='r', length_includes_head=True, width=w1, head_length=hl1, head_width=hw1)
+        plt.annotate(f'{round(abs(By),1)} N', xy=(ac.ST_y_strut-np.sign(By)*0.5, 0), xytext=(ac.ST_y_strut-np.sign(By)*0.5, hw1))
     if np.sign(Az) == 1:
         f_ax1.arrow(0, -np.sign(Az)*fac, 0, np.sign(Az)*fac, color='g', length_includes_head=True, width=w2, head_length=hl2, head_width=hw2)
         plt.annotate(f'{round(abs(Az),1)} N', xy=(0, -np.sign(Az)*fac), xytext=(hw2, -np.sign(Az)*fac))
@@ -59,11 +59,11 @@ def plot_diagrams(Ay, Az, By, Bz, load_case, normal, shear, moment, torque):
         f_ax1.arrow(0, -np.sign(Az)*fac, 0, np.sign(Az)*fac, color='g', length_includes_head=True, width=w2, head_length=hl2, head_width=hw2)
         plt.annotate(f'{round(abs(Az),1)} N', xy=(0, -np.sign(Az)*fac), xytext=(hw2, -np.sign(Az)*fac))
     if np.sign(Bz) == 1:
-        f_ax1.arrow(ac.wing_strut_location, -np.sign(Bz)*fac, 0, np.sign(Bz)*fac, color='g', length_includes_head=True, width=w2, head_length=hl2, head_width=hw2)
-        plt.annotate(f'{round(abs(Bz),1)} N', xy=(ac.wing_strut_location, -np.sign(Bz)*fac), xytext=(ac.wing_strut_location+hw2, -np.sign(Bz)*fac))
+        f_ax1.arrow(ac.ST_y_strut, -np.sign(Bz)*fac, 0, np.sign(Bz)*fac, color='g', length_includes_head=True, width=w2, head_length=hl2, head_width=hw2)
+        plt.annotate(f'{round(abs(Bz),1)} N', xy=(ac.ST_y_strut, -np.sign(Bz)*fac), xytext=(ac.ST_y_strut+hw2, -np.sign(Bz)*fac))
     else:
-        f_ax1.arrow(ac.wing_strut_location, -np.sign(Bz)*fac, 0, np.sign(Bz)*fac, color='g', length_includes_head=True, width=w2, head_length=hl2, head_width=hw2)
-        plt.annotate(f'{round(abs(Bz),1)} N', xy=(ac.wing_strut_location, -np.sign(Bz)*fac), xytext=(ac.wing_strut_location+hw2, -np.sign(Bz)*fac))
+        f_ax1.arrow(ac.ST_y_strut, -np.sign(Bz)*fac, 0, np.sign(Bz)*fac, color='g', length_includes_head=True, width=w2, head_length=hl2, head_width=hw2)
+        plt.annotate(f'{round(abs(Bz),1)} N', xy=(ac.ST_y_strut, -np.sign(Bz)*fac), xytext=(ac.ST_y_strut+hw2, -np.sign(Bz)*fac))
     f_ax1.set_xlabel('Spanwise location [m]')
     f_ax1.set_ylabel('Force [N/m]')
     f_ax1.legend()
@@ -155,20 +155,20 @@ def spanwise_func_2(y):
     return -spanwise_wing_weight(y)-spanwise_fuel_weight(y)+spanwise_wing_loading(y)
 
 ac = UAV('aircraft')
-plot = False
+plot = True
 
 # aircraft parameters -> to be connected with parameters.py later
-ac.wing_strut_location = 0.437277492*ac.b/2                         # [m] | based on statistical data, value is now based on half span running from middle fuselage
-ac.strut_angle = atan(ac.ST_h_fus/(ac.wing_strut_location-ac.ST_w_fus/2))      # [rad]
-ac.l_strut = ac.wing_strut_location/np.cos(ac.strut_angle)          # [m]
-ac.W_wl = 0.5                                                       # [kg] for 1 winglet
+# ac.wing_strut_location = 0.437277492*ac.b/2                         # [m] | based on statistical data, value is now based on half span running from middle fuselage
+# self.ST_angle_strut = np.arctan(self.ST_h_fus/(self.ST_y_strut-self.ST_w_fus/2))
+# ac.l_strut = ac.ST_y_strut/np.cos(ac.strut_angle)          # [m]
+ac.ST_angle_strut = np.arctan(ac.ST_h_fus/(ac.ST_y_strut-ac.ST_w_fus/2))      # [rad]
+ac.W_wl = 0                                                       # [kg] for 1 winglet
 ac.flap_s = 0.2                                                     # fraction of b/2
 ac.flap_e = 0.6                                                     # fraction of b/2
 ac.ail_s = 0.6                                                      # fraction of b/2
 ac.ail_e = 0.8                                                      # fraction of b/2
 
 # Make an array for the span
-
 y_span = np.linspace(0, ac.b/2, 1000)
 
 # Material choice for strut weight, add column for material index: sqrt(E)/rho -> the higher the value the better -> False
@@ -177,23 +177,24 @@ material_df['simga_yield/rho'] = material_df['yield stress']/material_df['densit
 # density, raw cost, eco cost, co2, yield stress, E, Kc, sqrt(E)/rho, sigma_yield/rho
 prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4, 0]
 possible_materials = rank_material(prop_weights_strut, [False, False])[:5]
+print(possible_materials)
 ms = pd.DataFrame(index=possible_materials, columns=['Case 1', 'Case 2'])
 
 for k in range(3):
     if k == 0:
         load_case = 1
-        n_ult = 6.6
+        n_ult = ac.ST_n_ult_pos
     elif k == 1:
         load_case = 0
-        n_ult = -2.78
+        n_ult = ac.ST_n_ult_neg
     else:
         load_case = 1
         n_ult = 2
 
     # Calculate reaction forces # important -> signs of the forces are with z is positive upwards and y is positive in spanwise direction (this is different from global coordinate system)
-    Bz = -1/ac.wing_strut_location*(quad(spanwise_wing_loading_ty, 0, ac.b/2)[0]-trapezoid(spanwise_flap_weight_ty(), y_span)-trapezoid(spanwise_aileron_weight_ty(), y_span)-quad(spanwise_fuel_weight_ty, 0, ac.b/2)[0]*abs(load_case-1)-quad(spanwise_wing_weight_ty, 0 , ac.b/2)[0]-ac.W_wl*ac.g0*ac.b/2)
+    Bz = -1/ac.ST_y_strut*(quad(spanwise_wing_loading_ty, 0, ac.b/2)[0]-trapezoid(spanwise_flap_weight_ty(), y_span)-trapezoid(spanwise_aileron_weight_ty(), y_span)-quad(spanwise_fuel_weight_ty, 0, ac.b/2)[0]*abs(load_case-1)-quad(spanwise_wing_weight_ty, 0 , ac.b/2)[0]-ac.W_wl*ac.g0*ac.b/2)
     Az = -(Bz+quad(spanwise_wing_loading, 0, ac.b/2)[0] - trapezoid(spanwise_flap_weight(), y_span) - trapezoid(spanwise_aileron_weight(), y_span) - quad(spanwise_fuel_weight, 0, ac.b/2)[0]*abs(load_case-1) - quad(spanwise_wing_weight, 0 ,ac.b/2)[0] - ac.W_wl*ac.g0)
-    By = Bz/tan(ac.strut_angle)
+    By = Bz/tan(ac.ST_angle_strut)
     Ay = -By
 
     # Calculate normal, shear, moment and torque
@@ -216,12 +217,12 @@ for k in range(3):
     torque_ail = ma_ail*-spanwise_aileron_weight()
 
     for j, i in enumerate(y_span):
-        normal.append(By*(1-np.heaviside(i-ac.wing_strut_location, 1)))
+        normal.append(By*(1-np.heaviside(i-ac.ST_y_strut, 1)))
         if load_case == 1:
-            shear.append(-(quad(spanwise_func_1, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.wing_strut_location, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
+            shear.append(-(quad(spanwise_func_1, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.ST_y_strut, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
             torque.append(-trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
         else:
-            shear.append(-(quad(spanwise_func_2, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.wing_strut_location, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
+            shear.append(-(quad(spanwise_func_2, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.ST_y_strut, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
             torque.append(-trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
     # get the bending moment by integrating the shear along the length
     moment = cumulative_trapezoid(shear, y_span, initial=0)
@@ -244,14 +245,14 @@ for k in range(3):
 
         if load_case == 1:
             A_min = P_truss / sigma_yield
-            m = A_min*mat_density*ac.l_strut
+            m = A_min*mat_density*ac.ST_l_strut
             ms.loc[mat, 'Case 1'] = m
         else:
-            I_min = P_truss * ac.l_strut**2 / (np.pi**2 * E)
+            I_min = P_truss * ac.ST_l_strut**2 / (np.pi**2 * E)
             t = 4*I_min/(np.pi*a**3 * (1+(3*b/a)))  # thickness of strut sheet [m]
             A = np.pi*(a+b)*t
             I_check = np.pi*a**3*t*(1+(3*b/a))/4
-            m = A*mat_density*ac.l_strut
+            m = A*mat_density*ac.ST_l_strut
             ms.loc[mat, 'Case 2'] = m
 
     if k == 0:
