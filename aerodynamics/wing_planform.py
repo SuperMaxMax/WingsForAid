@@ -244,7 +244,7 @@ def main_wing_planform(aircraft):
         K_LS = 1 + (0.0042*AR - 0.068) * (1+2.3*(CL_a_w*Omega)/C_lmax)
         K_LOmega = 0.125
 
-        CL_max = CL_clmax * K_LS * K_Lsweep * C_lmax * (1 - (K_LOmega*CL_a_w*Omega)/(C_lmax))
+        CL_max_clean = CL_clmax * K_LS * K_Lsweep * C_lmax * (1 - (K_LOmega*CL_a_w*Omega)/(C_lmax))
 
         if not full_print:
             return abs(C_L_wing-C_L_req)
