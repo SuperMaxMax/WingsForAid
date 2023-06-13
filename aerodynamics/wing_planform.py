@@ -15,7 +15,7 @@ def iw(airfoil):
     file_path_clcd = "aerodynamics/" + file_name_clcd + ".csv"
     
     cd_list = [] 
-    cl_list = []
+    cl_list = [] 
 
     with open(file_path_clcd) as f:
         reader = csv.reader(f, delimiter=',', quotechar='"')
@@ -270,8 +270,7 @@ def main_wing_planform(aircraft):
                
     return 
 
-aircraft = UAV("aircraft")
-main_wing_planform(aircraft)
+
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
