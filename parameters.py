@@ -349,7 +349,7 @@ class UAV:
 
         # box drop maneuver
         self.OP_V_boxlim = 100 / 3.6 # [m/s] box drop max speed
-        self.OP_Vbox_LDG = 40 / 3.6  # [m/s] 40kph drop limit
+        self.OP_Vbox_LDG = 50 / 3.6  # [m/s] xxkph drop limit
         self.boxDX = 0.5  # [m]
         self.boxDY = 0.3  # [m]
         self.boxDZ = 0  # [m]
