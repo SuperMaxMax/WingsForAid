@@ -291,14 +291,6 @@ def horizontal_tail_planform(aircraft):
     aircraft.AE_CL_a_v = CL_a_v
 
     aircraft.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane
-        #self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
-        self.AE_Sv = 1.2824
-        self.AE_b_v = 1.2015
-        self.AE_vertical_airfoil = '0009'      # Airfoil of vertical tail (NACA)
-        self.AE_rootchord_v = 0.9530
-        self.AE_tipchord_v = 0.6671
-        self.AE_lambda_LE_v = 35 * np.pi / 180
-        self.AE_i_w_v = 0.07
-        self.AE_CL_a_v = 2.57
+
 
 horizontal_tail_planform(object)
