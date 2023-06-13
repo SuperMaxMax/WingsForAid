@@ -58,7 +58,7 @@ class UAV:
         self.h_out = 0.7                    # Outer fuselage height [m]
         # I
         self.i_w = 0.935 * np.pi / 180       # Updated incidence angle of wing wrt fuselage [rad]
-
+        self.Ixx = 1300                      # mass moment of inertia x-axis [kg m^2]
 
         # J
 
@@ -182,7 +182,7 @@ class UAV:
         self.wing_twist = -2.0 *np.pi/180   # Updated wing twist (difference root and chord) [rad]
 
         # X
-        self.xc_aft_spar = 0.8              # Aft spar location as fraction of MAC
+        self.xc_aft_spar = 0.80             # Aft spar location as fraction of MAC
         self.X_LEMAC = 2.276                # Leading edge mean aerodynamic chord [m]
         self.x_lemac = 0.06057988483270884  # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
@@ -194,6 +194,7 @@ class UAV:
         self.y_mac = 2.2133293637093265     # Spanwise location of the MAC [m]
         self.ystart_ail = 3.308             # start location of aileron measured from rootchord
         self.yend_ail = 3.975               # end location of aileron measured from rootchord
+        self.ystart_flap = 0                # start location of flap measured from rootchord
         self.yend_flap = 1.5629             # end location of the HLD measured from rootchord
 
         "Aerodynamic parameters"            # NOTE: Add identifier "AE_" before variable names
