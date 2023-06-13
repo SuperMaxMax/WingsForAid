@@ -186,7 +186,7 @@ for k in range(3):
     torque = []
     
     # flexural axis assumption # -> replace 0.25 with front spar location variable, also add in location based on wingbox design -> for iteration
-    flex_ax = 0.48
+    flex_ax = ac.x_strut
 
     # define moment arms
     cop = 0.25                      # chord from leading edge

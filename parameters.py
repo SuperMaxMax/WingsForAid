@@ -21,9 +21,7 @@ class UAV:
         self.CL_LDG = 1.5702                # [-]
         self.CL_TO = 1.2397                 # [-]
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
-        self.CL_max_clean = 1.5             # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.CL_max_land = 1.9                # Maximum lift coefficient at landing [-]
-        self.CLa = 4.2                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         self.CL_max_clean = 1.5615             # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.CL_max_land = 1.9              # Maximum lift coefficient at landing [-]
         self.CLa = 4.743                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
@@ -33,7 +31,6 @@ class UAV:
         self.cruise_frac = 0.8348           # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
         self.CL_a_w = 4.743                 # Updated Lift curve slope [1/rad]
         self.C_r_C_v = 0.4                  # Rudder chord over vertical tail chord
-
 
         # D
         self.Drag_increase = 1.0126         # This is used for the calculations of the strut drag if applicable [-]
@@ -65,7 +62,6 @@ class UAV:
 
         # K
         self.kq = 0.95                      # Volume factor used to calculate wetted area of the wing [-]
-
 
         # L
         self.LDG_dist = 750.0               # Landing distance [m]
@@ -181,6 +177,7 @@ class UAV:
         self.w_in = 1.2                     # Inner fuselage width [m]
         self.w_out = 1.1                    # Outer fuselage width [m]
         self.wing_twist = -2.0 *np.pi/180   # Updated wing twist (difference root and chord) [rad]
+        self.W_strut = 12                   # Weight of 2 struts [kg]
 
         # X
         self.xc_aft_spar = 0.80             # Aft spar location as fraction of MAC
@@ -191,6 +188,7 @@ class UAV:
         self.X_cg_full = 0.4115             # MTOW cg location CG/MAC [-]
         self.X_cg_fwd = 0.1704              # Forward cg location CG/MAC [-]
         self.X_cg_range = 0.363             # Range of cg location CG/MAC [-]
+        self.x_strut = 0.48                 # strut location as fraction of chord @ spanwise position [-]
         # Y
         self.y_mac = 2.2133293637093265     # Spanwise location of the MAC [m]
         self.ystart_ail = 3.308             # start location of aileron measured from rootchord
@@ -223,18 +221,13 @@ class UAV:
         self.AE_sweep_co4 = 0.0                 # Updated half chord sweep [rad]
         self.AE_sweep_LE = 0.02736364725188103  # Updated leading edge sweep [rad]
         self.AE_taper = 0.65                    # Updated taper ratio [-]
-        self.AE_rootchord = 1.490               # Updated Root chord [m]
-        self.AE_tipchord = 0.9685               # Updated tip chord [m]
-        self.AE_x_lemac = 0.06057988483270884   # Updated distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.AE_y_mac = 2.2133293637093265      # Updated spanwise location of the MAC [m]
         self.AE_alpha_f = 0                     # Still to be updated angle of attack of the fuselage [rad]
 
         # Horizontal tailplane
-        self.AE_l_h = 4                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 5.166666                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.AE_Sh_S = 0.174                   # [-] Ratio between horizontal tailplane surface area and surface area win
         self.AE_Sh = 2.0377662
         self.AE_CL_a_h = 4.18773706267545    # Lift curve slope horizontal tailplane [1/rad] 
 
@@ -262,7 +255,6 @@ class UAV:
         self.AE_sweep_co4_v = 35 / 180 * np.pi                 # Updated half chord sweep [rad]
         self.AE_sweep_LE_v = 0.685533470761878  # Updated leading edge sweep [rad]
         self.AE_lambda_c02_v = 0.5274976173187572            # [rad] Half chord sweep of vertical tailplane
-        self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
         self.AE_Sv = 1.2824
         self.AE_b_v = 1.2015
         self.AE_vertical_airfoil = '0009'      # Airfoil of vertical tail (NACA)
