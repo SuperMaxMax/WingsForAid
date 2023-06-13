@@ -89,7 +89,7 @@ class UAV:
         self.M_res = 0.075 
         self.Mff = 0.9254                   # Fuel fraction [-]
         self.main_gear_type = 'fixed'       # Type of main gear: "fixed" or "retractable"
-        self.mass_penalty_struts = 7        # The weight of the struts [kg]
+        self.mass_penalty_struts = 16.794        # The weight of both struts [kg] #updated by Jan W. 13.06
         # N
         self.N_e = 1                        # Number of engines [-]
         self.n_boxes = 12                   # [-]
@@ -393,11 +393,14 @@ class UAV:
         self.ST_Torque_eng2 = 240 #Nm, UL 260 torque
 
         self.ST_l_strut = 2.563733275367119 #m strut lenght (single)
-        self.ST_d_strut = 0.015 #strut diameter (outer) [m]
-        self.ST_l_LG = 0.4 #m strut lenght (single)
-        self.ST_d_LG = 0.04 #strut diameter (outer) [m]
-        self.ST_d_boom = 0.05 #strut diameter (outer) [m]
+        self.ST_strut_2a = 0.08 #strut semi major*2 [m]
+        self.ST_strut_2b = 0.04 #strut semi minor*2 [m]
+        self.ST_strut_t = 0.0021 #m strut thickness [m]
+       # self.ST_l_LG = 0.4 #m strut lenght (single)
+        #self.ST_d_LG = 0.04 #strut diameter (outer) [m]
+       # self.ST_d_boom = 0.05 #strut diameter (outer) [m]
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
+        self.ST_strut_W = 8.397 #kg single strut mass
 
         self.ST_W_fus = 40.224 #kg mass of fuselage structure (only)
         self.ST_W_tb = 11.52 #kg mass of tail boom, given it is 2.8 m long
@@ -420,11 +423,31 @@ class UAV:
         self.ST_x_cg = 2.94 #max aft x_cg for nose wheel loading
 
 
-        self.ST_tail_boom_2a=0.15 #height of tail boom
-        self.ST_tail_boom_2b=0.1 #width of tail boom
-        self.ST_tail_boom_t=0.001 #thinckness of tail boom (steel 410)
-        self.ST_h_tail_spar_r=0.025 #radius of h tail spar
-        self.ST_h_tail_spar_t=0.001 #thickness of h tail spar (steel 410)
+        self.ST_tail_boom_r=0.075 #radius of tail boom if steel 4130
+        self.ST_tail_boom_t=0.0015 #thinckness of tail boom (steel 4130)
+        self.ST_tail_boom_W=20.34 #kg mass of tail boom
+        self.ST_tail_boom_l = 3.6658 #m length of tail boom
+
+
+        self.ST_h_tail_spar_r=0.035 #radius of h tail spar
+        self.ST_h_tail_spar_t=0.001 #thickness of h tail spar (steel 4130)
+        self.ST_h_tail_spar_theta = 0.01239 #rad twist of spar (steel 4130)
+        self.ST_h_tail_spar_W = 2.07 #kg mass of stail spar
+
+        self.ST_nose_gear_r = 0.03 #m radius of nose gear strut
+        self.ST_nose_gear_t = 0.0025 #m thickness of nose gear strut
+        self.ST_nose_gear_W = 2.01 #kg mass of nose gear
+
+        self.ST_main_gear_2a = 0.12 #m semi major*2 of main gear
+        self.ST_main_gear_2b = 0.06 #m semi minor*2 of main gear
+        self.ST_main_gear_t = 0.0029 #m thickness of main gear
+        self.ST_main_gear_W = 16.5 #kg mass of main gear
+
+        # self.ST_tail_boom_2a = 0.15  # height of tail boom if steel 410
+        # self.ST_tail_boom_2b = 0.1  # width of tail boom
+        # self.ST_tail_boom_t = 0.001  # thinckness of tail boom (steel 410)
+        # self.ST_h_tail_spar_r = 0.025  # radius of h tail spar
+        # self.ST_h_tail_spar_t = 0.001  # thickness of h tail spar (steel 410)
 
 
 class airport:

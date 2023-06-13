@@ -7,10 +7,10 @@ at=atmosphere()
 #from loading_diagram_wing import aircraft
 
 ## Define material ##
-# steel 4130
-yield_stress = 460*10**6
-density=7850
-E = 205*10**9
+#steel 4130
+# yield_stress = 460*10**6
+# density=7850
+# E = 205*10**9
 
 
 
@@ -20,9 +20,9 @@ E = 205*10**9
 # E = 200*10**9
 
 # #al 5052
-# yield_stress = 255*10**6
-# density=2680
-# E=70.3*10**9
+yield_stress = 255*10**6
+density=2680
+E=70.3*10**9
 ## Define main forces ##
 Thrust = 2800
 Lift = ac.W_TO*ac.g0
