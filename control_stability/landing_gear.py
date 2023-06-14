@@ -95,7 +95,7 @@ def lateral_position_landing_gear(aircraft):
 
     
     # Pitch Angle limit NOTE: 15 degrees can change for our aircraft. 
-    angle_theta_max = np.arctan(aircraft.h_out/(aircraft.l_f+aircraft.l_f_boom-aircraft.position_landing_back[0]))
+    angle_theta_max = np.arctan(aircraft.h_out/(aircraft.l_f - aircraft.l_fus_tail_cone + aircraft.l_f_boom-aircraft.position_landing_back[0]))
     # print('HHHHHHH',angle_theta_max * 180 / np.pi)
     # angle_theta_max = 15 * (np.pi/180) 
     x_cg_aft_limit = aircraft.x_cg_position_aft + aircraft.ST_z_cg_ground * np.tan(angle_theta_max)
@@ -216,8 +216,8 @@ ax.plot([aircraft.l_f-aircraft.l_fus_tail_cone, aircraft.l_f], [aircraft.w_out/2
 ax.plot([aircraft.l_f-aircraft.l_fus_tail_cone, aircraft.l_f], [-aircraft.w_out/2, 0], color='0.25', linewidth=0.8)
 
 # Boom
-ax.plot([aircraft.l_f - 0.35, aircraft.l_f + aircraft.l_f_boom], [0.1, 0.1], color='0.25', linewidth=0.8)
-ax.plot([aircraft.l_f - 0.35, aircraft.l_f + aircraft.l_f_boom], [-0.1, -0.1], color='0.25', linewidth=0.8)
+ax.plot([aircraft.l_f - aircraft.l_fus_tail_cone, aircraft.l_f - aircraft.l_fus_tail_cone + aircraft.l_f_boom], [0.1, 0.1], color='0.25', linewidth=0.8)
+ax.plot([aircraft.l_f - aircraft.l_fus_tail_cone, aircraft.l_f - aircraft.l_fus_tail_cone + aircraft.l_f_boom], [-0.1, -0.1], color='0.25', linewidth=0.8)
 
 ax.set_xlim(-0.3, aircraft.l_f+1)
 ax.set_ylim(-1, aircraft.b/2+1)

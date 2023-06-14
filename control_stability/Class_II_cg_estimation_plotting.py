@@ -41,8 +41,8 @@ def cg_calc(obj):
     engine_cg = obj.engine_cg - prop_correction     # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
 
     # Boom & tail
-    tail_cg = obj.l_f + 0.75*obj.l_f_boom    # educated guess
-    boom_cg = obj.l_f + 0.5*obj.l_f_boom    # educated guess
+    tail_cg = obj.l_f + 0.75*(obj.l_f_boom - obj.l_fus_tail_cone)    # educated guess
+    boom_cg = obj.l_f - obj.l_fus_tail_cone + 0.5*obj.l_f_boom    # educated guess
    
     # Equipment
     eq_cg = obj.engine_length + 0.25      # behind the firewall of the engine
@@ -53,8 +53,8 @@ def cg_calc(obj):
     # Undercarriage
     # For now: cg assumed to be at aircraft cg -> not taken into account for X_FCG, but is part of OEW
 
-    W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
-    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.W_boom)/(W_fus_gr - obj.W_uc)
+    W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.ST_W_uc + obj.ST_W_boom
+    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + boom_cg*obj.ST_W_boom)/(W_fus_gr - obj.ST_W_uc)
     obj.X_FCG = X_FCG
     
     # xc_OEW = obj.xc_OEW_p*obj.MAC_length
@@ -129,7 +129,7 @@ def cg_calc(obj):
     obj.X_cg_aft = Xs[labels.index(LimBoxConfigAft)] + obj.X_cg_range * 0.05
     obj.X_cg_range = obj.X_cg_aft - obj.X_cg_fwd
 
-    obj.l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
+    obj.l_h = obj.l_f - obj.l_fus_tail_cone + obj.l_f_boom - 3/4 * obj.AE_rootchord_h - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length)
 
     # Plot lines for forward and aft cg positions
 

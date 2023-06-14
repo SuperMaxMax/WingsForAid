@@ -20,15 +20,16 @@ def cg_calc(obj, plot):
     x_list = []
     y_list = []
     z_list = []
-    ixx_list = [0,0,0,0,0,0,0,0,0,0,0,0]
-    iyy_list = [0,0,0,0,0,0,0,0,0,0,0,0]
-    izz_list = [0,0,0,0,0,0,0,0,0,0,0,0]
+    ixx_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+    iyy_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+    izz_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
     
     # Calculate MTOW
+    obj.W_OE = obj.W_eq + obj.W_n + obj.W_pg + obj.W_sc + obj.W_t + obj.W_strut + obj.ST_W_fus + obj.ST_W_boom + obj.ST_W_uc + obj.W_w
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement
-    X_LEMAC = 0.42 * obj.l_f
+    X_LEMAC = 0.40 * obj.l_f
     obj.X_LEMAC = X_LEMAC
 
     '''v Wing group v'''
@@ -41,7 +42,7 @@ def cg_calc(obj, plot):
     list_mass += [obj.W_w/2, obj.W_w/2]
     x_list += [wing_cg+obj.X_LEMAC, wing_cg+obj.X_LEMAC]
     y_list += [-obj.b*0.175, obj.b*0.175]
-    z_list += [obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord, obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord] 
+    z_list += [obj.ST_z_ground+obj.w_out+0.075*obj.rootchord, obj.ST_z_ground+obj.w_out+0.075*obj.rootchord] 
 
     # Control surfaces
     control_surfaces_cg = obj.x_lemac + 0.9*obj.MAC_length  # guess for now, control surface location wrt leading edge rootchord
@@ -50,7 +51,7 @@ def cg_calc(obj, plot):
     list_mass += [obj.W_sc]
     x_list += [control_surfaces_cg+obj.X_LEMAC]
     y_list += [0]
-    z_list += [obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord] 
+    z_list += [obj.ST_z_ground+obj.w_out+0.075*obj.rootchord] 
 
     W_wing_gr = obj.W_w + obj.W_sc  # FIXME: W_sc variabel maken
     x_wcg = (wing_cg*obj.W_w + control_surfaces_cg*obj.W_sc)/(W_wing_gr)  # cg distance of wing group wrt leading edge rootchord
@@ -62,8 +63,8 @@ def cg_calc(obj, plot):
     engine_cg = obj.engine_cg - prop_correction     # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
         
     # Boom & tail
-    tail_cg = obj.X_LEMAC+obj.l_h+0.2*obj.AE_rootchord_h   # educated guess
-    boom_cg = obj.l_f + 0.5*obj.l_f_boom    # educated guess
+    tail_cg = obj.X_LEMAC + obj.X_cg_aft * obj.MAC_length + obj.l_h + 0.3 * obj.AE_rootchord_h   # educated guess
+    boom_cg = obj.l_f - obj.l_fus_tail_cone + 0.5 * obj.l_f_boom    # educated guess
    
     # Equipment
     eq_cg = obj.engine_length + 0.25      # behind the firewall of the engine
@@ -80,15 +81,15 @@ def cg_calc(obj, plot):
         return obj.rootchord-((obj.rootchord-obj.tipchord)/(obj.b/2))*y
     strut_cg = obj.X_LEMAC - obj.x_lemac + 0.25 * obj.rootchord + (obj.x_strut - 0.25) * chord(obj.ST_y_strut) 
 
-    W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom + obj.W_strut
-    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + uc_cg * obj.W_uc + strut_cg * obj.W_strut + boom_cg * obj.W_boom)/(W_fus_gr)
+    W_fus_gr = obj.ST_W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.ST_W_uc + obj.ST_W_boom + obj.W_strut
+    X_FCG = (fus_cg*obj.ST_W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + uc_cg * obj.ST_W_uc + strut_cg * obj.W_strut + boom_cg * obj.ST_W_boom)/(W_fus_gr)
     obj.X_FCG = X_FCG
 
-    name_list += ['fuselage', 'engine', 'tail', 'boom', 'equipment', 'nacelle', 'undercarriage']
-    list_mass += [obj.W_fus, obj.W_pg, obj.W_t, obj.W_boom, obj.W_eq, obj.W_n, obj.W_uc]
-    x_list += [fus_cg, engine_cg, tail_cg, boom_cg, eq_cg,nacelle_cg, uc_cg]
-    y_list += [0, 0, 0, 0, 0, 0, 0]
-    z_list += [obj.ST_z_ground+0.5*obj.ST_h_fus, obj.ST_h_prop_axis, obj.ST_z_ground+obj.ST_h_fus+0.15, obj.ST_z_ground+obj.ST_h_fus, obj.ST_h_prop_axis, obj.ST_h_prop_axis, obj.ST_z_ground*0.35] #add jan's parameters later
+    name_list += ['fuselage', 'engine', 'tail', 'boom', 'equipment', 'nacelle', 'undercarriage', 'struts']
+    list_mass += [obj.ST_W_fus, obj.W_pg, obj.W_t, obj.ST_W_boom, obj.W_eq, obj.W_n, obj.ST_W_uc, obj.W_strut]
+    x_list += [fus_cg, engine_cg, tail_cg, boom_cg, eq_cg,nacelle_cg, uc_cg, strut_cg]
+    y_list += [0, 0, 0, 0, 0, 0, 0, 0]
+    z_list += [obj.ST_z_ground+0.5*obj.ST_h_fus, obj.ST_h_prop_axis, obj.ST_z_ground+obj.w_out+0.15, obj.ST_z_ground+obj.w_out, obj.ST_h_prop_axis, obj.ST_h_prop_axis, obj.ST_z_ground*0.35, obj.ST_z_ground + 0.5 * obj.w_out] #add jan's parameters later
     
     # xc_OEW = obj.xc_OEW_p*obj.MAC_length
     #X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
@@ -109,7 +110,7 @@ def cg_calc(obj, plot):
     list_mass += [obj.W_F, obj.boxweight*12]
     x_list += [X_fuel_wi, obj.engine_length + 1.85]
     y_list += [0, 0]
-    z_list += [obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord, obj.ST_z_ground+0.3]
+    z_list += [obj.ST_z_ground+obj.w_out+0.075*obj.rootchord, obj.ST_z_ground+0.3]
 
     # Payload
     dist_front = obj.engine_length + 0.45  # [m]
@@ -168,7 +169,7 @@ def cg_calc(obj, plot):
     obj.X_cg_fwd = Xs[labels.index(LimBoxConfigFwd)] - obj.X_cg_range * 0.05
     obj.X_cg_aft = Xs[labels.index(LimBoxConfigAft)] + obj.X_cg_range * 0.05
 
-    obj.l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
+    obj.l_h = obj.l_f - obj.l_fus_tail_cone + obj.l_f_boom - 3/4 * obj.AE_rootchord_h - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length)
     # Plot lines for forward and aft cg positions
     plt.axvline(x=obj.X_cg_fwd, color='blue', label='most forward c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=135, length=1.1)])
     plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])
@@ -194,6 +195,6 @@ def cg_calc(obj, plot):
 
     return max(Xs), min(Xs), obj.X_cg_range
 
-from parameters import UAV
-aircraft = UAV('aircraft')
-print(cg_calc(aircraft, False))
+# from parameters import UAV
+# aircraft = UAV('aircraft')
+# print(cg_calc(aircraft, False))

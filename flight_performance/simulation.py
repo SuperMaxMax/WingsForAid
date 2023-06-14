@@ -25,8 +25,8 @@ def takeoffweight(obj, W_F):
 
 def atm_parameters(obj, h):
     T    = atm.T0 + atm.lambd * h
-    rho  = atm.rho0*np.power((T/obj.T0), (-((atm.g / (atm.lambd * atm.R))+1)))
-    p    = atm.p0*np.power((T/obj.T0), (-(atm.g / (atm.lambd * atm.R))))
+    rho  = atm.rho0*np.power((T/atm.T0), (-((atm.g / (atm.lambd * atm.R))+1)))
+    p    = atm.p0*np.power((T/atm.T0), (-(atm.g / (atm.lambd * atm.R))))
     a    = np.sqrt(atm.gamma*obj.R*T)
     return p, T, rho, a
 
@@ -224,7 +224,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             CL_to = max(CL_all)
             print(CL_to, CL_max)
             obj.FP_CL_max_TO = CL_max
-            obj.FP_CL_to = CL_to
+            obj.FP_CL_TO = CL_to
 
         if Plot:
             if i == 0:

@@ -28,8 +28,7 @@ def lateral_coefficients(aircraft, lcg):
 
     Sv_S = aircraft.b/l_v * (C_n_beta_spec - (C_n_beta_fus + C_n_beta_prop + C_n_beta_i)) / (C_Y_v_alpha * (aircraft.AE_Vv_V)**2)
     aircraft.Sv_S = Sv_S
-    aircraft.AE_S_v = aircraft.Sv_S * aircraft.Sw
-    aircraft.CS_S_v = Sv_S * aircraft.Sw
+    aircraft.AE_Sv = Sv_S * aircraft.Sw
 
 
 
