@@ -135,9 +135,9 @@ def horizontal_tail_planform(aircraft):
         variable = "Twist"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
-            variable_list2 = [0.6]
+            variable_list2 = [0.7]
         elif variable == "AR":  
-            variable_list2 = [2]
+            variable_list2 = [1.5]
         elif variable == "Twist":
             variable_list2 = [0]
         
@@ -160,11 +160,11 @@ def horizontal_tail_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 1.35
+                AR = 1.5
             if variable == "Lambda":
                 Lambda = parameter
             else:
-                Lambda = 0.7
+                Lambda = 0.7 
             if variable == "Twist":
                 alpha_twist = parameter
             else:
@@ -242,7 +242,7 @@ def horizontal_tail_planform(aircraft):
             print('=====================================================================')
             print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
             print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
-            print("aircraft height incl tail, container is 2.40 = ", b + 1.16)
+            print("Max is 1.80 = ", b )
             print(i_w*180/np.pi, C_L_wing - C_L_h, C_L_h, airfoildata.index.tolist())
             print("C_L", C_L_wing)
 
@@ -265,7 +265,7 @@ def horizontal_tail_planform(aircraft):
         if not full_print:
             return abs(C_L_wing - C_L_h)
         elif full_print:
-            return AR, b, Lambda, alpha_twist, S, CL_a_h  #choose whatever
+            return AR, b, Lambda, alpha_twist, S, CL_a_h, i_w  #choose whatever
 
     airfoildata = airfoil_select(required_lift(aircraft)[0], 0)
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
@@ -273,7 +273,26 @@ def horizontal_tail_planform(aircraft):
 
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     #print('pppppppp', a_h_optimal,type(a_h_optimal))
-    AR, b, Lambda, alpha_twist, S, CL_a_v  = plot_lift_distr(a_h_optimal, full_print = True)
+    AR, b, Lambda, alpha_twist, S, CL_a_v, i_w_v  = plot_lift_distr(a_h_optimal, full_print = True)
+
+    # Vertical tailplane
+        #self.AE_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
+    aircraft.AE_A_v = AR                     # [-] Aspect ratio vertical tail
+    #aircraft.AE_lambda_c02_v = None            # [rad] Half chord sweep of vertical tailplane
+    #aircraft.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
+    
+    aircraft.AE_Sv = S
+    aircraft.AE_b_v = b
+    #aircraft.AE_vertical_airfoil = '0009'      # Airfoil of vertical tail (NACA)
+    aircraft.AE_rootchord_v = 2 * S / (b * (1+Lambda)) 
+    aircraft.AE_tipchord_v = aircraft.AE_rootchord_v*Lambda
+    aircraft.AE_lambda_LE_v = 35 * np.pi / 180
+    aircraft.AE_i_w_v = i_w_v
+    aircraft.AE_CL_a_v = CL_a_v
+
+    aircraft.AE_sweep_co4_v = 35 / 180 * np.pi                 # Updated half chord sweep [rad]
+    aircraft.AE_sweep_LE_v = np.arctan(np.tan(aircraft.AE_sweep_co4_v) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.AE_lambda_c02_v = np.arctan(np.tan(aircraft.AE_sweep_co4_v) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
 
 
-horizontal_tail_planform(object)
+

@@ -129,7 +129,7 @@ def cg_calc(obj):
     obj.X_cg_aft = Xs[labels.index(LimBoxConfigAft)] + obj.X_cg_range * 0.05
     obj.X_cg_range = obj.X_cg_aft - obj.X_cg_fwd
 
-    obj.AE_l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
+    obj.l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
 
     # Plot lines for forward and aft cg positions
 

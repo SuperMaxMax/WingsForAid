@@ -178,10 +178,12 @@ drag_info.to_csv('drag_estimation.csv', index=True)
 
 #Plotting drag polar
 lift_induced_coef = 1/(aircraft.A * np.pi * aircraft.e)
-CL = np.linspace(0, 1.5, 100)
-CD = CD_0 + lift_induced_coef * CL**2
+CL = np.linspace(-3, 3, 1000)
+CD = CD_0 + lift_induced_coef * CL**2  + (-0.1821)**2/(2.35 * np.pi * 0.98999) * aircraft.Sh_S + (0.14177)**2/(1.481 * np.pi * 0.99784) * aircraft.Sv_S
 plt.figure(figsize=(8, 6))
 plt.plot(CD, CL)
+plt.axhline(y = 1.735 , color = 'r', linestyle = '--')
+plt.axhline(y = -1.735 , color = 'r', linestyle = '--')
 plt.xlabel('Drag Coefficient CD [-]')
 plt.ylabel('Lift Coefficient CL [-]')
 plt.savefig('dragpolar.pdf')
