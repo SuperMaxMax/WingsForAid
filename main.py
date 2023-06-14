@@ -1,4 +1,4 @@
-from parameters import UAV, Cessna_172
+from parameters import UAV
 import Class_I_weight_estimation as c1
 import Class_II_weight_estimation as c2
 import Class_II_cg_estimation as c2cg
