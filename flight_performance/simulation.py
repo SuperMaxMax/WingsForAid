@@ -166,17 +166,17 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
 # # Thrust and lift are taken as average values
 
 
-def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, w_fuel, Plot=True):
+def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, W_f, Plot=True):
 
     figure, axis = plt.subplots(2, 2)
     CL_all = []
     for i in range(0, 4):
         if i == 0:
             dic_constants = {'runway slope': np.arange(0, max_runwayslope),
-                             'airport altitude': 0, 'wing surface area': obj.Sw,
-                             'weight': takeoffweight(aircraft, w_fuel) * atm.g,
-                             'wind speed': 0, 'propeller power': aircraft.power * hp_to_watt,
-                             'propeller efficiency': aircraft.eta_p}
+                             'airport altitude': 0, 'wing surface area': obj.AE_Sw,
+                             'weight': takeoffweight(obj, W_f) * atm.g,
+                             'wind speed': 0, 'propeller power': obj.power * hp_to_watt,
+                             'propeller efficiency': obj.prop_eff}
             p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
 
         if i == 1:
@@ -191,7 +191,6 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             dic_constants['airport altitude'] = np.arange(0, max_hairport)
             p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
 
-
         CL_max = 1.5
         CL = CL_max
         S = [600]
@@ -202,7 +201,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
                 dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max) - dic_constants[
                         'wind speed'])
             V_avg_sq = V_LOF ** 2 / 2
-            CD = obj.CD0 + CL ** 2 / (np.pi * obj.A * obj.e)
+            CD = obj.AE_CD0 + CL ** 2 / (np.pi * obj.AE_A * obj.AE_e)
             D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             L = CL * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             T = dic_constants['propeller power'] * dic_constants['propeller efficiency'] / np.sqrt(V_avg_sq)
@@ -210,20 +209,22 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             a = atmos.g / dic_constants['weight'] * (
                         T - D - D_g - dic_constants['weight'] * np.sin(np.radians(dic_constants['runway slope'])))
             S = V_LOF ** 2 / (2 * a)
-            if CL <= 0.25:
+            if CL <= 0.75:
                 break
 
         S = S_old
         CL += 0.01
+        print(CL)
         CL_all.append(CL)
         if len(S) == 1:
             print('One or more of the flight conditions; runway slope, headwind, tailwind, airport altitude, '
                   'are not achievable')
+            print(i)
             Plot = False
             break
         else:
             CL_to = max(CL_all)
-            print(CL_to, CL_max)
+            print(CL_all)
             obj.FP_CL_max_TO = CL_max
             obj.FP_CL_to = CL_to
 
@@ -260,7 +261,11 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     return S
 
 
-#TO_eom(aircraft, airfield, atm, 5, 4000, 12, -15.4, 65)
+TO_eom(aircraft, airfield, atm, 12, 4000, 12, -13.4, 65)
+
+# Result:
+# - If 12 boxes, then the slope limit is 11 degrees and max tailwind of 13 m/s = 25.3 kts
+# - If we have a tailwind of 30knt we can't take more than 10 boxwes
 
 # ------------------------------------------------------------------------
 
@@ -510,7 +515,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             break
         else:
             CL_land = min(CL_all)
-            print(CL_all, round(CL_land, 1))
+            print(CL_all, CL_land, max(S))
             obj.FP_CL_max_land = CL_max
             obj.FP_CL_land = CL_land
 
@@ -537,6 +542,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             axis[0, 1].set_title('airport altitude vs C_L landing')
             axis[0, 1].set_xlabel('airport altitude [m]')
             axis[0, 1].set_ylabel('C_L landing [-]')
+
     if Plot:
         plt.subplots_adjust(hspace=0.6)
         plt.subplots_adjust(wspace=0.5)
@@ -546,7 +552,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     return CL_max
 
 
-LA_eom(aircraft, airfield, atm, -8, 4000, 14, -15.4, 70)
+LA_eom(aircraft, airfield, atm, -8, 4000, 14, -15.4, 5)
 
 # ------------------------------------------------------------------------------
 def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
@@ -593,7 +599,7 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
             throttle_setting.append(P_throttle*100)
 
         # update constants
-        dt = 0.01
+        dt = 0.1
         t += dt
         altitude.append(h)
         h += V*np.sin(np.radians(gamma)) * dt
@@ -603,8 +609,8 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
         W -= dWf
 
     figure, axis = plt.subplots(2, 2)
-
-    axis[0, 0].plot(altitude[0:len(RC)], RC)
+    altitude_ap = altitude[0: len(RC)]
+    axis[0, 0].plot(altitude_ap, RC)
     axis[0, 0].set_title('Altitude vs RC')
     axis[0, 0].set_xlabel('Altitude [m]')
     axis[0, 0].set_ylabel('Rate of Descend [m/s]')
@@ -614,17 +620,20 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
     axis[0, 1].set_xlabel('Altitude [m]')
     axis[0, 1].set_ylabel('Descending Angle [deg]')
 
-    axis[1, 0].plot(throttle_setting, altitude[len(RC):], color='black')
-    axis[1, 0].set_title('Throttle Setting  in Approach vs Altitude')
-    axis[1, 0].set_xlabel('Throttle Setting [%]')
-    axis[1, 0].set_ylabel('Altitude [m]')
-
-    plt.subplots_adjust(hspace=0.6)
     plt.subplots_adjust(wspace=0.5)
+    plt.subplots_adjust(hspace=0.5)
+    plt.show()
+
+    plt.plot(throttle_setting, altitude[len(RC):], color='black')
+    plt.title('Throttle Setting  in Approach vs Altitude')
+    plt.xlabel('Throttle Setting [%]')
+    plt.ylabel('Altitude [m]')
+
     plt.show()
 
 
-# descend(aircraft, atm, 90, (aircraft.W_OE+60)*atm.g, 95, 500, 0.6)
+# descend(aircraft, atm, 90, (aircraft.W_OE+10)*atm.g, 95, 500, 0.6)
+
 
 def cruiseheight(distance, desired_alt):
     if 0.0 <= distance <= 10000.0:
@@ -1069,4 +1078,4 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     flight_profile.append(W_F_used) # fuel burnt
     return flight_profile
 
-fuelusesortie(aircraft, atm, 12, 1, 12000, 55, 50, Summary=True, plot=True, savefig=True)
+# fuelusesortie(aircraft, atm, 12, 1, 12000, 55, 50, Summary=True, plot=True, savefig=True)
