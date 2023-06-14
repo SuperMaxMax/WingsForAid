@@ -3,7 +3,7 @@ import Class_I_weight_estimation as c1
 import Class_II_weight_estimation as c2
 import Class_II_cg_estimation as c2cg
 import geometry_determination as geo
-# import V_n_diagrams as Vn
+import V_n_diagrams as Vn
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +11,7 @@ import numpy as np
 aircraft = UAV("droppy", 'tractor', braced_wing=True, boom=True)
 
 # start
-plot = False
+plot = True
 remove_duplicates = False
 
 # create dataframe with members and values, to save all concepts in
@@ -47,7 +47,8 @@ for concept in [aircraft]:
         print(f"Operative empty weight: {np.round(concept.W_OE, 2)} [kg]")
 
         # update load factor
-        # concept.n_ult = Vn.max_n(concept)*1.5
+        concept.n_ult = Vn.max_n(concept)*1.5
+        concept.n_ult_neg = Vn.min_n(concept)*1.5
 
         # check if change is small enough
         change = (W_TO_c2 - W_TO_c2_old)/W_TO_c2_old
@@ -60,7 +61,7 @@ for concept in [aircraft]:
 
     # --- plotting of concept
     print(f"{concept.name} done in {n} iterations \n")
-    geo.geometry_determination(concept, plot = True)
+    geo.geometry_determination(concept, plot = False)
     # cg calculation
     plt.figure(1)
     plt.subplot(121)
@@ -69,10 +70,10 @@ for concept in [aircraft]:
     
 
     # V-n diagram
-    # plt.subplot(122)
-    # Vn.plot_all(concept)
-    # if plot == True:
-    #     plt.show()
+    plt.subplot(122)
+    Vn.plot_all(concept)
+    if plot == True:
+        plt.show()
     
     # --- saving
     # save all attributes of object to csv file

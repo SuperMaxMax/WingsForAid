@@ -135,9 +135,10 @@ def geometry_determination(obj, plot=False, high_WS = False):
     
     # --- Fuselage parameters
     cumulative_box_length   = obj.n_boxes*0.4                   # box 40x40x60, cumulative length in meter
-    length_between_boxes    = ((obj.n_boxes/2)-1)*0.2           # 20 cm in between boxes
-    engine_length           = 0.6651                            # engine length in cm, EASA type certificate data sheet ROTAX 912 series
-    engine_fairing          = 0.2                               # 20 cm room around the engine 
+    length_between_boxes    = 0.5 # ((obj.n_boxes/2)-1)*0.2           # 20 cm in between boxes
+    # engine_length           = 0.6651                            # engine length in cm, EASA type certificate data sheet ROTAX 912 series
+    # engine_fairing          = 0.2                               # 20 cm room around the engine 
+    l_nc                = 0.9342
     obj.d_eff               = np.sqrt(1.10*1.40)                # from cross sectional drawing with width 1.40 m and height 1.10 m
     d_engine_boxes          = 0.4                               # 40 cm, leaves room for possible fire wall
     if obj.boom:                                                # assume one effective diameter after last box
@@ -150,7 +151,7 @@ def geometry_determination(obj, plot=False, high_WS = False):
     obj.h_in  = 0.90
     obj.w_out = 1.40
     obj.w_in  = 1.20
-    obj.l_f   = cumulative_box_length + length_between_boxes + engine_length + engine_fairing + l_tc + d_engine_boxes
+    obj.l_f   = cumulative_box_length + length_between_boxes + l_nc + l_tc
     if obj.boom:
         obj.S_G = 19.77
     else:

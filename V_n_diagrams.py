@@ -233,6 +233,13 @@ def max_n(obj):
 
     return max(n_peak)
 
+def min_n(obj):
+
+    V, n_peak = gust_points(obj)
+    n_peak = np.append(n_peak, CS23_min(obj))
+
+    return min(n_peak)
+
 def plot_gust(obj):
 
     V, n_peak = gust_points(obj)
