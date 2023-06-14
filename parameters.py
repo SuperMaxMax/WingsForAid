@@ -59,8 +59,8 @@ class UAV:
         self.W1W_TO              = 0.995        # Engine startup fraction [-]
         self.W2W1                = 0.997        # Taxi fraction [-]
         self.W3W2                = 0.998        # Take_off fraction [-]
-        self.W4W3                = 0.992        # Climb fraction [-]
-        self.W10W9               = 0.993        # Descent fraction [-]
+        self.W4W3                = 0.995        # Climb fraction [-]
+        self.W10W9               = 0.999        # Descent fraction [-]
         self.WfinalW10           = 0.993        # Landing, taxi & shut-down fraction [-]
         self.cruise_frac         = self.W1W_TO*self.W2W1*self.W3W2*self.W4W3*0.85   # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
 
