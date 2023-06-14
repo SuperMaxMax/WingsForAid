@@ -11,7 +11,7 @@ import numpy as np
 DET_CON_2_braced = UAV('DET_CON_2_braced', 'tractor', boom=True, braced_wing=True)
 
 # start
-plot = False
+plot = True
 remove_duplicates = False
 
 # create dataframe with members and values, to save all concepts in
@@ -39,6 +39,7 @@ for concept in [DET_CON_2_braced]:
         # print(f"W_TO_c2_old after c2 {W_TO_c2_old}")
         # update load factor
         concept.n_ult = Vn.max_n(concept)*1.5
+        concept.n_ult_neg = Vn.min_n(concept)*1.5
         # print(f"W_TO_c2_old after Vn {W_TO_c2_old}")
 
         # check if change is small enough
@@ -59,15 +60,15 @@ for concept in [DET_CON_2_braced]:
     # --- plotting of concept
     print(f"{concept.name} done in {n} iterations \n")
     # cg calculation
-    #plt.figure(1)
-    #plt.subplot(121)
-    #c2cg.cg_calc(concept)
+    plt.figure(1)
+    plt.subplot(121)
+    c2cg.cg_calc(concept)
 
     # V-n diagram
-    #plt.subplot(122)
-    #Vn.plot_all(concept)
+    plt.subplot(122)
+    Vn.plot_all(concept)
 
-    geo.geometry_determination(concept, plot=True)
+    geo.geometry_determination(concept, plot=False)
 
     if plot == True:
         plt.show()

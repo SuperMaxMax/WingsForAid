@@ -8,17 +8,17 @@ class UAV:
         self.type                = "utility"     # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
 
         "-Aircraft geometry"
-        self.A                   = 10            # Aspect ratio [-]
-        self.e                   = 0.7           # Oswald factor [-]
+        self.A                   = 7.75            # Aspect ratio [-]
+        self.e                   = 0.776           # Oswald factor [-]
         self.braced_wing         = braced_wing   # True if wing is braced
         self.kq                  = 0.95          # Volume factor used to calculate wetted area of the wing [-]
 
-        self.s_tail              = 2             # Tail surface area [m]
-        self.l_t                 = 3.5           # Tail arm [m]
+        self.s_tail              = 3.31             # Tail surface area [m]
+        self.l_t                 = 3.795           # Tail arm [m]
 
         self.boom                = boom          # Boom, true if boom tail is implemented
-        self.W_boom              = 20            # Boom weight [kg]
-        self.l_f_boom            = 2             # Boom length [m]
+        self.W_boom              = 20.3            # Boom weight [kg]
+        self.l_f_boom            = 3.6             # Boom length [m]
 
         self.xc_OEW_p            = 0.25          # Center of gravity of OEW as a fraction of the MAC [-]
 
@@ -26,7 +26,7 @@ class UAV:
         self.main_gear_type      = "fixed"       # Type of main gear: "fixed" or "retractable"
         self.nose_gear_type      = "fixed"       # Type of nose gear: "fixed" or "retractable"
 
-        self.mass_penalty_struts = 7             # The weight of the struts [kg]
+        self.mass_penalty_struts = 12             # The weight of the struts [kg]
 
         "- Fuselage geometry"
         self.side_clearance      = 0.2           # Side clearance [m], this is for both sides
@@ -35,23 +35,23 @@ class UAV:
         self.structural_thickness= 0.2           # Structural thickness fuselage [m], this is for both sides
         
         "-Aerodynamic properties"
-        self.CD0                 = 0.027         # Zero lift coefficient [-]
-        self.CLa                 = 4.2           # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
+        self.CD0                 = 0.02578         # Zero lift coefficient [-]
+        self.CLa                 = 4.743           # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         self.Drag_increase       = 1.0           # This is used for the calculations of the strut drag if applicable [-]
 
         # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
         # but this means that CL_max_clean, CL_max_TO and CL_max_land must always be stored in an array. For an array with length 1
         # the code just runs once
-        self.CL_max_clean        = np.array([1.5])              # Maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.CL_max_clean        = np.array([1.5615])              # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.CL_max_TO           = np.array([1.5])              # Maximum lift coefficient at take-off [-]
-        self.CL_max_land         = np.array([1.9])              # Maximum lift coefficient at landing [-]
-        self.CL_TO               = self.CL_max_TO / (1.1**2)    # [-]
-        self.CL_LDG              = self.CL_max_land / (1.1**2)  # [-]
+        self.CL_max_land         = np.array([2.0])              # Maximum lift coefficient at landing [-]
+        self.CL_TO               = np.array([1.5 / (1.1**2)])    # [-]
+        self.CL_LDG              = np.array([2.0 / (1.1**2)])  # [-]
 
         "-Weights"
-        self.W_e                 = 62.6         # Definitive weight per engine [kg]
+        self.W_e                 = 63.6         # Definitive weight per engine [kg]
         self.W_TO                = 750          # Take-off weight [kg]
-        self.W_PL                = 240          # Payload weight [kg]
+        self.W_PL                = 276          # Payload weight [kg]
         self.WS                  = 600       # Wing Loading [N/m^2]
         self.W_F                 = 60
 
@@ -69,7 +69,7 @@ class UAV:
         self.engine_length       = 0.6651       # Engine length [m] - EASA type certificate data sheet ROTAX 912 series
         self.engine_cg           = 0.327        # Engine cg [m] - for ROTAX 912is engine
         self.engine_fairing      = 0.2          # Engine fairing length [m]
-        self.d_engine_boxes      = 0.4          # Distance between engine boxes [m], leaves room for possible firewall
+        self.d_engine_boxes      = 0.45          # Distance between engine boxes [m], leaves room for possible firewall
         self.power               = 80           # Power at take-off [hp]
 
         self.prop_eff            = 0.82         # Propulsive efficiency [-]

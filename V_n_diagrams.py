@@ -25,7 +25,7 @@ def stall_req(obj):
     step = 0.5
     V_D = VD_lim_low(obj)
     V = np.arange(0, V_D*1.1 + step, step)
-    n_pos = 0.5 * 1.225 * V**2 * obj.CL_max_land / obj.WS               #DENSITY?  #WHICH CL_max?
+    n_pos = 0.5 * 1.225 * V**2 * obj.CL_max_clean / obj.WS               #DENSITY?  #WHICH CL_max?
     n_neg = n_pos * -1
 
     return V, n_pos, n_neg
@@ -220,6 +220,13 @@ def max_n(obj):
 
     return max(n_peak)
 
+def min_n(obj):
+
+    V, n_peak = gust_points(obj)
+    n_peak = np.append(n_peak, CS23_min(obj))
+
+    return min(n_peak)
+
 def plot_gust(obj):
 
     V, n_peak = gust_points(obj)
@@ -280,17 +287,17 @@ def plot_all(obj):
     plt.title(f"V-n diagram for {obj.name}")
 #     plt.show()
 
-concept = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=True)
-plot_all(concept)
-print(VC_lim_low(concept))
+#concept = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=True)
+#plot_all(concept)
+#print(VC_lim_low(concept))
 # concept = UAV('DET_CON_1', 'tractor', boom=False, braced_wing=False)
 # plot_all(concept)
     #plt.show()
 
 
-DET_CON_2_braced = UAV('DET_CON_2_braced', 'tractor', boom=True, braced_wing=True)
+#DET_CON_2_braced = UAV('DET_CON_2_braced', 'tractor', boom=True, braced_wing=True)
 
-plot_all(DET_CON_2_braced)
-plt.show()
+#plot_all(DET_CON_2_braced)
+#plt.show()
 
 

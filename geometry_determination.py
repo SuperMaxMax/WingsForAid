@@ -140,15 +140,15 @@ def geometry_determination(obj, plot=False, high_WS = False):
     #longitudinal
     obj.n_rows              = obj.n_boxes/obj.n_boxes_abreast   # number of rows of boxes
     cumulative_box_length   = obj.n_rows * 0.4                  # box 40x40x60, cumulative length in meter
-    length_between_boxes    = (obj.n_rows-1)*0.2                # 20 cm in between boxes
-    obj.l_n                 = obj.engine_length + obj.engine_fairing
+    length_between_boxes    = 0.5 #(obj.n_rows-1)*0.2                # 20 cm in between boxes
+    obj.l_n                 = 0.9342 # obj.engine_length + obj.engine_fairing
     
     #cross sectional
     cumulative_box_width    = obj.n_boxes_abreast * 0.4
     width_between_boxes     = (obj.n_boxes_abreast-1) * 0.2
     box_height              = 0.6
-    obj.w_out               = cumulative_box_width + width_between_boxes + obj.side_clearance + obj.structural_thickness
-    obj.h_out               = box_height + obj.bot_clearance + obj.top_clearance + obj.structural_thickness
+    obj.w_out               = 1.1 # cumulative_box_width + width_between_boxes + obj.side_clearance + obj.structural_thickness
+    obj.h_out               = 0.737 # box_height + obj.bot_clearance + obj.top_clearance + obj.structural_thickness
     obj.w_in                = obj.w_out - obj.structural_thickness
     obj.h_in                = obj.h_out - obj.structural_thickness
     obj.d_eff               = np.sqrt(obj.w_out*obj.h_out)                # from cross sectional drawing with width 1.40 m and height 1.10 m
@@ -158,7 +158,7 @@ def geometry_determination(obj, plot=False, high_WS = False):
         obj.l_tc = 1.75*obj.d_eff                               # Based on drawing of the aircraft.
     
     # Fuselage dimensions
-    obj.l_f   = cumulative_box_length + length_between_boxes + obj.l_n + obj.l_tc + obj.d_engine_boxes
+    obj.l_f   = cumulative_box_length + length_between_boxes + obj.l_n + obj.l_tc 
     
     #shape the nose
     nose_shape = fuselage_shape(obj.l_n, obj.w_out, 2, 1.5, 1000)
@@ -182,8 +182,8 @@ def geometry_determination(obj, plot=False, high_WS = False):
     Weight_TO = obj.W_TO*obj.g0                                 # find the take off weight in newtons
     WS_values = design_points[0:12:2]                           # take the S/W values
     WP_values = design_points[1:13:2]                           # take the P/W values
-    obj.WS    = 788.51   #WS_values[0]                                    # it does [0] to prevent warnings -> if running multiple CLs, it will take the first one !!!
-    obj.WP    = 0.148859 #WP_values[0]                                    # it does [0] to prevent warnings -> if running multiple Cls, it will take the first one !!!
+    obj.WS    = WS_values[0]                                    # it does [0] to prevent warnings -> if running multiple CLs, it will take the first one !!!
+    obj.WP    = WP_values[0]                                    # it does [0] to prevent warnings -> if running multiple Cls, it will take the first one !!!
     if high_WS:
         obj.WS = 788.51
         obj.WP = 0.148859
