@@ -20,11 +20,12 @@ def cg_calc(obj, plot):
     x_list = []
     y_list = []
     z_list = []
-    ixx_list = [0,0,0,0,0,0,0,0,0,0,0,0]
-    iyy_list = [0,0,0,0,0,0,0,0,0,0,0,0]
-    izz_list = [0,0,0,0,0,0,0,0,0,0,0,0]
+    ixx_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+    iyy_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+    izz_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
     
     # Calculate MTOW
+    obj.W_OE = obj.W_eq + obj.W_n + obj.W_pg + obj.W_sc + obj.W_t + obj.W_strut + obj.ST_W_fus + obj.ST_W_boom + obj.ST_W_uc + obj.W_w
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement
@@ -194,6 +195,6 @@ def cg_calc(obj, plot):
 
     return max(Xs), min(Xs), obj.X_cg_range
 
-from parameters import UAV
-aircraft = UAV('aircraft')
-print(cg_calc(aircraft, False))
+# from parameters import UAV
+# aircraft = UAV('aircraft')
+# print(cg_calc(aircraft, False))

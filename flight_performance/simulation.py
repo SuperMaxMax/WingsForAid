@@ -224,7 +224,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             CL_to = max(CL_all)
             print(CL_to, CL_max)
             obj.FP_CL_max_TO = CL_max
-            obj.FP_CL_to = CL_to
+            obj.FP_CL_TO = CL_to
 
         if Plot:
             if i == 0:
