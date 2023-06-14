@@ -30,7 +30,6 @@ def LiftRateCoefficient(aircraft, Mach, A, lambda_co2):  # lift rate coefficient
     Equation from SEAD Lecture 7, slide 41"""
     aircraft.CS_beta = np.sqrt(1 - Mach ** 2)
     CLa = 2 * np.pi * A / (2 + np.sqrt(4 + ((A * aircraft.CS_beta / aircraft.CS_eta)** 2) * (1 + np.tan(lambda_co2) ** 2  / aircraft.CS_beta ** 2)))
-    aircraft.CLa = CLa
     return CLa
 
 def TaillessLiftRateCoefficient(aircraft, CLa): 
@@ -46,7 +45,7 @@ def nacelle_influence(aircraft, CLa_Ah):
     Equation from SEAD Lecture 7, slide 38"""
     #dx_ac_n = (-4) * (aircraft.w_out ** 2 * (aircraft.X_LEMAC + 0.25 * aircraft.MAC_length)) / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)   
     l_p = aircraft.X_LEMAC + 0.25 * aircraft.MAC_length
-    dx_ac_n = -0.05 * aircraft.CS_n_blades * aircraft.CS_D_prop**2 * l_p / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)
+    dx_ac_n = -0.05 * aircraft.CS_n_blades * (aircraft.prop_radius * 2)**2 * l_p / (aircraft.Sw * aircraft.MAC_length * CLa_Ah)
     return dx_ac_n
 
 
@@ -80,7 +79,7 @@ def Aerodynamic_centre_determination(aircraft):
 
 def C_m_alpha_calculation(aircraft, x_cg):
     aircraft.C_N_h_alpha = 2 * np.pi * aircraft.AE_A_h/(aircraft.AE_A_h + 2)
-    aircraft.C_m_alpha = aircraft.CLa_w_cruise * (x_cg - aircraft.CS_x_ac_w) - aircraft.C_N_h_alpha * (1 - aircraft.AE_dEpsilondA) * (aircraft.AE_Vh_V)**2 * aircraft.Sh_s * aircraft.AE_l_h/aircraft.MAC_length
+    aircraft.C_m_alpha = aircraft.CLa_w_cruise * (x_cg - aircraft.CS_x_ac_w) - aircraft.C_N_h_alpha * (1 - aircraft.AE_dEpsilondA) * (aircraft.AE_Vh_V)**2 * aircraft.Sh_s * aircraft.l_h/aircraft.MAC_length
 
 #################################################################################################################
 "FIXME: Determine Control Surface Coefficients"
@@ -93,13 +92,13 @@ def Flaplength(aircraft, taperratio, rootchord, span, HLDroot, flappedsurface):
     taperratio: taper ratio of the wing [m]
     rootchord: chord length of the wing root [m]
     span: total span of the wing [m]
-    HLDroot: starting point in span direction of the HLD [m]
+    HLDroot: starting point in span direction of the HLD measured from rootchord[m]
     flappedsurface: total area of wing that is flapped by HLDs [m^2]"""
 
     def Chordlength(y):
         return aircraft.rootchord * (1 - ((1-aircraft.taper) / (aircraft.b / 2)) * y)
     
-    AvailableArea = aircraft.Sw - 2 * quad(Chordlength, 0, HLDroot)[0]
+    AvailableArea = aircraft.Sw - 2 * quad(Chordlength, 0, HLDroot)[0]  # accounting for overlap of fuselage
     
     if flappedsurface > (AvailableArea):
         print(f"\nUnfeasible flap size, flapped area: {flappedsurface} > wing area not occupied by fuselage: {round(AvailableArea,5)}")
@@ -116,19 +115,30 @@ def Flaplength(aircraft, taperratio, rootchord, span, HLDroot, flappedsurface):
         return y1
 
 def flaps(aircraft):
-    flaptype = 'fowler'              # Can be 'singleslotted' or 'fowler'
+    flaptype = 'plain'              # Can be 'plain', 'singleslotted' or 'fowler'
     CS_Swf = 0.7 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) NOTE: Used to calculate resulting dCLmax
-    CS_lambda_hinge = 0.02                  # hinge line sweep angle, likely parallel to aft spar [rad] TODO: update value
+    CS_lambda_hinge = 0.05468               # hinge line sweep angle, likely parallel to aft spar [rad] NOTE: For aft spar @ 0.8 chord
 
     # Using data from Torenbeek aroung page 533
+    if flaptype == 'plain':  # FIXME values independent of flap chord, check if logical
+        CS_deltaf_TO                   = 20  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S14)
+        CS_deltaf_LD                   = 60  # flap deflection angle at landing [deg]
+        CS_fc_c                        = aircraft.xc_aft_spar  # flap chord length / wing chord length [-] (ADSEE-II, L3 S32) NOTE: This influences aft spar position
+        CS_cprime_c_TO = 1  # wing chord length with take-off extended flaps / chord [-]
+        CS_cprime_c_LD = 1  # wing chord length with landing extended flaps / chord [-]
+        CS_dClmax_TO = 0.9 * 0.7  # Additional airfoil lift at take-off due to plain flap (ADSEE-II, L3 S36)
+        CS_dClmax_LD = 0.9  # Additional airfoil lift at landing due to plain flap
+        print("\nPlain flap")
+        print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
+
     if flaptype == 'singleslotted':
         CS_deltaf_TO                   = 20  # flap deflection angle at take-off [deg] (ADSEE-II, L3 S14)
         CS_deltaf_LD                   = 40  # flap deflection angle at landing [deg]
-        CS_fc_c                        = 0.25  # flap chord length / wing chord length [-] (ADSEE-II, L3 S32) NOTE: This influences aft spar position
+        CS_fc_c                        = aircraft.xc_aft_spar  # flap chord length / wing chord length [-] (ADSEE-II, L3 S32) NOTE: This influences aft spar position
         CS_dc_cf_TO                    = 0.2  # increase in chord length / flap chord length [-] (ADSEE-II, L3 S37)
         CS_dc_cf_LD                    = 0.3  # increase in chord length / flap chord length [-]
-        CS_cprime_c_TO = 1 + CS_dc_cf_TO * CS_fc_c # wing chord length with take-off extended flaps / chord [-] (Using notes of ADSEE-II, L3 S37)
-        CS_cprime_c_LD = 1 + CS_dc_cf_LD * CS_fc_c # wing chord length with landing extended flaps / chord [-]
+        CS_cprime_c_TO = 1  # wing chord length with take-off extended flaps / chord [-]
+        CS_cprime_c_LD = 1  # wing chord length with landing extended flaps / chord [-]
         CS_dClmax_TO = 1.3 * 0.7  # Additional airfoil lift at take-off due to single slotted flap (ADSEE-II, L3 S36)
         CS_dClmax_LD = 1.3  # Additional airfoil lift at landing due to single slotted flap
         print("\nSingle slotted flap")
@@ -147,7 +157,7 @@ def flaps(aircraft):
         print('\nFowler flap')
         print(f"dClmax_TO: {CS_dClmax_TO}, dClmax_LD: {CS_dClmax_LD}")
 
-    #print(f"\nCLmax current wing in clean configuration: {aircraft.AE_CL_max_clean}")
+    print(f"\nCLmax current wing in clean configuration: {aircraft.CL_max_clean}")
 
     calcCL = False # calculate dCLmax for a given Swf, or vice versa
 
@@ -157,19 +167,23 @@ def flaps(aircraft):
         print(f"CS_dCLmax_TO: {CS_dCLmax_TO}, CS_dCLmax_LD: {CS_dCLmax_LD}")
 
     else:
-        CS_dCLmax_TO = float(input("\ndCLmax_TO required: "))
-        CS_dCLmax_LD = float(input("dCLmax_LD required: "))
+        CS_dCLmax_TO = 0
+        CS_dCLmax_LD = 0
+
+        if (aircraft.FP_CL_max_to - aircraft.CL_max_clean) > 0: CS_dCLmax_TO = (aircraft.FP_CL_max_to - aircraft.CL_max_clean)
+        if (aircraft.FP_CL_max_land - aircraft.CL_max_clean) > 0: CS_dCLmax_LD = (aircraft.FP_CL_max_land - aircraft.CL_max_clean)
+
         CS_Swf_TO = CS_dCLmax_TO / (0.9 * CS_dClmax_TO * np.cos(CS_lambda_hinge)) * aircraft.Sw
         CS_Swf_LD = CS_dCLmax_LD / (0.9 * CS_dClmax_LD * np.cos(CS_lambda_hinge)) * aircraft.Sw
         
         CS_Swf = max(CS_Swf_TO, CS_Swf_LD) # most constraining case becomes required flapped area
         
-        print(f"\nNew CLmax during take-off: {aircraft.AE_CL_max_clean + CS_dCLmax_TO}\nNew CLmax during landing: {aircraft.AE_CL_max_clean + CS_dCLmax_LD}")
+        print(f"\nNew CLmax during take-off: {aircraft.CL_max_clean + CS_dCLmax_TO}\nNew CLmax during landing: {aircraft.CL_max_clean + CS_dCLmax_LD}")
         print(f"\nSwf_TO: {round(CS_Swf_TO / aircraft.Sw * 100, 3)}% Sw") 
         print(f"Swf_LD: {round(CS_Swf_LD / aircraft.Sw * 100, 3)}% Sw")
 
-    #CS_yend_f = Flaplength(aircraft, aircraft.taper, aircraft.rootchord, aircraft.b, aircraft.w_out / 2, CS_Swf)
-    return CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD
+    CS_yend_f = Flaplength(aircraft, aircraft.taper, aircraft.rootchord, aircraft.b, 0, CS_Swf)
+    return CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD, CS_yend_f
 
        
 
@@ -184,8 +198,9 @@ def controlability_curve(aircraft, xcgRange):
     For CL_Ah: L = W @ approach
     For Cm_ac: SEAD L8 S19"""
     
-    CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD = flaps(aircraft)
-
+    CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD, CS_yend_f = flaps(aircraft)
+    aircraft.yend_flap = CS_yend_f
+    
     CL_h = -1  # Full moving tail
     CL_Ah = aircraft.W_TO * aircraft.g0 / (0.5 * aircraft.rho0 * (1.3 * aircraft.V_s_min)**2 * aircraft.Sw)
 
@@ -202,9 +217,9 @@ def controlability_curve(aircraft, xcgRange):
 
     Cm_ac = Cm_ac_w + dCm_ac_f + dCm_ac_fus
 
-    ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.AE_l_h / aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
-    print(f'Cm_ac:{Cm_ac}')
-    print(f"CL_Ah:{CL_Ah}")
+    ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.l_h / aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
+    # print(f'Cm_ac:{Cm_ac}')
+    # print(f"CL_Ah:{CL_Ah}")
     ControlSh_S = ControlFrac * (xcgRange + Cm_ac / CL_Ah - aircraft.x_ac_approach)
 
     return ControlSh_S
@@ -214,7 +229,7 @@ def stability_curve(aircraft, xcgRange):
     
     # Making stability line
 
-    StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.AE_dEpsilondA) * (aircraft.AE_l_h/aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
+    StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.AE_dEpsilondA) * (aircraft.l_h/aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
     StabilityMargin             = 0.05
     StabilitySh_S_margin        = StabilityFrac * xcgRange - StabilityFrac * (aircraft.x_ac_cruise - StabilityMargin)
     StabilitySh_S               = StabilityFrac * xcgRange - StabilityFrac * aircraft.x_ac_cruise

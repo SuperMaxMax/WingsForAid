@@ -15,7 +15,7 @@ def iw(airfoil):
     file_path_clcd = "aerodynamics/" + file_name_clcd + ".csv"
     
     cd_list = [] 
-    cl_list = []
+    cl_list = [] 
 
     with open(file_path_clcd) as f:
         reader = csv.reader(f, delimiter=',', quotechar='"')
@@ -23,7 +23,7 @@ def iw(airfoil):
         for row in reader:
             if row:    
                 #skip first line with explanation of columns
-                if linecount == 0:
+                if linecount == 0: 
                     linecount += 1
                 else:
                     cd_list.append(float(row[0]))
@@ -71,7 +71,6 @@ def iw(airfoil):
     
     return Iw, cl_alpha, alpha_zero_lift
 
-#iw(airfoil)
 
 def main_wing_planform(aircraft):
     def plot_lift_distr(i_w, full_print = False):
@@ -237,6 +236,16 @@ def main_wing_planform(aircraft):
         #plt.legend()
         #plt.show()
         
+        #Calculate CL_max from Predicting Maximum Lift Coefficient for Twisted Wings Using Lifting-Line Theory
+        CL_clmax = (0.952 - 0.45 * ((Lambda-0.5)**2)) * ((AR/12)**0.03)
+        C_lmax = aircraft.af_cl_max
+        Omega = alpha_twist
+        K_Lsweep = 1 #unswept wing
+        K_LS = 1 + (0.0042*AR - 0.068) * (1+2.3*(CL_a_w*Omega)/C_lmax)
+        K_LOmega = 0.125
+
+        CL_max_clean = CL_clmax * K_LS * K_Lsweep * C_lmax * (1 - (K_LOmega*CL_a_w*Omega)/(C_lmax))
+
         if not full_print:
             return abs(C_L_wing-C_L_req)
         elif full_print:
@@ -271,9 +280,7 @@ def main_wing_planform(aircraft):
                
     return 
 
-aircraft =  UAV('aircraft')
-main_wing_planform(aircraft)
-#print(aircraft.A)
+
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 

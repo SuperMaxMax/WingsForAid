@@ -1,16 +1,16 @@
 import sys
 sys.path.append("..")
 
-#########################################################
-# LOADING DIAGRAM WING
-#########################################################
+# Start your import below this
 from parameters import UAV
 import numpy as np
+import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import pandas as pd
 from scipy.integrate import quad, cumulative_trapezoid, trapezoid
 from scipy.optimize import minimize
 from math import tan, atan, cos
-import matplotlib.pyplot as plt
+from material_dictionary import material, material_df, rank_material
 
 def plot_diagrams(Ay, Az, By, Bz, load_case, normal, shear, moment, torque):
     # Make diagram
@@ -123,8 +123,8 @@ def spanwise_wing_loading_ty(y):
 
 def spanwise_flap_weight():
     # this function returns an array of spanwise flap weight
-    spanwise_weight = (ac.W_sc/2)*0.6/((ac.yend_flap/(ac.b/2)-ac.ystart_flap/(ac.b/2))*(ac.b/2))*ac.g0 # N/m
-    return spanwise_weight*(np.heaviside(y_span-ac.ystart_flap/(ac.b/2)*ac.b/2, 1)-np.heaviside(y_span-ac.yend_flap/(ac.b/2)*ac.b/2,1))
+    spanwise_weight = (ac.W_sc/2)*0.6/((ac.flap_e-ac.flap_s)*(ac.b/2))*ac.g0 # N/m
+    return spanwise_weight*(np.heaviside(y_span-ac.flap_s*ac.b/2, 1)-np.heaviside(y_span-ac.flap_e*ac.b/2,1))
 
 def spanwise_flap_weight_ty():
     # N/m 
@@ -132,8 +132,8 @@ def spanwise_flap_weight_ty():
 
 def spanwise_aileron_weight():
     # this function returns an array of spanwise flap weight
-    spanwise_weight = (ac.W_sc/2)*0.4/((ac.yend_ail/(ac.b/2)-ac.ystart_ail/(ac.b/2))*(ac.b/2))*ac.g0 # N/m
-    return spanwise_weight*(np.heaviside(y_span-ac.ystart_ail/(ac.b/2)*ac.b/2, 1)-np.heaviside(y_span-ac.yend_ail/(ac.b/2)*ac.b/2,1))
+    spanwise_weight = (ac.W_sc/2)*0.4/((ac.ail_e-ac.ail_s)*(ac.b/2))*ac.g0 # N/m
+    return spanwise_weight*(np.heaviside(y_span-ac.ail_s*ac.b/2, 1)-np.heaviside(y_span-ac.ail_e*ac.b/2,1))
 
 def spanwise_aileron_weight_ty():
     # N/m
@@ -157,11 +157,27 @@ def spanwise_func_2(y):
 ac = UAV('aircraft')
 plot = True
 
-ac.ST_angle_strut = np.arctan(ac.ST_h_fus/(ac.ST_y_strut-ac.ST_w_fus/2))    # [rad]
-ac.W_wl = 0                                                                 # [kg] for 1 winglet
+# aircraft parameters -> to be connected with parameters.py later
+# ac.wing_strut_location = 0.437277492*ac.b/2                         # [m] | based on statistical data, value is now based on half span running from middle fuselage
+# self.ST_angle_strut = np.arctan(self.ST_h_fus/(self.ST_y_strut-self.ST_w_fus/2))
+# ac.l_strut = ac.ST_y_strut/np.cos(ac.strut_angle)          # [m]
+ac.ST_angle_strut = np.arctan(ac.ST_h_fus/(ac.ST_y_strut-ac.ST_w_fus/2))      # [rad]
+ac.W_wl = 0                                                       # [kg] for 1 winglet
+ac.flap_s = 0.2                                                     # fraction of b/2
+ac.flap_e = 0.6                                                     # fraction of b/2
+ac.ail_s = 0.6                                                      # fraction of b/2
+ac.ail_e = 0.8                                                      # fraction of b/2
 
 # Make an array for the span
 y_span = np.linspace(0, ac.b/2, 1000)
+
+# Material choice for strut weight, add column for material index: sqrt(E)/rho -> the higher the value the better -> False
+material_df['sqrt(E)/rho'] = np.sqrt(material_df['E'])/material_df['density']
+material_df['simga_yield/rho'] = material_df['yield stress']/material_df['density']
+# density, raw cost, eco cost, co2, yield stress, E, Kc, sqrt(E)/rho, sigma_yield/rho
+prop_weights_strut = [0, 0.4, 0.1, 0.05, 0, 0, 0.05, 0.4, 0]
+possible_materials = rank_material(prop_weights_strut, [False, False])[:5]
+ms = pd.DataFrame(index=possible_materials, columns=['Case 1', 'Case 2'])
 
 for k in range(3):
     if k == 0:
@@ -186,16 +202,16 @@ for k in range(3):
     torque = []
     
     # flexural axis assumption # -> replace 0.25 with front spar location variable, also add in location based on wingbox design -> for iteration
-    flex_ax = ac.x_strut
+    flex_ax = 0.25+0.45*(0.75-0.25) # chord from leading edge
 
     # define moment arms
     cop = 0.25                      # chord from leading edge
     ma_wing_loading = (flex_ax-cop)*chord(y_span) # moment arm wing loading
     torque_wing_loading = ma_wing_loading*spanwise_wing_loading(y_span) # torque wing loading
-    pos_flap = ac.xc_aft_spar+0.4*(1-ac.xc_aft_spar) # make variable in future !!!
+    pos_flap = 0.75+0.45*(1-0.75) # make variable in future !!!
     ma_flap = (flex_ax-pos_flap)*chord(y_span)
     torque_flap = ma_flap*-spanwise_flap_weight()
-    pos_ail = ac.xc_aft_spar+0.4*(1-ac.xc_aft_spar) # make variable in future !!!
+    pos_ail = 0.75+0.45*(1-0.75) # make variable in future !!!
     ma_ail = (flex_ax-pos_ail)*chord(y_span)
     torque_ail = ma_ail*-spanwise_aileron_weight()
 
@@ -214,9 +230,35 @@ for k in range(3):
     if plot:
         plot_diagrams(Ay, Az, By, Bz, load_case, normal, shear, moment, torque)
 
+    # Calculate truss weight
+    P_truss = np.sqrt(By**2+Bz**2)
+    P_truss *= ac.ST_SF
+
+    for mat in possible_materials:
+        sigma_yield = material[mat]['yield stress']*10**6   # [Pa]
+        mat_density = material[mat]['density']              # [kg/m^3]
+        E = material[mat]['E']*10**9                        # [Pa]
+
+        a = 0.0125       # semi_minor of ellipse [m]
+        b = 2*a          # semi_major of ellipse [m]
+
+        if load_case == 1:
+            A_min = P_truss / sigma_yield
+            m = A_min*mat_density*ac.ST_l_strut
+            ms.loc[mat, 'Case 1'] = m
+        else:
+            I_min = P_truss * ac.ST_l_strut**2 / (np.pi**2 * E)
+            t = 4*I_min/(np.pi*a**3 * (1+(3*b/a)))  # thickness of strut sheet [m]
+            A = np.pi*(a+b)*t
+            I_check = np.pi*a**3*t*(1+(3*b/a))/4
+            m = A*mat_density*ac.ST_l_strut
+            ms.loc[mat, 'Case 2'] = m
+
     if k == 0:
         loading_tension = [normal, shear, moment, torque]
     elif k == 1:
         loading_compression = [normal, shear, moment, torque]
     else:
         loading_custom = [normal, shear, moment, torque]
+
+# print(ms)

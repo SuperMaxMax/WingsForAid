@@ -109,37 +109,38 @@ def cg_calc(obj):
         labels = [r'$W_{OE}$'] + labels + [r'$W_{TO}$']
         
     # plt.rcParams.update({'font.size': 14})
-    plt.figure(figsize=(14,7))
+    # plt.figure(figsize=(14,7))
 
-    for x, w, label, i in zip(Xs, w_fracs, labels, range(len(Xs))):
-        plt.scatter(x, w)
-        if i == 0 or i == len(Xs):
-            rotation_t = 0
-        else:
-            rotation_t = 90
-        plt.annotate(label, (x, w), textcoords="offset points", xytext=(5,0))#, ha='center')#, rotation=rotation_t)
+    # for x, w, label, i in zip(Xs, w_fracs, labels, range(len(Xs))):
+    #     # plt.scatter(x, w)
+    #     if i == 0 or i == len(Xs):
+    #         rotation_t = 0
+    #     else:
+    #         rotation_t = 90
+        # plt.annotate(label, (x, w), textcoords="offset points", xytext=(5,0))#, ha='center')#, rotation=rotation_t)
             
     LimBoxConfigFwd = '022000'
     LimBoxConfigAft = '000222'
 
     # Save most forward and most aft and fully loaded c.g. in object
     obj.X_cg_full = Xs[-1]
-    obj.X_cg_range = max(Xs) - 0.22
+    
     obj.X_cg_fwd = Xs[labels.index(LimBoxConfigFwd)] - obj.X_cg_range * 0.05
     obj.X_cg_aft = Xs[labels.index(LimBoxConfigAft)] + obj.X_cg_range * 0.05
+    obj.X_cg_range = obj.X_cg_aft - obj.X_cg_fwd
 
-    obj.AE_l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
+    obj.l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
 
     # Plot lines for forward and aft cg positions
 
-    plt.axvline(x=obj.X_cg_fwd, linestyle='--', color='blue', label='most forward c.g. considered')
-    plt.axvline(x=obj.X_cg_aft, linestyle='--', color='red', label='most aft c.g. considered')
-    plt.xlim((0, 1))
-    plt.xlabel('X_cg/MAC [-]', fontsize=12)
-    plt.ylabel('Mass fraction [-]', fontsize=12)
-    plt.grid()
-    plt.legend()
-    plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
+    # plt.axvline(x=obj.X_cg_fwd, linestyle='--', color='blue', label='most forward c.g. considered')
+    # plt.axvline(x=obj.X_cg_aft, linestyle='--', color='red', label='most aft c.g. considered')
+    # plt.xlim((0, 1))
+    # plt.xlabel('X_cg/MAC [-]', fontsize=12)
+    # plt.ylabel('Mass fraction [-]', fontsize=12)
+    # plt.grid()
+    # plt.legend()
+    # plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
     # plt.show()
 
     return obj.X_cg_aft, obj.X_cg_fwd, obj.X_cg_range
@@ -162,13 +163,21 @@ def iteration(aircraft):
         X_range_array.append(X_range)
         X_cg_range_lim_array.append(X_cg_range_lim)
 
+    print(X_min_array)
+    return X_max_array, X_min_array, wing_pos_array
+
     print(f"Wing LEMAC:{wing_pos_array[X_cg_range_lim_array.index(min(X_cg_range_lim_array))]}")
     
     fig2 = plt.figure()
 
     plt.plot(X_min_array, wing_pos_array)
     plt.plot(X_max_array, wing_pos_array)
+
+    plt.xlabel(r"$\dfrac{x_{cg}}{\bar{c}}$", fontsize = 12, loc='right')
+    plt.ylabel(r"$\dfrac{X_{LEMAC}}{l_{fus}}$",rotation = 0, fontsize = 12, loc='top')
+
     plt.text(0.9, 0.3, aircraft.X_LEMAC, fontsize=8, va='center')
     plt.show()
     
 iteration(aircraft)
+

@@ -10,6 +10,7 @@ from scipy import integrate, optimize
 
 from parameters import UAV
 
+aircraft = UAV("aircraft")
 
 def required_lift(aircraft):
     #load in parameters from current design
@@ -106,7 +107,7 @@ def horizontal_tail_planform(aircraft):
         variable = "Lambda"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
-            variable_list2 = [0.7]
+            variable_list2 = [1]
         elif variable == "AR":  
             variable_list2 = [5.1666666]
         elif variable == "Twist":
@@ -131,7 +132,7 @@ def horizontal_tail_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 2.6
+                AR = 4
             if variable == "Lambda":
                 Lambda = parameter
             else:
@@ -244,7 +245,7 @@ def horizontal_tail_planform(aircraft):
     epsilon_0 = 2 * C_L_W_c / (np.pi * AR_w)
     epsilon_alpha = 2 * C_L_a_w / (np.pi * AR_w)
     epsilon = epsilon_0 + epsilon_alpha * i_w
-    i_h = a_h_optimal - a_f + epsilon
+    i_h = (a_h_optimal - a_f + epsilon) * np.pi/180
     
     # Horizontal tailplane
     aircraft.S_h = S
@@ -270,5 +271,4 @@ def horizontal_tail_planform(aircraft):
     #print(S)
     return 
 
-aircraft = UAV("aircraft")
 horizontal_tail_planform(aircraft)
