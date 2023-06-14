@@ -26,7 +26,7 @@ class UAV:
         self.main_gear_type      = "fixed"       # Type of main gear: "fixed" or "retractable"
         self.nose_gear_type      = "fixed"       # Type of nose gear: "fixed" or "retractable"
 
-        self.mass_penalty_struts = 12             # The weight of the struts [kg]
+        self.mass_penalty_struts = 16.794             # The weight of the struts [kg]
 
         "- Fuselage geometry"
         self.side_clearance      = 0.2           # Side clearance [m], this is for both sides
