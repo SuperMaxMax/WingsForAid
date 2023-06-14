@@ -376,9 +376,9 @@ class UAV:
         self.ST_strut_2a = 0.08 #strut semi major*2 [m]
         self.ST_strut_2b = 0.04 #strut semi minor*2 [m]
         self.ST_strut_t = 0.0021 #m strut thickness [m]
-       # self.ST_l_LG = 0.4 #m strut length (single)
-        #self.ST_d_LG = 0.04 #strut diameter (outer) [m]
-       # self.ST_d_boom = 0.05 #strut diameter (outer) [m]
+        self.ST_l_LG = 2.5637 #m strut length (single)
+        self.ST_d_LG = 0.04 #strut diameter (outer) [m]
+        self.ST_d_boom = 0.05 #strut diameter (outer) [m]
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
 
         self.ST_W_fus_truss = 40.224 #kg mass of fuselage structure (only)
