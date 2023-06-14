@@ -166,17 +166,17 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
 # # Thrust and lift are taken as average values
 
 
-def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, w_fuel, Plot=True):
+def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, W_f, Plot=True):
 
     figure, axis = plt.subplots(2, 2)
     CL_all = []
     for i in range(0, 4):
         if i == 0:
             dic_constants = {'runway slope': np.arange(0, max_runwayslope),
-                             'airport altitude': 0, 'wing surface area': obj.Sw,
-                             'weight': takeoffweight(aircraft, w_fuel) * atm.g,
-                             'wind speed': 0, 'propeller power': aircraft.power * hp_to_watt,
-                             'propeller efficiency': aircraft.eta_p}
+                             'airport altitude': 0, 'wing surface area': obj.AE_Sw,
+                             'weight': takeoffweight(obj, W_f) * atm.g,
+                             'wind speed': 0, 'propeller power': obj.power * hp_to_watt,
+                             'propeller efficiency': obj.prop_eff}
             p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
 
         if i == 1:
@@ -191,7 +191,6 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             dic_constants['airport altitude'] = np.arange(0, max_hairport)
             p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
 
-
         CL_max = 1.5
         CL = CL_max
         S = [600]
@@ -202,7 +201,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
                 dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max) - dic_constants[
                         'wind speed'])
             V_avg_sq = V_LOF ** 2 / 2
-            CD = obj.CD0 + CL ** 2 / (np.pi * obj.A * obj.e)
+            CD = obj.AE_CD0 + CL ** 2 / (np.pi * obj.AE_A * obj.AE_e)
             D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             L = CL * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             T = dic_constants['propeller power'] * dic_constants['propeller efficiency'] / np.sqrt(V_avg_sq)
@@ -210,7 +209,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             a = atmos.g / dic_constants['weight'] * (
                         T - D - D_g - dic_constants['weight'] * np.sin(np.radians(dic_constants['runway slope'])))
             S = V_LOF ** 2 / (2 * a)
-            if CL <= 0.25:
+            if CL <= 0.75:
                 break
 
         S = S_old
@@ -259,7 +258,12 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
 
     return S
 
-# TO_eom(aircraft, airfield, atm, 5, 3000, 12, -15.4, 65)
+
+# TO_eom(aircraft, airfield, atm, 12, 4000, 12, -13.4, 65)
+
+# Result:
+# - If 12 boxes, then the slope limit is 11 degrees and max tailwind of 13 m/s = 25.3 kts
+# - If we have a tailwind of 30knt we can't take more than 10 boxwes
 
 # ------------------------------------------------------------------------
 
@@ -536,6 +540,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             axis[0, 1].set_title('airport altitude vs C_L landing')
             axis[0, 1].set_xlabel('airport altitude [m]')
             axis[0, 1].set_ylabel('C_L landing [-]')
+
     if Plot:
         plt.subplots_adjust(hspace=0.6)
         plt.subplots_adjust(wspace=0.5)
@@ -545,7 +550,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     return CL_max
 
 
-# LA_eom(aircraft, airfield, atm, -10, 3000, 12, -15.4, 70)
+LA_eom(aircraft, airfield, atm, -8, 4000, 14, -15.4, 5)
 
 # ------------------------------------------------------------------------------
 def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
@@ -592,7 +597,7 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
             throttle_setting.append(P_throttle*100)
 
         # update constants
-        dt = 0.01
+        dt = 0.1
         t += dt
         altitude.append(h)
         h += V*np.sin(np.radians(gamma)) * dt
@@ -613,17 +618,20 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
     axis[0, 1].set_xlabel('Altitude [m]')
     axis[0, 1].set_ylabel('Descending Angle [deg]')
 
-    axis[1, 0].plot(throttle_setting, altitude[len(RC):], color='black')
-    axis[1, 0].set_title('Throttle Setting  in Approach vs Altitude')
-    axis[1, 0].set_xlabel('Throttle Setting [%]')
-    axis[1, 0].set_ylabel('Altitude [m]')
-
-    plt.subplots_adjust(hspace=0.6)
     plt.subplots_adjust(wspace=0.5)
+    plt.subplots_adjust(hspace=0.5)
+    plt.show()
+
+    plt.plot(throttle_setting, altitude[len(RC):], color='black')
+    plt.title('Throttle Setting  in Approach vs Altitude')
+    plt.xlabel('Throttle Setting [%]')
+    plt.ylabel('Altitude [m]')
+
     plt.show()
 
 
-# descend(aircraft, atm, 90, (aircraft.W_OE+60)*atm.g, 95, 500, 0.6)
+# descend(aircraft, atm, 90, (aircraft.W_OE+10)*atm.g, 95, 500, 0.6)
+
 
 def cruiseheight(distance, desired_alt):
     if 0.0 <= distance <= 10000.0:
@@ -711,6 +719,7 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
 #     plt.show()
 
 # cruiseperf_varying(aircraft, atm)
+
 
 def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
@@ -838,6 +847,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     else:
         V_cruise = V_cruise
     W_TO = ac_obj.W_OE + W_F + n_boxes * ac_obj.boxweight
+    W_F_0 = W_TO
     W = W_TO
     if Summary:
         print("=====================================================")
@@ -845,7 +855,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     W_a_TO = W_TO * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2
     W = W_a_TO
     W_F_used = W_TO - W_a_TO
-    # print(f"W_F_used after take off: {W_F_used}")
+    print(f"W_F_used after take off: {round(W_F_used, 2)} | fraction: {round(1- W_F_used/W_F_0, 3)}")
     W_F -= W_F_used
     # Now comes climb to projected cruise
     if n_boxes == 0:                            # flight without payload, surveillance ??
@@ -865,6 +875,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         cruise_dist = dtt_remaining - descent_dist
         t_cruise, W_F_used_cruise, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
         t += t_cruise
+        print(f"Cruise time: {round(t_cruise, 2)} [sec]")
         x += cruise_dist
         x_array = np.append(x_array, x)
         h_array = np.append(h_array, h)
@@ -906,14 +917,14 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             x_between_drop += x_climb
             W_F_used += W_F_used_climb
             W_F_used_array = np.append(W_F_used_array, W_F_used)
-            # print(f"W_F_used after climb {i}: {W_F_used_climb} [kg] in {t_climb} [sec]")
+            print(f"W_F_used after climb {i}: {round(W_F_used_climb, 2)} [kg] in {t_climb} [sec] | fraction: {round(1 - W_F_used_climb/W_F_0, 3)}")
             W -= W_F_used_climb
-            # print(f"Start weight cruise: {np.round(W, 2)} [kg]")
+            print(f"Start weight cruise: {np.round(W, 2)} [kg]")
             # Cruise part - first calculate cruise distance
             dtt_remaining = target_dist - x_between_drop
             descent_dist = (cruise_alt-15.0) * LD_max
             cruise_dist = dtt_remaining - descent_dist
-            # print(f"Climb distance: {x_climb} [m] | Cruise distance: {cruise_dist} [m] | Descent distance: {descent_dist} [m]")
+            print(f"Climb distance: {x_climb} [m] | Cruise distance: {cruise_dist} [m] | Descent distance: {descent_dist} [m]")
             t_cruise, W_F_used_cruise, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
             # print(f"cruise time: {t_cruise}")
             t += t_cruise
@@ -924,7 +935,8 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             x_between_drop = cruise_dist
             W_F_used += W_F_used_cruise
             W_F_used_array = np.append(W_F_used_array, W_F_used)
-            # print(f"W_F_used after cruise {i}: {W_F_used_cruise}")
+            print(f"Cruise time: {round(t_cruise, 2)} [sec]")
+            print(f"W_F_used after cruise {i}: {round(W_F_used_cruise, 2)} | fraction: {round(1 - W_F_used_cruise/W_F_0, 3)}")
             W -= W_F_used_cruise
             # Descent part
             t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt, 15.0, W)
@@ -937,7 +949,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             h_array = np.append(h_array, h)
             t_array = np.append(h_array, t)
             W_F_used_array = np.append(W_F_used_array, W_F_used)
-            # print(f"W_F_used after descent {i}: {W_F_used_descent} | time descent {i}: {t_descent}")
+            print(f"W_F_used after descent {i}: {round(W_F_used_descent, 2)} | time descent {i}: {t_descent} | fraction: {round(1- W_F_used_descent/W_F_0, 3)}")
             W -= W_F_used_descent
             # After each descent, a certain amount of boxes are dropped
             W -= boxesperdrop * ac_obj.boxweight
@@ -1045,22 +1057,24 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     h_array = np.append(h_array, h)
     t_array = np.append(h_array, t)
     W_F_used_array = np.append(W_F_used_array, W_F_used)
-    # print(f"W_F_used for climb RTB: {W_F_used_cl_RTB} [kg]")
+    print(f"W_F_used for climb RTB: {round(W_F_used_cl_RTB, 2)} [kg] | fraction: {round(1 - W_F_used_cl_RTB/W_F_0, 2)}")
     W -= W_F_used_cl_RTB
     # Cruise return to base
     dtb_remaining = Range - x_return
     desc_dist_RTB = LD_max * cruise_alt_RTB
     cruise_dist_RTB = dtb_remaining - desc_dist_RTB
+    print(f"Climb distance: {x_cl_RTB} [m] | Cruise distance: {cruise_dist_RTB} [m] | Descent distance: {desc_dist_RTB} [m]")
     t_cr_RTB, W_F_used_cr_RTB, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt_RTB, cruise_dist_RTB, W, V_cruise)
     t += t_cr_RTB
     x += cruise_dist_RTB
     x_plot -= cruise_dist_RTB
+
     W_F_used += W_F_used_cr_RTB
     x_array = np.append(x_array, x_plot)
     h_array = np.append(h_array, h)
     t_array = np.append(h_array, t)
     W_F_used_array = np.append(W_F_used_array, W_F_used)
-    # print(f"W_F_used for cruise RTB: {W_F_used_cr_RTB} [kg]")
+    print(f"W_F_used for cruise RTB: {round(W_F_used_cr_RTB, 2)} [kg] | fraction: {round(1 - W_F_used_cr_RTB/W_F_0, 3)}")
     W -= W_F_used_cr_RTB
     # Descent
     t_des_RTB, x_des_RTB, W_F_used_des_RTB, h = descentmaneuver(ac_obj, atm_obj, cruise_alt_RTB, 15.0, W)
@@ -1072,11 +1086,12 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     h_array = np.append(h_array, h)
     t_array = np.append(h_array, t)
     W_F_used_array = np.append(W_F_used_array, W_F_used)
-    # print(f"W_F_used for descent RTB: {W_F_used_des_RTB} [kg]")
+    print(f"W_F_used for descent RTB: {round(W_F_used_des_RTB, 2)} [kg] | fraction: {round(1 - W_F_used_des_RTB/W_F_0, 3)}")
     W -= W_F_used_des_RTB
     W_beforelanding = W
     # Landing, taxi, shutdown using fuel fractions
     W *= ac_obj.WfinalW10
+    print(f"W_F_used landing, taxi, shutdown: {round(W_beforelanding - W, 2)} | fraction: {round(W/W_beforelanding, 3)}")
     W_F_used += (W_beforelanding - W)
     # Calculate the fuel use per kg payload per km range (that means half the distance flown)
     F_kg_km = np.round(W_F_used/(n_boxes*ac_obj.boxweight*Range/1000), 5)
@@ -1109,4 +1124,4 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     flight_profile.append(W_F_used)         # fuel burnt
     return flight_profile
 
-fuelusesortie(aircraft, atm, 12, 1, 12000, 45, 51.44, Range=250, Summary=True, plot=True, savefig=False)
+fuelusesortie(aircraft, atm, 12, 1, 10000, 45, 56.584, Range=250, Summary=True, plot=True, savefig=False)

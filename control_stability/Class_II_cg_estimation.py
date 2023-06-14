@@ -193,3 +193,7 @@ def cg_calc(obj, plot):
     #print(df_mass)
 
     return max(Xs), min(Xs), obj.X_cg_range
+
+from parameters import UAV
+aircraft = UAV('aircraft')
+print(cg_calc(aircraft, False))

@@ -245,7 +245,7 @@ def horizontal_tail_planform(aircraft):
     epsilon_0 = 2 * C_L_W_c / (np.pi * AR_w)
     epsilon_alpha = 2 * C_L_a_w / (np.pi * AR_w)
     epsilon = epsilon_0 + epsilon_alpha * i_w
-    i_h = a_h_optimal - a_f + epsilon
+    i_h = (a_h_optimal - a_f + epsilon) * np.pi/180
     
     # Horizontal tailplane
     aircraft.S_h = S

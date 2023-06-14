@@ -87,7 +87,7 @@ ANGLE
 
 # x,y,z bias for whole surface
 TRANSLATE
-    """,aircraft.X_LEMAC, ' ' ,      0.00000, ' ' ,      0.00000, """
+    """,aircraft.X_LEMAC, ' ' ,      0.00000, ' ' ,      aircraft.ST_z_ground+aircraft.ST_h_fus+0.075*aircraft.rootchord, """
 
 # Here the section starts
 #---------------Root Section-------------------------------------------
@@ -159,11 +159,11 @@ YDUPLICATE
 
 # twist angle bias for whole surface
 ANGLE
-     """,aircraft.i_w_h*180/np.pi,"""  
+     """,aircraft.i_w_h,"""  
 
 # x,y,z bias for whole surface
 TRANSLATE
-   """,aircraft.X_LEMAC + 0.25 * aircraft.rootchord + aircraft.l_h - 0.25*aircraft.AE_rootchord_h, ' ' ,      0.0, ' ' ,      0.0,"""
+   """,aircraft.X_LEMAC + 0.25 * aircraft.rootchord + aircraft.l_h - 0.25*aircraft.AE_rootchord_h, ' ' ,      0.0, ' ' ,      aircraft.ST_z_ground+aircraft.ST_h_fus+0.06*aircraft.AE_rootchord_h ,"""
 
 #-----------------------Root Section-----------------------------------
 #    Xle         Yle         Zle         chord       angle 
@@ -202,7 +202,7 @@ ANGLE
 
 # x,y,z bias for whole surface
 TRANSLATE
-   """,aircraft.X_LEMAC + 0.25 * aircraft.rootchord + aircraft.l_h - 0.25*aircraft.AE_rootchord_h, ' ' ,      0.00000, ' ' ,      0.00000,"""
+   """,aircraft.X_LEMAC + 0.25 * aircraft.rootchord + aircraft.l_h - 0.25*aircraft.AE_rootchord_h, ' ' ,      0.00000, ' ' ,      aircraft.ST_z_ground+aircraft.ST_h_fus,"""
 #-------------------Lower Section-------------------------------------------
 #    Xle         Yle         Zle         chord       angle   
 SECTION

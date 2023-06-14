@@ -286,11 +286,11 @@ class UAV:
         self.turnrate_half  = 1.5               # deg/s
         self.turnrate_1     = 3.0               # deg/s
         self.turnrate_2     = 6.0               # deg/s
-        # self.accelheight    = 300*0.3048
-        self.FP_CL_max_land = 2.0
-        self.FP_CL_max_TO   = 1.5
-        self.FP_CL_land     = 1.1
-        self.FP_CL_to       = 0.83
+        self.accelheight    = 300*0.3048
+        self.FP_CL_max_land = 2
+        self.FP_CL_max_to = 1.5
+        self.FP_CL_land = 0.84
+        self.FP_CL_to = 0.76
 
 
         "Control and stability parameters"      # NOTE: Add identifier "CS_" before variable names
@@ -434,7 +434,7 @@ class UAV:
 class airport:
     def __init__(self, name):
         self.name       = name
-        self.mu_ground = 0.08
+        self.mu_ground = 0.08                        # 0.08
         self.mu_ground_break  = 0.2                  #buildingspeed.org
         self.rwyslope   = 1.0                   #runway slope in degrees --> CONVERT TO RADIANS
 
