@@ -27,7 +27,7 @@ for concept in [aircraft]:
     while it:
         # class 1
         W_OE = c1.weight_empty_operational(concept)
-        W_F  = c1.profile(concept, 12, 1)
+        W_F  = c1.profile(concept, 12, 3)
         W_PL = n_boxes*concept.boxweight
         concept.W_TO = W_OE + W_F + W_PL
         print(f"Class I estimation {n}: MTOW [kg] = {np.round(concept.W_TO)}")
