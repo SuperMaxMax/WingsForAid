@@ -77,6 +77,7 @@ def profile(obj, n_boxes, n_drops, Range = None, dropregion = None, result = Fal
         Mf_used_TO  = (1 - Mff_untilTO) * W
         W   -= Mf_used_TO
         Mf_used += Mf_used_TO
+        print(f"Mf_used after Take-off: {Mf_used}")
         # == Climb - Cruise - Descent ==                          In between drops. If n_drops = 1 this is just climb cruise and descent once
         interdropdist = Range / n_drops                         # Distance between drops in meters
         if interdropdist <= 10000:
@@ -91,15 +92,21 @@ def profile(obj, n_boxes, n_drops, Range = None, dropregion = None, result = Fal
             interdrop_h_cruise = h_cruise                       # 3048 [m], 10000 [ft]
         for i in range(n_drops):
             W4W3 = obj.W4W3**(interdrop_h_cruise / 2286)        # Typical cruising altitude single engine props 5000 ft - 10000 ft, change climb fraction accordingly
+            print(f"Mf_used after Climb: {(1-W4W3)*W}")
             W5W4 = 1/exp(interdropdist * obj.g0 * obj.c_p / (obj.prop_eff * L_D))
+            print(f"Mf_used after Cruise: {(1-W5W4)*W}")
+            print(f"Mf_used after Descent: {(1-obj.W10W9)*W}")
             Mff_cl_cr_de = W4W3*W5W4*obj.W10W9
             Mf_used_cl_cr_de = (1 - Mff_cl_cr_de) * W
             W = W - Mf_used_cl_cr_de - (n_boxes/n_drops) * obj.boxweight
             Mf_used += Mf_used_cl_cr_de
         # ======= Return to base =======
         climbfrac   = obj.W4W3**(h_cruise / 2286)
+        print(f"Mf_used after Climb there: {(1-W4W3)*W}")
         cruisefrac  = 1/exp(Range * obj.g0 * obj.c_p / (obj.prop_eff * L_D))
+        print(f"Mf_used after Cruise back: {(1-W5W4)*W}")
         Mff_return  = climbfrac * cruisefrac * obj.W10W9 * obj.WfinalW10
+        print(f"Mf_used after Descent: {(1-obj.W10W9)*W}")
         Mf_used_return  = (1-Mff_return) * W
         W -= Mf_used_return
         Mf_used += Mf_used_return

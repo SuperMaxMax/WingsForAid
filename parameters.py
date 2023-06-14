@@ -8,7 +8,7 @@ class UAV:
         self.type                = "utility"    # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility          
 
         "-Aircraft geometry"
-        self.A                   = 8             # Aspect ratio [-]
+        self.A                   = 7.75          # Aspect ratio [-]
         self.e                   = 0.7           # Oswald factor [-]
         self.braced_wing         = braced_wing   # True if wing is braced
         self.kq                  = 0.95          # Volume factor used to calculate wetted area of the wing
@@ -196,7 +196,7 @@ class Cessna_172:
 
         "-Speeds"
         self.V_s_min             = 50*(1.852/3.6)       # Dropping speed [m/s]
-        self.V_cruise            = 122*(1.852/3.6)      # Cruise speed [m/s]
+        self.V_cruise            = 100*(1.852/3.6)      # Cruise speed [m/s]
         self.V_climb             = 76*(1.852/3.6)       # Climb speed [m/s]
         self.V_D                 = 175*0.514444         # Dive speed [m/s]
         self.V_B                 = 127*0.514444         # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
