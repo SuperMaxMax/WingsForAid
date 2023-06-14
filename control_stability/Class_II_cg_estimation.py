@@ -88,7 +88,7 @@ def cg_calc(obj, plot):
     list_mass += [obj.W_fus, obj.W_pg, obj.W_t, obj.W_boom, obj.W_eq, obj.W_n, obj.W_uc]
     x_list += [fus_cg, engine_cg, tail_cg, boom_cg, eq_cg,nacelle_cg, uc_cg]
     y_list += [0, 0, 0, 0, 0, 0, 0]
-    z_list += [obj.ST_z_ground+0.5*obj.ST_h_fus, obj.ST_h_prop_axis, obj.ST_z_ground+obj.ST_h_fus, obj.ST_z_ground+obj.ST_h_fus, obj.ST_h_prop_axis, obj.ST_h_prop_axis, obj.ST_z_ground*0.35] #add jan's parameters later
+    z_list += [obj.ST_z_ground+0.5*obj.ST_h_fus, obj.ST_h_prop_axis, obj.ST_z_ground+obj.ST_h_fus+0.15, obj.ST_z_ground+obj.ST_h_fus, obj.ST_h_prop_axis, obj.ST_h_prop_axis, obj.ST_z_ground*0.35] #add jan's parameters later
     
     # xc_OEW = obj.xc_OEW_p*obj.MAC_length
     #X_LEMAC = X_FCG + obj.MAC_length * ((x_wcg/obj.MAC_length)*(W_wing_gr/W_fus_gr)-(xc_OEW)*(1+W_wing_gr/W_fus_gr))
@@ -193,3 +193,7 @@ def cg_calc(obj, plot):
     #print(df_mass)
 
     return max(Xs), min(Xs), obj.X_cg_range
+
+from parameters import UAV
+aircraft = UAV('aircraft')
+print(cg_calc(aircraft, False))
