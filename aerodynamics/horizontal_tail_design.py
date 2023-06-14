@@ -249,10 +249,8 @@ def horizontal_tail_planform(aircraft):
     
     # Horizontal tailplane
     aircraft.S_h = S
-    aircraft.A_h = AR                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
-    aircraft.lambda_co2_h = 0               # [rad] Half chord sweep of horizontal tailplane [-] NOTE: This is a guestimate  
-    aircraft.dEpsilondA = epsilon_alpha              # Downwash [-] TODO: check this value, this is a pure guess
-    aircraft.A_h = AR                        
+    aircraft.AE_A_h = AR                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+    aircraft.AE_dEpsilondA = epsilon_alpha              # Downwash [-] TODO: check this value, this is a pure guess
     aircraft.b_h = b                     
     aircraft.i_w_h = i_h       
     aircraft.wing_twist_h = alpha_twist    
@@ -260,12 +258,12 @@ def horizontal_tail_planform(aircraft):
     aircraft.sweep_co2_h = np.arctan(np.tan(aircraft.sweep_co4_h) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
     aircraft.sweep_LE_h = np.arctan(np.tan(aircraft.sweep_co4_h) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda)))          
     aircraft.taper_h = Lambda                
-    aircraft.rootchord_h = 2 * aircraft.S_h / (aircraft.b_h * (1+Lambda))            
-    aircraft.tipchord_h = aircraft.rootchord_h*Lambda        
-    aircraft.MAC_length_h = 2/3 * aircraft.rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)        
+    aircraft.AE_rootchord_h = 2 * aircraft.S_h / (aircraft.b_h * (1+Lambda))            
+    aircraft.AE_tipchord_h = aircraft.AE_rootchord_h*Lambda        
+    aircraft.AE_MAC_length_h = 2/3 * aircraft.AE_rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)        
     aircraft.y_mac_h = 1/3*(aircraft.b_h/2)*(1+2*Lambda)/(1+Lambda)   
     aircraft.x_lemac_h = aircraft.y_mac_h*np.tan(aircraft.sweep_LE_h)
-    aircraft.CL_a_h = CL_a_h
+    aircraft.AE_CL_a_h = CL_a_h
     #print("Afsd", CL_a_h)
     #print(b)
     #print(S)

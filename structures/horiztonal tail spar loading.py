@@ -26,10 +26,10 @@ G = E/(2*(1+v))
 
 
 r_h_tail_spar = 0.035
-l_h_tail_spar = ac.AE_b_h
+l_h_tail_spar = ac.b_h
 F_h_max = abs(dF_h_man)
 T_max = 0.25*ac.AE_MAC_length_h*max(0.5*at.rho0*ac.V_A**2*ac.AE_Sh*ac.AE_CL_a_h*(2/360*2*np.pi),0.5*at.rho0*ac.V_cruise**2*ac.AE_Sh*ac.AE_CL_a_h*(1/360*2*np.pi),F_h_max)
-arm = ac.AE_b_h/2*1/3 #5/2*1/3 # conservative, assuming hor tail up to 5m
+arm = ac.b_h/2*1/3 #5/2*1/3 # conservative, assuming hor tail up to 5m
 M_h_max = abs(F_h_max*arm)
 A_m = np.pi*r_h_tail_spar**2
 

@@ -25,8 +25,8 @@ def takeoffweight(obj, W_F):
 
 def atm_parameters(obj, h):
     T    = atm.T0 + atm.lambd * h
-    rho  = atm.rho0*np.power((T/obj.T0), (-((atm.g / (atm.lambd * atm.R))+1)))
-    p    = atm.p0*np.power((T/obj.T0), (-(atm.g / (atm.lambd * atm.R))))
+    rho  = atm.rho0*np.power((T/atm.T0), (-((atm.g / (atm.lambd * atm.R))+1)))
+    p    = atm.p0*np.power((T/atm.T0), (-(atm.g / (atm.lambd * atm.R))))
     a    = np.sqrt(atm.gamma*obj.R*T)
     return p, T, rho, a
 

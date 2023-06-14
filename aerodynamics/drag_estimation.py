@@ -17,7 +17,7 @@ MAC = aircraft.MAC_length
 #intermediate calculation for consistent updates in function
 l_fus_1 = aircraft.l_n
 l_fus_2 = aircraft.l_fus_main_cone
-l_fus_3 = aircraft.l_tc
+l_fus_3 = aircraft.l_fus_tail_cone
 l_fus_total = l_fus_1 + l_fus_2 + l_fus_3
 d_fus = aircraft.d_fuselage
 
@@ -124,7 +124,7 @@ def Swet(section):
         Swet = (np.pi * D / 4) * (1/(3*L1) * ((4*L1**2 + D**2 /4)**1.5 - D**3 /8) - D + 4*L2 + 2 * np.sqrt(L3**2 + D**2 /4))
     elif section == 'boom':
         #l*pi*r**2
-        Swet = l_boom * np.pi * d_boom**2
+        Swet = (l_boom-l_fus_3) * np.pi * d_boom**2
     elif section == 'strut':
         #2*l*pi*r**2 twice for both struts
         Swet = 2 * l_strut * np.pi * d_strut**2

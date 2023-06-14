@@ -85,7 +85,7 @@ def elevator_design(aircraft):
     for X_cg in [aircraft.X_cg_fwd, aircraft.X_cg_aft]:
         delta_eq_req_range = []
         for V in V_range:
-            l_h = aircraft.l_f - (aircraft.X_LEMAC+ X_cg*aircraft.MAC_length) + aircraft.l_f_boom - 3/4 * aircraft.AE_rootchord_h
+            l_h = aircraft.l_f - aircraft.l_fus_tail_cone + aircraft.l_f_boom - 3/4 * aircraft.AE_rootchord_h - (aircraft.X_LEMAC+ X_cg*aircraft.MAC_length)
             C_L1 = 2 * aircraft.W_TO * aircraft.g0 /(aircraft.rho_TO* V**2*aircraft.Sw)
             tail_volume = l_h/aircraft.MAC_length * aircraft.Sh_S
 
@@ -116,7 +116,7 @@ def rudder_design(aircraft):
     V_t = sqrt((1.3 * aircraft.V_s_min)**2 + V_w**2) # [m/s] total speed
     S_s = 1.02 * (aircraft.l_f * aircraft.h_out + aircraft.Sv_S * aircraft.Sw)
 
-    x_ca = aircraft.l_f * aircraft.h_out * aircraft.X_FCG + aircraft.AE_S_v * aircraft.AE_l_v
+    x_ca = aircraft.l_f * aircraft.h_out * aircraft.X_FCG + aircraft.AE_Sv * aircraft.AE_l_v
     d_ca = x_ca - aircraft.x_cg_position_aft
 
     C_d_y = 0.6 # Assumption
@@ -130,7 +130,7 @@ def rudder_design(aircraft):
     eta_v = 0.96
     
     
-    vertical_tail_volume = aircraft.AE_l_v*aircraft.AE_S_v/(aircraft.b*aircraft.Sw)
+    vertical_tail_volume = aircraft.AE_l_v*aircraft.AE_Sv/(aircraft.b*aircraft.Sw)
 
     C_n_beta = 0.75 * C_L_alpha_v * (1 - dsigma_dalpha) * eta_v * vertical_tail_volume
     C_y_beta = -1.35 * C_L_alpha_v * (1 - dsigma_dalpha) * eta_v * aircraft.Sv_S
@@ -165,7 +165,7 @@ def rudder_design(aircraft):
     if (delta_r_value*180/pi) > 30:
         print(f"\nRequired rudder deflection ({round(delta_r_value*180/np.pi, 3)} degrees) exceeds maximum rudder deflection (30 degrees)\n")
 
-    #aircraft.S_r = aircraft.C_r_C_v * aircraft.C_v * aircraft.b_v
+    #aircraft.S_r = aircraft.C_r_C_v * aircraft.C_v * aircraft.AE_b_v
 
 def rudder_iteration(aircraft):
     delta_r_value_array = []

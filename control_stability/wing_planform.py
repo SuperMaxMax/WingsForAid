@@ -18,7 +18,7 @@ def WingPlanform(ac, plot):
     # Parameters
     AR = ac.A                                    # [-]
     S = ac.Sw                                    # [m^2]
-    c4_sweep = ac.lambda_co4                     # [rad]
+    c4_sweep = ac.sweep_co4                     # [rad]
     span = ac.b                                  # [m]
     taper_ratio = ac.taper                       # [-]
     c_r = ac.rootchord                           # [m]
