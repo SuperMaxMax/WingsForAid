@@ -5,22 +5,21 @@ from matplotlib import patheffects
 
 sys.path.append('..')
 
-from parameters import UAV, atmosphere
-aircraft = UAV('aircraft')
-atm      = atmosphere()
+from control_stability.Class_II_cg_estimation import cg_calc
+from control_stability.horizontal_tailplane import hor_run
+from control_stability.vertical_tailplane import ver_run
+from control_stability.control_surfaces import main_control_surface
+from control_stability.wing_planform import WingPlanform
 
-from Class_II_cg_estimation import cg_calc
-from horizontal_tailplane import hor_run
-from vertical_tailplane import ver_run
-from control_surfaces import main_control_surface
-from wing_planform import WingPlanform
+# from parameters import UAV, atmosphere
+# aircraft = UAV('aircraft')
+# atm      = atmosphere()
 
 def main_stab_control(aircraft, plot, print_value):
-
     cg_calc(aircraft, plot)
     hor_run(aircraft, plot)
     ver_run(aircraft)
-    exec(open("landing_gear.py").read(), {'aircraft':aircraft, 'plot':plot})
+    exec(open("control_stability/landing_gear.py").read(), {'aircraft':aircraft, 'plot':plot})
     main_control_surface(aircraft)
     WingPlanform(aircraft, plot)
 
@@ -52,4 +51,4 @@ def main_stab_control(aircraft, plot, print_value):
 
         print("---------------------Rudder Design--------------------------------")
         print(f"The maximum required rudder deflection will be {round(aircraft.delta_r_value, 3)} [deg]")
-main_stab_control(aircraft, True, True)
+# main_stab_control(aircraft, True, True)

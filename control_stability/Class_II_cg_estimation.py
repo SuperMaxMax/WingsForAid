@@ -11,10 +11,11 @@ from scipy.integrate import quad
 import math
 import pandas as pd 
 
-# Setting with which can be determined if first the aircraft is filled with fuel or with payload
-fuel_first = False
 
 def cg_calc(obj, plot):
+    # Setting with which can be determined if first the aircraft is filled with fuel or with payload
+    fuel_first = False
+    
     name_list = []
     list_mass = []
     x_list = []
@@ -29,7 +30,7 @@ def cg_calc(obj, plot):
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement
-    X_LEMAC = 0.40 * obj.l_f
+    X_LEMAC = 0.43 * obj.l_f
     obj.X_LEMAC = X_LEMAC
 
     '''v Wing group v'''

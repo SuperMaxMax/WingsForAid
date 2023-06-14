@@ -109,20 +109,20 @@ def WingPlanform(ac, plot):
 
     # ------------------------------------------ Printing results ------------------------------------------
 
-    print("-------------------- Summary ----------------------")
-    print("Span:                        ", round(span,2), "[m]")
-    print("Taper ratio:                 ", round(taper_ratio,3), "[-]")
-    print("Root chord:                  ", round(c_r,2), "[m]")
-    print("Tip chord:                   ", round(c_t,2), "[m]")
-    print("MAC:                         ", round(mac,2), "[m]")
-    print("Spanwise position MAC:       ", round(spanwise_pos,2), "[m]")
-    print("XLEMAC:                      ", round(XLEMAC,2), "[m]")
-    print("Leading edge sweep angle:    ", round(le_sweep*(180/math.pi),2), "[deg]")
-    print("Front spar sweep angle:      ", round(le_sp_sweep*(180/math.pi),2), "[deg]")
-    print("Half chord sweep angle:      ", round(c2_sweep*(180/math.pi),2), "[deg]")
-    print("Aft spar sweep angle:        ", round(te_sp_sweep*(180/math.pi),2), "[deg]")
-    print("Trailing edge sweep angle:   ", round(te_sweep*(180/math.pi),2), "[deg]")
-    print("---------------------------------------------------")
+    # print("-------------------- Summary ----------------------")
+    # print("Span:                        ", round(span,2), "[m]")
+    # print("Taper ratio:                 ", round(taper_ratio,3), "[-]")
+    # print("Root chord:                  ", round(c_r,2), "[m]")
+    # print("Tip chord:                   ", round(c_t,2), "[m]")
+    # print("MAC:                         ", round(mac,2), "[m]")
+    # print("Spanwise position MAC:       ", round(spanwise_pos,2), "[m]")
+    # print("XLEMAC:                      ", round(XLEMAC,2), "[m]")
+    # print("Leading edge sweep angle:    ", round(le_sweep*(180/math.pi),2), "[deg]")
+    # print("Front spar sweep angle:      ", round(le_sp_sweep*(180/math.pi),2), "[deg]")
+    # print("Half chord sweep angle:      ", round(c2_sweep*(180/math.pi),2), "[deg]")
+    # print("Aft spar sweep angle:        ", round(te_sp_sweep*(180/math.pi),2), "[deg]")
+    # print("Trailing edge sweep angle:   ", round(te_sweep*(180/math.pi),2), "[deg]")
+    # print("---------------------------------------------------")
 
     # ---------------------------------------------- Plotting ----------------------------------------------
 

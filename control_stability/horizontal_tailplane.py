@@ -229,10 +229,10 @@ def stability_curve(aircraft, xcgRange):
     
     # Making stability line
 
-    StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.AE_dEpsilondA) * (aircraft.l_h/aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
-    StabilityMargin             = 0.05
-    StabilitySh_S_margin        = StabilityFrac * xcgRange - StabilityFrac * (aircraft.x_ac_cruise - StabilityMargin)
-    StabilitySh_S               = StabilityFrac * xcgRange - StabilityFrac * aircraft.x_ac_cruise
+    StabilityFrac = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.AE_dEpsilondA) * (aircraft.l_h/aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
+    StabilityMargin = 0.05
+    StabilitySh_S_margin = StabilityFrac * xcgRange - StabilityFrac * (aircraft.x_ac_cruise - StabilityMargin)
+    StabilitySh_S = StabilityFrac * xcgRange - StabilityFrac * aircraft.x_ac_cruise
 
     return StabilitySh_S, StabilitySh_S_margin
 
