@@ -3,15 +3,15 @@ class UAV:
     def __init__(self, name):
         "=== Class I / Class II parameters ==="
         # A
-        self.A = 7.75                       # Aspect ratio [-]
-        self.alpha_f = 0                     # Still to be updated angle of attack of the fuselage [rad]
+        self.A = 7.75 * 1.20                # Aspect ratio [-]
+        self.alpha_f = 0                    # Still to be updated angle of attack of the fuselage [rad]
 
         # B
         self.BHP_cruise = 76.3436
-        self.CD0 =  0.027                    # Zero lift coefficient [-]
-        self.CL_land = 1.5702                # [-]
-        self.b = 9.527          # Wing span [m]
-        self.b_v = 1.60         # Vertical tail span [m] NOTE: Is this value updated during design vertical tail?
+        self.CD0 =  0.027                   # Zero lift coefficient [-]
+        self.CL_land = 1.5702               # [-]
+        self.b = 9.527                      # Wing span [m]
+        self.b_v = 1.60                     # Vertical tail span [m] NOTE: Is this value updated during design vertical tail?
         self.boom                = True     # Boom, true if boom tail is implemented
         self.bot_clearance = 0.1            # Bottom clearance [m]
         self.braced_wing         = True     # True if wing is braced
@@ -22,11 +22,11 @@ class UAV:
         self.CL_TO = 1.2397                 # [-]
         self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-]
         self.CL_max_clean = 1.5             # Maximum lift coefficient [-] | Range: 1.3 - 1.9
-        self.CL_max_land = 1.9                # Maximum lift coefficient at landing [-]
-        self.CLa = 4.2                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
-        self.CL_max_clean = 1.5615             # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.CL_max_land = 1.9              # Maximum lift coefficient at landing [-]
-        self.CLa = 4.743                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
+        self.CLa = 4.2                      # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
+        self.CL_max_clean = 1.5615          # Maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.CL_max_land = 1.9              # Maximum lift coefficient at landing [-]
+        self.CLa = 4.743                    # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         self.c_p = 72E-9                    # Specific fuel consumption [kg/J]
         self.climb_rate = 2.9889
         self.cos_lambda_c04 = 1
@@ -34,18 +34,17 @@ class UAV:
         self.CL_a_w = 4.743                 # Updated Lift curve slope [1/rad]
         self.C_r_C_v = 0.4                  # Rudder chord over vertical tail chord
 
-
         # D
         self.Drag_increase = 1.0126         # This is used for the calculations of the strut drag if applicable [-]
         self.d_eff = 1.241                  # Effective diameter [m]
         self.d_engine_boxes = 0.4           # Distance between engine and wing box [m]
         self.dihedral = 0
-        self.d_fuselage = 1.102                 # Fuselage diameter in [m]
+        self.d_fuselage = 1.102             # Fuselage diameter in [m]
         # E
-        self.e = 0.776                        # Oswald factor [-]
+        self.e = 0.776                      # Oswald factor [-]
         self.engine_cg = 0.267              # Engine cg location [m]
         self.engine_fairing = 0.2           # Engine fairing length [m]
-        self.engine_length = 0.534         # Engine length [m]
+        self.engine_length = 0.534          # Engine length [m]
         self.engine_pos = 'tractor'         # Engine position: "tractor" or "pusher" or "fuselage"
         self.eta_p = 0.82                   # Propulsive efficiency [-]
         # F
@@ -56,7 +55,7 @@ class UAV:
         self.h_TO = 0                       # Take-off altitude, airport altitude [m]
         self.h_cruise = 3048.0              # Cruise altitude [m]
         self.h_in = 0.9                     # Inner fuselage height [m]
-        self.h_out = 0.7                    # Outer fuselage height [m]
+        self.h_out = 0.737                  # Outer fuselage height [m]
         # I
         self.i_w = 0.935 * np.pi / 180       # Updated incidence angle of wing wrt fuselage [rad]
         self.Ixx = 1300                      # mass moment of inertia x-axis [kg m^2]
@@ -66,7 +65,6 @@ class UAV:
         # K
         self.kq = 0.95                      # Volume factor used to calculate wetted area of the wing [-]
 
-
         # L
         self.LDG_dist = 750.0               # Landing distance [m]
         self.L_D = 14.1804                  # Lift to drag ratio [-]
@@ -74,8 +72,8 @@ class UAV:
         self.l_fus_main_cone = 2.9          # Fuselage main cilindrical part length [m]
         self.l_fus_tail_cone = 0.8          # Fuselage tail cone length [m]
         self.l_f = 4.3                      # Fuselage length [m]
-        self.l_f_boom = 2.5                   # Boom length [m]
-        self.l_n = 0.9342                  # Nosecone length [m]
+        self.l_f_boom = 2.5                 # Boom length [m]
+        self.l_n = 0.9342                   # Nosecone length [m]
         self.l_t = 3.5                      # Tail arm [m]
         self.l_tc = 0.8                     # Tail cone length [m]
         self.lambda_co2 = -0.02736364725188103           # Half chord sweep angle [rad]
@@ -87,13 +85,13 @@ class UAV:
         self.position_landing_back = [2.33, 0.8]  # Main landing gear position [x, y] in [m]
 
         # M
-        self.MAC_length = 1.2477198640078417            # Mean aerodynamic chord [m]
+        self.MAC_length = 1.2477198640078417# Mean aerodynamic chord [m]
         self.MAC_ac = 0.24                  # Location of aerodynamic center relative to MAC [-]
         self.MGC = 1.0822                   # Mean geometric chord [m]
         self.M_res = 0.075 
         self.Mff = 0.9254                   # Fuel fraction [-]
         self.main_gear_type = 'fixed'       # Type of main gear: "fixed" or "retractable"
-        self.mass_penalty_struts = 7        # The weight of the struts [kg]
+        self.mass_penalty_struts = 16.794        # The weight of both struts [kg] #updated by Jan W. 13.06
         # N
         self.N_e = 1                        # Number of engines [-]
         self.n_boxes = 12                   # [-]
@@ -109,7 +107,7 @@ class UAV:
         self.pos_main_carriage = 'fuselage' # Position of main carriage: "fuselage" or "wing"
         self.power = 95.8347                # Power at takeoff [hp]
         self.power_setting = 0.9            # Power setting in cruise [-]
-        self.prop_eff = 0.82                 # Propulsive efficiency [-]
+        self.prop_eff = 0.82                # Propulsive efficiency [-]
         # Q
 
         # R
@@ -119,11 +117,11 @@ class UAV:
         self.rho0 = 1.225                   # Air density at sea level [kg/m^3]
         self.rho_TO = 1.225                 # Take-off air density if airport is at sea level [kg/m^3]
         self.rho_cruise = 0.9046            # Cruise air density [kg/m^3]
-        self.rootchord = 1.490             # Root chord [m]
+        self.rootchord = 1.490              # Root chord [m]
         # S
         self.S_G = 19.77                    # Gross shell area fuselage [m^2]
-        self.Sh_S = 0.174                    # [-] Ratio between horizontal tailplane surface area and surface area wing
-        self.Sv_S = 0.083                  # [-] Ratio between vertical tailplane surface area and surface area wing
+        self.Sh_S = 0.174                   # [-] Ratio between horizontal tailplane surface area and surface area wing
+        self.Sv_S = 0.083                   # [-] Ratio between vertical tailplane surface area and surface area wing
         self.Sw = 11.7113                   # Wing area [m^2]
         self.Sw_wetted = 23.4226            # Wetted area of the wing [m^2]
         self.s_tail = 2                     # Tail surface area [m]
@@ -132,7 +130,7 @@ class UAV:
         self.sigma_cruise = 0.7385
         self.structural_thickness = 0.2     # Structural thickness fuselage [m], this is for both sides
         self.sweep_co2 = -0.02736364725188103 # Updated half chord sweep angle [rad]
-        self.sweep_co4 = 0.0                 # Updated half chord sweep [rad]
+        self.sweep_co4 = 0.0                # Updated half chord sweep [rad]
 
   
         # T
@@ -145,7 +143,7 @@ class UAV:
         self.tire_nose_width = 0.14478      # Nose landing gear tire width [m]
         self.tire_main_height = 0.381       # Main landing gear tire height [m]
         self.tire_main_width = 0.1524       # Main landing gear tire height [m]
-        self.tipchord = 0.9685             # Tip chord [m]
+        self.tipchord = 0.9685              # Tip chord [m]
         self.top_clearance = 0.2            # Top clearance [m]
         self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility
         # U
@@ -181,6 +179,7 @@ class UAV:
         self.w_in = 1.2                     # Inner fuselage width [m]
         self.w_out = 1.1                    # Outer fuselage width [m]
         self.wing_twist = -2.0 *np.pi/180   # Updated wing twist (difference root and chord) [rad]
+        self.W_strut = 12                   # Weight of 2 struts [kg]
 
         # X
         self.xc_aft_spar = 0.80             # Aft spar location as fraction of MAC
@@ -191,6 +190,7 @@ class UAV:
         self.X_cg_full = 0.4115             # MTOW cg location CG/MAC [-]
         self.X_cg_fwd = 0.1704              # Forward cg location CG/MAC [-]
         self.X_cg_range = 0.363             # Range of cg location CG/MAC [-]
+        self.x_strut = 0.48                 # strut location as fraction of chord @ spanwise position [-]
         # Y
         self.y_mac = 2.2133293637093265     # Spanwise location of the MAC [m]
         self.ystart_ail = 3.308             # start location of aileron measured from rootchord
@@ -203,9 +203,7 @@ class UAV:
         self.AE_A = 7.75                        # Updated aspect ratio [-]
         self.AE_CD0 = 0.02578                   # Zero lift drag [-]
         self.AE_CL_LDG = 1.5702                 # Still to be updated [-]
-        self.AE_CL_max_TO = 1.5                 # Still to be updated maximum lift coefficient at take-off [-]
         self.AE_CL_max_clean = 1.5615              # Still to be updated maximum lift coefficient [-] | Range: 1.3 - 1.9
-        self.AE_CL_max_land = 1.9               # Still to be updated maximum lift coefficient at landing [-]
         self.AE_CL_a_w = 4.743                  # Updated Lift curve slope [1/rad]
         self.AE_L_D = 14.1804                   # Still to be updated lift to drag ratio [-]
         self.AE_MAC_length = 1.2477198640078417 # Updated mean aerodynamic chord [m]
@@ -223,18 +221,13 @@ class UAV:
         self.AE_sweep_co4 = 0.0                 # Updated half chord sweep [rad]
         self.AE_sweep_LE = 0.02736364725188103  # Updated leading edge sweep [rad]
         self.AE_taper = 0.65                    # Updated taper ratio [-]
-        self.AE_rootchord = 1.490               # Updated Root chord [m]
-        self.AE_tipchord = 0.9685               # Updated tip chord [m]
-        self.AE_x_lemac = 0.06057988483270884   # Updated distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.AE_y_mac = 2.2133293637093265      # Updated spanwise location of the MAC [m]
         self.AE_alpha_f = 0                     # Still to be updated angle of attack of the fuselage [rad]
 
         # Horizontal tailplane
-        self.AE_l_h = 4                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
         self.AE_Vh_V = 0.95                    # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 5.166666                        # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02              # Downwash [-] TODO: check this value, this is a pure guess
-        self.AE_Sh_S = 0.174                   # [-] Ratio between horizontal tailplane surface area and surface area win
         self.AE_Sh = 2.0377662
         self.AE_CL_a_h = 4.18773706267545    # Lift curve slope horizontal tailplane [1/rad] 
 
@@ -262,7 +255,6 @@ class UAV:
         self.AE_sweep_co4_v = 35 / 180 * np.pi                 # Updated half chord sweep [rad]
         self.AE_sweep_LE_v = 0.685533470761878  # Updated leading edge sweep [rad]
         self.AE_lambda_c02_v = 0.5274976173187572            # [rad] Half chord sweep of vertical tailplane
-        self.AE_Sv_S = 0.1095                  # [-] Ratio between vertical tailplane surface area and surface area wing
         self.AE_Sv = 1.2824
         self.AE_b_v = 1.2015
         self.AE_vertical_airfoil = '0009'      # Airfoil of vertical tail (NACA)
@@ -401,11 +393,14 @@ class UAV:
         self.ST_Torque_eng2 = 240 #Nm, UL 260 torque
 
         self.ST_l_strut = 2.563733275367119 #m strut lenght (single)
-        self.ST_d_strut = 0.015 #strut diameter (outer) [m]
-        self.ST_l_LG = 0.4 #m strut lenght (single)
-        self.ST_d_LG = 0.04 #strut diameter (outer) [m]
-        self.ST_d_boom = 0.05 #strut diameter (outer) [m]
+        self.ST_strut_2a = 0.08 #strut semi major*2 [m]
+        self.ST_strut_2b = 0.04 #strut semi minor*2 [m]
+        self.ST_strut_t = 0.0021 #m strut thickness [m]
+       # self.ST_l_LG = 0.4 #m strut lenght (single)
+        #self.ST_d_LG = 0.04 #strut diameter (outer) [m]
+       # self.ST_d_boom = 0.05 #strut diameter (outer) [m]
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
+        self.ST_strut_W = 8.397 #kg single strut mass
 
         self.ST_W_fus = 40.224 #kg mass of fuselage structure (only)
         self.ST_W_tb = 11.52 #kg mass of tail boom, given it is 2.8 m long
@@ -428,11 +423,31 @@ class UAV:
         self.ST_x_cg = 2.94 #max aft x_cg for nose wheel loading
 
 
-        self.ST_tail_boom_2a=0.15 #height of tail boom
-        self.ST_tail_boom_2b=0.1 #width of tail boom
-        self.ST_tail_boom_t=0.001 #thinckness of tail boom (steel 410)
-        self.ST_h_tail_spar_r=0.025 #radius of h tail spar
-        self.ST_h_tail_spar_t=0.001 #thickness of h tail spar (steel 410)
+        self.ST_tail_boom_r=0.075 #radius of tail boom if steel 4130
+        self.ST_tail_boom_t=0.0015 #thinckness of tail boom (steel 4130)
+        self.ST_tail_boom_W=20.34 #kg mass of tail boom
+        self.ST_tail_boom_l = 3.6658 #m length of tail boom
+
+
+        self.ST_h_tail_spar_r=0.035 #radius of h tail spar
+        self.ST_h_tail_spar_t=0.001 #thickness of h tail spar (steel 4130)
+        self.ST_h_tail_spar_theta = 0.01239 #rad twist of spar (steel 4130)
+        self.ST_h_tail_spar_W = 2.07 #kg mass of stail spar
+
+        self.ST_nose_gear_r = 0.03 #m radius of nose gear strut
+        self.ST_nose_gear_t = 0.0025 #m thickness of nose gear strut
+        self.ST_nose_gear_W = 2.01 #kg mass of nose gear
+
+        self.ST_main_gear_2a = 0.12 #m semi major*2 of main gear
+        self.ST_main_gear_2b = 0.06 #m semi minor*2 of main gear
+        self.ST_main_gear_t = 0.0029 #m thickness of main gear
+        self.ST_main_gear_W = 16.5 #kg mass of main gear
+
+        # self.ST_tail_boom_2a = 0.15  # height of tail boom if steel 410
+        # self.ST_tail_boom_2b = 0.1  # width of tail boom
+        # self.ST_tail_boom_t = 0.001  # thinckness of tail boom (steel 410)
+        # self.ST_h_tail_spar_r = 0.025  # radius of h tail spar
+        # self.ST_h_tail_spar_t = 0.001  # thickness of h tail spar (steel 410)
 
 
 class airport:

@@ -36,8 +36,9 @@ print('Fz',Fz)
 print('Gz',Gz)
 
 a = 0.15/2
-if a_b > 3/2:
-    b = 2/3*a
+# if a_b > 3/2:
+#     b = 2/3*a
+b=a
 
 Ixx_min = M_h_max*a/shear_stress
 Iyy_min = M_v_max*b/shear_stress
@@ -70,7 +71,7 @@ plt.plot(t,A_min,label='A_min')
 plt.legend()
 plt.show()
 
-t=1/1000
+t=2.5/1000
 a1=a+t/2
 a2=a-t/2
 b1=b+t/2

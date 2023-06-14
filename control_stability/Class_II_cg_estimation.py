@@ -52,7 +52,7 @@ def cg_calc(obj, plot):
     y_list += [0]
     z_list += [obj.ST_z_ground+obj.ST_h_fus+0.075*obj.rootchord] 
 
-    W_wing_gr = obj.W_w + obj.W_sc
+    W_wing_gr = obj.W_w + obj.W_sc  # FIXME: W_sc variabel maken
     x_wcg = (wing_cg*obj.W_w + control_surfaces_cg*obj.W_sc)/(W_wing_gr)  # cg distance of wing group wrt leading edge rootchord
 
     '''v Fuselage group v''' # Everything except winggroup
@@ -75,8 +75,13 @@ def cg_calc(obj, plot):
     uc_cg =  uc_cg =  0.2*obj.position_landing_fwd[0] + 0.8*obj.position_landing_back[0]
     # For now: cg assumed to be at aircraft cg -> not taken into account for X_FCG, but is part of OEW
 
-    W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom
-    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + uc_cg * obj.W_uc + boom_cg*obj.W_boom)/(W_fus_gr)
+    # Strut
+    def chord(y):
+        return obj.rootchord-((obj.rootchord-obj.tipchord)/(obj.b/2))*y
+    strut_cg = obj.X_LEMAC - obj.x_lemac + 0.25 * obj.rootchord + (obj.x_strut - 0.25) * chord(obj.ST_y_strut) 
+
+    W_fus_gr = obj.W_fus + obj.W_pg + obj.W_t + obj.W_eq + obj.W_n + obj.W_uc + obj.W_boom + obj.W_strut
+    X_FCG = (fus_cg*obj.W_fus + engine_cg*obj.W_pg + tail_cg*obj.W_t + eq_cg*obj.W_eq + nacelle_cg*obj.W_n + uc_cg * obj.W_uc + strut_cg * obj.W_strut + boom_cg * obj.W_boom)/(W_fus_gr)
     obj.X_FCG = X_FCG
 
     name_list += ['fuselage', 'engine', 'tail', 'boom', 'equipment', 'nacelle', 'undercarriage']
@@ -90,6 +95,7 @@ def cg_calc(obj, plot):
 
     # Final CG
     W_OEW = W_wing_gr+W_fus_gr
+    obj.W_OE = W_OEW
     X_OEW = X_LEMAC + obj.xc_OEW_p * obj.MAC_length
     # X_OEW = ((X_LEMAC - obj.x_lemac + x_wcg) * W_wing_gr + X_FCG * W_fus_gr) / (W_OEW)
 
@@ -158,11 +164,11 @@ def cg_calc(obj, plot):
 
     # Save most forward and most aft and fully loaded c.g. in object
     obj.X_cg_full = Xs[-1]
-    obj.X_cg_range = max(Xs) - 0.22
+    obj.X_cg_range = Xs[labels.index(LimBoxConfigAft)] - Xs[labels.index(LimBoxConfigFwd)]
     obj.X_cg_fwd = Xs[labels.index(LimBoxConfigFwd)] - obj.X_cg_range * 0.05
     obj.X_cg_aft = Xs[labels.index(LimBoxConfigAft)] + obj.X_cg_range * 0.05
 
-    obj.AE_l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
+    obj.l_h = obj.l_f - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length) + obj.l_f_boom - 3/4 * obj.AE_rootchord_h
     # Plot lines for forward and aft cg positions
     plt.axvline(x=obj.X_cg_fwd, color='blue', label='most forward c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=135, length=1.1)])
     plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])

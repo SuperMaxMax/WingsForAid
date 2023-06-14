@@ -30,14 +30,14 @@ def main_stab_control(aircraft, plot, print_value):
         print("-------------------C.G. Estimation---------------------------")
         print(f"CG_range is from {round(aircraft.X_cg_fwd, 3)} to {round(aircraft.X_cg_aft, 3)}")
         print(f"X_LEMAC is {round(aircraft.X_LEMAC, 3)} [m]\n")
-        print(f"l_h:{aircraft.AE_l_h}")
+        print(f"l_h:{aircraft.l_h}")
 
         print("--------------------Horizontal tailplane----------------------")
         print(f"Sh_S is {round(aircraft.Sh_S, 3)}\n")
         print(f"L_h is {round(aircraft.L_h, 3)}N")
 
         print("--------------------Vertical tailplane-------------------------")
-        print(f"Sv_V is {round(aircraft.AE_Sv_S, 3)}\n")
+        print(f"Sv_V is {round(aircraft.Sv_S, 3)}\n")
         print(f"\nC_m_alpha is {round(aircraft.C_m_alpha, 3)} [1/rad]\n")
 
         print("--------------------Landing Gear Design------------------------")

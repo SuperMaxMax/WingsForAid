@@ -221,7 +221,7 @@ def all_wingbox(ac):
         torque = []
         
         # flexural axis assumption # -> replace 0.25 with front spar location variable, also add in location based on wingbox design -> for iteration
-        flex_ax = 0.48
+        flex_ax = ac.x_strut
 
         # define moment arms
         cop = 0.25                      # chord from leading edge
@@ -1124,6 +1124,9 @@ def all_wingbox(ac):
 
         # Calculate weight
         weight = trapezoid(As, spanwise_pos)*material[mat]['density'] + w_ribs
+
+        # Overwrite strut location 
+        ac.x_strut = xcs[0]/chord(spanwise_pos)[0]
         
         return weight, t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer
 

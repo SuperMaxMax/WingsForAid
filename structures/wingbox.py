@@ -876,6 +876,9 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
 
     # Calculate weight
     weight = trapezoid(As, spanwise_pos)*material[mat]['density'] + w_ribs
+
+    # Overwrite strut location 
+    ac.x_strut = xcs[0]/chord(spanwise_pos)[0]
     
     return weight, t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer
 

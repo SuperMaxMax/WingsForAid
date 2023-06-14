@@ -134,6 +134,8 @@ def lateral_position_landing_gear(aircraft):
     # plotting turn_over limit II in torenbeek. 
     line_4 = ax.plot(x_range, y_1_range, linewidth = '0.8', color='red', path_effects=[patheffects.withTickedStroke(spacing=5, angle=75, length=0.7)])
     line_5 = ax.plot(x_range, y_2_range, linewidth = '0.8', color='red', path_effects=[patheffects.withTickedStroke(spacing=5, angle=-75, length=0.7)])
+    ax.text(x_range[-1]+0.1, y_1_range[-1]+0.1, "II")
+    ax.text(x_range[-1]+0.1, y_2_range[-1]+0.1, "II")
 
     plt.draw()
     return line_3, line_4, line_5

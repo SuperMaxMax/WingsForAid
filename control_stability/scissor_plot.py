@@ -132,7 +132,7 @@ def controlability_curve(aircraft, xcgRange): #TODO: change constants here
 
     Cm_ac = Cm_ac_w + dCm_ac_f + dCm_ac_fus
 
-    ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.AE_l_h / aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
+    ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.l_h / aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
     ControlSh_S = ControlFrac * (xcgRange + Cm_ac / CL_Ah - aircraft.x_ac_approach)
 
     return ControlSh_S
@@ -142,7 +142,7 @@ def stability_curve(aircraft, xcgRange):
     
     # Making stability line
 
-    StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.AE_dEpsilondA) * (aircraft.AE_l_h/aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
+    StabilityFrac               = 1 / ((aircraft.CLa_h_cruise / aircraft.CLa_Ah_cruise) * (1 - aircraft.AE_dEpsilondA) * (aircraft.l_h/aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
     StabilityMargin             = 0.05
     StabilitySh_S_margin        = StabilityFrac * xcgRange - StabilityFrac * (aircraft.x_ac_cruise - StabilityMargin)
     StabilitySh_S               = StabilityFrac * xcgRange - StabilityFrac * aircraft.x_ac_cruise
@@ -174,12 +174,12 @@ def plot_scissor_plot(aircraft):
         Sh_S_stab = stability_curve(aircraft, aircraft.X_cg_aft)[1]
 
         if Sh_S_cont > Sh_S_stab:
-            aircraft.AE_Sh_S = Sh_S_cont
+            aircraft.Sh_S = Sh_S_cont
         else:
-            aircraft.AE_Sh_S = Sh_S_stab
+            aircraft.Sh_S = Sh_S_stab
 
         x_cg_limit = [aircraft.X_cg_fwd, aircraft.X_cg_aft]
-        S_h_S_array = [aircraft.AE_Sh_S, aircraft.Sh_S]
+        S_h_S_array = [aircraft.Sh_S, aircraft.Sh_S]
 
         ax1.plot(x_cg_limit, S_h_S_array, color = 'orange')
 
@@ -211,12 +211,12 @@ def plot_scissor_plot(aircraft):
         Sh_S_stab = stability_curve(aircraft, aircraft.X_cg_aft)[1]
 
         if Sh_S_cont > Sh_S_stab:
-            aircraft.AE_Sh_S = Sh_S_cont
+            aircraft.Sh_S = Sh_S_cont
         else:
-            aircraft.AE_Sh_S = Sh_S_stab
+            aircraft.Sh_S = Sh_S_stab
 
         x_cg_limit = [aircraft.X_cg_fwd, aircraft.X_cg_aft]
-        S_h_S_array = [aircraft.AE_Sh_S, aircraft.Sh_S]
+        S_h_S_array = [aircraft.Sh_S, aircraft.Sh_S]
 
         ax1.plot(x_cg_limit, S_h_S_array, color = 'orange')
         

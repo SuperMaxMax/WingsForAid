@@ -236,6 +236,16 @@ def main_wing_planform(aircraft):
         #plt.legend()
         #plt.show()
         
+        #Calculate CL_max from Predicting Maximum Lift Coefficient for Twisted Wings Using Lifting-Line Theory
+        CL_clmax = (0.952 - 0.45 * ((Lambda-0.5)**2)) * ((AR/12)**0.03)
+        C_lmax = aircraft.af_cl_max
+        Omega = alpha_twist
+        K_Lsweep = 1 #unswept wing
+        K_LS = 1 + (0.0042*AR - 0.068) * (1+2.3*(CL_a_w*Omega)/C_lmax)
+        K_LOmega = 0.125
+
+        CL_max_clean = CL_clmax * K_LS * K_Lsweep * C_lmax * (1 - (K_LOmega*CL_a_w*Omega)/(C_lmax))
+
         if not full_print:
             return abs(C_L_wing-C_L_req)
         elif full_print:
