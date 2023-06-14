@@ -3,7 +3,7 @@ import Class_I_weight_estimation as c1
 import Class_II_weight_estimation as c2
 import Class_II_cg_estimation as c2cg
 import geometry_determination as geo
-import V_n_diagrams as Vn
+import V_n_diagrams_2 as Vn
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
