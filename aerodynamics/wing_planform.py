@@ -91,7 +91,7 @@ def main_wing_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 7.75
+                AR = 7.5
             if variable == "Lambda":
                 Lambda = parameter
             else:
@@ -193,7 +193,7 @@ def main_wing_planform(aircraft):
             l = CL1*c*q
             #label = variable + "= " + str(parameter)
             #plt.plot(y_s, l, marker = "s", label = label)
-            plt.plot(y_s, l)
+            #plt.plot(y_s, l)
             
             #Getting coefficients for a polynomial fit for the lift distribution
             lift_coefficients = np.polyfit(y_s, l, 10)
@@ -231,10 +231,10 @@ def main_wing_planform(aircraft):
     #   plt.plot(y, Cli_elliptical, label = "Elliptical")
 
         #General plot
-        #plt.grid()
-        #plt.xlabel('semi span [m]')
-        #plt.ylabel('C_L')
-        #plt.legend()
+        plt.grid()
+        plt.xlabel('semi span [m]')
+        plt.ylabel('C_L')
+        plt.legend()
         #plt.show()
         
         #Calculate CL_max from Predicting Maximum Lift Coefficient for Twisted Wings Using Lifting-Line Theory
@@ -256,7 +256,8 @@ def main_wing_planform(aircraft):
     initial_guess = iw(airfoil)[0]
     i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean = plot_lift_distr(i_w_optimal, full_print=True)
-
+    plt.plot(y_s, l)
+    plt.show()
     #print(','.join([str(x) for x in y_s]))
     #print('========')
     #print(','.join([str(x) for x in l]))
@@ -282,7 +283,8 @@ def main_wing_planform(aircraft):
                
     return 
 
-
+aircraft = UAV("aircraft")
+main_wing_planform(aircraft)
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
