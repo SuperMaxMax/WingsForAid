@@ -31,7 +31,7 @@ def atm_parameters(obj, h):
     return p, T, rho, a
 
 def dragpolar(ac_obj, CL):
-    CD = ac_obj.CD0 + CL**2/(np.pi*ac_obj.A*ac_obj.e)
+    CD = ac_obj.CD0 + 1.15*CL**2/(np.pi*ac_obj.A*ac_obj.e)
     return CD
 
 def prop_d(obj, power):
@@ -1125,4 +1125,4 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     flight_profile.append(W_F_used)         # fuel burnt
     return flight_profile
 
-# fuelusesortie(aircraft, atm, 12, 1, 12000, 45, 56.584, Range=250, Summary=True, plot=True, savefig=False)
+fuelusesortie(aircraft, atm, 12, 1, 9000, 45, 56.584, Range=250, Summary=True, plot=True, savefig=False)
