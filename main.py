@@ -26,13 +26,13 @@ while something:
 
     ae.run_aero(aircraft)
     cs.main_stab_control(aircraft, True, False)                     # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
-    print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
+    print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w, aircraft.W_v, aircraft.W_h, aircraft.W_t)
     if n_iteration % 1000 == 0 and n_iteration != 0:
         wb.all_wingbox(aircraft, True)
     else:
         wb.all_wingbox(aircraft, False)
     
-    aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, summary = True)[0] + 5
+    aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
 
     if np.abs((aircraft.W_TO - W_TO_old)/W_TO_old) < 0.001:
         something = False
