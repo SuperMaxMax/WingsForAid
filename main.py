@@ -1,13 +1,14 @@
-from parameters import UAV
+from parameters import UAV, atmosphere
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import aerodynamics.main_aero as ae
 import control_stability.main_stab_cont as cs
 import structures.wingbox_full as wb
-# import flight_performance.simulation as fp
+import flight_performance.simulation as fp
 
 aircraft = UAV("aircraft")
+atm      = atmosphere()
 
 # start
 plot = False
@@ -31,7 +32,7 @@ while something:
     else:
         wb.all_wingbox(aircraft, False)
     
-
+    aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, summary = True)[0] + 5
 
     if np.abs((aircraft.W_TO - W_TO_old)/W_TO_old) < 0.001:
         something = False
