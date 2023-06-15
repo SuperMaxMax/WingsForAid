@@ -550,7 +550,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     return CL_max
 
 
-LA_eom(aircraft, airfield, atm, -8, 4000, 14, -15.4, 5)
+# LA_eom(aircraft, airfield, atm, -8, 4000, 14, -15.4, 5)
 
 # ------------------------------------------------------------------------------
 def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
@@ -1131,4 +1131,4 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     flight_profile.append(W_F_used)         # fuel burnt
     return W_F_used, flight_profile
 
-fuelusesortie(aircraft, atm, 12, 1, 10000, 45, 54.012, Range=250, Summary=True, plot=True, savefig=False)
+# fuelusesortie(aircraft, atm, 12, 1, 10000, 45, 54.012, Range=250, Summary=True, plot=True, savefig=False)
