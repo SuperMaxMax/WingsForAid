@@ -810,7 +810,7 @@ def loiter(ac_obj, atm_obj, h_loiter, t_loiter, W0, standardrate, goback = True,
         print(f"Fuel used during loiter: {np.round(W_F_used, 2)} | Number of patterns completed: {patterns}")
         print(f"================================================================")
     return t, W_F_used
-# loiter(aircraft, atm, 7500, 1400, 700, 1, goback=True, result=True)
+# loiter(aircraft, atm, 7500, 1200, 700, 1, goback=True, result=True)
 
 def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = None, Range = None, dropregion = None, Summary = False, plot = False, savefig = False):
     cruiseNAT = False
@@ -1098,6 +1098,8 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     W *= ac_obj.WfinalW10
     print(f"W_F_used landing, taxi, shutdown: {round(W_beforelanding - W, 2)} | fraction: {round(W/W_beforelanding, 3)}")
     W_F_used += (W_beforelanding - W)
+    if W_F_used > W_F:
+        print("The fuel used is higher than the fuel loaded, this is not possible")
     # Calculate the fuel use per kg payload per km range (that means half the distance flown)
     F_kg_km = np.round(W_F_used/(n_boxes*ac_obj.boxweight*Range/1000), 5)
     print(f"The fuel used to transport one kg of payload over one km is {F_kg_km} [1/km]")
@@ -1127,6 +1129,6 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         plt.show()
     flight_profile.append(t)                # total sortie time
     flight_profile.append(W_F_used)         # fuel burnt
-    return flight_profile
+    return W_F_used, flight_profile
 
 fuelusesortie(aircraft, atm, 12, 1, 10000, 45, 54.012, Range=250, Summary=True, plot=True, savefig=False)
