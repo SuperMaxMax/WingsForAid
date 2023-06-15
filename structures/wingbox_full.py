@@ -18,7 +18,7 @@ from scipy.integrate import quad, cumulative_trapezoid, trapezoid
 from scipy.optimize import minimize
 from math import tan, atan, cos
 
-def all_wingbox(ac):
+def all_wingbox(ac, n_stringer_fixed, n_rib_fixed, full_loop=False):
     # #########################################################
     # # MATERIAL DICTIONARY
     # #########################################################
@@ -226,22 +226,28 @@ def all_wingbox(ac):
         # define moment arms
         cop = 0.25                      # chord from leading edge
         ma_wing_loading = (flex_ax-cop)*chord(y_span) # moment arm wing loading
-        torque_wing_loading = ma_wing_loading*spanwise_wing_loading(y_span) # torque wing loading
-        pos_flap = ac.xc_aft_spar+0.4*(1-ac.xc_aft_spar) # make variable in future !!!
+        torque_wing_loading = -ma_wing_loading*spanwise_wing_loading(y_span) # torque wing loading
+
+        pos_flap = ac.xc_aft_spar+0.4*(1-ac.xc_aft_spar)
         ma_flap = (flex_ax-pos_flap)*chord(y_span)
-        torque_flap = ma_flap*-spanwise_flap_weight()
-        pos_ail = ac.xc_aft_spar+0.4*(1-ac.xc_aft_spar) # make variable in future !!!
+        torque_flap = -ma_flap*-spanwise_flap_weight()
+
+        pos_ail = ac.xc_aft_spar+0.4*(1-ac.xc_aft_spar)
         ma_ail = (flex_ax-pos_ail)*chord(y_span)
-        torque_ail = ma_ail*-spanwise_aileron_weight()
+        torque_ail = -ma_ail*-spanwise_aileron_weight()
+
+        pos_strut = ac.xc_front_spar
+        ma_strut = (flex_ax-pos_strut)*chord(ac.ST_y_strut)
+        torque_strut = -ma_strut*Bz
 
         for j, i in enumerate(y_span):
             normal.append(By*(1-np.heaviside(i-ac.ST_y_strut, 1)))
             if load_case == 1:
                 shear.append(-(quad(spanwise_func_1, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.ST_y_strut, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
-                torque.append(-trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
+                torque.append(trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]) + torque_strut*(1-np.heaviside(i-ac.ST_y_strut, 1)))
             else:
                 shear.append(-(quad(spanwise_func_2, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.ST_y_strut, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
-                torque.append(-trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
+                torque.append(trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]) + torque_strut*(1-np.heaviside(i-ac.ST_y_strut, 1)))
         # get the bending moment by integrating the shear along the length
         moment = cumulative_trapezoid(shear, y_span, initial=0)
 
@@ -495,7 +501,10 @@ def all_wingbox(ac):
         mat = 'Al-5052-H38'
 
         #### CALCULATIONS ####
-        step_size = 0.0001          # [m] step size for integration
+        if full_loop:
+            step_size = 0.0001          # [m] step size for integration
+        else:
+            step_size = 0.00001
         ### Spanwise position ###
         spanwise_pos = np.linspace(0, ac.b/2, 1000)
         # split spanwise position in multiple parts based on ribs
@@ -1131,12 +1140,17 @@ def all_wingbox(ac):
         return weight, t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer
 
     # # create 3D surface plot, with n_stringers, n_ribs and weight
-    lower_start, upper_start, step_s, step_r = 0, 30, 10, 10
-    n_stringers = np.arange(lower_start, upper_start+step_s, step_s)
-    n_ribs = np.arange(lower_start, upper_start+step_r, step_r)
-    weights = np.zeros((n_stringers[-1]*2+1, n_ribs[-1]*2+1))
+    if full_loop:
+        lower_start, upper_start, step_s, step_r = 0, 30, 10, 10
+        n_stringers = np.arange(lower_start, upper_start+step_s, step_s)
+        n_ribs = np.arange(lower_start, upper_start+step_r, step_r)
+        weights = np.zeros((n_stringers[-1]*2+1, n_ribs[-1]*2+1))
+    else:
+        n_stringers = np.arange(n_stringer_fixed, n_stringer_fixed+1, 1)
+        n_ribs = np.arange(n_rib_fixed, n_rib_fixed+1, 1) 
+        weights = np.zeros((n_stringers[-1]*2+1, n_ribs[-1]*2+1))
 
-    solution =  True
+    solution = True
     last = 0
 
     while solution:
@@ -1170,34 +1184,37 @@ def all_wingbox(ac):
                 # print(t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3)
 
                 print(f"Done: {row*len(n_stringers)+col+1}/{len(n_ribs)*len(n_stringers)}") 
+
+        if full_loop: 
+            # get the stringers and ribs that give the minimum weight
+            n_stringers_min, n_ribs_min = np.argwhere(weights == np.min(weights[weights != 0]))[0]
+
+            # create new n_stringers and n_ribs arrays, with the minimum value in the middle
+            lower_start_s = n_stringers_min - step_s
+            lower_start_r = n_ribs_min - step_r
+            upper_start_s = n_stringers_min + step_s
+            upper_start_r = n_ribs_min + step_r
+            step_s = (upper_start_s-lower_start_s)/3
+            step_r = (upper_start_r-lower_start_r)/3
+
+            if last == 1:
+                solution =  False
+
+            if n_stringers[1]-n_stringers[0] == 2:
+                n_stringers = np.arange(int(lower_start_s), int(upper_start_s)+1, 1)
+                n_ribs = np.arange(int(lower_start_r), int(upper_start_r)+1, 1)
+                last = 1
+            else:
+                n_stringers = [int(lower_start_s+i*step_s) for i in range(4)]
+                n_ribs = [int(lower_start_r+i*step_r) for i in range(4)]
+            
+            n_stringers_g, n_ribs_g = np.meshgrid(n_stringers, n_ribs)
+
+            print('Region evaluating:')
+            print(f'n_stringers: {n_stringers}')
+            print(f'n_ribs: {n_ribs}')
         
-        # get the stringers and ribs that give the minimum weight
-        n_stringers_min, n_ribs_min = np.argwhere(weights == np.min(weights[weights != 0]))[0]
-
-        # create new n_stringers and n_ribs arrays, with the minimum value in the middle
-        lower_start_s = n_stringers_min - step_s
-        lower_start_r = n_ribs_min - step_r
-        upper_start_s = n_stringers_min + step_s
-        upper_start_r = n_ribs_min + step_r
-        step_s = (upper_start_s-lower_start_s)/3
-        step_r = (upper_start_r-lower_start_r)/3
-
-        if last == 1:
-            solution =  False
-
-        if n_stringers[1]-n_stringers[0] == 2:
-            n_stringers = np.arange(int(lower_start_s), int(upper_start_s)+1, 1)
-            n_ribs = np.arange(int(lower_start_r), int(upper_start_r)+1, 1)
-            last = 1
-        else:
-            n_stringers = [int(lower_start_s+i*step_s) for i in range(4)]
-            n_ribs = [int(lower_start_r+i*step_r) for i in range(4)]
-        
-        n_stringers_g, n_ribs_g = np.meshgrid(n_stringers, n_ribs)
-
-        print('Region evaluating:')
-        print(f'n_stringers: {n_stringers}')
-        print(f'n_ribs: {n_ribs}')
+        solution = False
 
     # save weights array
     np.save('weights.npy', weights)
@@ -1231,4 +1248,3 @@ def all_wingbox(ac):
     # print(np.where(weights == np.min(weights[weights != 0])))
 
     return np.min(weights[weights != 0]), n_stringers, n_ribs
-

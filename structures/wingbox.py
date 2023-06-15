@@ -11,8 +11,9 @@ from scipy import interpolate
 from scipy.integrate import cumulative_trapezoid, trapezoid
 import matplotlib.pyplot as plt
 from matplotlib import patches
+import pandas as pd
 
-def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load, check_twist=False):
+def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load, MOF_specific, MOF=False, check_twist=False):
     def plot_wingbox(spanwise_pos):
         """
         Plot the wingbox of the aircraft
@@ -247,7 +248,7 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     print(mat)
 
     #### CALCULATIONS ####
-    step_size = 0.0002          # [m] step size for integration
+    step_size = 0.00001          # [m] step size for integration
     ### Spanwise position ###
     spanwise_pos = np.linspace(0, ac.b/2, 1000)
     # split spanwise position in multiple parts based on ribs
@@ -460,6 +461,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                         if sigma_f_spar_c < 0:
                             MOF_sigma_f_spar_c = material[mat]['yield stress']*10**6/abs(sigma_f_spar_c)
                             MOFs[0] = MOF_sigma_f_spar_c
+                            if runs == 1 and MOF == True:
+                                MOF_specific.loc[i, 'MOF_sigma_f_spar_c'] = MOF_sigma_f_spar_c
                             if MOF_sigma_f_spar_c < 1:
                                 # print(f"Front spar compressive strength failure, MOF: {MOF_sigma_f_spar_c:.2f}")
                                 failure_ele = True
@@ -478,6 +481,9 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                             MOFs[1] = MOF_sigma_f_spar_t
                             MOF_fracture_f_spar = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_f_spar_t)
                             MOFs[2] = MOF_fracture_f_spar
+                            if runs == 1 and MOF == True:
+                                MOF_specific.loc[i, 'MOF_sigma_f_spar_t'] = MOF_sigma_f_spar_t
+                                MOF_specific.loc[i, 'MOF_fracture_f_spar'] = MOF_fracture_f_spar
                             if MOF_sigma_f_spar_t < 1:
                                 # print(f"Front spar tensile strength failure, MOF: {MOF_sigma_f_spar_t:.2f}")
                                 failure_ele = True
@@ -507,6 +513,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                         if sigma_a_spar_c < 0:
                             MOF_sigma_a_spar = material[mat]['yield stress']*10**6/abs(sigma_a_spar_c)
                             MOFs[3] = MOF_sigma_a_spar
+                            if runs == 1 and MOF == True:
+                                MOF_specific.loc[i, 'MOF_sigma_a_spar'] = MOF_sigma_a_spar
                             if MOF_sigma_a_spar < 1:
                                 # print(f"Aft spar compressive strength failure, MOF: {MOF_sigma_a_spar:.2f}")
                                 failure_ele = True
@@ -525,6 +533,9 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                             MOFs[4] = MOF_sigma_a_spar_t
                             MOF_fracture_a_spar = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_a_spar_t)
                             MOFs[5] = MOF_fracture_a_spar
+                            if runs == 1 and MOF == True:
+                                MOF_specific.loc[i, 'MOF_sigma_a_spar_t'] = MOF_sigma_a_spar_t
+                                MOF_specific.loc[i, 'MOF_fracture_a_spar'] = MOF_fracture_a_spar
                             if MOF_sigma_a_spar_t < 1:
                                 # print(f"Aft spar tensile strength failure, MOF: {MOF_sigma_a_spar_t:.2f}")
                                 failure_ele = True
@@ -553,6 +564,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                         if sigma_top_panel_c < 0:
                             MOF_sigma_top_panel = material[mat]['yield stress']*10**6/abs(sigma_top_panel_c)
                             MOFs[6] = MOF_sigma_top_panel
+                            if runs == 1 and MOF == True:
+                                MOF_specific.loc[i, 'MOF_sigma_top_panel'] = MOF_sigma_top_panel
                             if MOF_sigma_top_panel < 1:
                                 # print(f"Top panel compressive strength failure, MOF: {MOF_sigma_top_panel:.2f}")
                                 failure_ele = True
@@ -571,6 +584,9 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                             MOFs[7] = MOF_sigma_bot_panel_t
                             MOF_fracture_bot_panel = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_bot_panel_t)
                             MOFs[8] = MOF_fracture_bot_panel
+                            if runs == 1 and MOF == True:
+                                MOF_specific.loc[i, 'MOF_sigma_bot_panel_t'] = MOF_sigma_bot_panel_t
+                                MOF_specific.loc[i, 'MOF_fracture_bot_panel'] = MOF_fracture_bot_panel
                             if MOF_sigma_bot_panel_t < 1:
                                 # print(f"Bottom panel tensile strength failure, MOF: {MOF_sigma_bot_panel_t:.2f}")
                                 failure_ele = True
@@ -599,6 +615,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                         if sigma_bot_panel_c < 0:
                             MOF_sigma_bot_panel = material[mat]['yield stress']*10**6/abs(sigma_bot_panel_c)
                             MOFs[9] = MOF_sigma_bot_panel
+                            if runs == 1 and MOF == True:
+                                MOF_specific.loc[i, 'MOF_sigma_bot_panel'] = MOF_sigma_bot_panel
                             if MOF_sigma_bot_panel < 1:
                                 # print(f"Bottom panel compressive strength failure, MOF: {MOF_sigma_bot_panel:.2f}")
                                 failure_ele = True
@@ -617,6 +635,9 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                             MOFs[10] = MOF_sigma_top_panel_t
                             MOF_fracture_top_panel = (material[mat]['Kc']*10**6/np.sqrt(np.pi*0.005))/abs(sigma_top_panel_t)
                             MOFs[11] = MOF_fracture_top_panel
+                            if runs == 1 and MOF == True:
+                                MOF_specific.loc[i, 'MOF_sigma_top_panel_t'] = MOF_sigma_top_panel_t
+                                MOF_specific.loc[i, 'MOF_fracture_top_panel'] = MOF_fracture_top_panel
                             if MOF_sigma_top_panel_t < 1:
                                 # print(f"Top panel tensile strength failure, MOF: {MOF_sigma_top_panel_t:.2f}")
                                 failure_ele = True
@@ -686,6 +707,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
 
                             # check for failure
                             MOFs[12] = abs(tau_cr_f_spar/tau_f_spar)
+                            if runs == 1 and MOF == True:
+                                MOF_specific.loc[i, 'MOF_tau_f_spar'] = abs(tau_cr_f_spar/tau_f_spar)
                             if abs(tau_f_spar) > tau_cr_f_spar:
                                 # print(f"Front spar shear buckling, MOF: {abs(tau_cr_f_spar/tau_f_spar):.2f}")
                                 failure_ele = True
@@ -693,6 +716,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                                 continue
                             
                             MOFs[13] = abs(tau_cr_a_spar/tau_a_spar)
+                            if runs == 1 and MOF == True:
+                                MOF_specific.loc[i, 'MOF_tau_a_spar'] = abs(tau_cr_a_spar/tau_a_spar)
                             if abs(tau_a_spar) > tau_cr_a_spar:
                                 # print(f"Aft spar shear buckling, MOF: {abs(tau_cr_a_spar/tau_a_spar):.2f}")
                                 failure_ele = True
@@ -741,8 +766,9 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
 
                             # check for failure
                             if len(sigma_top_p_c) != 0:
-
                                 MOFs[14] = abs(sigma_cr_top/abs(sigma_top_p.min()))
+                                if runs == 1 and MOF == True:
+                                    MOF_specific.loc[i, 'MOF_sigma_top_p'] = abs(sigma_cr_top/abs(sigma_top_p.min()))
                                 if not np.all(abs(sigma_top_p_c) < sigma_cr_top):
                                     # print(f"Panel compression buckling top, MOF: {abs(sigma_cr_top/abs(sigma_top_p.min())):.2f}")
                                     failure_ele = True
@@ -751,6 +777,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                                     
                             if len(sigma_bot_p_c) != 0:
                                 MOFs[15] = abs(sigma_cr_bot/abs(sigma_bot_p.min()))
+                                if runs == 1 and MOF == True:
+                                    MOF_specific.loc[i, 'MOF_sigma_bot_p'] = abs(sigma_cr_bot/abs(sigma_bot_p.min()))
                                 if not np.all(abs(sigma_bot_p_c) < sigma_cr_bot):
                                     # print(f"Panel compression buckling bottom, MOF: {abs(sigma_cr_bot/abs(sigma_bot_p.min())):.2f}")
                                     failure_ele = True
@@ -781,6 +809,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                                 # check for failure
                                 if len(sigma_top_s_c) != 0:
                                     MOFs[16] = abs(sigma_cr_top_s/min(sigma_top_s_c))
+                                    if runs == 1 and MOF == True:
+                                        MOF_specific.loc[i, 'MOF_sigma_top_s'] = abs(sigma_cr_top_s/min(sigma_top_s_c))
                                     if MOFs[16] < 1:
                                         # print(f"Stringer column buckling top, MOF: {abs(sigma_cr_top_s/min(sigma_top_s_c)):.2f}")
                                         failure_ele = True
@@ -795,6 +825,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                                 
                                 if len(sigma_bot_s_c) != 0:
                                     MOFs[17] = abs(sigma_cr_bot_s/min(sigma_bot_s_c))
+                                    if runs == 1 and MOF == True:
+                                        MOF_specific.loc[i, 'MOF_sigma_bot_s'] = abs(sigma_cr_bot_s/min(sigma_bot_s_c))
                                     if MOFs[17] < 1:
                                         # print(f"Stringer column buckling bottom, MOF: {abs(sigma_cr_bot_s/max(abs(sigma_bot_s[sigma_bot_s < 0]))):.2f}")
                                         failure_ele = True
@@ -880,7 +912,9 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     # Overwrite strut location 
     ac.x_strut = xcs[0]/chord(spanwise_pos)[0]
     
-    return weight, t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer
+    return weight, t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer, MOF_specific
+
+MOF_specific = pd.DataFrame(index=np.linspace(0, 9.620022329579792/2, 1000))
 
 n_stringers = np.arange(20, 21, 1)
 n_ribs = np.arange(15, 16, 1)
@@ -900,19 +934,27 @@ for i in range(len(n_ribs)):
 
         load = loading_compression
 
-        weights[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load)
+        weights[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load, MOF_specific)
         # print(t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func)
 
         load = loading_tension
 
-        weights[i][j], t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2 = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load) 
+        weights[i][j], t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load, MOF_specific) 
         # print(t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2)
 
         load = loading_custom
 
-        weights[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3 = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2, load, True)
+        weights[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2, load, MOF_specific, False, True)
         # print(t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3)
 
+        # Run once more through compression and tension to get the MOFs
+        load = loading_compression
+        a,b,c,d,e,f,g,h, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3, load, MOF_specific, True, False)
+        load = loading_tension
+        a,b,c,d,e,f,g,h, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3, load, MOF_specific, True, False)
+
+        print(MOF_specific)
+        MOF_specific.to_csv('MOF_specific.txt', sep=';')
         print(f"Done: {i*len(n_stringers)+j+1}/{len(n_ribs)*len(n_stringers)}")   
 
 print(weights)
@@ -920,15 +962,30 @@ print(f"Minimum weight: {np.min(weights)} kg")
 print(f"Number of stringers: {n_stringers_g[np.where(weights == np.min(weights))[0][0]][np.where(weights == np.min(weights))[1][0]]}")
 print(f"Number of ribs: {n_ribs_g[np.where(weights == np.min(weights))[0][0]][np.where(weights == np.min(weights))[1][0]]}")
 
-# find all weight that are within a range of 0.5 kg of the minimum weight
-weights_range = weights[np.where(weights < np.min(weights)+2)]  
-# print these weights, together with the amount of stringers and ribs
-for i in range(len(weights_range)):
-    n_stringers_range = n_stringers_g[np.where(weights == weights_range[i])[0][0]][np.where(weights == weights_range[i])[1][0]]
-    n_ribs_range = n_ribs_g[np.where(weights == weights_range[i])[0][0]][np.where(weights == weights_range[i])[1][0]]
-    print(f"Weight: {weights_range[i]} kg")
-    print(f"Number of ribs: {n_ribs_range}")
-    print(f"Number of stringers: {n_stringers_range}")
+# Plot MOFs against spanwise position
+plt.figure()
+
+for col in MOF_specific.columns:
+    # if the col containts NaN -> only use the non NaN values with their corresponding index
+    if MOF_specific[col].isnull().values.any():
+        plt.plot(MOF_specific.index[~np.isnan(MOF_specific[col])], MOF_specific[col][~np.isnan(MOF_specific[col])], label=col)
+    else:
+        plt.plot(MOF_specific.index, MOF_specific[col], label=col)
+plt.xlabel('Spanwise position [m]')
+plt.ylabel('MOF [-]')
+plt.legend()
+plt.grid()
+plt.show()
+
+# # find all weight that are within a range of 0.5 kg of the minimum weight
+# weights_range = weights[np.where(weights < np.min(weights)+2)]  
+# # print these weights, together with the amount of stringers and ribs
+# for i in range(len(weights_range)):
+#     n_stringers_range = n_stringers_g[np.where(weights == weights_range[i])[0][0]][np.where(weights == weights_range[i])[1][0]]
+#     n_ribs_range = n_ribs_g[np.where(weights == weights_range[i])[0][0]][np.where(weights == weights_range[i])[1][0]]
+#     print(f"Weight: {weights_range[i]} kg")
+#     print(f"Number of ribs: {n_ribs_range}")
+#     print(f"Number of stringers: {n_stringers_range}")
 
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')
