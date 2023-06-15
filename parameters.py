@@ -16,7 +16,7 @@ class UAV:
         # self.braced_wing         = True     # True if wing is braced
         self.boxweight = 23.0               # weight of a single box [kg]
         # C
-        self.CD0 =  0.026097709288539186                 # Zero lift coefficient [-]
+        self.CD0 =  0.0285                 # Zero lift coefficient [-]
         # self.CL_LDG = 1.6529                # [-]
         # self.CL_TO = 1.2397                 # [-]
         # self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-] 
@@ -160,7 +160,7 @@ class UAV:
 
         self.WS = 632.739                           # Wing Loading [N/m^2]
         self.W_F = 52.69403541333709                # Fuel weight [kg]                                  constant
-        self.W_OE = 441.8453382404869               # Operational empty weight [kg]                     variable
+        self.W_OE = 375.0                           # Operational empty weight [kg] CALCULATED 15-6-23 14:16  variable
         self.W_PL = 276                             # Payload weight [kg]                               constant
         self.W_TO = 770.539373653824                # Take-off weight [kg]                              variable
         self.W_e = 63.6                             # Definitive weight per engine [kg]                 constant
