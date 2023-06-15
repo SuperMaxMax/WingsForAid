@@ -91,11 +91,11 @@ def main_wing_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 7.5
+                AR = 8
             if variable == "Lambda":
                 Lambda = parameter
             else:
-                Lambda = 0.6
+                Lambda = 0.65
             if variable == "Twist":
                 alpha_twist = parameter
             else:
@@ -231,10 +231,9 @@ def main_wing_planform(aircraft):
     #   plt.plot(y, Cli_elliptical, label = "Elliptical")
 
         #General plot
-        plt.grid()
-        plt.xlabel('semi span [m]')
-        plt.ylabel('C_L')
-        plt.legend()
+        #plt.grid()
+        #plt.xlabel('semi span [m]')
+        ##plt.legend()
         #plt.show()
         
         #Calculate CL_max from Predicting Maximum Lift Coefficient for Twisted Wings Using Lifting-Line Theory
@@ -256,8 +255,8 @@ def main_wing_planform(aircraft):
     initial_guess = iw(airfoil)[0]
     i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean = plot_lift_distr(i_w_optimal, full_print=True)
-    plt.plot(y_s, l)
-    plt.show()
+    #plt.plot(y_s, l)
+    #plt.show()
     #print(','.join([str(x) for x in y_s]))
     #print('========')
     #print(','.join([str(x) for x in l]))

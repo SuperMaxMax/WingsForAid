@@ -179,7 +179,7 @@ def horizontal_tail_planform(aircraft):
                 
         
             label = variable + "= " + str(parameter)
-            plt.plot(y_s, CL1, marker = "s", label = label)
+            #plt.plot(y_s, CL1, marker = "s", label = label)
 
             ##Wing Lift Coefficient
             C_L_wing = np.pi * AR * A[0]

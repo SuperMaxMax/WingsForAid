@@ -18,7 +18,7 @@ from scipy.integrate import quad, cumulative_trapezoid, trapezoid
 from scipy.optimize import minimize
 from math import tan, atan, cos
 
-def all_wingbox(ac, n_stringer_fixed, n_rib_fixed, full_loop=False):
+def all_wingbox(ac, full_loop=False):
     # #########################################################
     # # MATERIAL DICTIONARY
     # #########################################################
@@ -473,9 +473,9 @@ def all_wingbox(ac, n_stringer_fixed, n_rib_fixed, full_loop=False):
         #### INPUT ####
         airfoil_num = '4415'            # [-] NACA airfoil number (4 digit)
 
-        f_spar = 0.25                   # [-] location of front spar (as fraction of chord) 
+        f_spar = ac.xc_front_spar       # [-] location of front spar (as fraction of chord) 
         t_f_spar = t_f_spar_func        # [m] thickness of front spar
-        a_spar = 0.8                   # [-] location of aft spar (as fraction of chord)
+        a_spar = 0.8                    # [-] location of aft spar (as fraction of chord)
         t_a_spar = t_a_spar_func        # [m] thickness of aft spar
 
         t_top = t_top_func              # [m] thickness of top panel
@@ -1146,8 +1146,8 @@ def all_wingbox(ac, n_stringer_fixed, n_rib_fixed, full_loop=False):
         n_ribs = np.arange(lower_start, upper_start+step_r, step_r)
         weights = np.zeros((n_stringers[-1]*2+1, n_ribs[-1]*2+1))
     else:
-        n_stringers = np.arange(n_stringer_fixed, n_stringer_fixed+1, 1)
-        n_ribs = np.arange(n_rib_fixed, n_rib_fixed+1, 1) 
+        n_stringers = np.arange(ac.n_stringers, ac.n_stringers+1, 1)
+        n_ribs = np.arange(ac.n_ribs, ac.n_ribs+1, 1) 
         weights = np.zeros((n_stringers[-1]*2+1, n_ribs[-1]*2+1))
 
     solution = True
@@ -1210,6 +1210,9 @@ def all_wingbox(ac, n_stringer_fixed, n_rib_fixed, full_loop=False):
             
             n_stringers_g, n_ribs_g = np.meshgrid(n_stringers, n_ribs)
 
+            ac.n_stringers = n_stringers_min
+            ac.n_ribs = n_ribs_min
+
             print('Region evaluating:')
             print(f'n_stringers: {n_stringers}')
             print(f'n_ribs: {n_ribs}')
@@ -1217,7 +1220,8 @@ def all_wingbox(ac, n_stringer_fixed, n_rib_fixed, full_loop=False):
         solution = False
 
     # save weights array
-    np.save('weights.npy', weights)
+    if full_loop:
+        np.save('weights.npy', weights)
 
     # n_stringers = np.arange(lower_start, upper_start+1, 1)
     # n_ribs = np.arange(lower_start, upper_start+1, 1)
@@ -1246,5 +1250,7 @@ def all_wingbox(ac, n_stringer_fixed, n_rib_fixed, full_loop=False):
 
     # print(np.min(weights[weights != 0]))
     # print(np.where(weights == np.min(weights[weights != 0])))
+
+    ac.W_w = 2*np.min(weights[weights != 0])
 
     return np.min(weights[weights != 0]), n_stringers, n_ribs
