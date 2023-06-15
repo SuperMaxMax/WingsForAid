@@ -64,14 +64,15 @@ def required_lift(aircraft):
     W_TO = aircraft.W_TO * 9.80665
 
 
-    rpm = 3000 #Change to object variable [1/min]
+    rpm = 3600 #Change to object variable [1/min]
     omega = rpm / 60 * 2 * np.pi
     power = 100*745.7 #Change to object variable [W]
+    power = 29500
 
     M = power / omega
 
-    cg_vt_d = 1.16 - aircraft.ST_z_cg_ground
-    ver_dist = cg_vt_d  + aircraft.AE_b_v / 2 #Change to object variable, distance between centre of pressure vertical tail and vertical cg location
+    cg_vt_d = aircraft.ST_z_ground+aircraft.w_out - aircraft.ST_z_cg_ground
+    ver_dist = cg_vt_d  + aircraft.AE_b_v * 0.35 #Change to object variable, distance between centre of pressure vertical tail and vertical cg location
 
     L_h = M / ver_dist
 
@@ -137,7 +138,7 @@ def horizontal_tail_planform(aircraft):
         if variable == "Lambda":    
             variable_list2 = [0.7]
         elif variable == "AR":  
-            variable_list2 = [1.5]
+            variable_list2 = [1.45]
         elif variable == "Twist":
             variable_list2 = [0]
         
@@ -145,7 +146,7 @@ def horizontal_tail_planform(aircraft):
         a_stall = airfoildata_temp['alpha_s'].tolist()[0] * np.pi /180
         
         for parameter in variable_list2:
-            if abs(i_w/a_stall) > 0.1333: #2degree out of 15 is 0.13333
+            if abs(i_w/a_stall) > 0.1: #2degree out of 15 is 0.13333
                 change = 1
             elif abs(i_w/a_stall) < 0.06666: #1degree out of 15 is 0.06666
                 change = -1
@@ -160,7 +161,7 @@ def horizontal_tail_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 1.5
+                AR = 1.45
             if variable == "Lambda":
                 Lambda = parameter
             else:
@@ -242,7 +243,7 @@ def horizontal_tail_planform(aircraft):
             print('=====================================================================')
             print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
             print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
-            print("Max is 1.80 = ", b )
+            print("Max is 1.20 = ", b)
             print(i_w*180/np.pi, C_L_wing - C_L_h, C_L_h, airfoildata.index.tolist())
             print("C_L", C_L_wing)
 
