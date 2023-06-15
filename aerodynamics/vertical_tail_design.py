@@ -161,7 +161,7 @@ def horizontal_tail_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 1.45
+                AR = 1.3
             if variable == "Lambda":
                 Lambda = parameter
             else:
@@ -291,8 +291,7 @@ def horizontal_tail_planform(aircraft):
 
     aircraft.sweep_co4_v = 35 / 180 * np.pi                 # Updated half chord sweep [rad]
     aircraft.sweep_LE_v = np.arctan(np.tan(aircraft.sweep_co4_v) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda))) 
-    aircraft.sweep_co2_v = np.arctan(np.tan(aircraft.sweep_co4_v) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
+    aircraft.sweep_co2_v = np.arctan(np.tan(aircraft.sweep_co4_v) - 4/AR * (25/100*(1-Lambda)/(1+Lambda)))
     
 
-vertical_wing_design(object)
-
+#horizontal_tail_planform(object)
