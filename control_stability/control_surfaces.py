@@ -79,7 +79,7 @@ def elevator_design(aircraft):
     eta_h = 0.96
     V_range = np.arange(aircraft.V_s_min, aircraft.V_cruise*1.4, 2)
     
-    color_r = ['black', 'steelblue']
+    color_r = ['black', 'red'] #steelblue
     e = 0
     plt.figure()
     for X_cg in [aircraft.X_cg_fwd, aircraft.X_cg_aft]:
@@ -109,7 +109,7 @@ def elevator_design(aircraft):
     plt.grid()
     plt.show(block=True)
 
-def rudder_design(aircraft):
+def rudder_design(aircraft):#, tau_r):
     
     V_w = 20 * (0.51444444444) # [m/s] side wind
 
@@ -174,7 +174,7 @@ def rudder_iteration(aircraft):
     plt.figure()
     for i in tau_array:
         tau_r = i
-        rudder_design(aircraft, tau_r)
+        rudder_design(aircraft)#, tau_r)
 
         delta_r_value_array.append(aircraft.delta_r_value)
 
