@@ -167,7 +167,7 @@ class UAV:
         self.W_e = 63.6                             # Definitive weight per engine [kg]                 constant
         self.W_eq = 63.59091417331568               # Equipment weight [kg]                             constant -> needs to be changed
         self.W_n = 11.34                            # Nacelle weight [kg]                               constant
-        self.W_pg = 86.41999999999999               # Propulsion group weight [kg]                      constant
+        self.W_pg = 77.1                            # Propulsion group weight [kg]                      constant
         self.W_sc = 28.996836344162986              # Control systems weight [kg]                       variable -> needs to be implemented
         self.W_t = 18.647695670124357               # Tail weight [kg]                                  variable -> needs to be implemented
         self.W_strut = 16.794                       # Weight of 2 struts [kg]                           constant
