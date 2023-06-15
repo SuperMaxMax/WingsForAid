@@ -11,7 +11,6 @@ from parameters import UAV
 import aerodynamics.main_aero as ae
 
 
-
 aircraft = UAV("aircraft")
 
 # start
