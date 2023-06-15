@@ -1125,4 +1125,4 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     flight_profile.append(W_F_used)         # fuel burnt
     return flight_profile
 
-fuelusesortie(aircraft, atm, 12, 1, 10500, 45, 56.584, Range=250, Summary=True, plot=True, savefig=False)
+# fuelusesortie(aircraft, atm, 12, 1, 12000, 45, 56.584, Range=250, Summary=True, plot=True, savefig=False)
