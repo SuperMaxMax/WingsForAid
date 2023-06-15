@@ -101,7 +101,7 @@ class UAV:
 
         "-Speeds"
         self.V_s_min             = 50*(1.852/3.6)       # Dropping speed [m/s]
-        self.V_cruise            = 116.82*(1.852/3.6)   # Cruise speed [m/s]
+        self.V_cruise            = 105*(1.852/3.6)      # Cruise speed [m/s]
         self.V_climb             = 70*(1.852/3.6)       # Climb speed [m/s]
         self.V_D                 = 163.54*0.514444      # Dive speed [m/s]
         self.V_B                 = 42.22                # Design speed for maximum gust intensity [m/s] | NOTES: Follow guidelines to choose this speed
