@@ -191,22 +191,28 @@ for k in range(3):
     # define moment arms
     cop = 0.25                      # chord from leading edge
     ma_wing_loading = (flex_ax-cop)*chord(y_span) # moment arm wing loading
-    torque_wing_loading = ma_wing_loading*spanwise_wing_loading(y_span) # torque wing loading
-    pos_flap = ac.xc_aft_spar+0.4*(1-ac.xc_aft_spar) # make variable in future !!!
+    torque_wing_loading = -ma_wing_loading*spanwise_wing_loading(y_span) # torque wing loading
+
+    pos_flap = ac.xc_aft_spar+0.4*(1-ac.xc_aft_spar)
     ma_flap = (flex_ax-pos_flap)*chord(y_span)
-    torque_flap = ma_flap*-spanwise_flap_weight()
-    pos_ail = ac.xc_aft_spar+0.4*(1-ac.xc_aft_spar) # make variable in future !!!
+    torque_flap = -ma_flap*-spanwise_flap_weight()
+
+    pos_ail = ac.xc_aft_spar+0.4*(1-ac.xc_aft_spar)
     ma_ail = (flex_ax-pos_ail)*chord(y_span)
-    torque_ail = ma_ail*-spanwise_aileron_weight()
+    torque_ail = -ma_ail*-spanwise_aileron_weight()
+
+    pos_strut = ac.xc_front_spar
+    ma_strut = (flex_ax-pos_strut)*chord(ac.ST_y_strut)
+    torque_strut = -ma_strut*Bz
 
     for j, i in enumerate(y_span):
         normal.append(By*(1-np.heaviside(i-ac.ST_y_strut, 1)))
         if load_case == 1:
             shear.append(-(quad(spanwise_func_1, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.ST_y_strut, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
-            torque.append(-trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
+            torque.append(trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]) + torque_strut*(1-np.heaviside(i-ac.ST_y_strut, 1)))
         else:
             shear.append(-(quad(spanwise_func_2, i, ac.b/2)[0] - trapezoid(spanwise_flap_weight()[j:]+spanwise_aileron_weight()[j:], y_span[j:]) + Bz*(1-np.heaviside(i-ac.ST_y_strut, 1)) - ac.W_wl*ac.g0)) # + smth for reaction force? # CHECK SIGNS
-            torque.append(-trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]))
+            torque.append(trapezoid(torque_wing_loading[j:]+torque_flap[j:]+torque_ail[j:], y_span[j:]) + torque_strut*(1-np.heaviside(i-ac.ST_y_strut, 1)))
     # get the bending moment by integrating the shear along the length
     moment = cumulative_trapezoid(shear, y_span, initial=0)
 
