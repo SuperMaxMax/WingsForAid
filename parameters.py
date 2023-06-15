@@ -152,9 +152,9 @@ class UAV:
         self.V_s_min = 25.721               # Minimum stall velocity [m/s]
         # W
         # self.W10W9 = 0.993                  # Descent fraction [-]
-        # self.W1W_TO = 0.995                 # Engine startup fraction [-]
-        # self.W2W1 = 0.997                   # Taxi fraction [-]
-        # self.W3W2 = 0.998                   # Take-off fraction [-]
+        self.W1W_TO = 0.995                 # Engine startup fraction [-]
+        self.W2W1 = 0.997                   # Taxi fraction [-]
+        self.W3W2 = 0.998                   # Take-off fraction [-]
         # self.W4W3 = 0.992                   # Climb fraction [-]
         # self.WP = 0.1215
 
@@ -290,7 +290,7 @@ class UAV:
         self.prop_radius    = 0.7237            # [m] based on 3 blade rotax 3B0 ground adjustable propeller by sensenich propellers
         self.ceiling        = 18000*0.3048      # [m] 18000 ft service ceiling
         # self.th_ceil        = 30000*0.3048
-        self.SFC            = 1.2*7.77777778e-8 # kg/J specific fuel consumption
+        self.SFC            = 1.2*7.5e-8 # kg/J specific fuel consumption
         self.fuelcapacity   = 100               # L
         self.fueldensity    = 0.7429            # kg/L
         self.turnrate_half  = 1.5               # deg/s
