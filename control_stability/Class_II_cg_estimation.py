@@ -11,24 +11,26 @@ from scipy.integrate import quad
 import math
 import pandas as pd 
 
-# Setting with which can be determined if first the aircraft is filled with fuel or with payload
-fuel_first = False
 
 def cg_calc(obj, plot):
+    # Setting with which can be determined if first the aircraft is filled with fuel or with payload
+    fuel_first = False
+    
     name_list = []
     list_mass = []
     x_list = []
     y_list = []
     z_list = []
-    ixx_list = [0,0,0,0,0,0,0,0,0,0,0,0]
-    iyy_list = [0,0,0,0,0,0,0,0,0,0,0,0]
-    izz_list = [0,0,0,0,0,0,0,0,0,0,0,0]
+    ixx_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+    iyy_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+    izz_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
     
     # Calculate MTOW
+    obj.W_OE = obj.W_eq + obj.W_n + obj.W_pg + obj.W_sc + obj.W_t + obj.W_strut + obj.ST_W_fus + obj.ST_W_boom + obj.ST_W_uc + obj.W_w
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
 
     # Wing placement
-    X_LEMAC = 0.40 * obj.l_f
+    X_LEMAC = 0.43 * obj.l_f
     obj.X_LEMAC = X_LEMAC
 
     '''v Wing group v'''
@@ -194,6 +196,6 @@ def cg_calc(obj, plot):
 
     return max(Xs), min(Xs), obj.X_cg_range
 
-from parameters import UAV
-aircraft = UAV('aircraft')
-print(cg_calc(aircraft, False))
+# from parameters import UAV
+# aircraft = UAV('aircraft')
+# print(cg_calc(aircraft, False))

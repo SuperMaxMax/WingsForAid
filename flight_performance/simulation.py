@@ -224,7 +224,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             CL_to = max(CL_all)
             print(CL_to, CL_max)
             obj.FP_CL_max_TO = CL_max
-            obj.FP_CL_to = CL_to
+            obj.FP_CL_TO = CL_to
 
         if Plot:
             if i == 0:
@@ -725,6 +725,7 @@ def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD = dragpolar(ac_obj, CL)
     LD_max = CL / CD
+    print(f"Maximum lift to drag ratio: {LD_max} [-]")
     gamma_LD_max = np.arctan(1/(LD_max))
     h = h_cruise
     p, rho  = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
@@ -1124,4 +1125,4 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     flight_profile.append(W_F_used)         # fuel burnt
     return flight_profile
 
-fuelusesortie(aircraft, atm, 12, 1, 10000, 45, 56.584, Range=250, Summary=True, plot=True, savefig=False)
+fuelusesortie(aircraft, atm, 12, 1, 10500, 45, 56.584, Range=250, Summary=True, plot=True, savefig=False)

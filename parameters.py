@@ -20,15 +20,15 @@ class UAV:
         # self.CL_LDG = 1.6529                # [-]
         # self.CL_TO = 1.2397                 # [-]
         # self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-] 
-        self.CL_max_clean = 1.5615          # Maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.CL_max_clean = 1.5615            # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         # self.CL_max_land = 2.0              # Maximum lift coefficient at landing [-]
         # self.CLa = 4.743                    # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         # self.c_p = 72E-9                    # Specific fuel consumption [kg/J]
         # self.climb_rate = 2.9889
         # self.cos_lambda_c04 = 1
         # self.cruise_frac = 0.8348           # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
-        self.CL_a_w = 4.743                 # Updated Lift curve slope [1/rad]
-        self.C_r_C_v = 0.4                  # Rudder chord over vertical tail chord
+        self.CL_a_w = 4.743                     # Updated Lift curve slope [1/rad]
+        self.C_r_C_v = 0.4                      # Rudder chord over vertical tail chord
 
         # D
         # self.Drag_increase = 1.0            # This is used for the calculations of the strut drag if applicable [-]
@@ -36,6 +36,7 @@ class UAV:
         # self.d_engine_boxes = 0.4           # Distance between engine and box [m]
         self.dihedral = 0
         self.d_fuselage = 1.102             # Effective fuselage diameter used for drag estimation [m]
+        
         # E
         self.e = 0.776                      # Oswald factor [-]
         self.engine_cg = 0.267              # Engine cg location [m]
@@ -68,7 +69,7 @@ class UAV:
         self.l_fus_main_cone = 2.9              # Fuselage main cilindrical part length [m]
         self.l_fus_tail_cone = 0.8              # Fuselage tail cone length [m]
         self.l_f = 4.6342                       # Fuselage length [m]
-        self.l_f_boom = 2.8                     # Boom length [m]
+        self.l_f_boom = 3.0                     # Boom length [m]
         self.l_n = 0.9342                       # Nosecone length [m]
         # self.l_tc = 0.8                       # Tail cone length [m]
         # self.lin_par1 = 0.5249                  # [-]
@@ -156,26 +157,35 @@ class UAV:
         # self.W3W2 = 0.998                   # Take-off fraction [-]
         # self.W4W3 = 0.992                   # Climb fraction [-]
         # self.WP = 0.1215
-        self.WS = 632.739                   # Wing Loading [N/m^2]
-        self.W_F = 52.69403541333709               # Fuel weight [kg]
-        self.W_OE = 441.8453382404869                # Operational empty weight [kg]
-        self.W_PL = 276                     # Payload weight [kg]
-        self.W_TO = 770.539373653824                 # Take-off weight [kg]
-        # self.W_boom = 20.3                  # Boom weight [kg]
-        self.W_e = 63.6                     # Definitive weight per engine [kg]
-        self.W_eq = 63.59091417331568                 # Equipment weight [kg]
-        # self.W_fus = 116.507                # Fuselage weight [kg]
-        self.W_n = 11.34                  # Nacelle weight [kg]
-        self.W_pg = 86.41999999999999                 # Propulsion group weight [kg]
-        self.W_sc = 28.996836344162986                 # Control systems weight [kg]
-        self.W_t = 18.647695670124357             # Tail weight [kg]
-        # self.W_uc = 66.4175                 # Undercarriage weight [kg]
-        self.W_w =52.72497438003413                # Wing weight [kg]
-        self.WfinalW10 = 0.993              # Landing, taxi & shut-down fraction [-]
-        # self.w_in = 1.2                     # Inner fuselage width [m]
-        self.w_out = 1.1                    # Outer fuselage width [m]
-        self.wing_twist = -2.0 *np.pi/180   # Updated wing twist (difference root and chord) [rad]
-        self.W_strut = 16.794               # Weight of 2 struts [kg]
+
+        self.WS = 632.739                           # Wing Loading [N/m^2]
+        self.W_F = 52.69403541333709                # Fuel weight [kg]                                  constant
+        self.W_OE = 441.8453382404869               # Operational empty weight [kg]                     variable
+        self.W_PL = 276                             # Payload weight [kg]                               constant
+        self.W_TO = 770.539373653824                # Take-off weight [kg]                              variable
+        self.W_e = 63.6                             # Definitive weight per engine [kg]                 constant
+        self.W_eq = 63.59091417331568               # Equipment weight [kg]                             constant -> needs to be changed
+        self.W_n = 11.34                            # Nacelle weight [kg]                               constant
+        self.W_pg = 86.41999999999999               # Propulsion group weight [kg]                      constant
+        self.W_sc = 28.996836344162986              # Control systems weight [kg]                       variable -> needs to be implemented
+        self.W_t = 18.647695670124357               # Tail weight [kg]                                  variable -> needs to be implemented
+        self.W_strut = 16.794                       # Weight of 2 struts [kg]                           constant
+        self.ST_W_fus_truss = 40.224                # Mass of fuselage structure (only) [kg]            constant
+        self.ST_W_fus_fairing = 15                  # Mass of fuselage fairing [kg]                     constant
+        self.ST_W_fus = self.ST_W_fus_truss + self.ST_W_fus_fairing                                   # constant
+        # self.W_fus = 116.507                      # Fuselage weight [kg]                              constant  
+        self.ST_W_boom = 20.3                       # Mass of tail boom, given it is 2.8 m long [kg]    constant
+        # self.W_boom = 20.3                        # Boom weight [kg]                                  constant
+        self.ST_W_lg = 7.75                         # Mass of landing gear struts [kg]                  constant
+        self.ST_W_wheels = 10                       # Mass of wheels [kg]                               constant
+        self.ST_W_uc = self.ST_W_lg + self.ST_W_wheels                                                # constant              
+        # self.W_uc = 66.4175                       # Undercarriage weight [kg]                         constant
+        self.W_w =52.72497438003413                 # Wing weight [kg]                                  variable
+
+        self.WfinalW10 = 0.993                      # Landing, taxi & shut-down fraction [-]
+        # self.w_in = 1.2                           # Inner fuselage width [m]
+        self.w_out = 1.1                            # Outer fuselage width [m]
+        self.wing_twist = -2.0 *np.pi/180           # Updated wing twist (difference root and chord) [rad]
 
         # X
         self.xc_aft_spar = 0.80             # Aft spar location as fraction of MAC
@@ -219,7 +229,7 @@ class UAV:
 
         # Horizontal tailplane
         self.AE_Vh_V = 0.95                     # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
-        self.AE_A_h = 5.166666                  # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+        self.AE_A_h = 4                  # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02               # Downwash [-] TODO: check this value, this is a pure guess
         self.AE_Sh = 2.0377662                  # Surface area horizontal tailplane [m^2]
         self.AE_CL_a_h = 4.18773706267545       # Lift curve slope horizontal tailplane [1/rad] 
@@ -288,9 +298,9 @@ class UAV:
         self.turnrate_2     = 6.0               # deg/s
         self.accelheight    = 300*0.3048
         self.FP_CL_max_land = 2
-        self.FP_CL_max_to = 1.5
+        self.FP_CL_max_TO = 1.5
         self.FP_CL_land = 0.84
-        self.FP_CL_to = 0.76
+        self.FP_CL_TO = 0.76
 
 
         "Control and stability parameters"      # NOTE: Add identifier "CS_" before variable names
@@ -380,14 +390,6 @@ class UAV:
         self.ST_d_LG = 0.04 #strut diameter (outer) [m]
         self.ST_d_boom = 0.05 #strut diameter (outer) [m]
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
-
-        self.ST_W_fus_truss = 40.224 #kg mass of fuselage structure (only)
-        self.ST_W_fus_fairing = 10
-        self.ST_W_fus = self.ST_W_fus_truss + self.ST_W_fus_fairing
-        self.ST_W_boom = 20.3 #kg mass of tail boom, given it is 2.8 m long
-        self.ST_W_lg = 7.75 #kg mass of landing gear struts
-        self.ST_W_wheels = 10
-        self.ST_W_uc = self.ST_W_lg + self.ST_W_wheels
 
         self.ST_z_ground = 0.5 #m floor height
         self.ST_z_prop = 0.3 #m propeller clearance
