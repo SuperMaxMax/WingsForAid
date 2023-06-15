@@ -70,7 +70,7 @@ class UAV:
         self.l_fus_main_cone = 2.9              # Fuselage main cilindrical part length [m]
         self.l_fus_tail_cone = 0.8              # Fuselage tail cone length [m]
         self.l_f = 4.6342                       # Fuselage length [m]
-        self.l_f_boom = 3.0                     # Boom length [m]
+        self.l_f_boom = 3.3                     # Boom length [m]
         self.l_n = 0.9342                       # Nosecone length [m]
         # self.l_tc = 0.8                       # Tail cone length [m]
         # self.lin_par1 = 0.5249                  # [-]
@@ -236,7 +236,7 @@ class UAV:
         self.AE_Vh_V = 0.95                     # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 4                  # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02               # Downwash [-] TODO: check this value, this is a pure guess
-        self.AE_Sh = 2.0377662                  # Surface area horizontal tailplane [m^2]
+        # self.AE_Sh = 2.0377662                  # Surface area horizontal tailplane [m^2]
         self.AE_CL_a_h = 4.18773706267545       # Lift curve slope horizontal tailplane [1/rad] 
         self.b_h = 3.649                        # Wing span horizontal tailplane [m]
         self.i_w_h = -1.8957                    # Incidence angle horizontal tailplane [degrees]      

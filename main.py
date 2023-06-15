@@ -16,7 +16,6 @@ remove_duplicates = False
 
 n_iteration = 0
 something = True
-# n_stringer_f, n_rib_f = 20, 15
 
 while something:
 
@@ -37,8 +36,8 @@ while something:
     if np.abs((aircraft.W_TO - W_TO_old)/W_TO_old) < 0.001:
         something = False
 
+    print(aircraft.__dict__)
 # print all attributes of object
-print(aircraft.__dict__)
 # # create dataframe with members and values, to save all aircrafts in
 # df = pd.DataFrame()
 
