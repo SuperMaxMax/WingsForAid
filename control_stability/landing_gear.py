@@ -219,7 +219,7 @@ ax.plot([aircraft.l_f-aircraft.l_fus_tail_cone, aircraft.l_f], [-aircraft.w_out/
 ax.plot([aircraft.l_f - aircraft.l_fus_tail_cone, aircraft.l_f - aircraft.l_fus_tail_cone + aircraft.l_f_boom], [0.1, 0.1], color='0.25', linewidth=0.8)
 ax.plot([aircraft.l_f - aircraft.l_fus_tail_cone, aircraft.l_f - aircraft.l_fus_tail_cone + aircraft.l_f_boom], [-0.1, -0.1], color='0.25', linewidth=0.8)
 
-ax.set_xlim(-0.3, aircraft.l_f+1)
+ax.set_xlim(-0.3, aircraft.l_f+4)
 ax.set_ylim(-1, aircraft.b/2+1)
 ax.axhline(0, color='blue', linestyle='dashdot', linewidth = 1)
 
