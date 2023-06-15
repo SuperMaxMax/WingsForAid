@@ -27,7 +27,7 @@ def WingPlanform(ac, plot):
     # For aileron
     y1_a = ac.ystart_ail             # Start of aileron - [m]
     y2_a = ac.yend_ail               # End of aileron - [m]
-    c_a = 1 - ac.xc_aft_spar                        # aileron chord - [c]
+    c_a = 1 - ac.xc_aft_spar         # aileron chord - [c]
 
     # For flaps
     y1_f = 0                         # Start of flaps - [m]
@@ -35,7 +35,7 @@ def WingPlanform(ac, plot):
     c_f = 1 - ac.xc_aft_spar         # flap chord - [c]
 
     # Spars
-    f_spar = 0.15                    # front spar location - [c]
+    f_spar = ac.xc_front_spar        # front spar location - [c]
     a_spar = ac.xc_aft_spar          # aft spar location - [c]
 
     # -------------------------------------------- Calculations --------------------------------------------
@@ -137,14 +137,14 @@ def WingPlanform(ac, plot):
     ax1.plot((-ac.w_out/2, -ac.w_out/2), (-3, 3), 'black', label = "Fuselage", linewidth = line_width)
     ax1.plot((ac.w_out/2, ac.w_out/2), (-3, 3), 'black', linewidth = line_width)
 
-    # Quarter chord line left side
-    ax1.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(q_c_r,q_c_t), label="Quarter Chord line", linewidth=line_width)
-
     # Spars
     ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r-f_spar*c_r,le_c_t-f_spar*c_t), 'm', label="Spars", linewidth=line_width)
     ax1.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_r-f_spar*c_r,le_c_t-f_spar*c_t), 'm', linewidth=line_width)
     ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r-a_spar*c_r,le_c_t-a_spar*c_t), 'm', linewidth=line_width)
     ax1.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_r-a_spar*c_r,le_c_t-a_spar*c_t), 'm', linewidth=line_width)
+
+    # Quarter chord line left side
+    ax1.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(q_c_r,q_c_t), label="Quarter Chord line", linewidth=line_width)
 
     # Aileron
     ax1.plot((y1_a + ac.w_out/2, y2_a + ac.w_out/2),(ai1,ai3),'y', label="Ailerons", linewidth=line_width)

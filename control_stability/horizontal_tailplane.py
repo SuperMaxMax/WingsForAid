@@ -201,7 +201,6 @@ def controlability_curve(aircraft, xcgRange):
     CS_dClmax_LD, CS_cprime_c_LD, CS_Swf, CS_dCLmax_LD, CS_yend_f = flaps(aircraft)
     aircraft.yend_flap = CS_yend_f
     
-    CL_h = -1  # Full moving tail
     CL_Ah = aircraft.W_TO * aircraft.g0 / (0.5 * atm.rho0 * (1.3 * aircraft.V_s_min)**2 * aircraft.Sw)
 
     #Calculation of Cm_ac starting here
@@ -217,7 +216,7 @@ def controlability_curve(aircraft, xcgRange):
 
     Cm_ac = Cm_ac_w + dCm_ac_f + dCm_ac_fus
 
-    ControlFrac = 1 / ((CL_h / CL_Ah) * (aircraft.l_h / aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
+    ControlFrac = 1 / ((aircraft.CL_h / CL_Ah) * (aircraft.l_h / aircraft.MAC_length) * aircraft.AE_Vh_V ** 2)
     # print(f'Cm_ac:{Cm_ac}')
     # print(f"CL_Ah:{CL_Ah}")
     ControlSh_S = ControlFrac * (xcgRange + Cm_ac / CL_Ah - aircraft.x_ac_approach)

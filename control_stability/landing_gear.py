@@ -16,8 +16,8 @@ aircraft.x_cg_position_aft = aircraft.X_LEMAC + aircraft.X_cg_aft * aircraft.MAC
 aircraft.x_cg_position_fwd = aircraft.X_LEMAC + aircraft.X_cg_fwd * aircraft.MAC_length
 
 # initial guess for position. Is needed to run, but does not influence result. 
-aircraft.position_landing_fwd = [2, 0]
-aircraft.position_landing_back = [4, 1]
+# aircraft.position_landing_fwd = [2, 0]
+# aircraft.position_landing_back = [4, 1]
 
 # Initial values for plotting
 left_click_point = None

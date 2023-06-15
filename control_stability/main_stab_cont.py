@@ -20,7 +20,7 @@ def main_stab_control(aircraft, plot, print_value):
     hor_run(aircraft, plot)
     ver_run(aircraft)
     exec(open("control_stability/landing_gear.py").read(), {'aircraft':aircraft, 'plot':plot})
-    main_control_surface(aircraft)
+    main_control_surface(aircraft, plot)
     WingPlanform(aircraft, plot)
 
     if print_value:

@@ -28,10 +28,28 @@ def cg_calc(obj, plot):
     # Calculate MTOW
     obj.W_OE = obj.W_eq + obj.W_n + obj.W_pg + obj.W_sc + obj.W_t + obj.W_strut + obj.ST_W_fus + obj.ST_W_boom + obj.ST_W_uc + obj.W_w
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
-
+    
     # Wing placement
-    X_LEMAC = 0.43 * obj.l_f
+    allignment = True  # choose True to allign front and aft spar with front and aft vertical truss
+    
+    if allignment:
+        # Calculate front spar location, so that the distance between front and aft == 1m (distance between beams)
+        obj.xc_front_spar = obj.xc_aft_spar - 1/obj.rootchord
+        print(f"Front spar position: {obj.xc_front_spar} * rootchord")
+
+        X_LEMAC = obj.ST_x_beam_front - obj.xc_front_spar * obj.rootchord + obj.x_lemac
+        
+        if (obj.xc_front_spar <= 0.2) or (obj.xc_front_spar >= 0.3): # Warning if spar would be placed weirdly
+            print(f"WARNING: NOTICEABLE FRONT SPAR POSITION: {obj.xc_front_spar} * ROOTCHORD")
+            obj.xc_front_spar = 0.23
+            print(f"FRONT SPAR PLACED AT {obj.xc_front_spar} * ROOTCHORD")
+            X_LEMAC = 0.43 * obj.l_f
+
+    else:  # Dont bother about allignment
+        X_LEMAC = 0.43 * obj.l_f
+
     obj.X_LEMAC = X_LEMAC
+    print(f"X_LEMAC = {X_LEMAC} [m]")    
 
     '''v Wing group v'''
     if obj.sweep_co4 == 0:
