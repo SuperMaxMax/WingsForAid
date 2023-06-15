@@ -148,7 +148,7 @@ class UAV:
         # self.V_B = 52.0489                  # [m/s]
         # self.V_D = 92.5741                  # [m/s]
         # self.V_climb = 36.0111              # [m/s]
-        self.V_cruise = 100 * 0.514444444   # Cruise velocity [m/s]
+        self.V_cruise = 105 * 0.514444444   # Cruise velocity [m/s]
         self.V_s_min = 25.721               # Minimum stall velocity [m/s]
         # W
         # self.W10W9 = 0.993                  # Descent fraction [-]

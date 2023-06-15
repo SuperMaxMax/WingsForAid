@@ -291,6 +291,7 @@ def horizontal_tail_planform(aircraft):
     aircraft.sweep_co4_v = 35 / 180 * np.pi                 # Updated half chord sweep [rad]
     aircraft.sweep_LE_v = np.arctan(np.tan(aircraft.sweep_co4_v) - 4/AR * (-25/100*(1-Lambda)/(1+Lambda))) 
     aircraft.sweep_co2_v = np.arctan(np.tan(aircraft.sweep_co4_v) - 4/AR * (25/100*(1-Lambda)/(1+Lambda))) 
+    
 
-
+vertical_wing_design(object)
 
