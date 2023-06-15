@@ -182,6 +182,9 @@ class UAV:
         self.ST_W_uc = self.ST_W_lg + self.ST_W_wheels                                                # constant              
         # self.W_uc = 66.4175                       # Undercarriage weight [kg]                         constant
         self.W_w =52.72497438003413                 # Wing weight [kg]                                  variable
+        self.W_v = 0
+        self.W_h = 0
+        self.W_t = 0
 
         self.WfinalW10 = 0.993                      # Landing, taxi & shut-down fraction [-]
         # self.w_in = 1.2                           # Inner fuselage width [m]

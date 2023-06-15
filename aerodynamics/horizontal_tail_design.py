@@ -264,6 +264,13 @@ def horizontal_tail_planform(aircraft):
     aircraft.y_mac_h = 1/3*(aircraft.b_h/2)*(1+2*Lambda)/(1+Lambda)   
     aircraft.x_lemac_h = aircraft.y_mac_h*np.tan(aircraft.sweep_LE_h)
     aircraft.AE_CL_a_h = CL_a_h
+
+
+    MAC_length = 2/3 * aircraft.AE_rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)
+    V_h = aircraft.Sh_S * aircraft.l_h / aircraft.b
+        
+    aircraft.W_h = S * MAC_length * 0.12 * 2680 * 0.025 * (AR / np.cos(aircraft.sweep_co4_h))**0.6*Lambda**0.04*V_h**0.2*1**0.4*9.80665
+    aircraft.W_t = aircraft.W_h + aircraft.W_v
     #print("Afsd", CL_a_h)
     #print(b)
     #print(S)
