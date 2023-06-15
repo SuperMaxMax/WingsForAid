@@ -188,8 +188,9 @@ class UAV:
         self.wing_twist = -2.0 *np.pi/180           # Updated wing twist (difference root and chord) [rad]
 
         # X
-        self.xc_aft_spar = 0.80             # Aft spar location as fraction of MAC
-        self.X_LEMAC = 2.9164800703929266               # Leading edge mean aerodynamic chord [m]
+        self.xc_front_spar = 0.25                   # Front spar location as fraction of MAC
+        self.xc_aft_spar = 0.80                     # Aft spar location as fraction of MAC
+        self.X_LEMAC = 2.9164800703929266           # Leading edge mean aerodynamic chord [m]
         self.x_lemac = 0.3298932388521987               # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
         self.X_cg_aft = 0.38751834425790044             # Aft cg location CG/MAC [-]
