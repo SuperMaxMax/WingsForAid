@@ -27,6 +27,7 @@ class UAV:
         # self.climb_rate = 2.9889
         # self.cos_lambda_c04 = 1
         # self.cruise_frac = 0.8348           # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
+        self.CL_h = -1.0                        # CL of full moving tail [-] 
         self.CL_a_w = 4.743                     # Updated Lift curve slope [1/rad]
         self.C_r_C_v = 0.4                      # Rudder chord over vertical tail chord
 
@@ -389,10 +390,12 @@ class UAV:
         self.ST_strut_2a = 0.08 #strut semi major*2 [m]
         self.ST_strut_2b = 0.04 #strut semi minor*2 [m]
         self.ST_strut_t = 0.0021 #m strut thickness [m]
-        self.ST_l_LG = 2.5637 #m strut length (single)
+        self.ST_l_LG = 2.5637 #m strut length (single) TODO FIXME THIS IS WRONG
         self.ST_d_LG = 0.04 #strut diameter (outer) [m]
         self.ST_d_boom = 0.05 #strut diameter (outer) [m]
         self.ST_y_strut = 2.0829580913074834  #spanwise location of strut attachment
+        self.ST_x_beam_front = 1.884  # longitudinal position of front vertical truss (used for wing placement)
+        self.ST_x_beam_aft = 2.884  # longitudinal position of aft vertical truss (used for wing placement)
 
         self.ST_z_ground = 0.5 #m floor height
         self.ST_z_prop = 0.3 #m propeller clearance

@@ -70,8 +70,8 @@ def elevator_design(aircraft):
     # L_TO = 1/2 * atm.rho0 * C_L_TO * aircraft.Vs_min**2 * aircraft.Sw 
     # M_ac_wf = 1/2*atm.rho0 * aircraft.Cm_ac_w * aircraft.Vs_min**2 * aircraft.Sw * aircraft.MAC_length
 
-    CL_h = -1
-    aircraft.L_h = 0.5 * 0.7 * CL_h * (aircraft.V_cruise)**2 * aircraft.Sh_S * aircraft.Sw
+    
+    aircraft.L_h = 0.5 * 0.7 * aircraft.CL_h * (aircraft.V_cruise)**2 * aircraft.Sh_S * aircraft.Sw
     
     T= 2800 
     z_position_T = -(aircraft.ST_z_prop + aircraft.prop_radius - aircraft.ST_z_cg_ground)
@@ -79,7 +79,7 @@ def elevator_design(aircraft):
     eta_h = 0.96
     V_range = np.arange(aircraft.V_s_min, aircraft.V_cruise*1.4, 2)
     
-    color_r = ['black', 'red'] #steelblue
+    color_r = ['black', 'steelblue']
     e = 0
     plt.figure()
     for X_cg in [aircraft.X_cg_fwd, aircraft.X_cg_aft]:
@@ -107,7 +107,7 @@ def elevator_design(aircraft):
     plt.text(aircraft.V_cruise - 2.5, min(delta_eq_req_range), r'$V_{cruise}$', rotation=90, color='red')
 
     plt.grid()
-    plt.show(block=True)
+    # plt.show(block=True)
 
 def rudder_design(aircraft):#, tau_r):
     
@@ -191,10 +191,12 @@ def rudder_iteration(aircraft):
 
     plt.xlabel(r"$\frac{C_r}{C_v}$")
     plt.ylabel(r"$\delta_{r_{max}}$ [deg]")
-    plt.show(block=True)
+    # plt.show(block=True)
     
-def main_control_surface(aircraft):
+def main_control_surface(aircraft, plot):
     aileron_design(aircraft)
     # rudder_iteration(aircraft)
     rudder_design(aircraft)
     elevator_design(aircraft)
+    if plot:
+        plt.show(block=True)
