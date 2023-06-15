@@ -26,17 +26,20 @@ rho_steel = 7850                                                    # density of
 ### Defining Hail Stone ### 
 #info from https://www.nssl.noaa.gov/education/svrwx101/hail/
 d_hail = 0.0254                                     # diameter hail stone [m]
+#d_hail = 0.04445
 r_hail = d_hail/2                                   # radius hail stone [m]
 v_hail = 11.176                                     # velocity hail stone [m/s]
+#v_hail = 17.8816
 rho_hail = 200                                      # denisty hail stone [kg/m3]
 A_hail = np.pi * (r_hail**2)                        # impact area [m2]
 
 ### Defining Chicken ### 
-d_bird = 0.15                                       # diameter chicken [m]
+d_bird = 0.2                                        # diameter chicken [m]
 r_bird = d_bird/2                                   # radius chicken [m]
-v_bird = aircraft.V_cruise                          # velocity cruise [m/s]
-M_bird = 0.31                                       # mass chicken [kg]
+v_bird = aircraft.V_cruise + 25/3.6                 # velocity cruise [m/s]
+M_bird = 1.0                                        # mass chicken [kg]
 A_bird = np.pi * (r_bird**2)                        # impact area [m2]
+
 
 ### Kinematic Energy Hail Stone Calculation ###
 V_hail = (4/3) * np.pi * (r_hail**3)                # volume hail stone [m3]
@@ -69,4 +72,3 @@ m_nose_fuselage_cone = surface_nose_fuselage_cone * t_nose * rho_steel          
 
 ### Mass fairing ###
 mass_fairing = m_main_fuselage_cone + m_tail_fuselage_cone + m_nose_fuselage_cone + m_main_fuselage_cone_bottom
-

@@ -31,7 +31,7 @@ def atm_parameters(obj, h):
     return p, T, rho, a
 
 def dragpolar(ac_obj, CL):
-    CD = ac_obj.CD0 + CL**2/(np.pi*ac_obj.A*ac_obj.e)
+    CD = ac_obj.CD0 + 1.15*CL**2/(np.pi*ac_obj.A*ac_obj.e)
     return CD
 
 def prop_d(obj, power):
@@ -671,6 +671,7 @@ def climbmaneuver(ac_obj, atm_obj, h, h_cruise, W0):
     return t, x, W_F_used, h
 
 def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
+    n = 0
     cruiseNAT = False
     x   = 0.0
     t   = 0.0
@@ -691,6 +692,8 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
         x += V * dt
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
         Pbr = Pr/ac_obj.prop_eff
+        if n%1000 == 0:
+            print(f"Break horse power: {Pbr}")
         if Pbr > ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt:
             print("This cruise speed is not obtainable (Pr > Pa)")
             cruiseNAT = True
@@ -699,6 +702,7 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
         W_F_used += FF * dt
         W -= FF * dt
         t += dt
+        n += 1
     return t, W_F_used, cruiseNAT
 
 # def cruiseperf_varying(ac_obj, atm_obj):
@@ -1047,7 +1051,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     x_plot = x
     # Return to base
     x_return = 0.0
-    cruise_alt_RTB = cruiseheight(Range, h_cruise)
+    cruise_alt_RTB = cruiseheight(Range, 15000)
     t_cl_RTB, x_cl_RTB, W_F_used_cl_RTB, h = climbmaneuver(ac_obj, atm_obj, h, cruise_alt_RTB, W)
     t += t_cl_RTB
     x += x_cl_RTB
@@ -1125,4 +1129,4 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     flight_profile.append(W_F_used)         # fuel burnt
     return flight_profile
 
-fuelusesortie(aircraft, atm, 12, 1, 10500, 45, 56.584, Range=250, Summary=True, plot=True, savefig=False)
+fuelusesortie(aircraft, atm, 12, 1, 10000, 45, 54.012, Range=250, Summary=True, plot=True, savefig=False)
