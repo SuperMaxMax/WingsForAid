@@ -53,7 +53,7 @@ while something:
     
 if jan: #Jan's path is linked in avl so otherwise code breaks 
     import aerodynamics.avl as avl
-    avl
+    avl.export(aircraft)
 
     
 # print all attributes of object
