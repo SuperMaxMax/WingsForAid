@@ -51,7 +51,7 @@ while something:
     print("=================================")
     n_iteration += 1
     
-if jan: #Jan's path is linked in avl so otherwise code breaks
+if jan: #Jan's path is linked in avl so otherwise code breaks 
     import aerodynamics.avl as avl
     avl
 
