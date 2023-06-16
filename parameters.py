@@ -200,6 +200,7 @@ class UAV:
         self.X_cg_aft = 0.38751834425790044             # Aft cg location CG/MAC [-]
         self.X_cg_full = 0.1999014176671784            # MTOW cg location CG/MAC [-]
         self.X_cg_fwd = 0.0797611294848881              # Forward cg location CG/MAC [-]
+        self.X_cg_OEW = 0.25
         self.X_cg_range = 0.3077572147730123          # Range of cg location CG/MAC [-]
         self.x_strut = 0.48                 # strut location as fraction of chord @ spanwise position [-]
         # Y

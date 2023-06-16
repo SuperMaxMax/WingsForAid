@@ -33,7 +33,7 @@ while something:
     print('Iteration: ', n_iteration)
     print(f'MTOW: {aircraft.W_TO:.2f} kg, OEW: {aircraft.W_OE:.2f}')
     W_TO_old = aircraft.W_TO
-    aircraft.Sw = aircraft.W_TO/aircraft.WS
+    # aircraft.Sw = aircraft.W_TO/aircraft.WS
     ae.run_aero(aircraft)
     cs.main_stab_control(aircraft, False, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
     print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)

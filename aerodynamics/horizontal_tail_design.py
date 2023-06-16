@@ -26,7 +26,7 @@ def required_lift(aircraft):
     h0 = aircraft.MAC_ac
     MAC = aircraft.MAC_length
     xcg_full = aircraft.X_cg_full
-    xcg_aft = aircraft.X_cg_
+    xcg_oew = aircraft.X_cg_OEW
     Sh_SW = aircraft.Sh_S
 
     #test to verify code
@@ -52,7 +52,7 @@ def required_lift(aircraft):
     #sweep_LE = 8 * np.pi/180 #test to verify code
     C_m_0_wf = C_m_af * (AR * (np.cos(sweep_LE) ** 2)) / (AR + 2 * np.cos(sweep_LE)) + 0.01 * alpha_t
 
-    most_extreme_cg = [xcg_full, xcg_aft]
+    most_extreme_cg = [xcg_oew, xcg_full]
     C_L_h = 0 
     for xcg_wf in most_extreme_cg:
         h = xcg_wf
