@@ -172,7 +172,7 @@ class UAV:
         self.W_t = 18.647695670124357               # Tail weight [kg]                                  variable -> needs to be implemented
         self.W_strut = 16.794                       # Weight of 2 struts [kg]                           constant
         self.ST_W_fus_truss = 40.224                # Mass of fuselage structure (only) [kg]            constant
-        self.ST_W_fus_fairing = 15                  # Mass of fuselage fairing [kg]                     constant
+        self.ST_W_fus_fairing = 22.3                # Mass of fuselage fairing [kg]                     constant
         self.ST_W_fus = 55.224      #Built up off truss and fairing                                   # constant
         # self.W_fus = 116.507                      # Fuselage weight [kg]                              constant  
         self.ST_W_boom = 20.3                       # Mass of tail boom, given it is 2.8 m long [kg]    constant
