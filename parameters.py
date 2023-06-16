@@ -161,7 +161,7 @@ class UAV:
 
         self.WS = 632.739                           # Wing Loading [N/m^2]
         self.W_F = 52.69403541333709                # Fuel weight [kg]                                  constant
-        self.W_OE = 375.0                           # Operational empty weight [kg] CALCULATED 15-6-23 14:16  variable
+        self.W_OE = 400 #375.0                           # Operational empty weight [kg] CALCULATED 15-6-23 14:16  variable
         self.W_PL = 276                             # Payload weight [kg]                               constant
         self.W_TO = 770.539373653824                # Take-off weight [kg]                              variable
         self.W_e = 63.6                             # Definitive weight per engine [kg]                 constant
@@ -173,18 +173,18 @@ class UAV:
         self.W_strut = 16.794                       # Weight of 2 struts [kg]                           constant
         self.ST_W_fus_truss = 40.224                # Mass of fuselage structure (only) [kg]            constant
         self.ST_W_fus_fairing = 15                  # Mass of fuselage fairing [kg]                     constant
-        self.ST_W_fus = self.ST_W_fus_truss + self.ST_W_fus_fairing                                   # constant
+        self.ST_W_fus = 55.224      #Built up off truss and fairing                                   # constant
         # self.W_fus = 116.507                      # Fuselage weight [kg]                              constant  
         self.ST_W_boom = 20.3                       # Mass of tail boom, given it is 2.8 m long [kg]    constant
         # self.W_boom = 20.3                        # Boom weight [kg]                                  constant
         self.ST_W_lg = 7.75                         # Mass of landing gear struts [kg]                  constant
         self.ST_W_wheels = 10                       # Mass of wheels [kg]                               constant
-        self.ST_W_uc = self.ST_W_lg + self.ST_W_wheels                                                # constant              
+        self.ST_W_uc = 17.75                                                # constant              
         # self.W_uc = 66.4175                       # Undercarriage weight [kg]                         constant
         self.W_w =52.72497438003413                 # Wing weight [kg]                                  variable
-        self.W_v = 0
-        self.W_h = 0
-        self.W_t = 0
+        self.W_v = 6.5
+        self.W_h = 20
+        self.W_t = 26.5
 
         self.WfinalW10 = 0.993                      # Landing, taxi & shut-down fraction [-]
         # self.w_in = 1.2                           # Inner fuselage width [m]
@@ -236,7 +236,7 @@ class UAV:
         self.AE_Vh_V = 0.95                     # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
         self.AE_A_h = 4                  # Aspect ratio horizontal tail. NOTE: This is a guestimate  
         self.AE_dEpsilondA = 0.02               # Downwash [-] TODO: check this value, this is a pure guess
-        # self.AE_Sh = 2.0377662                  # Surface area horizontal tailplane [m^2]
+        # self.AE_Sh = 2.0377662                # Surface area horizontal tailplane [m^2]
         self.AE_CL_a_h = 4.18773706267545       # Lift curve slope horizontal tailplane [1/rad] 
         self.b_h = 3.649                        # Wing span horizontal tailplane [m]
         self.i_w_h = -1.8957                    # Incidence angle horizontal tailplane [degrees]      
