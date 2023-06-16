@@ -22,6 +22,12 @@ jarno = True
 n_iteration = 0
 something = True
 
+#TODO landing distance
+#TODO max ferry range
+#TODO ceiling altitude
+#TODO max climb rate
+#TODO max endurance
+
 while something:
     print('Iteration: ', n_iteration)
     print(f'MTOW: {aircraft.W_TO:.2f} kg, OEW: {aircraft.W_OE:.2f}')
