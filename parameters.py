@@ -138,10 +138,10 @@ class UAV:
         # self.t_c = 0.15                     # Thickness to chord ratio [-]
         self.taper = 0.4                   # Taper ratio [-]
         self.tipchord = 0.7093104021809986              # Tip chord [m]
-        self.tire_nose_height = 0.35306     # Nose landing gear tire height [m]
-        self.tire_nose_width = 0.14478      # Nose landing gear tire width [m]
-        self.tire_main_height = 0.381       # Main landing gear tire height [m]
-        self.tire_main_width = 0.1524       # Main landing gear tire height [m]
+        self.tire_nose_height = 0.24     # Nose landing gear tire height [m] minimum inner diam 8.89 cm
+        self.tire_nose_width = 0.08      # Nose landing gear tire width [m] minimum width 7.62cm
+        self.tire_main_height = 0.32      # Main landing gear tire height [m] minimum inner diam 8.89 cm
+        self.tire_main_width = 0.12       # Main landing gear tire width [m] minimum width 10.16 cm
         # self.top_clearance = 0.2            # Top clearance [m]
         # self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility
         # U
@@ -172,7 +172,7 @@ class UAV:
         self.W_t = 18.647695670124357               # Tail weight [kg]                                  variable -> needs to be implemented
         self.W_strut = 16.794                       # Weight of 2 struts [kg]                           constant
         self.ST_W_fus_truss = 40.224                # Mass of fuselage structure (only) [kg]            constant
-        self.ST_W_fus_fairing = 15                  # Mass of fuselage fairing [kg]                     constant
+        self.ST_W_fus_fairing = 22.3                # Mass of fuselage fairing [kg]                     constant
         self.ST_W_fus = 55.224      #Built up off truss and fairing                                   # constant
         # self.W_fus = 116.507                      # Fuselage weight [kg]                              constant  
         self.ST_W_boom = 20.3                       # Mass of tail boom, given it is 2.8 m long [kg]    constant
