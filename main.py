@@ -16,6 +16,7 @@ airfield = airport("Sudan")
 plot = False
 remove_duplicates = False
 jan = False
+jarno = False
 
 n_iteration = 0
 something = True
@@ -28,10 +29,12 @@ while something:
     ae.run_aero(aircraft)
     cs.main_stab_control(aircraft, False, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
     print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
-    # if n_iteration % 1  == 0 and n_iteration != 0:
-    #     wb.all_wingbox(aircraft, True)
-    # else:
-    #     wb.all_wingbox(aircraft, False)
+
+    if not jarno:
+        if n_iteration % 1  == 0 and n_iteration != 0:
+            wb.all_wingbox(aircraft, True)
+        else:
+            wb.all_wingbox(aircraft, False)
     
     aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
     fp.TO_eom(aircraft, airfield, atm, 11, 4000, 12.86, -7.716, aircraft.W_F, Plot = False)
