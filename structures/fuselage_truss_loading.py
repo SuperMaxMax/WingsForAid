@@ -7,10 +7,10 @@ at=atmosphere()
 #from loading_diagram_wing import aircraft
 
 ## Define material ##
-#steel 4130
-# yield_stress = 460*10**6
-# density=7850
-# E = 205*10**9
+# steel 4130
+yield_stress = 460*10**6
+density=7850
+E = 205*10**9
 
 
 
@@ -19,10 +19,10 @@ at=atmosphere()
 # density=7800
 # E = 200*10**9
 
-# #al 5052
-yield_stress = 255*10**6
-density=2680
-E=70.3*10**9
+# # #al 5052
+# yield_stress = 255*10**6
+# density=2680
+# E=70.3*10**9
 ## Define main forces ##
 Thrust = 2800
 Lift = ac.W_TO*ac.g0
@@ -201,7 +201,7 @@ print('minumum mass for compression of bottom pannel due to wing structural weig
 T_eng = 0
 
 C_L_h = -0.1331864964576476
-F_h_cruise=ac.W_TO*ac.g0*(ac.AE_Vh_V)**2*ac.Sh_S*C_L_h/ac.AE_CL_max_clean
+F_h_cruise=ac.W_TO*ac.g0*(ac.AE_Vh_V)**2*ac.Sh_S*C_L_h/ac.CL_max_clean
 print("F_h in cruise",F_h_cruise)
 rho = at.rho0
 U_de = 50 #derived gust velocity (ft/s)

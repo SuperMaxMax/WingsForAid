@@ -138,10 +138,10 @@ class UAV:
         # self.t_c = 0.15                     # Thickness to chord ratio [-]
         self.taper = 0.4                   # Taper ratio [-]
         self.tipchord = 0.7093104021809986              # Tip chord [m]
-        self.tire_nose_height = 0.35306     # Nose landing gear tire height [m]
-        self.tire_nose_width = 0.14478      # Nose landing gear tire width [m]
-        self.tire_main_height = 0.381       # Main landing gear tire height [m]
-        self.tire_main_width = 0.1524       # Main landing gear tire height [m]
+        self.tire_nose_height = 0.24     # Nose landing gear tire height [m] minimum inner diam 8.89 cm
+        self.tire_nose_width = 0.08      # Nose landing gear tire width [m] minimum width 7.62cm
+        self.tire_main_height = 0.32      # Main landing gear tire height [m] minimum inner diam 8.89 cm
+        self.tire_main_width = 0.12       # Main landing gear tire width [m] minimum width 10.16 cm
         # self.top_clearance = 0.2            # Top clearance [m]
         # self.type = "utility"               # CS23 aircraft type: "normal" for normal/commuter and "utility" for utility
         # U
