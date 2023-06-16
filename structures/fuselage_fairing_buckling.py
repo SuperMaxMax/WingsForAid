@@ -62,10 +62,9 @@ bottom_mass = (t_sheet * b*3 * w + 4*a*8*t_stringer*b*3 + 24*a*8*t_stringer*0.45
 
 top_mass = (3*b*w*t_sheet) * rho_GFRP
 
-tail_mass = 1.55385 * t_nose_tail * rho_GFRP
+tail_mass = 1.418 * t_nose_tail * rho_GFRP
 
 nose_mass = 2.72 * t_nose_tail * rho_GFRP
 
 mass_total = main_sides_mass + bottom_mass + top_mass + tail_mass + nose_mass
 print(mass_total)
-print(main_sides_mass,bottom_mass,top_mass,nose_mass,tail_mass)
