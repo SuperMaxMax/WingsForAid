@@ -109,7 +109,7 @@ def horizontal_tail_planform(aircraft):
         if variable == "Lambda":    
             variable_list2 = [1]
         elif variable == "AR":  
-            variable_list2 = [5.1666666]
+            variable_list2 = [2/3*aircraft.A]
         elif variable == "Twist":
             variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
         
@@ -132,7 +132,7 @@ def horizontal_tail_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 5.166666
+                AR = 2/3*aircraft.A
             if variable == "Lambda":
                 Lambda = parameter
             else:
