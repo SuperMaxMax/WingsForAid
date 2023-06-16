@@ -73,6 +73,49 @@ def operations_eval(ac):
 if __name__ == '__main__':
     AC = UAV('aircraft')
     print("AC default:", AC.__dict__)
-    AC.n_drops = 3
+    AC.n_drops = 2
     AC.n_boxes = 12
-    operations_eval(AC)
+    AC.OP_Range = 250
+    #AC.h_cruise = 5000 #ft
+    AC.OP_droprange = 10
+    RTB = True
+
+    atm = atmosphere()
+    ac = AC
+
+    # eval max range with switched payload for fuel
+    if False:
+        Wf_extra = 240 + 43.27
+        dR = 20000 #km
+        R = dR / 2
+        TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise/0.3048, ac.W_F, None,
+                                              ac.OP_Range, AC.OP_droprange, RTB,
+                                              False, False)
+        while abs(Wf-Wf_extra) > 0.1:
+            TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, Wf_extra, None,
+                                                  R, AC.OP_droprange, RTB,
+                                                  False, False)
+            dR *= 0.5
+            print("\n XXXXXXX \n", R, Wf, dR,"\n XXXXXXX \n")
+            if Wf < Wf_extra: R += dR
+            else: R -= dR
+
+    # eval max payload for current fuel
+    if True:
+        Wf_extra = 44.32
+        TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise/0.3048, ac.W_F, None,
+                                              ac.OP_Range, AC.OP_droprange, RTB,
+                                              False, False)
+        while Wf < Wf_extra:
+            ac.n_boxes += 1
+            TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, ac.W_F, None,
+                                                  ac.OP_Range, AC.OP_droprange, RTB,
+                                                  False, False)
+            print(ac.n_boxes,Wf)
+        ac.n_boxes -= 1
+
+
+    # operations_eval(AC)
+    TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, Wf_extra, None,
+                                          AC.OP_Range, AC.OP_droprange, RTB,
+                                          True, True)
