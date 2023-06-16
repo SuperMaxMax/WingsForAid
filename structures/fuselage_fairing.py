@@ -55,6 +55,9 @@ t_fairing = (E_kin_hail)/(A_hail*T_GFRP)            # required thickness fairing
 ### Thickness sizing ###
 t_nose = (E_kin_bird)/(A_bird*T_steel)              # required thickness nose
 
+t_fairing = 0.0005
+t_nose = 0.002
+
 ### Main cabin ###
 circumference = 2.4                                                             # circumfernece of fuselage from CAD
 surface_main_fuselage_cone = aircraft.l_fus_main_cone * circumference           # wetted area main cone of fuselage [m2]
@@ -68,7 +71,8 @@ m_tail_fuselage_cone = surface_tail_fuselage_cone * t_fairing * rho_GFRP        
 
 ### Nose cone ###
 surface_nose_fuselage_cone = 2.72                                               # wetted area tail cone of fuselage [m2] 
-m_nose_fuselage_cone = surface_nose_fuselage_cone * t_nose * rho_steel          # mass fairing of tail cone [kg]
+m_nose_fuselage_cone = surface_nose_fuselage_cone * t_nose * rho_GFRP          # mass fairing of tail cone [kg]
 
 ### Mass fairing ###
 mass_fairing = m_main_fuselage_cone + m_tail_fuselage_cone + m_nose_fuselage_cone + m_main_fuselage_cone_bottom
+print(mass_fairing)

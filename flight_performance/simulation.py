@@ -173,7 +173,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     for i in range(0, 4):
         if i == 0:
             dic_constants = {'runway slope': np.arange(0, max_runwayslope),
-                             'airport altitude': 0, 'wing surface area': obj.AE_Sw,
+                             'airport altitude': 0, 'wing surface area': obj.Sw,
                              'weight': takeoffweight(obj, W_f) * atm.g,
                              'wind speed': 0, 'propeller power': obj.power * hp_to_watt,
                              'propeller efficiency': obj.prop_eff}
@@ -191,7 +191,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             dic_constants['airport altitude'] = np.arange(0, max_hairport)
             p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
 
-        CL_max = 1.5
+        CL_max = obj.CL_max_clean
         CL = CL_max
         S = [600]
         while max(S) <= 750:
@@ -201,7 +201,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
                 dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max) - dic_constants[
                         'wind speed'])
             V_avg_sq = V_LOF ** 2 / 2
-            CD = obj.AE_CD0 + CL ** 2 / (np.pi * obj.AE_A * obj.AE_e)
+            CD = obj.CD0 + CL ** 2 / (np.pi * obj.A * obj.e)
             D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             L = CL * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             T = dic_constants['propeller power'] * dic_constants['propeller efficiency'] / np.sqrt(V_avg_sq)
@@ -250,11 +250,11 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
                 axis[0, 1].set_title('airport altitude vs C_L take-off')
                 axis[0, 1].set_xlabel('airport altitude [m]')
                 axis[0, 1].set_ylabel('C_L take-off [-]')
-
-    plt.subplots_adjust(hspace=0.6)
-    plt.subplots_adjust(wspace=0.5)
-    plt.suptitle('Take-Off')
-    plt.show()
+    if Plot:
+        plt.subplots_adjust(hspace=0.6)
+        plt.subplots_adjust(wspace=0.5)
+        plt.suptitle('Take-Off')
+        plt.show()
 
     return S
 
@@ -484,7 +484,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             dic_constants['airport altitude'] = np.arange(0, max_hairport)
             p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
 
-        S = [600]
+        S = [600.0]
         CL = 0.8
         CL_max = 2
         while max(S) <= 750:
@@ -550,7 +550,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     return CL_max
 
 
-# LA_eom(aircraft, airfield, atm, -8, 4000, 14, -15.4, 5)
+# LA_eom(aircraft, airfield, atm, -8, 4000, 14, -5.144, 5)
 
 # ------------------------------------------------------------------------------
 def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):

@@ -281,13 +281,13 @@ def plot_scissor_plot(aircraft, plot):
     ax1.legend(loc='lower right')
     ax1.grid()
 
+    plt.show()
     # fig1.savefig("scissorplot")
-    if plot:
-        plt.show()
     
 
 def hor_run(aircraft, plot):
     Aerodynamic_centre_determination(aircraft)
-    plot_scissor_plot(aircraft, plot)
     C_m_alpha_calculation(aircraft, aircraft.X_cg_full)
+    if plot:
+        plot_scissor_plot(aircraft)
     

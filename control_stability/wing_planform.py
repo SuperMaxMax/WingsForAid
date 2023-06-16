@@ -127,67 +127,69 @@ def WingPlanform(ac, plot):
     # ---------------------------------------------- Plotting ----------------------------------------------
 
     # Make plot
-    fig1, ax1 = plt.subplots(figsize=(10,6))
-    # plt.subplots_adjust(left = 0, bottom = 0, right = 1, top = 1)
-    
-    ax1.set_xlim(-span/2 - 2, span/2 + 2)
-    ax1.set_ylim(te_c_r - 0.5, le_c_r + 0.5)
-
-    # Fuselage
-    ax1.plot((-ac.w_out/2, -ac.w_out/2), (-3, 3), 'black', label = "Fuselage", linewidth = line_width)
-    ax1.plot((ac.w_out/2, ac.w_out/2), (-3, 3), 'black', linewidth = line_width)
-
-    # Spars
-    ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r-f_spar*c_r,le_c_t-f_spar*c_t), 'm', label="Spars", linewidth=line_width)
-    ax1.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_r-f_spar*c_r,le_c_t-f_spar*c_t), 'm', linewidth=line_width)
-    ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r-a_spar*c_r,le_c_t-a_spar*c_t), 'm', linewidth=line_width)
-    ax1.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_r-a_spar*c_r,le_c_t-a_spar*c_t), 'm', linewidth=line_width)
-
-    # Quarter chord line left side
-    ax1.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(q_c_r,q_c_t), label="Quarter Chord line", linewidth=line_width)
-
-    # Aileron
-    ax1.plot((y1_a + ac.w_out/2, y2_a + ac.w_out/2),(ai1,ai3),'y', label="Ailerons", linewidth=line_width)
-    ax1.plot((y1_a + ac.w_out/2, y1_a + ac.w_out/2),(ai1,ai2),'y', linewidth=line_width)
-    ax1.plot((y2_a + ac.w_out/2, y2_a + ac.w_out/2),(ai3,ai4),'y', linewidth=line_width)
-    ax1.plot((-y1_a - ac.w_out/2, -y2_a - ac.w_out/2),(ai1,ai3),'y', linewidth=line_width)
-    ax1.plot((-y1_a - ac.w_out/2, -y1_a - ac.w_out/2),(ai1,ai2),'y', linewidth=line_width)
-    ax1.plot((-y2_a - ac.w_out/2, -y2_a - ac.w_out/2),(ai3,ai4),'y', linewidth=line_width) 
-
-    # Flaps
-    ax1.plot((y1_f + ac.w_out/2, y2_f + ac.w_out/2),(fl1,fl3),'c', label="Flaps", linewidth=line_width)
-    ax1.plot((y1_f + ac.w_out/2, y1_f + ac.w_out/2),(fl1,fl2),'c', linewidth=line_width)
-    ax1.plot((y2_f + ac.w_out/2, y2_f + ac.w_out/2),(fl3,fl4),'c', linewidth=line_width)
-    ax1.plot((-y1_f - ac.w_out/2, -y2_f - ac.w_out/2),(fl1,fl3),'c', linewidth=line_width)
-    ax1.plot((-y1_f - ac.w_out/2, -y1_f - ac.w_out/2),(fl1,fl2),'c', linewidth=line_width)
-    ax1.plot((-y2_f - ac.w_out/2, -y2_f - ac.w_out/2),(fl3,fl4),'c', linewidth=line_width) 
-
-    # Root chord
-    ax1.plot((0 + ac.w_out/2, 0 + ac.w_out/2),(le_c_r,te_c_r), 'limegreen', label="Root chord", linewidth=line_width)
-    ax1.plot((0 - ac.w_out/2, 0 - ac.w_out/2),(le_c_r,te_c_r), 'limegreen', linewidth=line_width)
-
-    # Tip chords
-    ax1.plot((span/2 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_t,te_c_t), 'r', linewidth=line_width)
-    ax1.plot((-span/2 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_t,te_c_t), 'r', label="Tip chord", linewidth=line_width)
-
-    # MAC on left side
-    mac_plot = ax1.plot((-spanwise_pos - ac.w_out/2, -spanwise_pos - ac.w_out/2),(te_mac,le_mac), label="MAC", linewidth=line_width)
-
-    # Connecting
-    ax1.plot((-span/2 - ac.w_out/2, 0 - ac.w_out/2),(le_c_t,le_c_r), 'b', linewidth=line_width)
-    ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r,le_c_t), 'b', linewidth=line_width)
-    ax1.plot((-span/2 - ac.w_out/2, 0 - ac.w_out/2),(te_c_t,te_c_r), 'b', linewidth=line_width)
-    ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(te_c_r,te_c_t), 'b', linewidth=line_width)
-
-    # Finalizing
-    fig1.gca().set_aspect('equal', adjustable='box')
-    # ax1.set_title("Wing planform")
-    ax1.set_xlabel("Spanwise position [m]")
-    ax1.set_ylabel("Longitudinal position [m]")
-    ax1.legend(loc = "upper center", fontsize = "medium", bbox_to_anchor = (0.5, 1.4), ncol = 4)
-    ax1.grid()
-
-    plt.savefig("WingPlanform.png", bbox_inches = "tight")
-
     if plot:
+        fig1, ax1 = plt.subplots(figsize=(10,6))
+        # plt.subplots_adjust(left = 0, bottom = 0, right = 1, top = 1)
+        
+        ax1.set_xlim(-span/2 - 2, span/2 + 2)
+        ax1.set_ylim(te_c_r - 0.5, le_c_r + 0.5)
+
+        # Fuselage
+        ax1.plot((-ac.w_out/2, -ac.w_out/2), (-3, 3), 'black', label = "Fuselage", linewidth = line_width)
+        ax1.plot((ac.w_out/2, ac.w_out/2), (-3, 3), 'black', linewidth = line_width)
+
+        # Spars
+        ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r-f_spar*c_r,le_c_t-f_spar*c_t), 'm', label="Spars", linewidth=line_width)
+        ax1.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_r-f_spar*c_r,le_c_t-f_spar*c_t), 'm', linewidth=line_width)
+        ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r-a_spar*c_r,le_c_t-a_spar*c_t), 'm', linewidth=line_width)
+        ax1.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_r-a_spar*c_r,le_c_t-a_spar*c_t), 'm', linewidth=line_width)
+
+        # Quarter chord line left side
+        ax1.plot((0 - ac.w_out/2, -span/2 - ac.w_out/2),(q_c_r,q_c_t), label="Quarter Chord line", linewidth=line_width)
+
+        # Aileron
+        ax1.plot((y1_a + ac.w_out/2, y2_a + ac.w_out/2),(ai1,ai3),'y', label="Ailerons", linewidth=line_width)
+        ax1.plot((y1_a + ac.w_out/2, y1_a + ac.w_out/2),(ai1,ai2),'y', linewidth=line_width)
+        ax1.plot((y2_a + ac.w_out/2, y2_a + ac.w_out/2),(ai3,ai4),'y', linewidth=line_width)
+        ax1.plot((-y1_a - ac.w_out/2, -y2_a - ac.w_out/2),(ai1,ai3),'y', linewidth=line_width)
+        ax1.plot((-y1_a - ac.w_out/2, -y1_a - ac.w_out/2),(ai1,ai2),'y', linewidth=line_width)
+        ax1.plot((-y2_a - ac.w_out/2, -y2_a - ac.w_out/2),(ai3,ai4),'y', linewidth=line_width) 
+
+        # Flaps
+        ax1.plot((y1_f + ac.w_out/2, y2_f + ac.w_out/2),(fl1,fl3),'c', label="Flaps", linewidth=line_width)
+        ax1.plot((y1_f + ac.w_out/2, y1_f + ac.w_out/2),(fl1,fl2),'c', linewidth=line_width)
+        ax1.plot((y2_f + ac.w_out/2, y2_f + ac.w_out/2),(fl3,fl4),'c', linewidth=line_width)
+        ax1.plot((-y1_f - ac.w_out/2, -y2_f - ac.w_out/2),(fl1,fl3),'c', linewidth=line_width)
+        ax1.plot((-y1_f - ac.w_out/2, -y1_f - ac.w_out/2),(fl1,fl2),'c', linewidth=line_width)
+        ax1.plot((-y2_f - ac.w_out/2, -y2_f - ac.w_out/2),(fl3,fl4),'c', linewidth=line_width) 
+
+        # Root chord
+        ax1.plot((0 + ac.w_out/2, 0 + ac.w_out/2),(le_c_r,te_c_r), 'limegreen', label="Root chord", linewidth=line_width)
+        ax1.plot((0 - ac.w_out/2, 0 - ac.w_out/2),(le_c_r,te_c_r), 'limegreen', linewidth=line_width)
+
+        # Tip chords
+        ax1.plot((span/2 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_t,te_c_t), 'r', linewidth=line_width)
+        ax1.plot((-span/2 - ac.w_out/2, -span/2 - ac.w_out/2),(le_c_t,te_c_t), 'r', label="Tip chord", linewidth=line_width)
+
+        # MAC on left side
+        mac_plot = ax1.plot((-spanwise_pos - ac.w_out/2, -spanwise_pos - ac.w_out/2),(te_mac,le_mac), label="MAC", linewidth=line_width)
+
+        # Connecting
+        ax1.plot((-span/2 - ac.w_out/2, 0 - ac.w_out/2),(le_c_t,le_c_r), 'b', linewidth=line_width)
+        ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(le_c_r,le_c_t), 'b', linewidth=line_width)
+        ax1.plot((-span/2 - ac.w_out/2, 0 - ac.w_out/2),(te_c_t,te_c_r), 'b', linewidth=line_width)
+        ax1.plot((0 + ac.w_out/2, span/2 + ac.w_out/2),(te_c_r,te_c_t), 'b', linewidth=line_width)
+
+        # Finalizing
+        fig1.gca().set_aspect('equal', adjustable='box')
+        # ax1.set_title("Wing planform")
+        ax1.set_xlabel("Spanwise position [m]")
+        ax1.set_ylabel("Longitudinal position [m]")
+        ax1.legend(loc = "upper center", fontsize = "medium", bbox_to_anchor = (0.5, 1.4), ncol = 4)
+        ax1.grid()
+
+        plt.savefig("WingPlanform.png", bbox_inches = "tight")
         plt.show(block=True)
+
+
+    

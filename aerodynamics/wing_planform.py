@@ -177,12 +177,12 @@ def main_wing_planform(aircraft):
             
             CL_a_w = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
 
-            print('=====================================================================')
-            print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
-            print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_req, "CD_i = ", CD_induced)
-            print(C_L_wing**2 / (AR* np.pi * CD_induced))
-            print('mac = ', MAC, Croot, Croot*Lambda)
-            print('oswald - ', oswald)
+            # print('=====================================================================')
+            # print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
+            # print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_req, "CD_i = ", CD_induced)
+            # print(C_L_wing**2 / (AR* np.pi * CD_induced))
+            # print('mac = ', MAC, Croot, Croot*Lambda)
+            # print('oswald - ', oswald)
 
             #print("CL_wing", C_L_wing)
             #print("CL required for cruis", C_L_req)
@@ -278,7 +278,7 @@ def main_wing_planform(aircraft):
     aircraft.x_lemac = aircraft.y_mac*np.tan(aircraft.sweep_LE)
     aircraft.CL_max_clean = CL_max_clean
 
-    print('afoqwbqlbng', aircraft.y_mac, aircraft.x_lemac, aircraft.sweep_LE, aircraft.MAC_length)
+    #print('afoqwbqlbng', aircraft.y_mac, aircraft.x_lemac, aircraft.sweep_LE, aircraft.MAC_length)
                
     return 
 

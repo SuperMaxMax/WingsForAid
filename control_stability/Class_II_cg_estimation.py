@@ -26,6 +26,10 @@ def cg_calc(obj, plot):
     izz_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
     
     # Calculate MTOW
+    obj.ST_W_fus = obj.ST_W_fus_truss + obj.ST_W_fus_fairing
+    obj.ST_W_uc = obj.ST_W_lg + obj.ST_W_wheels
+    obj.W_t = obj.W_v + obj.W_h
+    
     obj.W_OE = obj.W_eq + obj.W_n + obj.W_pg + obj.W_sc + obj.W_t + obj.W_strut + obj.ST_W_fus + obj.ST_W_boom + obj.ST_W_uc + obj.W_w
     obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
     
@@ -171,18 +175,7 @@ def cg_calc(obj, plot):
         Xs = (Xs-X_LEMAC)/obj.MAC_length
         w_fracs = [W_OEW/obj.W_TO] + W_OEW_box_frac + [W_OEW_fuel_box_frac[-1]]
         labels = [r'$W_{OE}$'] + labels + [r'$W_{TO}$']
-        
-    # plt.rcParams.update({'font.size': 14})
-    plt.figure(figsize=(14,7))
-
-    for x, w, label, i in zip(Xs, w_fracs, labels, range(len(Xs))):
-        plt.scatter(x, w)
-        if i == 0 or i == len(Xs):
-            rotation_t = 0
-        else:
-            rotation_t = 90
-        plt.annotate(label, (x, w), textcoords="offset points", xytext=(5,0))#, ha='center')#, rotation=rotation_t)
-            
+                
     LimBoxConfigFwd = '220000'
     LimBoxConfigAft = r'$W_{TO}$' #'022222'
 
@@ -194,19 +187,28 @@ def cg_calc(obj, plot):
 
     obj.l_h = obj.l_f - obj.l_fus_tail_cone + obj.l_f_boom - 3/4 * obj.AE_rootchord_h - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length)
     # Plot lines for forward and aft cg positions
-    plt.axvline(x=obj.X_cg_fwd, color='blue', label='most forward c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=135, length=1.1)])
-    plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])
-
-    plt.ylim(top = 1.03)
-    plt.xlim(left = 0.1, right = 0.5)
-    plt.xlabel(r"$\dfrac{x_{cg}}{\bar{c}}$", fontsize = 12, loc='right')
-    plt.ylabel(r"$\dfrac{1}{W_{TO}}$",rotation = 0, fontsize = 12, loc='top')
-    plt.grid()
-    plt.legend()
-    # plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
     
     if plot:
-        plt.show()
+        for x, w, label, i in zip(Xs, w_fracs, labels, range(len(Xs))):
+            plt.scatter(x, w)
+            if i == 0 or i == len(Xs):
+                rotation_t = 0
+            else:
+                rotation_t = 90
+            plt.annotate(label, (x, w), textcoords="offset points", xytext=(5,0))#, ha='center')#, rotation=rotation_t)
+            
+            plt.figure(figsize=(14,7))
+            plt.axvline(x=obj.X_cg_fwd, color='blue', label='most forward c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=135, length=1.1)])
+            plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])
+
+            plt.ylim(top = 1.03)
+            plt.xlim(left = 0.1, right = 0.5)
+            plt.xlabel(r"$\dfrac{x_{cg}}{\bar{c}}$", fontsize = 12, loc='right')
+            plt.ylabel(r"$\dfrac{1}{W_{TO}}$",rotation = 0, fontsize = 12, loc='top')
+            plt.grid()
+            plt.legend()
+            # plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
+            plt.show()
 
     name_list = ['!' + name for name in name_list]
 

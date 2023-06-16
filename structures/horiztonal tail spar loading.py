@@ -6,18 +6,18 @@ from fuselage_truss_loading import dF_h_man
 from parameters import atmosphere
 at=atmosphere()
 
-# # s-steel 410
-yield_stress = 1225*10**6
-yield_stress_shear = yield_stress*0.58
-density=7800
-E = 200*10**9
+# # # s-steel 410
+# yield_stress = 1225*10**6
+# yield_stress_shear = yield_stress*0.58
+# density=7800
+# E = 200*10**9
 
 
 # # # steel 4130 parameters
-# sigma_yield = 460*10**6
-# sigma_yield_shear = 0.58*sigma_yield
-# density = 7850
-# E=205*10**9
+yield_stress = 460*10**6
+yield_stress_shear= 0.58*yield_stress
+density = 7850
+E=205*10**9
 
 
 
@@ -26,9 +26,9 @@ G = E/(2*(1+v))
 
 
 r_h_tail_spar = 0.035
-l_h_tail_spar = ac.b_h
+l_h_tail_spar = ac.b_h*1/3+0.2
 F_h_max = abs(dF_h_man)
-T_max = 0.25*ac.AE_MAC_length_h*max(0.5*at.rho0*ac.V_A**2*ac.AE_Sh*ac.AE_CL_a_h*(2/360*2*np.pi),0.5*at.rho0*ac.V_cruise**2*ac.AE_Sh*ac.AE_CL_a_h*(1/360*2*np.pi),F_h_max)
+T_max = 0.25*ac.AE_MAC_length_h*F_h_max
 arm = ac.b_h/2*1/3 #5/2*1/3 # conservative, assuming hor tail up to 5m
 M_h_max = abs(F_h_max*arm)
 A_m = np.pi*r_h_tail_spar**2
@@ -60,7 +60,8 @@ plt.plot(t,A_min,label='A_min')
 plt.legend()
 plt.show()
 
-t=1./1000
+
+t=1.3/1000
 print("mass kg",P*t*1.2*density)
 print("area", 2*np.pi*r_h_tail_spar*t)
 print('min area', A_min[0])
@@ -68,5 +69,6 @@ print('Ixx',1/8*np.pi*(r_h_tail_spar*2)**3*t)
 print('min Ixx',Ixx_min[0])
 print("T_max req",T_max)
 print("T_max allowed", 2*t*yield_stress_shear*A_m)
-print("Max twist, deg",(T_max/(4*A_m**2*G)*P/t*1.2/2)/(2*np.pi)*360)
+print("Max twist, deg",(T_max/(4*A_m**2*G)*P/t*l_h_tail_spar/2)/(2*np.pi)*360)
+print("lenght",l_h_tail_spar )
 #print('Iyy mm^4',0.25*np.pi*(a1*b1**3-a2*b2**3)*1000**4)

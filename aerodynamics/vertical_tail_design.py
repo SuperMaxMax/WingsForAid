@@ -50,7 +50,7 @@ def vertical_wing_design(aircraft):
 
     V_v = Sv_Sw * l_v / b
     S_v = Sv_Sw * Sw
-    print(V_v)
+    #print(V_v)
 
 
 vertical_wing_design(object)
@@ -153,7 +153,7 @@ def horizontal_tail_planform(aircraft):
             else: 
                 change = 0
             
-            
+            b = 1.2
 
             segments = 100
             N = segments - 1
@@ -161,7 +161,7 @@ def horizontal_tail_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 1.3
+                AR = b**2 / S
             if variable == "Lambda":
                 Lambda = parameter
             else:
@@ -171,8 +171,8 @@ def horizontal_tail_planform(aircraft):
             else:
                 alpha_twist = 0 * np.pi / 180
 
-            b = (AR * S)**0.5
-            print(b, "b")
+            #b = (AR * S)**0.5
+            #print(b, "b")
             airfoildata = airfoil_select(required_lift(aircraft)[0], change)
             
             C_L_h = required_lift(aircraft)[0]
@@ -180,7 +180,6 @@ def horizontal_tail_planform(aircraft):
             a_2d = airfoildata['C_l_alpha'].tolist()[0]         #AIRFOIL PARAMETER                                  
             alpha_0 = airfoildata['alpha_0'].tolist()[0]        #AIRFOIL PARAMETER
             
-            print("b",b)
             Croot = 2/(1+Lambda) * S/b
             MAC = Croot * 2 / 3 * ((1 + Lambda + Lambda**2)/(1+Lambda))
 
@@ -230,22 +229,22 @@ def horizontal_tail_planform(aircraft):
             span_eff = 1 / (1 + delta)
             tau = 1/span_eff - 1
             
-            print("a_2d", a_2d)
-            print("span_eff", span_eff)
-            print("tau", tau)
-            print("AR", AR)
+            # print("a_2d", a_2d)
+            # print("span_eff", span_eff)
+            # print("tau", tau)
+            # print("AR", AR)
 
             CL_a_h = a_2d / (1+(a_2d/(np.pi*AR))*(1+tau))
-            print("CLav", CL_a_h)
+            # print("CLav", CL_a_h)
 
 
 
-            print('=====================================================================')
-            print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
-            print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
-            print("Max is 1.20 = ", b)
-            print(i_w*180/np.pi, C_L_wing - C_L_h, C_L_h, airfoildata.index.tolist())
-            print("C_L", C_L_wing)
+            # print('=====================================================================')
+            # print('current option is: AR = ', AR, 'taper ratio = ', Lambda, 'indidence = ', i_w*180/np.pi)
+            # print("Span_eff = ", span_eff, "CL_wing = ", C_L_wing, "CL required for cruis = ", C_L_h, "CD_i = ", CD_induced)
+            # print("Max is 1.20 = ", b)
+            # print(i_w*180/np.pi, C_L_wing - C_L_h, C_L_h, airfoildata.index.tolist())
+            # print("C_L", C_L_wing)
 
         #Find integral current distribution
         area_lift_dist = -integrate.simps(CL1, y_s)

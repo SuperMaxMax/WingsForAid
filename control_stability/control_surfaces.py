@@ -61,7 +61,7 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
 
     delta_L = L_a/2 /((aircraft.yend_ail + aircraft.ystart_ail + aircraft.w_out)/2 * (aircraft.b/2 + aircraft.w_out/2))
 
-def elevator_design(aircraft):
+def elevator_design(aircraft, plot):
     
     # C_L_c = 2 * aircraft.W_TO *atm.g0/(aircraft.rho * aircraft.V_cruise**2 * aircraft.Sw)
     # C_L_TO = C_L_c + aircraft.CS_dCLmax_TO
@@ -80,8 +80,7 @@ def elevator_design(aircraft):
     V_range = np.arange(aircraft.V_s_min, aircraft.V_cruise*1.4, 2)
     
     color_r = ['black', 'steelblue']
-    e = 0
-    plt.figure()
+    # e = 0
     for X_cg in [aircraft.X_cg_fwd, aircraft.X_cg_aft]:
         delta_eq_req_range = []
         for V in V_range:
@@ -95,19 +94,19 @@ def elevator_design(aircraft):
             delta_e_req = - ((T*z_position_T/(1/2 * aircraft.rho_TO * V**2 * aircraft.Sw * aircraft.MAC_length) + aircraft.af_cm0) * aircraft.CLa_w_cruise + (C_L1 - aircraft.af_Cl0)*aircraft.C_m_alpha)/(aircraft.CLa_w_cruise*C_m_delta_e - aircraft.C_m_alpha*C_L_delta_e)
             delta_eq_req_range.append(delta_e_req*180/np.pi)
         
-        
-        plt.scatter(V_range, delta_eq_req_range, marker='x', color=color_r[e])
-        
-        e = e +1
-    
-    plt.xlabel(r"V [m/s]")
-    plt.ylabel(r"$\delta_E$ [deg]")
+    if plot:
+        plt.figure()
+        plt.scatter(V_range, delta_eq_req_range, marker='x', color=(color_r[e] for e in range(len(color_r))))
+            
+            # e = e +1
+        plt.xlabel(r"V [m/s]")
+        plt.ylabel(r"$\delta_E$ [deg]")
 
-    plt.axvline(x=aircraft.V_cruise, color='red', linestyle='--')
-    plt.text(aircraft.V_cruise - 2.5, min(delta_eq_req_range), r'$V_{cruise}$', rotation=90, color='red')
+        plt.axvline(x=aircraft.V_cruise, color='red', linestyle='--')
+        plt.text(aircraft.V_cruise - 2.5, min(delta_eq_req_range), r'$V_{cruise}$', rotation=90, color='red')
 
-    plt.grid()
-    # plt.show(block=True)
+        plt.grid()
+        plt.show(block=True)
 
 def rudder_design(aircraft):#, tau_r):
     
@@ -167,36 +166,33 @@ def rudder_design(aircraft):#, tau_r):
 
     #aircraft.S_r = aircraft.C_r_C_v * aircraft.C_v * aircraft.AE_b_v
 
-def rudder_iteration(aircraft):
+def rudder_iteration(aircraft, plot):
     delta_r_value_array = []
     c_array = np.arange(0.10, 0.75, 0.05)
     tau_array = [0.27, 0.35, 0.41, 0.47, 0.52, 0.56, 0.6, 0.64, 0.68, 0.71, 0.74, 0.77, 0.8]
-    plt.figure()
     for i in tau_array:
         tau_r = i
         rudder_design(aircraft)#, tau_r)
 
         delta_r_value_array.append(aircraft.delta_r_value)
 
-    
-    plt.scatter(c_array, delta_r_value_array, marker='x', color='black')
-    plt.axhline(y=30, color= 'red')
-    plt.text(0.6, 30.5, r"$\delta_{r_{max}}$", rotation=0, color='red')
-    plt.axhline(y=27, color= 'darkorange')
-    plt.text(0.6, 27.5, r"$\delta_{r_{max}}$ + margin", rotation=0, color='red')
+    if plot:
+        plt.figure()
+        plt.scatter(c_array, delta_r_value_array, marker='x', color='black')
+        plt.axhline(y=30, color= 'red')
+        plt.text(0.6, 30.5, r"$\delta_{r_{max}}$", rotation=0, color='red')
+        plt.axhline(y=27, color= 'darkorange')
+        plt.text(0.6, 27.5, r"$\delta_{r_{max}}$ + margin", rotation=0, color='red')
 
-    index = np.where(np.array(delta_r_value_array) < 27)[0][0]
-    plt.scatter(c_array[index], delta_r_value_array[index], color='r')
+        index = np.where(np.array(delta_r_value_array) < 27)[0][0]
+        plt.scatter(c_array[index], delta_r_value_array[index], color='r')
 
-
-    plt.xlabel(r"$\frac{C_r}{C_v}$")
-    plt.ylabel(r"$\delta_{r_{max}}$ [deg]")
-    # plt.show(block=True)
+        plt.xlabel(r"$\frac{C_r}{C_v}$")
+        plt.ylabel(r"$\delta_{r_{max}}$ [deg]")
+        plt.show(block=True)
     
 def main_control_surface(aircraft, plot):
     aileron_design(aircraft)
-    # rudder_iteration(aircraft)
+    # rudder_iteration(aircraft, plot)
     rudder_design(aircraft)
-    elevator_design(aircraft)
-    if plot:
-        plt.show(block=True)
+    elevator_design(aircraft, plot)
