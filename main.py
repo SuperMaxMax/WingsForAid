@@ -35,7 +35,7 @@ while something:
     W_TO_old = aircraft.W_TO
     # aircraft.Sw = aircraft.W_TO/aircraft.WS
     ae.run_aero(aircraft)
-    cs.main_stab_control(aircraft, False, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
+    cs.main_stab_control(aircraft, True, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
     print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
 
     if not jarno: #Jarno can't run wingbox
@@ -49,7 +49,7 @@ while something:
     fp.TO_eom(aircraft, airfield, atm, 11, 4000, 12.86, -7.716, aircraft.W_F, Plot = False)
     fp.LA_eom(aircraft, airfield, atm, -8, 4000, 12.86, -5.14, 5, Plot = False)
 
-    op.operations_eval(aircraft)
+    # op.operations_eval(aircraft)
 
     if np.abs((aircraft.W_TO - W_TO_old)/W_TO_old) < 0.001:
         something = False
