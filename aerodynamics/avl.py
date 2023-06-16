@@ -11,9 +11,9 @@ from scipy import integrate, optimize
 from parameters import UAV
 aircraft = UAV('aircraft')
 
-import wing_planform as wp
-import horizontal_tail_design as htd
-import vertical_tail_design as vtd
+import aerodynamics.wing_planform as wp
+import aerodynamics.horizontal_tail_design as htd
+import aerodynamics.vertical_tail_design as vtd
 
 
 wp.main_wing_planform(aircraft)
@@ -180,7 +180,7 @@ elevator  """,1.0, ' ' ,     0.001, ' ' ,     0.0, ' ' ,  1.0, ' ' ,  0.0, ' ' ,
 #-------------------Tip Section-------------------------
 #    Xle         Yle         Zle         chord       angle 
 SECTION
-     """,0.0, ' ' ,          aircraft.AE_b_h/2, ' ' ,        0.0, ' ' ,        aircraft.AE_tipchord_h, ' ' ,      0.000*180/np.pi,"""  
+     """,0.0, ' ' ,          aircraft.b_h/2, ' ' ,        0.0, ' ' ,        aircraft.AE_tipchord_h, ' ' ,      0.000*180/np.pi,"""  
 
 NACA
 0012

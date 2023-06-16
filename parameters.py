@@ -161,7 +161,7 @@ class UAV:
 
         self.WS = 632.739                           # Wing Loading [N/m^2]
         self.W_F = 52.69403541333709                # Fuel weight [kg]                                  constant
-        self.W_OE = 400 #375.0                           # Operational empty weight [kg] CALCULATED 15-6-23 14:16  variable
+        self.W_OE = 275.0                           # Operational empty weight [kg] CALCULATED 15-6-23 14:16  variable
         self.W_PL = 276                             # Payload weight [kg]                               constant
         self.W_TO = 770.539373653824                # Take-off weight [kg]                              variable
         self.W_e = 63.6                             # Definitive weight per engine [kg]                 constant

@@ -7,6 +7,7 @@ import control_stability.main_stab_cont as cs
 import structures.wingbox_full as wb
 import flight_performance.simulation as fp
 
+
 aircraft = UAV("aircraft")
 atm      = atmosphere()
 airfield = airport("Sudan")
@@ -14,6 +15,7 @@ airfield = airport("Sudan")
 # start
 plot = False
 remove_duplicates = False
+jan = False
 
 n_iteration = 0
 something = True
@@ -26,10 +28,10 @@ while something:
     ae.run_aero(aircraft)
     cs.main_stab_control(aircraft, False, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
     print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
-    if n_iteration % 1  == 0 and n_iteration != 0:
-        wb.all_wingbox(aircraft, True)
-    else:
-        wb.all_wingbox(aircraft, False)
+    # if n_iteration % 1  == 0 and n_iteration != 0:
+    #     wb.all_wingbox(aircraft, True)
+    # else:
+    #     wb.all_wingbox(aircraft, False)
     
     aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
     fp.TO_eom(aircraft, airfield, atm, 11, 4000, 12.86, -7.716, aircraft.W_F, Plot = False)
@@ -44,6 +46,11 @@ while something:
     print("TAKE-OFF WEIGHT:", aircraft.W_TO)
     print("=================================")
     n_iteration += 1
+    
+if jan:
+    import aerodynamics.avl as avl
+    avl
+
     
 # print all attributes of object
 # # create dataframe with members and values, to save all aircrafts in
