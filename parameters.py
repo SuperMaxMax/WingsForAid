@@ -91,7 +91,7 @@ class UAV:
         # self.N_e = 1                      # Number of engines [-]
         self.n_boxes = 12                   # [-]
         self.n_boxes_abreast = 2            # [-]
-        self.n_drops = 1                    # [-]
+        self.n_drops = 2                    # [-]
         # self.n_rows = 6                     # [-]
         self.name = name                    # Name of the aircraft
         # self.nose_gear_type = 'fixed'       # Type of nose gear: "fixed" or "retractable"
@@ -321,10 +321,11 @@ class UAV:
         
         "Operations parameters"                 # NOTE: Add identifier "OP_" before variable names
         # inputs
-        # self.OP_fuel_energy_density = 44.65E6   # [J/kg]
-        # self.OP_h_loiter = 500 * 0.3048         # [m]
-        # self.OP_h_dropzone = 0                  # [m]
         self.OP_n_app_max = 3                   # [g]
+        self.n_drops = 2
+        self.n_boxes = 12
+        self.OP_Range = 250
+        self.OP_droprange = 10
 
         # requirements
         self.OP_hmin = 15                       # [m] requirements

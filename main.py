@@ -6,6 +6,7 @@ import aerodynamics.main_aero as ae
 import control_stability.main_stab_cont as cs
 import structures.wingbox_full as wb
 import flight_performance.simulation as fp
+import operations.sortie as op
 
 
 aircraft = UAV("aircraft")
@@ -36,10 +37,12 @@ while something:
         else:
             wb.all_wingbox(aircraft, False)
     
-    
+
     aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
     fp.TO_eom(aircraft, airfield, atm, 11, 4000, 12.86, -7.716, aircraft.W_F, Plot = False)
     fp.LA_eom(aircraft, airfield, atm, -8, 4000, 12.86, -5.14, 5, Plot = False)
+
+    op.operations_eval(aircraft)
 
     if np.abs((aircraft.W_TO - W_TO_old)/W_TO_old) < 0.001:
         something = False
@@ -50,12 +53,12 @@ while something:
     print("TAKE-OFF WEIGHT:", aircraft.W_TO)
     print("=================================")
     n_iteration += 1
-    
-if jan: #Jan's path is linked in avl so otherwise code breaks 
+
+if jan: #Jan's path is linked in avl so otherwise code breaks
     import aerodynamics.avl as avl
     avl.export(aircraft)
 
-    
+
 # print all attributes of object
 # # create dataframe with members and values, to save all aircrafts in
 # df = pd.DataFrame()
@@ -83,28 +86,31 @@ if jan: #Jan's path is linked in avl so otherwise code breaks
 #     plt.show()
 
 # # --- saving
-# # save all attributes of object to csv file
-# members = [attr for attr in dir(aircraft) if not callable(getattr(aircraft, attr)) and not attr.startswith("__")]
-# values = [getattr(aircraft, member) for member in members]
+# create dataframe with members and values, to save all aircrafts in
+df = pd.DataFrame()
 
-# # remove brackets and round values
-# values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
-# values = [round(value, 4) if isinstance(value, float) else value for value in values]
+# save all attributes of object to csv file
+members = [attr for attr in dir(aircraft) if not callable(getattr(aircraft, attr)) and not attr.startswith("__")]
+values = [getattr(aircraft, member) for member in members]
 
-# # add to dataframe
-# df[aircraft.name] = values
+# remove brackets and round values
+values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
+values = [round(value, 4) if isinstance(value, float) else value for value in values]
 
-# # set index of dataframe
-# df.index = members
+# add to dataframe
+df[aircraft.name] = values
 
-# # export dataframe of current design to csv file
-# df['DET_CON_2_braced'].to_csv('DET_CON_2_braced.csv', sep=';')
+# set index of dataframe
+df.index = members
 
-# # remove row in dataframe if all values in that row are the same
-# if remove_duplicates == True:
-#     for i in df.index:
-#         if all(element == df.loc[i].values[0] for element in df.loc[i].values):
-#             df.drop(i, inplace=True)
+# export dataframe of current design to csv file
+df[aircraft.name].to_csv('output', sep=';')
+
+# remove row in dataframe if all values in that row are the same
+if remove_duplicates == True:
+    for i in df.index:
+        if all(element == df.loc[i].values[0] for element in df.loc[i].values):
+            df.drop(i, inplace=True)
         
-# # save dataframe to csv file
-# df.to_csv('aircraft_comparison.csv', sep=';')
+# save dataframe to csv file
+df.to_csv('output.csv', sep=';')

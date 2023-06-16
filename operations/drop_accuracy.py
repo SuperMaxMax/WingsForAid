@@ -363,8 +363,8 @@ print("box default:", box.__dict__)
 # Simulation param
 dt_sim = 5 / 10E3  # [s] between simulation frames
 IT_max = 10E4
-SingleTry = False # 1 maneuver, full uncertainties
-SingleTryGNC = True # 1 maneuver, all conditions with some uncertainty
+SingleTry = True # 1 maneuver, full uncertainties
+SingleTryGNC = False # 1 maneuver, all conditions with some uncertainty
 DoVerif = False
 
 # Operational limits & requirements
@@ -395,7 +395,7 @@ C_Nbox = 1 # [#]
 # c combinations
 N_div_C = 2
 if SingleTry:
-    C_Nbox = 4
+    C_Nbox = 12
     C_VAR = {
         "Mbox": subdivide(C_Mbox, 0),
         "Vw": subdivide([0,0], 0),
@@ -477,7 +477,7 @@ print("try maneuvers:", M_COMB)
 # limits
 U_dt = 0.1 # [s] default time deviation
 U_Mbox = [-0.5,0.5] # [kg]
-U_T_drop = [-U_dt, U_dt] # [s]
+U_T_drop = [U_dt, U_dt] # [s]
 U_T_brake = [-U_dt, U_dt] # [s]
 U_T_flap = [-U_dt, U_dt] # [s]
 U_pos = [0.25, 0.25] # [m]
@@ -493,7 +493,7 @@ if SingleTry:
         "Mbox": subdivide(U_Mbox, 1),
         "Vw": subdivide(U_Vw, 2),
         "w_heading": subdivide(U_w_heading, 8),
-        "T_drop": subdivide(U_T_drop, 1),
+        "T_drop": subdivide(U_T_drop, 0),
         "T_brake": subdivide(U_T_brake, 1),
         "T_flap": subdivide(U_T_flap, 1),
     }
@@ -502,7 +502,7 @@ else:
         "Mbox": subdivide(U_Mbox, 1),
         "Vw": subdivide(U_Vw, 1),
         "w_heading": subdivide(U_w_heading, N_div_U+1),
-        "T_drop": subdivide(U_T_drop, 1),
+        "T_drop": subdivide(U_T_drop, 0),
         "T_brake": subdivide(U_T_brake, 0),
         "T_flap": subdivide(U_T_flap, 0),
     }
@@ -604,8 +604,10 @@ for DropCon in C_COMB:
         Racc = []
         Pvi = 0
         for DropUnc in U_COMB:
+            DropUnc = list(DropUnc)
             if SingleTry: print(N_Unc, "/", len(U_COMB), "variation", str(DropUnc))
             DropCon[-1] = C_Nbox
+            DropUnc[3] = 0
             while DropCon[-1] > 0:
                 SimuDrop(DropCon, ManCase, DropUnc, DropResults)
                 Racc.append(np.sqrt(DropResults["impact DX [m]"][-1] ** 2 + DropResults["impact DY [m]"][-1] ** 2))
@@ -613,6 +615,7 @@ for DropCon in C_COMB:
                     Pvi += 1
                 # try for N boxes
                 DropCon[-1] -= 1
+                DropUnc[3] += 0.5 # time delay between each box
             N_Unc += 1
 
         # get maneuver evaluation
