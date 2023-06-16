@@ -321,10 +321,11 @@ class UAV:
         
         "Operations parameters"                 # NOTE: Add identifier "OP_" before variable names
         # inputs
-        # self.OP_fuel_energy_density = 44.65E6   # [J/kg]
-        # self.OP_h_loiter = 500 * 0.3048         # [m]
-        # self.OP_h_dropzone = 0                  # [m]
         self.OP_n_app_max = 3                   # [g]
+        self.n_drops = 2
+        self.n_boxes = 12
+        self.OP_Range = 250
+        self.OP_droprange = 10
 
         # requirements
         self.OP_hmin = 15                       # [m] requirements

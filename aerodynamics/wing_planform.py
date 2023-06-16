@@ -249,12 +249,12 @@ def main_wing_planform(aircraft):
         if not full_print:
             return abs(C_L_wing-C_L_req)
         elif full_print:
-            return AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean
+            return AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean, oswald
     
     airfoil = aircraft.airfoil
     initial_guess = iw(airfoil)[0]
     i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
-    AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean = plot_lift_distr(i_w_optimal, full_print=True)
+    AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean, oswald = plot_lift_distr(i_w_optimal, full_print=True)
     #plt.plot(y_s, l)
     #plt.show()
     #print(','.join([str(x) for x in y_s]))
@@ -277,6 +277,7 @@ def main_wing_planform(aircraft):
     aircraft.y_mac = 1/3*(aircraft.b/2)*(1+2*Lambda)/(1+Lambda)   
     aircraft.x_lemac = aircraft.y_mac*np.tan(aircraft.sweep_LE)
     aircraft.CL_max_clean = CL_max_clean
+    aircraft.oswald = oswald 
 
     #print('afoqwbqlbng', aircraft.y_mac, aircraft.x_lemac, aircraft.sweep_LE, aircraft.MAC_length)
                

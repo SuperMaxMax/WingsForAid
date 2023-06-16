@@ -86,7 +86,7 @@ def cg_calc(obj, plot):
     '''v Fuselage group v''' # Everything except winggroup
     # Fuselage & engine
     prop_correction = 0.06          # correction for propeller weight
-    fus_cg = 0.48 * obj.l_f         # educated guess
+    fus_cg = 0.52 * obj.l_f         # educated guess
     engine_cg = obj.engine_cg - prop_correction     # based on Rotax 912is (.g. or rotax 912is is at 327 mm, total length is 665.1 mm)
         
     # Boom & tail

@@ -6,6 +6,7 @@ import aerodynamics.main_aero as ae
 import control_stability.main_stab_cont as cs
 import structures.wingbox_full as wb
 import flight_performance.simulation as fp
+import operations.sortie as op
 
 
 aircraft = UAV("aircraft")
@@ -18,8 +19,15 @@ remove_duplicates = False
 jan = False
 jarno = True
 
+
 n_iteration = 0
 something = True
+
+#TODO landing distance
+#TODO max ferry range
+#TODO ceiling altitude
+#TODO max climb rate
+#TODO max endurance
 
 while something:
     print('Iteration: ', n_iteration)
@@ -36,10 +44,12 @@ while something:
         else:
             wb.all_wingbox(aircraft, False)
     
-    
+
     aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
     fp.TO_eom(aircraft, airfield, atm, 11, 4000, 12.86, -7.716, aircraft.W_F, Plot = False)
     fp.LA_eom(aircraft, airfield, atm, -8, 4000, 12.86, -5.14, 5, Plot = False)
+
+    op.operations_eval(aircraft)
 
     if np.abs((aircraft.W_TO - W_TO_old)/W_TO_old) < 0.001:
         something = False
@@ -51,8 +61,8 @@ while something:
     print("TAKE-OFF WEIGHT:", aircraft.W_TO)
     print("=================================")
     n_iteration += 1
-    
-if jan: #Jan's path is linked in avl so otherwise code breaks 
+
+if jan: #Jan's path is linked in avl so otherwise code breaks
     import aerodynamics.avl as avl
     avl.export(aircraft)
 
@@ -83,4 +93,4 @@ if remove_duplicates == True:
             df.drop(i, inplace=True)
         
 # save dataframe to csv file
-df.to_csv('aircraft_comparison.csv', sep=';')
+# df.to_csv('aircraft_comparison.csv', sep=';')

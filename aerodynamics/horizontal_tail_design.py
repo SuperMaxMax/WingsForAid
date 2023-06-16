@@ -109,7 +109,7 @@ def horizontal_tail_planform(aircraft):
         if variable == "Lambda":    
             variable_list2 = [1]
         elif variable == "AR":  
-            variable_list2 = [5.1666666]
+            variable_list2 = [2/3*aircraft.A]
         elif variable == "Twist":
             variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
         
@@ -132,7 +132,7 @@ def horizontal_tail_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 5.166666
+                AR = 2/3*aircraft.A
             if variable == "Lambda":
                 Lambda = parameter
             else:
@@ -268,8 +268,9 @@ def horizontal_tail_planform(aircraft):
 
     MAC_length = 2/3 * aircraft.AE_rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)
     V_h = aircraft.Sh_S * aircraft.l_h / aircraft.b
-        
+    
     aircraft.W_h = S * MAC_length * 0.12 * 2680 * 0.025 * (AR / np.cos(aircraft.sweep_co4_h))**0.6*Lambda**0.04*V_h**0.2*1**0.4
+    #Raymer horizontal tail formula (gives 2.7kg?): #aircraft.W_h = 0.016*(6.6*aircraft.W_TO)**0.414*(0.5*aircraft.rho_cruise*aircraft.V_cruise**2)**0.168*aircraft.S_h**0.896*(12/np.cos(0))**(-0.12)*(aircraft.A/(np.cos(0)**2))**0.043*1**(-0.02)
     aircraft.W_t = aircraft.W_h + aircraft.W_v
     #print("Afsd", CL_a_h)
     #print(b)
