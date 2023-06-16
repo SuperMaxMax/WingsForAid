@@ -30,7 +30,7 @@ while something:
     cs.main_stab_control(aircraft, False, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
     print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
 
-    if not jarno:
+    if not jarno: #Jarno can't run wingbox
         if n_iteration % 1  == 0 and n_iteration != 0:
             wb.all_wingbox(aircraft, True)
         else:
@@ -51,7 +51,7 @@ while something:
     print("=================================")
     n_iteration += 1
     
-if jan:
+if jan: #Jan's path is linked in avl so otherwise code breaks
     import aerodynamics.avl as avl
     avl
 
