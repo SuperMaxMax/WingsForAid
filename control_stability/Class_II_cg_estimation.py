@@ -180,6 +180,7 @@ def cg_calc(obj, plot):
     LimBoxConfigAft = r'$W_{TO}$' #'022222'
 
     # Save most forward and most aft and fully loaded c.g. in object
+    obj.X_cg_OEW = Xs[0]
     obj.X_cg_full = Xs[-1]
     obj.X_cg_range = Xs[labels.index(LimBoxConfigAft)] - Xs[labels.index(LimBoxConfigFwd)]
     obj.X_cg_fwd = Xs[labels.index(LimBoxConfigFwd)] - obj.X_cg_range * 0.05
@@ -190,25 +191,25 @@ def cg_calc(obj, plot):
     
     if plot:
         for x, w, label, i in zip(Xs, w_fracs, labels, range(len(Xs))):
-            plt.scatter(x, w)
             if i == 0 or i == len(Xs):
                 rotation_t = 0
             else:
                 rotation_t = 90
+            plt.scatter(x, w)
             plt.annotate(label, (x, w), textcoords="offset points", xytext=(5,0))#, ha='center')#, rotation=rotation_t)
             
-            plt.figure(figsize=(14,7))
-            plt.axvline(x=obj.X_cg_fwd, color='blue', label='most forward c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=135, length=1.1)])
-            plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])
+            # plt.figure(figsize=(14,7))
+        plt.axvline(x=obj.X_cg_fwd, color='blue', label='most forward c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=135, length=1.1)])
+        plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])
 
-            plt.ylim(top = 1.03)
-            plt.xlim(left = 0.1, right = 0.5)
-            plt.xlabel(r"$\dfrac{x_{cg}}{\bar{c}}$", fontsize = 12, loc='right')
-            plt.ylabel(r"$\dfrac{1}{W_{TO}}$",rotation = 0, fontsize = 12, loc='top')
-            plt.grid()
-            plt.legend()
-            # plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
-            plt.show()
+        plt.ylim(top = 1.03)
+        plt.xlim(left = 0.1, right = 0.5)
+        plt.xlabel(r"$\dfrac{x_{cg}}{\bar{c}}$", fontsize = 12, loc='right')
+        plt.ylabel(r"$\dfrac{1}{W_{TO}}$",rotation = 0, fontsize = 12, loc='top')
+        plt.grid()
+        plt.legend()
+        # plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
+        plt.show()
 
     name_list = ['!' + name for name in name_list]
 
