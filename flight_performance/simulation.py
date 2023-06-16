@@ -1073,7 +1073,6 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     t += t_cr_RTB
     x += cruise_dist_RTB
     x_plot -= cruise_dist_RTB
-
     W_F_used += W_F_used_cr_RTB
     x_array = np.append(x_array, x_plot)
     h_array = np.append(h_array, h)
