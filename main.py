@@ -16,7 +16,7 @@ airfield = airport("Sudan")
 plot = False
 remove_duplicates = False
 jan = False
-jarno = False
+jarno = True
 
 n_iteration = 0
 something = True
@@ -25,7 +25,7 @@ while something:
     print('Iteration: ', n_iteration)
     print(f'MTOW: {aircraft.W_TO:.2f} kg, OEW: {aircraft.W_OE:.2f}')
     W_TO_old = aircraft.W_TO
-
+    aircraft.Sw = aircraft.W_TO/aircraft.WS
     ae.run_aero(aircraft)
     cs.main_stab_control(aircraft, False, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
     print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
@@ -45,6 +45,7 @@ while something:
         something = False
 
     print(aircraft.__dict__)
+    aircraft.__dict__
 
     print("=================================")
     print("TAKE-OFF WEIGHT:", aircraft.W_TO)
@@ -55,56 +56,31 @@ if jan: #Jan's path is linked in avl so otherwise code breaks
     import aerodynamics.avl as avl
     avl.export(aircraft)
 
-    
-# print all attributes of object
-# # create dataframe with members and values, to save all aircrafts in
-# df = pd.DataFrame()
 
-# # --- iteration
-# n = 1
-# it = True
-# W_TO_c2_old = 750
+# --- saving
+df = pd.DataFrame()
+# save all attributes of object to csv file
+members = [attr for attr in dir(aircraft) if not callable(getattr(aircraft, attr)) and not attr.startswith("__")]
+values = [getattr(aircraft, member) for member in members]
 
-# while it:
-#     ae.wp.main_wing_planform(aircraft)
-#     ae.htd.horizontal_tail_planform(aircraft)
-#     ae.vtd.horizontal_tail_planform(aircraft)
+# remove brackets and round values
+values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
+values = [round(value, 4) if isinstance(value, float) else value for value in values]
 
-#     # check if change is small enough
-#     change = (W_TO_c2 - W_TO_c2_old)/W_TO_c2_old
+# add to dataframe
+df[aircraft.name] = values
 
-#     if np.abs(change) < 0.001:
-#         it = False
-#     else:
-#         n += 1
-#         W_TO_c2_old = W_TO_c2
-    
-# if plot == True:
-#     plt.show()
+# set index of dataframe
+df.index = members
 
-# # --- saving
-# # save all attributes of object to csv file
-# members = [attr for attr in dir(aircraft) if not callable(getattr(aircraft, attr)) and not attr.startswith("__")]
-# values = [getattr(aircraft, member) for member in members]
+# export dataframe of current design to csv file
+df['finaldesign'].to_csv('finaldesign.csv', sep=';')
 
-# # remove brackets and round values
-# values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
-# values = [round(value, 4) if isinstance(value, float) else value for value in values]
-
-# # add to dataframe
-# df[aircraft.name] = values
-
-# # set index of dataframe
-# df.index = members
-
-# # export dataframe of current design to csv file
-# df['DET_CON_2_braced'].to_csv('DET_CON_2_braced.csv', sep=';')
-
-# # remove row in dataframe if all values in that row are the same
-# if remove_duplicates == True:
-#     for i in df.index:
-#         if all(element == df.loc[i].values[0] for element in df.loc[i].values):
-#             df.drop(i, inplace=True)
+# remove row in dataframe if all values in that row are the same
+if remove_duplicates == True:
+    for i in df.index:
+        if all(element == df.loc[i].values[0] for element in df.loc[i].values):
+            df.drop(i, inplace=True)
         
-# # save dataframe to csv file
-# df.to_csv('aircraft_comparison.csv', sep=';')
+# save dataframe to csv file
+df.to_csv('aircraft_comparison.csv', sep=';')
