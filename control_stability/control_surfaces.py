@@ -196,3 +196,5 @@ def main_control_surface(aircraft, plot):
     # rudder_iteration(aircraft, plot)
     rudder_design(aircraft)
     elevator_design(aircraft, plot)
+
+
