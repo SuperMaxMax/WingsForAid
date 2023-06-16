@@ -1,4 +1,4 @@
-from parameters import UAV, atmosphere
+from parameters import UAV, atmosphere, airport
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,6 +6,7 @@ import aerodynamics.main_aero as ae
 import control_stability.main_stab_cont as cs
 import structures.wingbox_full as wb
 import flight_performance.simulation as fp
+import operations.sortie as op
 
 
 aircraft = UAV("aircraft")
@@ -40,6 +41,8 @@ while something:
     aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
     fp.TO_eom(aircraft, airfield, atm, 11, 4000, 12.86, -7.716, aircraft.W_F, Plot = False)
     fp.LA_eom(aircraft, airfield, atm, -8, 4000, 12.86, -5.14, 5, Plot = False)
+
+    op.operations_eval(aircraft)
 
     if np.abs((aircraft.W_TO - W_TO_old)/W_TO_old) < 0.001:
         something = False

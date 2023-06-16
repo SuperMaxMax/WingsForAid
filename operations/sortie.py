@@ -15,8 +15,9 @@ import flight_performance.simulation as fpsim
 def operations_eval(ac):
     print("\noperations evaluation")
     atm = atmosphere()
-    TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise/0.3048, ac.W_F, None, ac.OP_Range, ac.OP_Range/3,
-                                          True, True)
+    TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, ac.W_F, None,
+                                          ac.OP_Range, ac.OP_droprange, True,
+                                          False, False)
 
     # print("TTFD(sortie) [fh]", np.round(TTFD_s/3600,3))
     # print("T(sortie) [fh]", np.round(T_s/3600,3))
@@ -101,7 +102,7 @@ if __name__ == '__main__':
             else: R -= dR
 
     # eval max payload for current fuel
-    if True:
+    if False:
         Wf_extra = 44.32
         TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise/0.3048, ac.W_F, None,
                                               ac.OP_Range, AC.OP_droprange, RTB,
@@ -114,8 +115,7 @@ if __name__ == '__main__':
             print(ac.n_boxes,Wf)
         ac.n_boxes -= 1
 
-
     # operations_eval(AC)
-    TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, Wf_extra, None,
+    TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, ac.W_F, None,
                                           AC.OP_Range, AC.OP_droprange, RTB,
-                                          True, True)
+                                          False, False)
