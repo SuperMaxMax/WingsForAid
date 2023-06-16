@@ -16,7 +16,7 @@ airfield = airport("Sudan")
 plot = False
 remove_duplicates = False
 jan = False
-jarno = False
+jarno = True
 
 n_iteration = 0
 something = True
