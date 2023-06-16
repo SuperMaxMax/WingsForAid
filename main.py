@@ -32,6 +32,7 @@ while something:
     else:
         wb.all_wingbox(aircraft, False)
     
+    
     aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
 
     if np.abs((aircraft.W_TO - W_TO_old)/W_TO_old) < 0.001:
