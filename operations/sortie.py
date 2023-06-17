@@ -13,7 +13,9 @@ import matplotlib.pyplot as plt
 import flight_performance.simulation as fpsim
 
 def operations_eval(ac):
+    print("=====================================================")
     print("\noperations evaluation")
+    print("=====================================================")
     atm = atmosphere()
     #TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, ac.W_F, None,
                                           # ac.OP_Range, ac.OP_droprange, True,
@@ -28,13 +30,14 @@ def operations_eval(ac):
     # print("\n")
 
     # REQ-check: time to first delivery
+    print(str("TTFD: " + str(np.round(TTFD_s/3600, 3)) + "[fh]"))
     TTFD = ac.OP_TTFS + ac.OP_T_sortie_gnd + TTFD_s/3600 # sum time until first drop (5th time entry)
-    print(str("TTFD: "+str(np.round(TTFD, 1))+"[hr]"))
+    print(str("TTFD: "+str(np.round(TTFD, 1))+"[h]"))
 
     # REQ-check: sortie per day
     T_sortie = ac.OP_T_sortie_gnd + ac.OP_T_pilot + T_s/3600 # total per AC
-    print("T sortie:", str(np.round(T_s/3600, 1)), "[hh]")
-    print("T sortie:", str(np.round(T_sortie, 1)),"[h]")
+    print("T sortie:", str(np.round(T_s/3600, 3)), "[fh]")
+    print("T sortie:", str(np.round(T_sortie, 3)),"[h]")
     N_sortie_per_day = 24/(T_sortie)
     print(str("Ns/day: "+str(np.round(N_sortie_per_day,2))+"[#]"))
 
@@ -59,7 +62,7 @@ def operations_eval(ac):
     # fuel cost
     CST_Fs = Vol_Fs * ac.OP_fuelprice
     CST_Ftot = CST_Fs * N_sortie_tot
-    print("total fuel cost:" + str(np.round(CST_Ftot, 1)) + "[euro]")
+    #print("total fuel cost:" + str(np.round(CST_Ftot, 1)) + "[euro]")
     #euro/kg (over tot operations, incl. fuel)
     CST_TOT = ac.OP_CST_nofuel + CST_Ftot
     CST_per_kg = CST_TOT / PL_tot

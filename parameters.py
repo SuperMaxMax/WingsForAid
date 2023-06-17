@@ -339,7 +339,7 @@ class UAV:
 
         self.OP_Range = 250                     # [km]
         self.OP_N_boxes_per_sortie = 12         # [-]
-        self.OP_MR_PL = 20000                   # [kg/day]
+        self.OP_MR_PL = 20400                   # [kg/day]
         self.OP_PL_per_box = 20                 # [kg]
         self.OP_TTFD = 72                       # [h]
 
@@ -352,13 +352,13 @@ class UAV:
 
         # cost breakdown inputs
         self.OP_T_ops = 28                      # [days]
-        self.OP_N_ops = 144                     # [operations]
-        self.OP_AC_per_op = 19                  # [#AC] available on average
-        self.OP_TTFS = 60.967                  # [h] from contract to finished assembly and first sortie starts
+        self.OP_N_ops = 107                     # [operations]
+        self.OP_AC_per_op = 22                  # [#AC] available on average
+        self.OP_TTFS = 59.25967              # [h] from contract to finished assembly and first sortie starts
         self.OP_T_sortie_gnd = 1.5            # [hr]
         self.OP_T_pilot = 0.75                  # [h]
 
-        self.OP_CST_nofuel = 104614744.8        # [euro]
+        self.OP_CST_nofuel = 90896247.83        # [euro]
         self.OP_fuelprice = 1.1935              # [euro/L]
         #
         # self.OP_T_taxi = 5/60                   # [h]
