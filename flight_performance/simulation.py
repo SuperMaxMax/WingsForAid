@@ -13,9 +13,9 @@ import time
 # Import other files
 from parameters import UAV, airport, atmosphere
 
-aircraft = UAV("aircraft")
-airfield = airport("Sudan")
-atm      = atmosphere()
+# aircraft = UAV("aircraft")
+# airfield = airport("Sudan")
+# atm      = atmosphere()
 hp_to_watt = 745.699872
 
 def takeoffweight(obj, W_F):
@@ -23,11 +23,11 @@ def takeoffweight(obj, W_F):
     TOW = ZFW + W_F
     return TOW
 
-def atm_parameters(obj, h):
-    T    = atm.T0 + atm.lambd * h
-    rho  = atm.rho0*np.power((T/atm.T0), (-((atm.g / (atm.lambd * atm.R))+1)))
-    p    = atm.p0*np.power((T/atm.T0), (-(atm.g / (atm.lambd * atm.R))))
-    a    = np.sqrt(atm.gamma*obj.R*T)
+def atm_parameters(atm_obj, h):
+    T    = atm_obj.T0 + atm_obj.lambd * h
+    rho  = atm_obj.rho0*np.power((T/atm_obj.T0), (-((atm_obj.g / (atm_obj.lambd * atm_obj.R))+1)))
+    p    = atm_obj.p0*np.power((T/atm_obj.T0), (-(atm_obj.g / (atm_obj.lambd * atm_obj.R))))
+    a    = np.sqrt(atm_obj.gamma*atm_obj.R*T)
     return p, T, rho, a
 
 def dragpolar(ac_obj, CL):
@@ -174,10 +174,10 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
         if i == 0:
             dic_constants = {'runway slope': np.arange(0, max_runwayslope),
                              'airport altitude': 0, 'wing surface area': obj.Sw,
-                             'weight': takeoffweight(obj, W_f) * atm.g,
+                             'weight': takeoffweight(obj, W_f) * atmos.g,
                              'wind speed': 0, 'propeller power': obj.power * hp_to_watt,
                              'propeller efficiency': obj.prop_eff}
-            p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
+            p, T, rho, a = atm_parameters(atmos, dic_constants['airport altitude'])
 
         if i == 1:
             dic_constants['runway slope'] = 0
@@ -189,7 +189,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
         if i == 3:
             dic_constants['wind speed'] = 0
             dic_constants['airport altitude'] = np.arange(0, max_hairport)
-            p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
+            p, T, rho, a = atm_parameters(atmos, dic_constants['airport altitude'])
 
         CL_max = obj.CL_max_clean
         CL = CL_max
@@ -368,7 +368,7 @@ def cruiseperformance(ac_obj, atm_obj, n_boxes, W_F_TO, Range=None, V_cruise=Non
     print(f"The fuel used during the cruise is {np.round(W_F_used)} [kilograms] ({np.round(((W_cr-W)/0.7429), 2)} [L] @ {ac_obj.fueldensity} [kg/m^3])")
     print("---------------------------------------------------")
     print("D", D_max)
-    print('V', (aircraft.power * hp_to_watt * aircraft.eta_p)/D_max)
+    print('V', (ac_obj.power * hp_to_watt * ac_obj.eta_p)/D_max)
     return None
 # cruiseperformance(aircraft, atm, 12, 65)
 
@@ -467,10 +467,10 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
         if i == 0:
             dic_constants = {'runway slope': np.arange(0, max_runwayslope, -1),
                              'airport altitude': 0, 'wing surface area': obj.Sw,
-                             'weight': (aircraft.W_OE + w_fuel) * atm.g,
-                             'wind speed': 0, 'propeller power': aircraft.power * hp_to_watt,
-                             'propeller efficiency': aircraft.eta_p}
-            p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
+                             'weight': (obj.W_OE + w_fuel) * atmos.g,
+                             'wind speed': 0, 'propeller power': obj.power * hp_to_watt,
+                             'propeller efficiency': obj.eta_p}
+            p, T, rho, a = atm_parameters(atmos, dic_constants['airport altitude'])
 
         if i == 1:
             dic_constants['runway slope'] = 0
@@ -482,7 +482,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
         if i == 3:
             dic_constants['wind speed'] = 0
             dic_constants['airport altitude'] = np.arange(0, max_hairport)
-            p, T, rho, a = atm_parameters(obj, dic_constants['airport altitude'])
+            p, T, rho, a = atm_parameters(atmos, dic_constants['airport altitude'])
 
         S = [600.0]
         CL = 0.8
@@ -570,7 +570,7 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
     RC = np.empty(0)
     gamma_d = np.empty(0)
     while h > 0:
-        p, T, rho, a = atm_parameters(obj, h)
+        p, T, rho, a = atm_parameters(atmos, h)
         # descending
         if h > h_sc:
             Pa = obj.power * P_descend * obj.eta_p * hp_to_watt * (rho / atmos.rho0) ** (3 / 4)
@@ -692,8 +692,8 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
         x += V * dt
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
         Pbr = Pr/ac_obj.prop_eff
-        if n%1000 == 0:
-            print(f"Break horse power: {Pbr}")
+        # if n%1000 == 0:
+        #     print(f"Break horse power: {Pbr}")
         if Pbr > ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt:
             print("This cruise speed is not obtainable (Pr > Pa)")
             cruiseNAT = True
@@ -729,7 +729,7 @@ def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD = dragpolar(ac_obj, CL)
     LD_max = CL / CD
-    print(f"Maximum lift to drag ratio: {LD_max} [-]")
+    # print(f"Maximum lift to drag ratio: {LD_max} [-]")
     gamma_LD_max = np.arctan(1/(LD_max))
     h = h_cruise
     p, rho  = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
@@ -880,7 +880,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         cruise_dist = dtt_remaining - descent_dist
         t_cruise, W_F_used_cruise, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
         t += t_cruise
-        print(f"Cruise time: {round(t_cruise, 2)} [sec]")
+        # print(f"Cruise time: {round(t_cruise, 2)} [sec]")
         x += cruise_dist
         x_array = np.append(x_array, x)
         h_array = np.append(h_array, h)
@@ -922,14 +922,14 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             x_between_drop += x_climb
             W_F_used += W_F_used_climb
             W_F_used_array = np.append(W_F_used_array, W_F_used)
-            print(f"W_F_used after climb {i}: {round(W_F_used_climb, 2)} [kg] in {t_climb} [sec] | fraction: {round(1 - W_F_used_climb/W_F_0, 3)}")
+            # print(f"W_F_used after climb {i}: {round(W_F_used_climb, 2)} [kg] in {t_climb} [sec] | fraction: {round(1 - W_F_used_climb/W_F_0, 3)}")
             W -= W_F_used_climb
-            print(f"Start weight cruise: {np.round(W, 2)} [kg]")
+            # print(f"Start weight cruise: {np.round(W, 2)} [kg]")
             # Cruise part - first calculate cruise distance
             dtt_remaining = target_dist - x_between_drop
             descent_dist = (cruise_alt-15.0) * LD_max
             cruise_dist = dtt_remaining - descent_dist
-            print(f"Climb distance: {x_climb} [m] | Cruise distance: {cruise_dist} [m] | Descent distance: {descent_dist} [m]")
+            # print(f"Climb distance: {x_climb} [m] | Cruise distance: {cruise_dist} [m] | Descent distance: {descent_dist} [m]")
             t_cruise, W_F_used_cruise, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt, cruise_dist, W, V_cruise)
             # print(f"cruise time: {t_cruise}")
             t += t_cruise
@@ -940,8 +940,8 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             x_between_drop = cruise_dist
             W_F_used += W_F_used_cruise
             W_F_used_array = np.append(W_F_used_array, W_F_used)
-            print(f"Cruise time: {round(t_cruise, 2)} [sec]")
-            print(f"W_F_used after cruise {i}: {round(W_F_used_cruise, 2)} | fraction: {round(1 - W_F_used_cruise/W_F_0, 3)}")
+            # print(f"Cruise time: {round(t_cruise, 2)} [sec]")
+            # print(f"W_F_used after cruise {i}: {round(W_F_used_cruise, 2)} | fraction: {round(1 - W_F_used_cruise/W_F_0, 3)}")
             W -= W_F_used_cruise
             # Descent part
             t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt, 15.0, W)
@@ -954,7 +954,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             h_array = np.append(h_array, h)
             t_array = np.append(h_array, t)
             W_F_used_array = np.append(W_F_used_array, W_F_used)
-            print(f"W_F_used after descent {i}: {round(W_F_used_descent, 2)} | time descent {i}: {t_descent} | fraction: {round(1- W_F_used_descent/W_F_0, 3)}")
+            # print(f"W_F_used after descent {i}: {round(W_F_used_descent, 2)} | time descent {i}: {t_descent} | fraction: {round(1- W_F_used_descent/W_F_0, 3)}")
             W -= W_F_used_descent
             # After each descent, a certain amount of boxes are dropped
             W -= boxesperdrop * ac_obj.boxweight
@@ -1068,7 +1068,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     dtb_remaining = Range - x_return
     desc_dist_RTB = LD_max * cruise_alt_RTB
     cruise_dist_RTB = dtb_remaining - desc_dist_RTB
-    print(f"Climb distance: {x_cl_RTB} [m] | Cruise distance: {cruise_dist_RTB} [m] | Descent distance: {desc_dist_RTB} [m]")
+    # print(f"Climb distance: {x_cl_RTB} [m] | Cruise distance: {cruise_dist_RTB} [m] | Descent distance: {desc_dist_RTB} [m]")
     t_cr_RTB, W_F_used_cr_RTB, cruiseNAT = cruisecalc(ac_obj, atm_obj, cruise_alt_RTB, cruise_dist_RTB, W, V_cruise)
     t += t_cr_RTB
     x += cruise_dist_RTB
@@ -1090,7 +1090,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     h_array = np.append(h_array, h)
     t_array = np.append(h_array, t)
     W_F_used_array = np.append(W_F_used_array, W_F_used)
-    print(f"W_F_used for descent RTB: {round(W_F_used_des_RTB, 2)} [kg] | fraction: {round(1 - W_F_used_des_RTB/W_F_0, 3)}")
+    # print(f"W_F_used for descent RTB: {round(W_F_used_des_RTB, 2)} [kg] | fraction: {round(1 - W_F_used_des_RTB/W_F_0, 3)}")
     W -= W_F_used_des_RTB
     W_beforelanding = W
     # Landing, taxi, shutdown using fuel fractions
@@ -1129,6 +1129,6 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     if len(flight_profile)==0: flight_profile.append(0)
     flight_profile.append(t)                # total sortie time
     flight_profile.append(W_F_used)         # fuel burnt
-    return flight_profile
+    return W_F_used, flight_profile
 
 # fuelusesortie(aircraft, atm, 12, 1, 10000, 45, 54.012, Range=250, Summary=True, plot=True, savefig=False)

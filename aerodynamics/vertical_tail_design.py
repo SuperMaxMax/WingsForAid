@@ -70,23 +70,16 @@ def required_lift(aircraft):
     power = 29500
 
     M = power / omega
-    print(f"Engine torque: {M} [Nm]")
 
     cg_vt_d = aircraft.ST_z_ground + aircraft.w_out
     ver_dist = cg_vt_d  + aircraft.AE_b_v * 0.35 - aircraft.ST_z_cg_ground #Change to object variable, distance between centre of pressure vertical tail and vertical cg location
 
     L_h = M / ver_dist
-    print(f"Required correction force: {L_h} [N]")
 
     Sw = aircraft.Sw
-    print(f"Sw: {Sw}")
     Sv_Sw = aircraft.Sv_S
     S_v = Sv_Sw * Sw
-    print(f"Sv_Sw: {Sv_Sw}")
-    print(f"S_v: {S_v}")
-    print(f"V_cruise: {V_c}")
     C_L_h = L_h / (0.5 * rho_c * V_c**2 * S_v)
-    print(f"C_L_h: {C_L_h}")
     #C_L_h = 0.4
 
 
