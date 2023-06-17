@@ -16,10 +16,10 @@ airfield = airport("Sudan")
 # start
 plot = False
 jan = False
-jarno = False
+jarno = True
 
 n_iteration = 0
-something = True
+running = True
 full_wingbox_loop = True
 
 #TODO landing distance
@@ -28,13 +28,13 @@ full_wingbox_loop = True
 #TODO max climb rate
 #TODO max endurance
 
-while something:
+while running:
     print('Iteration: ', n_iteration)
     print(f'MTOW: {aircraft.W_TO:.2f} kg, OEW: {aircraft.W_OE:.2f}')
     W_check= aircraft.W_OE + aircraft.W_F
     # aircraft.Sw = aircraft.W_TO/aircraft.WS
     ae.run_aero(aircraft)
-    cs.main_stab_control(aircraft, True, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
+    cs.main_stab_control(aircraft, plot, True, False)
     print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
 
     if not jarno: #Jarno can't run wingbox
@@ -51,7 +51,7 @@ while something:
     # op.operations_eval(aircraft)
 
     if np.abs((aircraft.W_OE + aircraft.W_F - W_check)/W_check) < 0.001:
-        something = False
+        running = False
 
     print(aircraft.__dict__)
     aircraft.__dict__
