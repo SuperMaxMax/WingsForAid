@@ -15,7 +15,6 @@ airfield = airport("Sudan")
 
 # start
 plot = False
-remove_duplicates = False
 jan = False
 jarno = True
 
@@ -82,13 +81,4 @@ df[aircraft.name] = values
 df.index = members
 
 # export dataframe of current design to csv file
-df['finaldesign'].to_csv('finaldesign.csv', sep=';')
-
-# remove row in dataframe if all values in that row are the same
-if remove_duplicates == True:
-    for i in df.index:
-        if all(element == df.loc[i].values[0] for element in df.loc[i].values):
-            df.drop(i, inplace=True)
-        
-# save dataframe to csv file
-# df.to_csv('aircraft_comparison.csv', sep=';')
+df['aircraft'].to_csv('finaldesign.csv', sep=';')
