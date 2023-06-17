@@ -203,11 +203,11 @@ def cg_calc(obj, plot):
         plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])
 
         plt.ylim(top = 1.03)
-        plt.xlim(left = 0.1, right = 0.5)
+        plt.xlim(left = 0.15, right = 0.55)
         plt.xlabel(r"$\dfrac{x_{cg}}{\bar{c}}$", fontsize = 12, loc='right')
         plt.ylabel(r"$\dfrac{1}{W_{TO}}$",rotation = 0, fontsize = 12, loc='top')
         plt.grid()
-        plt.legend()
+        plt.legend(loc='upper center')
         # plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
         plt.show()
 
@@ -219,7 +219,7 @@ def cg_calc(obj, plot):
     df_mass.to_csv('AVL_mass.csv', index=False)
     #print(df_mass)
 
-    return max(Xs), min(Xs), obj.X_cg_range
+    return #max(Xs), min(Xs), obj.X_cg_range
 
 # from parameters import UAV
 # aircraft = UAV('aircraft')
