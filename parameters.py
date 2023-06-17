@@ -372,8 +372,8 @@ class UAV:
         self.lift_coefficients = [1.02549983e+03,  3.40489460e+02, -2.62539473e+03,  6.99194179e+03,     #Coefficents of a polynomial fit for the
                             -9.67481071e+03,  7.76224418e+03, -3.81444542e+03,  1.16482541e+03,     #lift distribution over the half span
                             -2.15539510e+02,  2.21217522e+01, -9.66193857e-01]                      #Highest order coefficient first
-        self.n_stringers = 20                # [-]
-        self.n_ribs = 15                    # [-]
+        self.n_stringers = 36                # [-]
+        self.n_ribs = 17                    # [-]
 
         "Jan W's coefficinets:"
         self.ST_U_de = 50 #derived gust velocity (ft/s)
