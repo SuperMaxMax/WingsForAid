@@ -15,7 +15,6 @@ airfield = airport("Sudan")
 
 # start
 plot = False
-remove_duplicates = False
 jan = False
 jarno = True
 
@@ -43,7 +42,8 @@ while something:
         else:
             wb.all_wingbox(aircraft, False)
     
-    aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, aircraft.n_drops, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
+
+    aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
     fp.TO_eom(aircraft, airfield, atm, 11, 4000, 12.86, -7.716, aircraft.W_F, Plot = False)
     fp.LA_eom(aircraft, airfield, atm, -8, 4000, 12.86, -5.14, 5, Plot = False)
 
@@ -81,14 +81,5 @@ if jan: #Jan's path is linked in avl so otherwise code breaks
 # # set index of dataframe
 # df.index = members
 
-# # export dataframe of current design to csv file
-# df['finaldesign'].to_csv('finaldesign.csv', sep=';')
-
-# # remove row in dataframe if all values in that row are the same
-# if remove_duplicates == True:
-#     for i in df.index:
-#         if all(element == df.loc[i].values[0] for element in df.loc[i].values):
-#             df.drop(i, inplace=True)
-        
-# # save dataframe to csv file
-# # df.to_csv('aircraft_comparison.csv', sep=';')
+# export dataframe of current design to csv file
+df['aircraft'].to_csv('finaldesign.csv', sep=';')

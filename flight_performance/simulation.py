@@ -960,6 +960,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             W -= boxesperdrop * ac_obj.boxweight
             if i == 0:
                 ttfd = t
+                ac_obj.TTFD_s = t
                 flight_profile.append(t)
     else:
         target_dist = Range - dropregion*1000                           # distance to first target
@@ -1001,6 +1002,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         W -= W_F_used_descent
         W -= boxesperdrop * ac_obj.boxweight
         ttfd = t
+        ac_obj.TTFD_s = t
         flight_profile.append(t)
         # ============================================================================================================================
         # Drops in dropregion
@@ -1126,9 +1128,14 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
                 filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ str(Range) + str(n_drops) + ".png"
                 plt.savefig(filepath)
         plt.show()
+
     if len(flight_profile)==0: flight_profile.append(0)
     flight_profile.append(t)                # total sortie time
     flight_profile.append(W_F_used)         # fuel burnt
-    return W_F_used, flight_profile
+
+    ac_obj.T_s = t
+    #ac_obj.Wf = W_F_used
+
+    return flight_profile
 
 # fuelusesortie(aircraft, atm, 12, 1, 10000, 45, 54.012, Range=250, Summary=True, plot=True, savefig=False)

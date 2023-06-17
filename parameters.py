@@ -179,7 +179,7 @@ class UAV:
         # self.W_boom = 20.3                        # Boom weight [kg]                                  constant
         self.ST_W_lg = 7.75                         # Mass of landing gear struts [kg]                  constant
         self.ST_W_wheels = 10                       # Mass of wheels [kg]                               constant
-        self.ST_W_uc = 18.51                                                # constant              
+        self.ST_W_uc = 18.51                                                # constant
         # self.W_uc = 66.4175                       # Undercarriage weight [kg]                         constant
         self.W_w = 52.72497438003413                 # Wing weight [kg]                                  variable
         self.W_v = 6.5
@@ -235,7 +235,7 @@ class UAV:
 
         # Horizontal tailplane
         self.AE_Vh_V = 0.95                     # Ratio between velocity at tail and wing [-] NOTE: This is a guestimate
-        self.AE_A_h = 5.33                      # Aspect ratio horizontal tail. NOTE: This is a guestimate  
+        self.AE_A_h = 5.33                      # Aspect ratio horizontal tail. NOTE: This is a guestimate
         self.AE_dEpsilondA = 0.02               # Downwash [-] TODO: check this value, this is a pure guess
         # self.AE_Sh = 2.0377662                # Surface area horizontal tailplane [m^2]
         self.AE_CL_a_h = 4.18773706267545       # Lift curve slope horizontal tailplane [1/rad] 
@@ -339,7 +339,7 @@ class UAV:
 
         self.OP_Range = 250                     # [km]
         self.OP_N_boxes_per_sortie = 12         # [-]
-        self.OP_MR_PL = 20000                   # [kg/day]
+        self.OP_MR_PL = 20400                   # [kg/day]
         self.OP_PL_per_box = 20                 # [kg]
         self.OP_TTFD = 72                       # [h]
 
@@ -352,20 +352,19 @@ class UAV:
 
         # cost breakdown inputs
         self.OP_T_ops = 28                      # [days]
-        self.OP_N_ops = 659                     # [operations]
-        self.OP_AC_per_op = 20                  # [#AC] available on average
-        self.OP_TTFS = 66.712                   # [h] from contract to finished assembly and first sortie starts
-        self.OP_T_sortie_gnd = 2.067            # [hr]
-        self.OP_T_ground = 2                    # [h]
+        self.OP_N_ops = 107                     # [operations]
+        self.OP_AC_per_op = 22                  # [#AC] available on average
+        self.OP_TTFS = 59.25967              # [h] from contract to finished assembly and first sortie starts
+        self.OP_T_sortie_gnd = 1.5            # [hr]
         self.OP_T_pilot = 0.75                  # [h]
 
-        self.OP_CST_nofuel = 217584726.5        # [euro]
+        self.OP_CST_nofuel = 90896247.83        # [euro]
         self.OP_fuelprice = 1.1935              # [euro/L]
-
-        self.OP_T_taxi = 5/60                   # [h]
-        self.OP_T_TO = 10 / 60                  # [h]
-        self.OP_T_LDG = 10 / 60                 # [h]
-        self.OP_T_clearance = 5 / 60            # [h]
+        #
+        # self.OP_T_taxi = 5/60                   # [h]
+        # self.OP_T_TO = 10 / 60                  # [h]
+        # self.OP_T_LDG = 10 / 60                 # [h]
+        # self.OP_T_clearance = 5 / 60            # [h]
 
 
         "Structural parameters"             # NOTE: Add identifier "ST_" before variable names
