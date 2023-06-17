@@ -34,7 +34,7 @@ while something:
     W_TO_old = aircraft.W_TO
     # aircraft.Sw = aircraft.W_TO/aircraft.WS
     ae.run_aero(aircraft)
-    cs.main_stab_control(aircraft, False, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
+    cs.main_stab_control(aircraft, True, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
     print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
 
     if not jarno: #Jarno can't run wingbox

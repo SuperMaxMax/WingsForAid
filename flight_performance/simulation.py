@@ -168,7 +168,6 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
 
 def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, W_f, Plot=True):
 
-    figure, axis = plt.subplots(2, 2)
     CL_all = []
     for i in range(0, 4):
         if i == 0:
@@ -227,6 +226,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             obj.FP_CL_TO = CL_to
 
         if Plot:
+            figure, axis = plt.subplots(2, 2)
             if i == 0:
                 axis[0, 0].plot(dic_constants['runway slope'], S)
                 axis[0, 0].set_title('runway slope vs C_L take-off')
@@ -250,11 +250,11 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
                 axis[0, 1].set_title('airport altitude vs C_L take-off')
                 axis[0, 1].set_xlabel('airport altitude [m]')
                 axis[0, 1].set_ylabel('C_L take-off [-]')
-    if Plot:
-        plt.subplots_adjust(hspace=0.6)
-        plt.subplots_adjust(wspace=0.5)
-        plt.suptitle('Take-Off')
-        plt.show()
+
+            plt.subplots_adjust(hspace=0.6)
+            plt.subplots_adjust(wspace=0.5)
+            plt.suptitle('Take-Off')
+            plt.show()
 
     return S
 
@@ -461,7 +461,6 @@ def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
 # -------------------------------- LANDING -----------------------------------
 def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, w_fuel, Plot=True):
 
-    figure, axis = plt.subplots(2, 2)
     CL_all = []
     for i in range(0, 4):
         if i == 0:
@@ -517,6 +516,8 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             obj.FP_CL_max_land = CL_max
             obj.FP_CL_land = CL_land
 
+    if Plot:
+        figure, axis = plt.subplots(2, 2)
         if i == 0:
             axis[0, 0].plot(dic_constants['runway slope'], S)
             axis[0, 0].set_title('runway slope vs runway length')
@@ -541,7 +542,6 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             axis[0, 1].set_xlabel('airport altitude [m]')
             axis[0, 1].set_ylabel('C_L landing [-]')
 
-    if Plot:
         plt.subplots_adjust(hspace=0.6)
         plt.subplots_adjust(wspace=0.5)
         plt.suptitle('Landing')

@@ -240,7 +240,7 @@ def stability_curve(aircraft, xcgRange):
 "Plotting and running"
 ##################################################################################################################
 
-def plot_scissor_plot(aircraft, plot):
+def plot_scissor_plot(aircraft):
     xcgRange = np.arange(-0.105, 1.005, 0.0005)
     ControlSh_s = controlability_curve(aircraft, xcgRange)
 
