@@ -20,6 +20,7 @@ jarno = False
 
 n_iteration = 0
 something = True
+full_wingbox_loop = True
 
 #TODO landing distance
 #TODO max ferry range
@@ -37,7 +38,7 @@ while something:
     print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
 
     if not jarno: #Jarno can't run wingbox
-        if n_iteration % 5  == 0 and n_iteration != 0:
+        if full_wingbox_loop: # and n_iteration != 0:
             wb.all_wingbox(aircraft, True)
         else:
             wb.all_wingbox(aircraft, False)

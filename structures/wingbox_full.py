@@ -1217,7 +1217,10 @@ def all_wingbox(ac, full_loop=False):
             print(f'n_stringers: {n_stringers}')
             print(f'n_ribs: {n_ribs}')
         
-        solution = False
+        if full_loop:
+            continue
+        else:
+            solution = False
 
     # save weights array
     if full_loop:
