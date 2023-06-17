@@ -184,7 +184,7 @@ def on_key(event):
         print(f"\nMax CG position Z-axis: {round(Z_position_cg,3)}")       
 
 ##########################################################################################################
-if plot:
+if LGplot:
     """Plotting"""
     # Enable interactive mode
     plt.ion()

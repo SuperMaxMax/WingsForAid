@@ -15,13 +15,17 @@ from control_stability.wing_planform import WingPlanform
 # aircraft = UAV('aircraft')
 # atm      = atmosphere()
 
-def main_stab_control(aircraft, plot, print_value):
-    cg_calc(aircraft, plot)
-    hor_run(aircraft, plot)
+def main_stab_control(aircraft, genplot, LGplot, print_value):
+    """aircraft: import the UAV
+    genplot: plot all the general plots, except for landing gear
+    LGplot: plot the interactive landing gear plot, used for sizing
+    print_value: print all results C&S calculates"""
+    cg_calc(aircraft, genplot)
+    hor_run(aircraft, genplot)
     ver_run(aircraft)
-    exec(open("control_stability/landing_gear.py").read(), {'aircraft':aircraft, 'plot':plot})
-    main_control_surface(aircraft, plot)
-    WingPlanform(aircraft, plot)
+    exec(open("control_stability/landing_gear.py").read(), {'aircraft':aircraft, 'LGplot':LGplot})
+    main_control_surface(aircraft, genplot)
+    WingPlanform(aircraft, genplot)
 
     if print_value:
         print("\n-----------------Summary-Stabily-&-Control----------------")

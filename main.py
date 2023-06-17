@@ -20,7 +20,7 @@ plot = False
 jan = False
 
 n_iteration = 1
-something = True
+running = True
 
 # for wingbox
 jarno = False               # Jarno can't run wingbox
@@ -33,15 +33,14 @@ ele_span = 500              # number of elements in spanwise direction (smaller 
 #TODO max climb rate
 #TODO max endurance
 
-while something:
+while running:
     W_check = aircraft.W_OE + aircraft.W_F
-
     print(f"=================== AERO-{n_iteration} =====================")
     ae.run_aero(aircraft)
     print("================================================\n")
 
     print(f"=================== CS-{n_iteration} =======================")
-    cs.main_stab_control(aircraft, True, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
+    cs.main_stab_control(aircraft, plot, True, False)
     print("================================================\n")
 
     print(f"=================== WB-{n_iteration} =======================")
@@ -63,15 +62,13 @@ while something:
     # op.operations_eval(aircraft)
 
     if np.abs((aircraft.W_OE + aircraft.W_F - W_check)/W_check) < 0.001:
-        something = False
+        running = False
 
     df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w]
 
     print(f"================= GENERAL-INFO ==================")
     print(df_iterations)
     print("===================================================\n")
-
-    
 
     n_iteration += 1
 
