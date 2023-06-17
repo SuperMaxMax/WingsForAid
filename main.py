@@ -8,19 +8,24 @@ import structures.wingbox_full as wb
 import flight_performance.simulation as fp
 import operations.sortie as op
 
-
 aircraft = UAV("aircraft")
 atm      = atmosphere()
 airfield = airport("Sudan")
 
+index_df = ["MTOW", "OEW", "Fuel weight", "Tail weight", "Wing weight"]
+df_iterations = pd.DataFrame(index = index_df)
+
 # start
 plot = False
 jan = False
-jarno = False
 
-n_iteration = 0
+n_iteration = 1
 something = True
-full_wingbox_loop = True
+
+# for wingbox
+jarno = False               # Jarno can't run wingbox
+full_wingbox_loop = True    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
+ele_span = 500              # number of elements in spanwise direction (smaller value is faster, but less accurate)
 
 #TODO landing distance
 #TODO max ferry range
@@ -29,42 +34,50 @@ full_wingbox_loop = True
 #TODO max endurance
 
 while something:
-    print('Iteration: ', n_iteration)
-    print(f'MTOW: {aircraft.W_TO:.2f} kg, OEW: {aircraft.W_OE:.2f}')
-    W_check= aircraft.W_OE + aircraft.W_F
-    # aircraft.Sw = aircraft.W_TO/aircraft.WS
+    W_check = aircraft.W_OE + aircraft.W_F
+
+    print(f"=================== AERO-{n_iteration} =====================")
     ae.run_aero(aircraft)
+    print("================================================\n")
+
+    print(f"=================== CS-{n_iteration} =======================")
     cs.main_stab_control(aircraft, True, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
-    print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
+    print("================================================\n")
 
+    print(f"=================== WB-{n_iteration} =======================")
     if not jarno: #Jarno can't run wingbox
-        if full_wingbox_loop: # and n_iteration != 0:
-            wb.all_wingbox(aircraft, True)
+        if full_wingbox_loop and n_iteration == 1:
+            wb.all_wingbox(aircraft, ele_span, True)
+        elif full_wingbox_loop and n_iteration > 1:
+            wb.all_wingbox(aircraft, ele_span, False, True)
         else:
-            wb.all_wingbox(aircraft, False)
+            wb.all_wingbox(aircraft, ele_span, False)
+    print("================================================\n")
     
-
+    print(f"=================== FP-{n_iteration} =======================")
     aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
     fp.TO_eom(aircraft, airfield, atm, 11, 4000, 12.86, -7.716, aircraft.W_F, Plot = False)
     fp.LA_eom(aircraft, airfield, atm, -8, 4000, 12.86, -5.14, 5, Plot = False)
+    print("=================================================\n")
 
     # op.operations_eval(aircraft)
 
     if np.abs((aircraft.W_OE + aircraft.W_F - W_check)/W_check) < 0.001:
         something = False
 
-    print(aircraft.__dict__)
-    aircraft.__dict__
+    df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w]
 
-    print("=================================")
-    print("TAKE-OFF WEIGHT:", aircraft.W_TO)
-    print("=================================")
+    print(f"================= GENERAL-INFO ==================")
+    print(df_iterations)
+    print("===================================================\n")
+
+    
+
     n_iteration += 1
 
 if jan: #Jan's path is linked in avl so otherwise code breaks
     import aerodynamics.avl as avl
     avl.export(aircraft)
-
 
 # # --- saving
 df = pd.DataFrame()
