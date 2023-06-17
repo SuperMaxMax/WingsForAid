@@ -221,9 +221,9 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     #### INPUT ####
     airfoil_num = '4415'            # [-] NACA airfoil number (4 digit)
 
-    f_spar = 0.25                   # [-] location of front spar (as fraction of chord) 
+    f_spar = ac.xc_front_spar                   # [-] location of front spar (as fraction of chord) 
     t_f_spar = t_f_spar_func        # [m] thickness of front spar
-    a_spar = 0.8                   # [-] location of aft spar (as fraction of chord)
+    a_spar = ac.xc_aft_spar                   # [-] location of aft spar (as fraction of chord)
     t_a_spar = t_a_spar_func        # [m] thickness of aft spar
 
     t_top = t_top_func              # [m] thickness of top panel
@@ -953,7 +953,6 @@ for i in range(len(n_ribs)):
         load = loading_tension
         a,b,c,d,e,f,g,h, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3, load, MOF_specific, True, False)
 
-        print(MOF_specific)
         MOF_specific.to_csv('MOF_specific.txt', sep=';')
         print(f"Done: {i*len(n_stringers)+j+1}/{len(n_ribs)*len(n_stringers)}")   
 
