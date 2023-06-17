@@ -42,7 +42,8 @@ while something:
         else:
             wb.all_wingbox(aircraft, False)
     
-    aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, aircraft.n_drops, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
+
+    aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
     fp.TO_eom(aircraft, airfield, atm, 11, 4000, 12.86, -7.716, aircraft.W_F, Plot = False)
     fp.LA_eom(aircraft, airfield, atm, -8, 4000, 12.86, -5.14, 5, Plot = False)
 

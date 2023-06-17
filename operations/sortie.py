@@ -15,9 +15,12 @@ import flight_performance.simulation as fpsim
 def operations_eval(ac):
     print("\noperations evaluation")
     atm = atmosphere()
-    TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, ac.W_F, None,
-                                          ac.OP_Range, ac.OP_droprange, True,
-                                          False, False)
+    #TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, ac.W_F, None,
+                                          # ac.OP_Range, ac.OP_droprange, True,
+                                          # False, False)
+    TTFD_s = ac.TTFD_s
+    T_s = ac.T_s
+    Wf = ac.W_F
 
     # print("TTFD(sortie) [fh]", np.round(TTFD_s/3600,3))
     # print("T(sortie) [fh]", np.round(T_s/3600,3))
@@ -65,10 +68,12 @@ def operations_eval(ac):
     ac.CST_PL_per_kg = CST_per_kg
     ac.N_sortie_per_day = N_sortie_per_day
     ac.OP_TTFD = TTFD
+
     ac.T_sortie = T_sortie
     ac.T_fh_sortie = T_s/3600
     ac.T_fhTFD = TTFD_s/3600
     ac.Vol_F_per_sortie = Vol_Fs
+
     return CST_per_kg, N_sortie_per_day, TTFD
 
 if __name__ == '__main__':
