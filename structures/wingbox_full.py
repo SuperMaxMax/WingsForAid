@@ -18,7 +18,7 @@ from scipy.integrate import quad, cumulative_trapezoid, trapezoid
 from scipy.optimize import minimize
 from math import tan, atan, cos
 
-def all_wingbox(ac, full_loop=False):
+def all_wingbox(ac, ele_span, full_loop=False, opt_loop=False):
     # #########################################################
     # # MATERIAL DICTIONARY
     # #########################################################
@@ -196,7 +196,7 @@ def all_wingbox(ac, full_loop=False):
     ac.W_wl = 0                                                                 # [kg] for 1 winglet
 
     # Make an array for the span
-    y_span = np.linspace(0, ac.b/2, 1000)
+    y_span = np.linspace(0, ac.b/2, ele_span)
 
     for k in range(3):
         if k == 0:
@@ -366,7 +366,7 @@ def all_wingbox(ac, full_loop=False):
             a_spar = location of aft spar (as fraction of chord)
             span = spanwise location of airfoil
             """
-            c = np.linspace(0, 1, 1000)
+            c = np.linspace(0, 1, ele_span)
             m = float(airfoil_num[0]) / 100
             p = float(airfoil_num[1]) / 10
             c1 = c[c <= p]
@@ -390,7 +390,7 @@ def all_wingbox(ac, full_loop=False):
             y_l = np.concatenate((y_l, y_c - y_t*np.cos(theta)))
             x_l = np.concatenate((x_l, c2 + y_t*np.sin(theta)))
 
-            x_gen = np.linspace(0, 1, 1000)
+            x_gen = np.linspace(0, 1, ele_span)
             y_u = np.interp(x_gen, x_u, y_u)
             y_l = np.interp(x_gen, x_l, y_l)
 
@@ -501,12 +501,12 @@ def all_wingbox(ac, full_loop=False):
         mat = 'Al-5052-H38'
 
         #### CALCULATIONS ####
-        if full_loop:
+        if full_loop or opt_loop:
             step_size = 0.0001          # [m] step size for integration
         else:
             step_size = 0.00001
         ### Spanwise position ###
-        spanwise_pos = np.linspace(0, ac.b/2, 1000)
+        spanwise_pos = np.linspace(0, ac.b/2, ele_span)
         # split spanwise position in multiple parts based on ribs
         spanwise_pos_sec = np.array_split(spanwise_pos, n_ribs+1)
 
@@ -1145,10 +1145,19 @@ def all_wingbox(ac, full_loop=False):
         n_stringers = np.arange(lower_start, upper_start+step_s, step_s)
         n_ribs = np.arange(lower_start, upper_start+step_r, step_r)
         weights = np.zeros((n_stringers[-1]*2+1, n_ribs[-1]*2+1))
+    elif opt_loop:
+        n_stringers = np.arange(ac.n_stringers-2, ac.n_stringers+3, 1)
+        n_ribs = np.arange(ac.n_ribs-2, ac.n_ribs+3, 1) 
+        weights = np.zeros((n_stringers[-1]*2+1, n_ribs[-1]*2+1))
     else:
         n_stringers = np.arange(ac.n_stringers, ac.n_stringers+1, 1)
         n_ribs = np.arange(ac.n_ribs, ac.n_ribs+1, 1) 
         weights = np.zeros((n_stringers[-1]*2+1, n_ribs[-1]*2+1))
+    
+    print('Region evaluating:')
+    print(f'range stringers: {n_stringers}')
+    print(f'range ribs:      {n_ribs}')
+    print(" ")
 
     solution = True
     last = 0
@@ -1182,7 +1191,7 @@ def all_wingbox(ac, full_loop=False):
 
                 weights[val_str][val_rib], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3 = full_wingbox(val_str, val_rib, t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2, load, True)
                 # print(t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3)
-
+                print ("\033[A                             \033[A")
                 print(f"Done: {row*len(n_stringers)+col+1}/{len(n_ribs)*len(n_stringers)}") 
 
         if full_loop: 
@@ -1198,7 +1207,7 @@ def all_wingbox(ac, full_loop=False):
             step_r = (upper_start_r-lower_start_r)/3
 
             if last == 1:
-                solution =  False
+                solution = False
 
             if n_stringers[1]-n_stringers[0] == 2:
                 n_stringers = np.arange(int(lower_start_s), int(upper_start_s)+1, 1)
@@ -1213,9 +1222,12 @@ def all_wingbox(ac, full_loop=False):
             ac.n_stringers = n_stringers_min
             ac.n_ribs = n_ribs_min
 
-            print('Region evaluating:')
-            print(f'n_stringers: {n_stringers}')
-            print(f'n_ribs: {n_ribs}')
+            print ("\033[4A                    \033[J")
+            print ("\033[A                             \033[A")
+            print('Region evaluating:                         ')
+            print(f'range stringers: {n_stringers}            ')
+            print(f'range ribs:      {n_ribs}                 ')
+            print(" ")
         
         if full_loop:
             continue
