@@ -16,7 +16,7 @@ airfield = airport("Sudan")
 # start
 plot = False
 jan = False
-jarno = True
+jarno = False
 
 n_iteration = 0
 something = True
@@ -30,14 +30,14 @@ something = True
 while something:
     print('Iteration: ', n_iteration)
     print(f'MTOW: {aircraft.W_TO:.2f} kg, OEW: {aircraft.W_OE:.2f}')
-    W_TO_old = aircraft.W_TO
+    W_check= aircraft.W_OE + aircraft.W_F
     # aircraft.Sw = aircraft.W_TO/aircraft.WS
     ae.run_aero(aircraft)
     cs.main_stab_control(aircraft, True, False) # FIXME: Tomorrow ask Theo about W_eq and calculate W_sc and W_tail
     print(aircraft.n_stringers, aircraft.n_ribs, aircraft.W_w)
 
     if not jarno: #Jarno can't run wingbox
-        if n_iteration % 1  == 0 and n_iteration != 0:
+        if n_iteration % 5  == 0 and n_iteration != 0:
             wb.all_wingbox(aircraft, True)
         else:
             wb.all_wingbox(aircraft, False)
@@ -49,7 +49,7 @@ while something:
 
     # op.operations_eval(aircraft)
 
-    if np.abs((aircraft.W_TO - W_TO_old)/W_TO_old) < 0.001:
+    if np.abs((aircraft.W_OE + aircraft.W_F - W_check)/W_check) < 0.001:
         something = False
 
     print(aircraft.__dict__)
@@ -66,20 +66,20 @@ if jan: #Jan's path is linked in avl so otherwise code breaks
 
 
 # # --- saving
-# df = pd.DataFrame()
-# # save all attributes of object to csv file
-# members = [attr for attr in dir(aircraft) if not callable(getattr(aircraft, attr)) and not attr.startswith("__")]
-# values = [getattr(aircraft, member) for member in members]
+df = pd.DataFrame()
+# save all attributes of object to csv file
+members = [attr for attr in dir(aircraft) if not callable(getattr(aircraft, attr)) and not attr.startswith("__")]
+values = [getattr(aircraft, member) for member in members]
 
-# # remove brackets and round values
-# values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
-# values = [round(value, 4) if isinstance(value, float) else value for value in values]
+# remove brackets and round values
+values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
+values = [round(value, 4) if isinstance(value, float) else value for value in values]
 
-# # add to dataframe
-# df[aircraft.name] = values
+# add to dataframe
+df[aircraft.name] = values
 
-# # set index of dataframe
-# df.index = members
+# set index of dataframe
+df.index = members
 
 # export dataframe of current design to csv file
 df['aircraft'].to_csv('finaldesign.csv', sep=';')
