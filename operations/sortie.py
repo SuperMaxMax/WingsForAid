@@ -28,11 +28,11 @@ def operations_eval(ac):
     # print("\n")
 
     # REQ-check: time to first delivery
-    TTFD = ac.OP_TTFS + ac.OP_T_ground + TTFD_s/3600 # sum time until first drop (5th time entry)
+    TTFD = ac.OP_TTFS + ac.OP_T_sortie_gnd + TTFD_s/3600 # sum time until first drop (5th time entry)
     print(str("TTFD: "+str(np.round(TTFD, 1))+"[hr]"))
 
     # REQ-check: sortie per day
-    T_sortie = ac.OP_T_ground + ac.OP_T_pilot + T_s/3600 # total per AC
+    T_sortie = ac.OP_T_sortie_gnd + ac.OP_T_pilot + T_s/3600 # total per AC
     print("T sortie:", str(np.round(T_s/3600, 1)), "[hh]")
     print("T sortie:", str(np.round(T_sortie, 1)),"[h]")
     N_sortie_per_day = 24/(T_sortie)
@@ -79,12 +79,12 @@ def operations_eval(ac):
 if __name__ == '__main__':
     AC = UAV('aircraft')
     print("AC default:", AC.__dict__)
-    AC.n_drops = 2
-    AC.n_boxes = 12
-    AC.OP_Range = 250
-    #AC.h_cruise = 5000 #ft
-    AC.OP_droprange = 10
-    RTB = True
+    # AC.n_drops = 2
+    # AC.n_boxes = 12
+    # AC.OP_Range = 250
+    # #AC.h_cruise = 5000 #ft
+    # AC.OP_droprange = 10
+    # RTB = True
 
     atm = atmosphere()
     ac = AC
@@ -122,5 +122,6 @@ if __name__ == '__main__':
 
     # operations_eval(AC)
     TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, ac.W_F, None,
-                                          AC.OP_Range, AC.OP_droprange, RTB,
+                                          AC.OP_Range, AC.OP_droprange, True,
                                           False, False)
+    operations_eval(ac)

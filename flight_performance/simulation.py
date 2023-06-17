@@ -1002,6 +1002,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         W -= W_F_used_descent
         W -= boxesperdrop * ac_obj.boxweight
         ttfd = t
+        ac_obj.TTFD_s = t
         flight_profile.append(t)
         # ============================================================================================================================
         # Drops in dropregion
