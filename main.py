@@ -47,7 +47,7 @@ while something:
     fp.TO_eom(aircraft, airfield, atm, 11, 4000, 12.86, -7.716, aircraft.W_F, Plot = False)
     fp.LA_eom(aircraft, airfield, atm, -8, 4000, 12.86, -5.14, 5, Plot = False)
 
-    # op.operations_eval(aircraft)
+    op.operations_eval(aircraft)
 
     if np.abs((aircraft.W_TO - W_TO_old)/W_TO_old) < 0.001:
         something = False
@@ -65,30 +65,30 @@ if jan: #Jan's path is linked in avl so otherwise code breaks
     avl.export(aircraft)
 
 
-# --- saving
-df = pd.DataFrame()
-# save all attributes of object to csv file
-members = [attr for attr in dir(aircraft) if not callable(getattr(aircraft, attr)) and not attr.startswith("__")]
-values = [getattr(aircraft, member) for member in members]
+# # --- saving
+# df = pd.DataFrame()
+# # save all attributes of object to csv file
+# members = [attr for attr in dir(aircraft) if not callable(getattr(aircraft, attr)) and not attr.startswith("__")]
+# values = [getattr(aircraft, member) for member in members]
 
-# remove brackets and round values
-values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
-values = [round(value, 4) if isinstance(value, float) else value for value in values]
+# # remove brackets and round values
+# values = [value[0] if isinstance(value, np.ndarray) else value for value in values]
+# values = [round(value, 4) if isinstance(value, float) else value for value in values]
 
-# add to dataframe
-df[aircraft.name] = values
+# # add to dataframe
+# df[aircraft.name] = values
 
-# set index of dataframe
-df.index = members
+# # set index of dataframe
+# df.index = members
 
-# export dataframe of current design to csv file
-df['finaldesign'].to_csv('finaldesign.csv', sep=';')
+# # export dataframe of current design to csv file
+# df['finaldesign'].to_csv('finaldesign.csv', sep=';')
 
-# remove row in dataframe if all values in that row are the same
-if remove_duplicates == True:
-    for i in df.index:
-        if all(element == df.loc[i].values[0] for element in df.loc[i].values):
-            df.drop(i, inplace=True)
+# # remove row in dataframe if all values in that row are the same
+# if remove_duplicates == True:
+#     for i in df.index:
+#         if all(element == df.loc[i].values[0] for element in df.loc[i].values):
+#             df.drop(i, inplace=True)
         
-# save dataframe to csv file
-# df.to_csv('aircraft_comparison.csv', sep=';')
+# # save dataframe to csv file
+# # df.to_csv('aircraft_comparison.csv', sep=';')
