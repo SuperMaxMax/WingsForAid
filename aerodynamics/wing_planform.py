@@ -278,6 +278,7 @@ def main_wing_planform(aircraft):
     aircraft.x_lemac = aircraft.y_mac*np.tan(aircraft.sweep_LE)
     aircraft.CL_max_clean = CL_max_clean
     aircraft.oswald = oswald 
+    aircraft.AE_CD_i_w = CD_induced
 
     #print('afoqwbqlbng', aircraft.y_mac, aircraft.x_lemac, aircraft.sweep_LE, aircraft.MAC_length)
                

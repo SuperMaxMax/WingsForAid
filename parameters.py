@@ -260,6 +260,9 @@ class UAV:
         self.AE_i_w_v = 0.07
         self.AE_CL_a_v = 2.57
 
+        # Drag 
+        self.AE_CD_i_w = 0.01
+
         "-NACA4415"
         self.airfoil = "4415"
 
