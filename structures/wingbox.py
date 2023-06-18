@@ -3,7 +3,7 @@ import os.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 # Start your import below this
-from parameters import UAV
+from parameters import UAV_final
 from material_dictionary import rank_material, material_df, material
 from loading_diagram_wing import loading_tension, loading_compression, loading_custom
 import numpy as np
@@ -214,8 +214,7 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
             values[i] += increase
         
         return values
-
-    ac = UAV("aircraft")
+    
     plot = False
 
     #### INPUT ####
@@ -914,10 +913,12 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     
     return weight, t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer, MOF_specific
 
+ac = UAV_final()
+
 MOF_specific = pd.DataFrame(index=np.linspace(0, 9.620022329579792/2, 1000))
 
-n_stringers = np.arange(20, 21, 1)
-n_ribs = np.arange(15, 16, 1)
+n_stringers = np.arange(ac.n_stringers, ac.n_stringers+1, 1)
+n_ribs = np.arange(ac.n_ribs, ac.n_ribs+1, 1)
 
 weights = np.zeros((len(n_ribs), len(n_stringers)))
 
