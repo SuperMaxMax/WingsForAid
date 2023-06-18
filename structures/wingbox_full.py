@@ -1235,7 +1235,7 @@ def all_wingbox(ac, ele_span, full_loop=False, opt_loop=False):
             solution = False
 
     # save weights array
-    if full_loop:
+    if full_loop or opt_loop:
         np.save('weights.npy', weights)
 
     # n_stringers = np.arange(lower_start, upper_start+1, 1)
