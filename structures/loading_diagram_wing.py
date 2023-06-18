@@ -4,7 +4,7 @@ sys.path.append("..")
 #########################################################
 # LOADING DIAGRAM WING
 #########################################################
-from parameters import UAV
+from parameters import UAV_final
 import numpy as np
 import matplotlib.gridspec as gridspec
 from scipy.integrate import quad, cumulative_trapezoid, trapezoid
@@ -154,7 +154,7 @@ def spanwise_func_1(y):
 def spanwise_func_2(y):
     return -spanwise_wing_weight(y)-spanwise_fuel_weight(y)+spanwise_wing_loading(y)
 
-ac = UAV('aircraft')
+ac = UAV_final()
 plot = True
 
 ac.ST_angle_strut = np.arctan(ac.ST_h_fus/(ac.ST_y_strut-ac.ST_w_fus/2))    # [rad]
