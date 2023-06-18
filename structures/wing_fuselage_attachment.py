@@ -4,10 +4,10 @@ from parameters import UAV
 ac=UAV("aircraft")
 
 # # s steel 410 parameters
-# sigma_yield = 1225*10**6 #Pa
-# sigma_yield_shear = 0.58*sigma_yield
-# density = 7800 #kg/m^3
-# E=200*10**9
+sigma_yield = 1225*10**6 #Pa
+sigma_yield_shear = 0.58*sigma_yield
+density = 7800 #kg/m^3
+E=200*10**9
 
 # # steel 4130 parameters
 # sigma_yield = 460*10**6
@@ -21,19 +21,19 @@ print("D",D_load)
 
 
 # loads
-Ay_max=-25311.964670613932 #+ D_load#N n=-2.87
-Ay_min= 54676.90451955772 #- D_load#N n=6.6
-Az_min = -759.779152495221#N n=6.6
-Az_max= 232.43169183082978 #N n=-2.78
-Ay_n2 = 15811.009678066164 #n=2
-Az_n2 = -264.19243480328936 #n=2
-Bz_n2 = -6692.083591480969 #n=2
-By_n2 =  -15811.009678066164 #n=2
-Bz_min = -23142.254860289046 #n= 6.6
-By_min = -54676.90451955772 #n= 6.6
+Ay_max=-32440 #+ D_load#N n=-2.87
+Ay_min= 55419 #- D_load#N n=6.6
+Az_min = -717#N n=6.6
+Az_max= 416 #N n=-2.78
+Ay_n2 = 16013 #n=2
+Az_n2 = -206 #n=2
+Bz_n2 = -6778 #n=2
+By_n2 =  -16013 #n=2
+Bz_min = -23456 #n= 6.6
+By_min = 55419 #n= 6.6
 B_min = np.sqrt(Bz_min**2 + By_min**2)
-Bz_max = 10713.407106147533 #n=-2.78
-By_max= 25311.964670613932 #n=-2.78
+Bz_max = 13730  #n=-2.78
+By_max= 32440 #n=-2.78
 B_max = np.sqrt(Bz_max**2 + By_max**2)
 B_n2 = np.sqrt(Bz_n2**2 + By_n2**2)
 
@@ -108,8 +108,9 @@ A_tens = B_min / sigma_yield
 t_tens = P/A_tens
 m_tens = A_tens*density*ac.ST_l_strut
 
+l_strut = 1.78
 
-I_min = max(B_max,B_n2) * ac.ST_l_strut**2 / (np.pi**2 * E)
+I_min = max(B_max,B_n2) * l_strut**2 / (np.pi**2 * E)
 print('Imin',I_min)
 #t = 4*I_min/(np.pi*a**3 * (1+(3*b/a)))  # thickness of strut sheet [m]
 #A_comp = P*t
@@ -141,8 +142,8 @@ plt.plot(t,A_min,label='A_min')
 plt.legend()
 plt.show()
 
-t=2.1/1000
-m_strut = density*ac.ST_l_strut*P*t
+t=1.3/1000
+m_strut = density*l_strut*P*t
 print("mass of strut",m_strut)
 
 
