@@ -460,3 +460,23 @@ class atmosphere:
         self.p0     = 101325    # Pa 
         self.gamma  = 1.4
 
+class UAV_final:
+    def __init__(self):
+        parameters = open("../finaldesign.csv", "r")
+        lines = parameters.readlines()
+        parameters.close()
+        for line in lines[1:]:
+            line = line.strip().split(";")
+            if line[1][0] == '[':
+                line[1] = line[1][1:-1].split(', ')
+                line[1] = [float(i) for i in line[1]]
+                setattr(self, line[0], line[1])
+            elif line[1] == '0009' or line[1] == '0012' or line[1] == '4415':
+                setattr(self, line[0], str(line[1]))
+            elif line[1].isdecimal():
+                setattr(self, line[0], int(line[1]))
+            elif line[1].replace('.','').replace('-','').isdecimal():
+                setattr(self, line[0], float(line[1]))
+            else:
+                setattr(self, line[0], str(line[1]))
+        
