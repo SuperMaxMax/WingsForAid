@@ -300,7 +300,7 @@ class UAV:
         self.ceiling        = 18000*0.3048      # [m] 18000 ft service ceiling
         # self.th_ceil        = 30000*0.3048
         self.SFC            = 1.2*7.5e-8 # kg/J specific fuel consumption
-        self.fuelcapacity   = 100               # L
+        self.fuelcapacity   = 75               # L
         self.fueldensity    = 0.7429            # kg/L
         self.turnrate_half  = 1.5               # deg/s
         self.turnrate_1     = 3.0               # deg/s
@@ -465,7 +465,7 @@ class atmosphere:
 
 class UAV_final:
     def __init__(self):
-        parameters = open("../finaldesign.csv", "r")
+        parameters = open("C:\\Users\\ties\\OneDrive\\Documenten\\GitHub\\WingsForAid\\finaldesign.csv", "r")
         lines = parameters.readlines()
         parameters.close()
         for line in lines[1:]:
