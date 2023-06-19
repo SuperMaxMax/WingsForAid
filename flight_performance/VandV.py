@@ -10,11 +10,12 @@ import matplotlib.pyplot as plt
 
 # ========== Import other files =============
 import flight_performance.simulation as fp
-from parameters import UAV, atmosphere, airport, UAV_final
+from parameters import UAV, atmosphere, airport, UAV_final, Cessna_172
 
 # ============= Define objects ==============
 aircraft = UAV_final()
 atm      = atmosphere()
+Cessna   = Cessna_172("tractor", braced_wing=True, boom=False)
 
 # ========= V&V sortie simulation ===========
 def VV_sortiesim_expected(ac_obj, atm_obj, plot = False):
@@ -214,7 +215,49 @@ def VV_sortiesim_boundary(ac_obj, atm_obj):
     print(f"Sortie 12 boxes 6  drops Range 250 [km] Dropregion 200 km | W_F_used: {round(sortie_largedz[0], 2)} [kg], sortie time: {round(sortie_largedz[2]/3600, 2)} [hr]")
     print("======================================================")
 
-
-
-
-
+def Cessnacomparison(ac_obj, atm_obj, h_cruise, V_cruise, result = False):
+    h_cruise *= 0.3048
+    V_cruise *= 0.5144
+    # This function assesses the model output compared to reality for a Cessna 172
+    # Max fuel, payload accordingly (no drops as Cessna)
+    W_F_TO = ac_obj.fuelcapacity * ac_obj.fueldensity
+    W_TO   = ac_obj.W_TO
+    W_F_used = 0.0
+    t = 0.0
+    x = 0.0
+    h = 15.0
+    # After take-off:
+    W_a_TO = W_TO * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2
+    W = W_a_TO
+    W_F_used += W_TO - W_a_TO
+    # Climb
+    t_climb, x_climb, W_F_used_climb, h = fp.climbmaneuver(ac_obj, atm_obj, 15.0, h_cruise, W)
+    t += t_climb
+    x += x_climb
+    W_F_used += W_F_used_climb
+    W -= W_F_used_climb
+    # Cruise
+    d_remain = ac_obj.R - x_climb
+    CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD = fp.dragpolar(ac_obj, CL)
+    d_descent = CL/CD * h_cruise
+    d_cruise = d_remain - d_descent
+    t_cruise, W_F_used_cruise, cruiseNAT = fp.cruisecalc(ac_obj, atm_obj, h_cruise, d_cruise, W, V_cruise)
+    if cruiseNAT:
+        print("This cruise speed - altitude combination is impossible")
+    t += t_cruise
+    x += d_cruise
+    W_F_used += W_F_used_cruise
+    # Descent
+    t_descent, x_descent, W_F_used_descent, h = fp.descentmaneuver(ac_obj, atm_obj, h_cruise, 15.0, W)
+    t += t_descent
+    x += x_descent
+    W_F_used += W_F_used_descent
+    if result:
+        print("============================================================")
+        print(f"Distance flown: {round(x/1000, 2)} [km]")
+        print(f"Fuel used: {round(W_F_used, 2)} [kg]")
+        print(f"Fuel remaining: {round(W_F_TO - W_F_used, 2)} [kg]")
+        print(f"Sortie time: {round(t/3600, 2)} [hr]")
+        print("============================================================")
+    return 
