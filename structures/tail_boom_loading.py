@@ -17,7 +17,7 @@ M_v_max = dF_h_man/a_b*1.8
 F_v_max = dF_h_man/a_b
 shear_stress = 0.58*yield_stress
 #shear_stress=165*10**6 #alu
-L=2.69
+L=2.95
 
 L_EF = 0.8
 L_FG = 1
