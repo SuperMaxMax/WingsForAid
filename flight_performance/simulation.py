@@ -100,13 +100,13 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
     print(f"This calculation took {end_time-start_time} seconds")
     return
 
-def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
-    W   = ac_obj.W_TO * atm_obj.g
-    h   = 0.0
+def flightceiling(ac_obj, atm_obj, W0, plot=False, result = False):
+    W   = W0
+    h   = 15.0                                                          # Start from screenheight
     Pa  = ac_obj.power * ac_obj.prop_eff * 735.49875
     CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD_opt  = dragpolar(ac_obj, CL_opt)
-    V   = np.sqrt(2*W/(atm_obj.rho0*ac_obj.Sw*CL_opt))
+    V   = np.sqrt(2*W*atm_obj.g/(atm_obj.rho0*ac_obj.Sw*CL_opt))
     Pr  = 1/2 * atm_obj.rho0 * V**3 * ac_obj.Sw * CD_opt
     roc = (Pa-Pr)/W
     dt  = 1.0
@@ -117,14 +117,14 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
     Height  = np.empty(0)
     while roc > 0.508:
         p, rho = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
-        V   = np.sqrt(2*W/(rho*ac_obj.Sw*CL_opt))
+        V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
         Pa  = ac_obj.power * ac_obj.prop_eff * p/(atm_obj.p0) * hp_to_watt
         roc = (Pa - Pr)/W
-        if t%10 == 0:
-            print(f"Altitude: {np.round(h, 2)} [m] | Power required: {np.round(Pr, 2)} [W] | Power available: {np.round(Pa, 2)} [W] | Rate of Climb: {np.round(roc, 2)} [m/s] | Velocity: {np.round(V, 2)} [m/s]")
+        if t%50 == 0:
+            print(f"Velocity: {np.round(V, 2)} [m/s]")
         h   += roc * dt
-        W   -= Pa * ac_obj.SFC * dt * atm_obj.g
+        W   -= (Pa/ac_obj.prop_eff) * ac_obj.SFC * dt
         t   += dt
         Time= np.append(Time, t)
         ROC = np.append(ROC, roc)
@@ -700,7 +700,7 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
         Pbr = Pr/ac_obj.prop_eff
         # if n%1000 == 0:
         #     print(f"Break horse power: {Pbr}")
-        if Pbr > ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt:
+        if Pbr > ac_obj.power * rho/atm_obj.rho0**(3/4) * hp_to_watt:
             print("This cruise speed is not obtainable (Pr > Pa)")
             cruiseNAT = True
             break
