@@ -1137,5 +1137,3 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     #ac_obj.Wf = W_F_used
 
     return W_F_used, flight_profile
-
-# fuelusesortie(aircraft, atm, 12, 1, 10000, 45, 54.012, Range=250, Summary=True, plot=True, savefig=False)
