@@ -36,13 +36,13 @@ class UAV:
         
         "-Aerodynamic properties"
         self.CD0                 = 0.02578         # Zero lift coefficient [-]
-        self.CLa                 = 4.743           # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
+        self.CLa                 = 4.7595           # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         self.Drag_increase       = 1.0           # This is used for the calculations of the strut drag if applicable [-]
 
         # ASSUMPTION/NOTES: ADSEE 1 slides mention ranges for CL, the code automatically runs over all the CL's in these lists
         # but this means that CL_max_clean, CL_max_TO and CL_max_land must always be stored in an array. For an array with length 1
         # the code just runs once
-        self.CL_max_clean        = np.array([1.5615])              # Maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.CL_max_clean        = np.array([1.59])              # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         self.CL_max_TO           = np.array([1.5])              # Maximum lift coefficient at take-off [-]
         self.CL_max_land         = np.array([2.0])              # Maximum lift coefficient at landing [-]
         self.CL_TO               = np.array([1.5 / (1.1**2)])    # [-]
@@ -52,7 +52,7 @@ class UAV:
         self.W_e                 = 63.6         # Definitive weight per engine [kg]
         self.W_TO                = 750          # Take-off weight [kg]
         self.W_PL                = 276          # Payload weight [kg]
-        self.WS                  = 600       # Wing Loading [N/m^2]
+        self.WS                  = 632.739      # Wing Loading [N/m^2]
         self.W_F                 = 60
 
         "-Weight fractions"

@@ -1,7 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from parameters import UAV
+aircraft = UAV('DET_CON_2_braced', 'tractor', boom=True, braced_wing=True)
 
+
+plot = True
 
 def VC_lim_low(obj):
     return 33 * (obj.WS * 0.020885) ** 0.5 * 0.51444 #[m/s]
@@ -284,9 +287,14 @@ def plot_all(obj):
 
     plot_Vn(obj)
     plot_gust(obj)
-    plt.title(f"V-n diagram for {obj.name}")
-#     plt.show()
+    plt.title(f"V-n diagram")
+    plt.show()
 
+plot_all(aircraft)
+aircraft.min_n= min_n(aircraft)*1.5
+aircraft.max_n= max_n(aircraft)*1.5
+
+print(aircraft.__dict__)
 #concept = UAV('DET_CON_2', 'tractor', boom=True, braced_wing=True)
 #plot_all(concept)
 #print(VC_lim_low(concept))
