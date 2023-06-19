@@ -11,12 +11,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 # Import other files
-from parameters import UAV, airport, atmosphere
+from parameters import UAV, airport, atmosphere, UAV_final
 
 # aircraft = UAV("aircraft")
 # airfield = airport("Sudan")
-# atm      = atmosphere()
+atm      = atmosphere()
 hp_to_watt = 745.699872
+final_aircraft = UAV_final()
 
 def takeoffweight(obj, W_F):
     ZFW = obj.W_OE + obj.n_boxes*obj.boxweight
@@ -660,6 +661,11 @@ def climbmaneuver(ac_obj, atm_obj, h, h_cruise, W0):
         Pa  = ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt
         CD  = dragpolar(ac_obj, CL_opt) 
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
+        Pa_req = Pr + (5.0 * W * atm_obj.g)
+        if Pa > Pa_req:
+            Pa = Pa_req
+        else:
+            Pa = ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt
         ROC = (Pa-Pr)/(W*atm_obj.g)
         gamma = ROC / V
         x   += V*np.cos(gamma)*dt
@@ -890,7 +896,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         W_F_used_array = np.append(W_F_used_array, W_F_used)
         # print(f"W_F_used after cruise {i}: {W_F_used_cruise}")
         W -= W_F_used_cruise
-        t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt, 15.0, W)
+        t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt, 1524, W)
         # print(f"Horizontal distance descent: {x_descent} [m]")
         t += t_descent
         x += x_descent
@@ -902,9 +908,10 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         W_F_used_array = np.append(W_F_used_array, W_F_used)
         # print(f"W_F_used after descent {i}: {W_F_used_descent} | time descent {i}: {t_descent}")
         W -= W_F_used_descent
-        t_loiter, W_F_used_loiter = loiter(ac_obj, atm_obj, 5000, 1200, W, 1, goback=True)
+        t_loiter, W_F_used_loiter = loiter(ac_obj, atm_obj, 1524 ,1200, W, 1, goback=True)
         t += t_loiter
         W_F_used += W_F_used_loiter
+        W -= W_F_used_loiter
     elif dropregion == None:                      # either 1 drop or n evenly spaced drops
         target_dist = Range / n_drops
         cruise_alt  = cruiseheight(target_dist, h_cruise)
@@ -1136,4 +1143,6 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     ac_obj.T_s = t
     #ac_obj.Wf = W_F_used
 
-    return W_F_used, flight_profile
+    return W_F_used, flight_profile, t
+
+# fuelusesortie(final_aircraft, atm, 12, 1, 10000, 50, 54.012, Summary=True, plot=True)
