@@ -21,11 +21,25 @@ l_fus_3 = aircraft.l_fus_tail_cone
 l_fus_total = l_fus_1 + l_fus_2 + l_fus_3
 d_fus = aircraft.d_fuselage
 
-variable_list2 = np.arange(0.5,3,0.2)
 
 
 for j in range(2):
+
     nose = [False,True]
+
+    if nose[j]:
+        variable_list2 = np.linspace(0.,1.5,50)
+    else:
+        variable_list2 = np.linspace(0.5,3,50)
+
+
+
+    if nose[j]:
+        variable_list2 = np.append(variable_list2, 0.9342)
+    else:
+        variable_list2 = np.append(variable_list2, 0.8)
+
+
     for i in range(len(variable_list2)):
         if nose[j] == True:
             l_fus_1 = variable_list2[i]
@@ -187,7 +201,25 @@ for j in range(2):
         print("Wetted area fuselage:", Swet_list[4])
         print("Zero lift drag fuselage:", CD0_list[4])
         print(l_fus_total / d_fus)
-        plt.scatter(l_fus_total / d_fus, CD0_list[4], s = 4, color = 'black')
+        #plt.scatter(l_fus_total / d_fus, CD0_list[4], s = 10, color = 'black')
+        if nose:
+            plt.scatter(variable_list2[i], CD0_list[4], s = 10, color = 'black')
+        else:
+            plt.scatter(variable_list2[i], CD0_list[4], s = 10, color = 'black')
 
+    print(CD0_list[4], variable_list2[-1])
+    #plt.scatter(l_fus_total / d_fus, CD0_list[4], s = 60, color = 'red', label = "Current design")
+    if nose:
+        plt.scatter(variable_list2[-1], CD0_list[4], s = 60, color = 'red', label = "Current design")
+    else:
+        plt.scatter(variable_list2[-1], CD0_list[4], s = 60, color = 'red', label = "Current design")
+    
+    plt.grid()
+
+    
+    plt.xlabel("Nosecone length [-]", fontsize = 10, wrap = True)
+    plt.ylabel("Fuselage zero-lift drag [-]", fontsize = 10, wrap = True)
+    plt.legend()
     plt.show()
+
 drag_info.to_csv('drag_estimation.csv', index=True)
