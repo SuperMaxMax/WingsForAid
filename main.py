@@ -64,7 +64,7 @@ while running:
     if np.abs((aircraft.W_OE + aircraft.W_F - W_check)/W_check) < 0.001:
         running = False
     
-    aircraft.Sw = ((aircraft.W_OE + aircraft.fuelcapacity*aircraft.fueldensity + aircraft.n_boxes*aircraft.boxweight)*atm.g0)/aircraft.WS
+    aircraft.Sw = ((aircraft.W_OE + aircraft.W_F + aircraft.n_boxes*aircraft.boxweight)*atm.g0)/aircraft.WS
 
     df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w]
 
