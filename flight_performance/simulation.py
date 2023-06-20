@@ -1166,7 +1166,4 @@ def endurance(ac_obj, atm_obj, h_loiter, summary = False):
         print(f"Fuel used: {round(W_F_used, 2)} [kg]")
         print(f"Fuel remaining: {round(W_F, 2)} [kg]")
         print("======================================================================")
-
-endurance(aircraft, atm, 3048, True)
-        
-        
+    return round(t/3600, 2)
