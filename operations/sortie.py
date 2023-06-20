@@ -7,10 +7,12 @@ sys.path.append("..")
 # Start your import below this
 
 import numpy as np
-from parameters import UAV, atmosphere
+from parameters import UAV, atmosphere, UAV_final
 import pandas as pd
 import matplotlib.pyplot as plt
 import flight_performance.simulation as fpsim
+
+aircraft = UAV_final()
 
 def operations_eval(ac):
     print("=====================================================")
@@ -78,6 +80,8 @@ def operations_eval(ac):
     ac.Vol_F_per_sortie = Vol_Fs
 
     return CST_per_kg, N_sortie_per_day, TTFD
+
+operations_eval(aircraft)
 
 if __name__ == '__main__':
     AC = UAV('aircraft')

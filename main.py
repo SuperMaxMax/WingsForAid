@@ -1,4 +1,4 @@
-from parameters import UAV, atmosphere, airport
+from parameters import UAV_final, atmosphere, airport, UAV
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,7 +8,8 @@ import structures.wingbox_full as wb
 import flight_performance.simulation as fp
 import operations.sortie as op
 
-aircraft = UAV("aircraft")
+# aircraft = UAV_final()
+aircraft = UAV('aircraft')
 atm      = atmosphere()
 airfield = airport("Sudan")
 

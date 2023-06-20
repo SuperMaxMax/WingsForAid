@@ -115,8 +115,9 @@ def cg_calc(obj, plot):
 
     # Final CG
     W_OEW = W_wing_gr+W_fus_gr
-    X_OEW = X_LEMAC + obj.xc_OEW_p * obj.MAC_length
-    # X_OEW = ((X_LEMAC - obj.x_lemac + x_wcg) * W_wing_gr + X_FCG * W_fus_gr) / (W_OEW)
+    obj.W_OE = W_OEW
+    # X_OEW = X_LEMAC + obj.xc_OEW_p * obj.MAC_length
+    X_OEW = ((X_LEMAC - obj.x_lemac + x_wcg) * W_wing_gr + X_FCG * W_fus_gr) / (W_OEW)
 
     # X_OEW = X_LEMAC-obj.x_lemac+( x_wcg) + xc_OEW
 
@@ -177,7 +178,7 @@ def cg_calc(obj, plot):
     obj.X_cg_fwd = Xs[labels.index(LimBoxConfigFwd)] - obj.X_cg_range * 0.05
     obj.X_cg_aft = Xs[labels.index(LimBoxConfigAft)] + obj.X_cg_range * 0.05
 
-    obj.l_h = obj.l_f - obj.l_fus_tail_cone + obj.l_f_boom - 3/4 * obj.AE_rootchord_h - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length)
+    obj.l_h = obj.l_f - obj.l_fus_tail_cone + obj.l_f_boom - 1/4 * obj.AE_rootchord_h - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length)
     # Plot lines for forward and aft cg positions
     
     if plot:
@@ -194,7 +195,7 @@ def cg_calc(obj, plot):
         plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])
 
         plt.ylim(top = 1.03)
-        plt.xlim(left = 0.15, right = 0.55)
+        plt.xlim(left = 0.15, right = 0.5)
         plt.xlabel(r"$\dfrac{x_{cg}}{\bar{c}}$", fontsize = 12, loc='right')
         plt.ylabel(r"$\dfrac{1}{W_{TO}}$",rotation = 0, fontsize = 12, loc='top')
         plt.grid()
