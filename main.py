@@ -35,6 +35,7 @@ ele_span = 500              # number of elements in spanwise direction (smaller 
 
 while running:
     W_check = aircraft.W_OE + aircraft.W_F
+
     print(f"=================== AERO-{n_iteration} =====================")
     ae.run_aero(aircraft)
     print("================================================\n")
@@ -61,10 +62,19 @@ while running:
 
     # op.operations_eval(aircraft)
 
+    # print(f"=================== MANUAL UPDATES-{n_iteration} =======================")
+    # aircraft.A = float(input("Wing aspect ratio: "))
+    # aircraft.taper = float(input("Wing taper ratio: "))
+    # aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
+    # print(f"=================================================\n")
+
     if np.abs((aircraft.W_OE + aircraft.W_F - W_check)/W_check) < 0.001:
         running = False
     
-    aircraft.Sw = ((aircraft.W_OE + aircraft.W_F + aircraft.n_boxes*aircraft.boxweight)*atm.g0)/aircraft.WS
+    aircraft.Sw = ((aircraft.W_OE + aircraft.W_F + aircraft.n_boxes*aircraft.boxweight)*atm.g)/aircraft.WS
+
+    aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w
+    aircraft.W_TO = aircraft.W_F + aircraft.W_OE + aircraft.W_PL
 
     df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w]
 
