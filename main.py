@@ -8,8 +8,8 @@ import structures.wingbox_full as wb
 import flight_performance.simulation as fp
 import operations.sortie as op
 
-# aircraft = UAV_final()
-aircraft = UAV('aircraft')
+aircraft = UAV_final()
+# aircraft = UAV('aircraft')
 atm      = atmosphere()
 airfield = airport("Sudan")
 
@@ -25,7 +25,7 @@ running = True
 
 # for wingbox
 jarno = False               # Jarno can't run wingbox
-full_wingbox_loop = True    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
+full_wingbox_loop = False    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
 ele_span = 100              # number of elements in spanwise direction (smaller value is faster, but less accurate)
 
 #TODO landing distance
@@ -68,6 +68,9 @@ while running:
     # aircraft.taper = float(input("Wing taper ratio: "))
     # aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
     # print(f"=================================================\n")
+    
+    aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w
+    aircraft.W_TO = aircraft.W_F + aircraft.W_OE + aircraft.W_PL
 
     aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w
     aircraft.W_TO = aircraft.W_F + aircraft.W_OE + aircraft.W_PL

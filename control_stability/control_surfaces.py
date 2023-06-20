@@ -143,6 +143,7 @@ def elevator_design(aircraft, plot):
         plt.text(aircraft.V_cruise - 2.5, min(delta_e_req_aft), r'$V_{cruise}$', rotation=90, color='red')
 
         plt.grid()
+        plt.savefig('ElevatorDeflection.png')
         plt.show(block=True)
 
 def rudder_design(aircraft):#, tau_r):
@@ -226,7 +227,9 @@ def rudder_iteration(aircraft, plot):
 
         plt.xlabel(r"$\frac{C_r}{C_v}$")
         plt.ylabel(r"$\delta_{r_{max}}$ [deg]")
+        plt.savefig('RudderDeflection.png')
         plt.show(block=True)
+
     
 def main_control_surface(aircraft, plot):
     aileron_design(aircraft)

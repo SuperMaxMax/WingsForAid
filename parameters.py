@@ -478,7 +478,7 @@ class UAV_final:
                 setattr(self, line[0], str(line[1]))
             elif line[1].isdecimal():
                 setattr(self, line[0], int(line[1]))
-            elif line[1].replace('.','').replace('-','').isdecimal():
+            elif line[1].replace('.','').replace('-','').replace('e','').isdecimal():
                 setattr(self, line[0], float(line[1]))
             else:
                 setattr(self, line[0], str(line[1]))

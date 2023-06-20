@@ -135,6 +135,8 @@ dmypy.json
 
 # skip csv files
 *.csv
+*.png
+*.npy
 
 # ignore output folder
 output_folder/

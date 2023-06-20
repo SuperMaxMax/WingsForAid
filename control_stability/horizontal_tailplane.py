@@ -282,7 +282,7 @@ def plot_scissor_plot(aircraft, plot):
         ax1.grid()
 
         plt.show()
-        # fig1.savefig("scissorplot")
+        fig1.savefig("Scissorplot.png")
     
 
 def hor_run(aircraft, plot):
