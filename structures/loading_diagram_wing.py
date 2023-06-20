@@ -158,6 +158,7 @@ def spanwise_func_2(y):
 ac = UAV_final()
 plot = True
 
+ac.ST_y_strut = ((ac.ST_w_fus+ac.b)/2)*ac.ST_y_strut_frac-ac.ST_w_fus/2
 ac.ST_angle_strut = np.arctan(ac.ST_h_fus/(ac.ST_y_strut-ac.ST_w_fus/2))    # [rad]
 ac.W_wl = 0                                                                 # [kg] for 1 winglet
 
