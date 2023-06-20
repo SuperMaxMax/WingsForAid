@@ -78,11 +78,11 @@ def main_wing_planform(aircraft):
         variable = "Lambda"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
-            variable_list2 = [0.1]
+            variable_list2 = [aircraft.taper] #[0.65]
         elif variable == "AR":  
-            variable_list2 = [4,5,6,7,8,9,10]
+            variable_list2 = [aircraft.A] #[4,5,6,7,8,9,10]
         elif variable == "Twist":
-            variable_list2 = [-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
+            variable_list2 = [-2*np.pi/180] #[-1 * np.pi / 180 , -2 * np.pi / 180, -3 * np.pi / 180, -4 * np.pi / 180, -5 * np.pi / 180]
 
         for parameter in variable_list2:
             segments = 30
@@ -91,11 +91,11 @@ def main_wing_planform(aircraft):
             if variable == "AR":
                 AR = parameter
             else:
-                AR = 8
+                AR = aircraft.A
             if variable == "Lambda":
                 Lambda = parameter
             else:
-                Lambda = 0.65
+                Lambda = aircraft.taper
             if variable == "Twist":
                 alpha_twist = parameter
             else:
@@ -244,7 +244,7 @@ def main_wing_planform(aircraft):
         K_LS = 1 + (0.0042*AR - 0.068) * (1+2.3*(CL_a_w*Omega)/C_lmax)
         K_LOmega = 0.125
 
-        CL_max_clean = CL_clmax * K_LS * K_Lsweep * C_lmax * (1 - (K_LOmega*CL_a_w*Omega)/(C_lmax))
+        CL_max_clean = aircraft.CL_max_clean # CL_clmax * K_LS * K_Lsweep * C_lmax * (1 - (K_LOmega*CL_a_w*Omega)/(C_lmax)) * 0.95
 
         if not full_print:
             return abs(C_L_wing-C_L_req)
@@ -257,9 +257,9 @@ def main_wing_planform(aircraft):
     AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean, oswald = plot_lift_distr(i_w_optimal, full_print=True)
     #plt.plot(y_s, l)
     #plt.show()
-    print(','.join([str(x) for x in y_s]))
-    print('========')
-    print(','.join([str(x) for x in l]))
+    # print(','.join([str(x) for x in y_s]))
+    # print('========')
+    # print(','.join([str(x) for x in l]))
     aircraft.A = AR                        
     aircraft.b = (AR*aircraft.Sw)**0.5                      
     aircraft.span_eff = span_eff                     
