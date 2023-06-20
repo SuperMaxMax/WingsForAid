@@ -296,5 +296,5 @@ def horizontal_tail_planform(aircraft):
     V_v = aircraft.Sv_S * aircraft.l_h / aircraft.b
     # aircraft.W_v = S * MAC_length * 0.09 * 2680 * 0.07 * (AR / np.cos(aircraft.sweep_co4_v))**0.6*Lambda**0.04*V_v**0.2*aircraft.C_r_C_v**0.4
     aircraft.W_v = ((aircraft.AE_b_v * (aircraft.AE_rootchord_v + aircraft.AE_tipchord_v) / 2) / (aircraft.b * (aircraft.rootchord + aircraft.tipchord) / 2)) * 0.5 * aircraft.W_w
-    aircraft.W_t = 1.2 * (aircraft.W_h + aircraft.W_v) # 20% Margin
+    aircraft.W_t = 1.6 * (aircraft.W_h + aircraft.W_v) # 20% Margin
 #horizontal_tail_planform(object)
