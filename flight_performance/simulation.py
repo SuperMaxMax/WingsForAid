@@ -705,26 +705,6 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
         n += 1
     return t, W_F_used, cruiseNAT
 
-# def cruiseperf_varying(ac_obj, atm_obj):
-#     W_F_used = np.empty(0)
-#     h_cruise = np.arange(5000, 15000, 500) * 0.3048
-#     V_cruise = np.arange(45, 70, 5)
-#     x_cruise = np.arange(10000, 111000, 1000)
-#     for j in range(3):
-#         V = 50 + 5*j
-#         for i in range(len(h_cruise)):
-#             W_F_used_s = cruisecalc(ac_obj, atm_obj, h_cruise[i], 100000, 710, V)
-#             W_F_used = np.append(W_F_used, W_F_used_s)
-#         plt.plot(h_cruise, W_F_used[20*j:20*j + 20], label=f"Cruise speed: {V} [m/s]")
-#     plt.xlabel("h_cruise [m]")
-#     plt.ylabel("W_F_used [kg]")
-#     plt.title("W_F_used versus h_cruise")
-#     plt.legend()
-#     plt.show()
-
-# cruiseperf_varying(aircraft, atm)
-
-
 def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD = dragpolar(ac_obj, CL)
