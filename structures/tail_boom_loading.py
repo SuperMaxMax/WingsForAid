@@ -11,17 +11,17 @@ a_b = dF_h_gust/dF_v_gust #ellipsoid cross sectio a/b optimal ratio
 
 
 
-M_h_max = 5569.2 #5569.2  4364
-F_h_max =  65865 #65865 7626
+M_h_max = 4838.8 #5569.2  4364
+F_h_max =  17859 #65865 7626
 M_v_max = dF_h_man/a_b*1.8
 F_v_max = dF_h_man/a_b
-shear_stress = 0.5*yield_stress
+shear_stress = 0.58*yield_stress
 #shear_stress=165*10**6 #alu
-L=3.6658
+L=2.95
 
 L_EF = 0.8
 L_FG = 1
-L_GT=1
+L_GT=0.714
 angle_1 = 40/360*2*np.pi
 angle_2 = 20/360*2*np.pi
 Gx = -F_h_max*L_GT
@@ -63,7 +63,7 @@ sigma = M_h_max*a/Ixx #define max stress
 
 plt.plot(t,Ixx, label="Ixx")
 plt.plot(t,Iyy,label='Iyy')
-plt.plot(t,A, label='A')
+#plt.plot(t,A, label='A')
 #plt.plot(t,sigma, label="sigma")
 plt.plot(t,Ixx_min, label='ixx_min')
 plt.plot(t,Iyy_min,label='iyy min')
@@ -71,7 +71,7 @@ plt.plot(t,A_min,label='A_min')
 plt.legend()
 plt.show()
 
-t=2.5/1000
+t=1.1/1000
 a1=a+t/2
 a2=a-t/2
 b1=b+t/2

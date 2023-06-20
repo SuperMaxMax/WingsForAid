@@ -78,7 +78,7 @@ def main_wing_planform(aircraft):
         variable = "Lambda"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
-            variable_list2 = [0.65]
+            variable_list2 = [0.1]
         elif variable == "AR":  
             variable_list2 = [4,5,6,7,8,9,10]
         elif variable == "Twist":
@@ -257,9 +257,9 @@ def main_wing_planform(aircraft):
     AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean, oswald = plot_lift_distr(i_w_optimal, full_print=True)
     #plt.plot(y_s, l)
     #plt.show()
-    #print(','.join([str(x) for x in y_s]))
-    #print('========')
-    #print(','.join([str(x) for x in l]))
+    print(','.join([str(x) for x in y_s]))
+    print('========')
+    print(','.join([str(x) for x in l]))
     aircraft.A = AR                        
     aircraft.b = (AR*aircraft.Sw)**0.5                      
     aircraft.span_eff = span_eff                     

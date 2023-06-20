@@ -19,7 +19,7 @@ E = 2*10**11
 I = 7.6694*10**(-7)
 L=1
 
-anal_deformation =1000*load*L/(3*E*I)
+anal_deformation =1000*load*L**3/(3*E*I)
 anal_max_moment = load*L
 #print(anal_deformation)
 ansys_deformation = np.array([0.02307,0.11536,0.23072,1.1536,2.3072,11.536,23.072,115.36])
