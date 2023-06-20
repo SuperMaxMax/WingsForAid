@@ -25,14 +25,6 @@ def cg_calc(obj, plot):
     iyy_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
     izz_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
     
-    # Calculate MTOW
-    obj.ST_W_fus = obj.ST_W_fus_truss + obj.ST_W_fus_fairing
-    obj.ST_W_uc = obj.ST_W_lg + obj.ST_W_wheels
-    obj.W_t = obj.W_v + obj.W_h
-    
-    obj.W_OE = obj.W_eq + obj.W_n + obj.W_pg + obj.W_sc + obj.W_t + obj.W_strut + obj.ST_W_fus + obj.ST_W_boom + obj.ST_W_uc + obj.W_w
-    obj.W_TO = obj.W_F + obj.W_OE + obj.W_PL
-    
     # Wing placement
             # allignment = True  # choose True to allign front and aft spar with front and aft vertical truss
             
@@ -123,7 +115,6 @@ def cg_calc(obj, plot):
 
     # Final CG
     W_OEW = W_wing_gr+W_fus_gr
-    obj.W_OE = W_OEW
     X_OEW = X_LEMAC + obj.xc_OEW_p * obj.MAC_length
     # X_OEW = ((X_LEMAC - obj.x_lemac + x_wcg) * W_wing_gr + X_FCG * W_fus_gr) / (W_OEW)
 
