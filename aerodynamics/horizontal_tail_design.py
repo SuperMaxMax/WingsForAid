@@ -269,9 +269,11 @@ def horizontal_tail_planform(aircraft):
     MAC_length = 2/3 * aircraft.AE_rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)
     V_h = aircraft.Sh_S * aircraft.l_h / aircraft.b
     
-    aircraft.W_h = S * MAC_length * 0.12 * 2680 * 0.025 * (AR / np.cos(aircraft.sweep_co4_h))**0.6*Lambda**0.04*V_h**0.2*1**0.4
+    # aircraft.W_h = S * MAC_length * 0.12 * 2680 * 0.025 * (AR / np.cos(aircraft.sweep_co4_h))**0.6*Lambda**0.04*V_h**0.2*1**0.4
+    # print(0.016 * ((aircraft.Sh_S * aircraft.Sw /0.3048)**2)**0.873 * (6.7 * aircraft.W_TO / 0.4542) **0.414 * (1481.35 * 0.688 * 0.0846**2)**0.122)
+    aircraft.W_h = ((aircraft.b_h * (aircraft.AE_rootchord_h + aircraft.AE_tipchord_h) / 2) / (aircraft.b * (aircraft.rootchord + aircraft.tipchord) / 2)) * aircraft.W_w
     #Raymer horizontal tail formula (gives 2.7kg?): #aircraft.W_h = 0.016*(6.6*aircraft.W_TO)**0.414*(0.5*aircraft.rho_cruise*aircraft.V_cruise**2)**0.168*aircraft.S_h**0.896*(12/np.cos(0))**(-0.12)*(aircraft.A/(np.cos(0)**2))**0.043*1**(-0.02)
-    aircraft.W_t = aircraft.W_h + aircraft.W_v
+    aircraft.W_t = 1.2 * (aircraft.W_h + aircraft.W_v) # 20% Margin
     #print("Afsd", CL_a_h)
     #print(b)
     #print(S)

@@ -465,7 +465,7 @@ class atmosphere:
 
 class UAV_final:
     def __init__(self):
-        parameters = open("../finaldesign.csv", "r")
+        parameters = open("./finaldesign.csv", "r")
         lines = parameters.readlines()
         parameters.close()
         for line in lines[1:]:

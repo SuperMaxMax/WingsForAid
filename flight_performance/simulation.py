@@ -11,7 +11,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 # Import other files
-from parameters import UAV, airport, atmosphere
+from parameters import UAV, airport, atmosphere, UAV_final
 
 # aircraft = UAV("aircraft")
 # airfield = airport("Sudan")
