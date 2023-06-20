@@ -11,11 +11,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 # Import other files
-from parameters import UAV, airport, atmosphere
+from parameters import UAV, airport, atmosphere, UAV_final
 
-# aircraft = UAV("aircraft")
+aircraft = UAV_final()
 # airfield = airport("Sudan")
-# atm      = atmosphere()
+atm      = atmosphere()
 hp_to_watt = 745.699872
 
 def takeoffweight(obj, W_F):
@@ -705,26 +705,6 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
         n += 1
     return t, W_F_used, cruiseNAT
 
-# def cruiseperf_varying(ac_obj, atm_obj):
-#     W_F_used = np.empty(0)
-#     h_cruise = np.arange(5000, 15000, 500) * 0.3048
-#     V_cruise = np.arange(45, 70, 5)
-#     x_cruise = np.arange(10000, 111000, 1000)
-#     for j in range(3):
-#         V = 50 + 5*j
-#         for i in range(len(h_cruise)):
-#             W_F_used_s = cruisecalc(ac_obj, atm_obj, h_cruise[i], 100000, 710, V)
-#             W_F_used = np.append(W_F_used, W_F_used_s)
-#         plt.plot(h_cruise, W_F_used[20*j:20*j + 20], label=f"Cruise speed: {V} [m/s]")
-#     plt.xlabel("h_cruise [m]")
-#     plt.ylabel("W_F_used [kg]")
-#     plt.title("W_F_used versus h_cruise")
-#     plt.legend()
-#     plt.show()
-
-# cruiseperf_varying(aircraft, atm)
-
-
 def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD = dragpolar(ac_obj, CL)
@@ -960,6 +940,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             W -= boxesperdrop * ac_obj.boxweight
             if i == 0:
                 ttfd = t
+                print(f"time to first drop (printed in loop): {ttfd} [sec] / {np.round(ttfd/3600, 2)} [hr]")
                 ac_obj.TTFD_s = t
                 flight_profile.append(t)
     else:
@@ -1002,6 +983,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         W -= W_F_used_descent
         W -= boxesperdrop * ac_obj.boxweight
         ttfd = t
+        print(f"time to first drop (printed in loop): {ttfd} [sec] / {np.round(ttfd/3600, 2)}")
         ac_obj.TTFD_s = t
         flight_profile.append(t)
         # ============================================================================================================================
@@ -1111,7 +1093,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             print(f"Payload: {n_boxes} boxes ({np.round(n_boxes*ac_obj.boxweight, 2)} [kg]) | {n_drops} dropping maneuvers")
             print(f"Range: {np.round(Range/1000, 2)} [km] | Distance flown: {np.round(x/1000, 2)} [km] | Flight time: {np.round(t/3600, 2)} [hrs]")
             if n_drops != 0:
-                print(f"Time to first drop: {ttfd} [sec] / {np.round(t/3600, 2)} [hrs]")
+                print(f"Time to first drop: {ttfd} [sec] / {np.round(ttfd/3600, 2)} [hrs]")
             print(f"Fuel used: {np.round(W_F_used, 2)} [kg]")
             print(f"======================================================================================")
             print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
@@ -1137,5 +1119,51 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     #ac_obj.Wf = W_F_used
 
     return W_F_used, flight_profile
+# fuelusesortie(aircraft, atm, 12, 6, 10000, aircraft.W_F, 54.012, Range = 250, Summary=True, plot=True)
 
-# fuelusesortie(aircraft, atm, 12, 1, 10000, 45, 54.012, Range=250, Summary=True, plot=True, savefig=False)
+def endurance(ac_obj, atm_obj, h_loiter, summary = False):
+    W_F  = ac_obj.fuelcapacity*ac_obj.fueldensity                   # Max fuel
+    W_F_0= W_F
+    W_TO = ac_obj.W_OE + W_F                                        # Max endurance --> no payload
+    W_F_used = 0.0
+    t    = 0.0
+    dt   = 1.0
+    h    = 15.0
+    W_a_TO  = W_TO * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2
+    W       = W_a_TO
+    W_F_used += W_TO - W_a_TO
+    W_F      -= W_TO - W_a_TO
+    t_climb, x_climb, W_F_used_climb, h = climbmaneuver(ac_obj, atm_obj, h, h_loiter, W)
+    t   += t_climb
+    W_F_used += W_F_used_climb
+    W_F -= W_F_used_climb
+    W   -= W_F_used_climb
+    CL = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD = dragpolar(ac_obj, CL)
+    p, rho = atm_parameters(atm_obj, h_loiter)[0], atm_parameters(atm_obj, h_loiter)[2]
+    while W_F > 6.0:
+        V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL))
+        Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
+        Pbr = Pr/ac_obj.prop_eff
+        t   += dt
+        FF  = Pbr * ac_obj.SFC
+        W_F_used += FF * dt
+        W_F      -= FF * dt
+        W        -= FF * dt
+    t_des, x_des, W_F_used_des, h = descentmaneuver(ac_obj, atm_obj, h_loiter, 15.0, W)
+    t += t_des
+    W_F_used += W_F_used_des
+    W_F      -= W_F_used_des
+    W        -= W_F_used_des
+    W_beforelanding = W
+    W *= ac_obj.WfinalW10
+    W_F_used += W_beforelanding - W
+    W_F      -= W_beforelanding - W
+    if summary:
+        print("======================================================================")
+        print(f"Take-off weight: {round(W_TO, 2)} [kg] | Fuel loaded: {round(W_F_0, 2)} [kg]")
+        print(f"Total endurance: {round(t/3600, 2)} [hrs] ({t} [sec])")
+        print(f"Fuel used: {round(W_F_used, 2)} [kg]")
+        print(f"Fuel remaining: {round(W_F, 2)} [kg]")
+        print("======================================================================")
+    return round(t/3600, 2)

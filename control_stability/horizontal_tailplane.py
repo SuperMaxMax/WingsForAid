@@ -115,7 +115,7 @@ def Flaplength(aircraft, taperratio, rootchord, span, HLDroot, flappedsurface):
         return y1
 
 def flaps(aircraft):
-    flaptype = 'plain'              # Can be 'plain', 'singleslotted' or 'fowler'
+    flaptype = 'singleslotted'              # Can be 'plain', 'singleslotted' or 'fowler'
     CS_Swf = 0.7 * aircraft.Sw              # spanwise portion of wing influenced by flaps (ADSEE-II, L3 S31) NOTE: Used to calculate resulting dCLmax
     CS_lambda_hinge = 0.05468               # hinge line sweep angle, likely parallel to aft spar [rad] NOTE: For aft spar @ 0.8 chord
 
@@ -282,7 +282,7 @@ def plot_scissor_plot(aircraft, plot):
         ax1.grid()
 
         plt.show()
-        # fig1.savefig("scissorplot")
+        fig1.savefig("Scissorplot.png")
     
 
 def hor_run(aircraft, plot):

@@ -17,6 +17,7 @@ def plot_diagrams(Ay, Az, By, Bz, load_case, normal, shear, moment, torque):
     fig = plt.figure(constrained_layout=True)
     gs = fig.add_gridspec(4, 2)
     f_ax1 = fig.add_subplot(gs[:, 0])
+    plt.rcParams.update({'font.size': 22})
 
     # Plot forces
     f_ax1.plot(y_span, -spanwise_wing_weight(y_span), label='Wing weight')
@@ -29,17 +30,17 @@ def plot_diagrams(Ay, Az, By, Bz, load_case, normal, shear, moment, torque):
         f_ax1.set_title('Spanwise force diagram for full wing loading, no fuel')
         global y_range1
         y_range1 = f_ax1.axis()[3]-f_ax1.axis()[2]
-        hl1, hw1 = 0.06, 20
-        hl2, hw2 = 20, 0.06
-        w1, w2 = 5, 0.02
+        hl1, hw1 = 0.06, 132
+        hl2, hw2 = 132, 0.06
+        w1, w2 = 33, 0.02
         global fac
-        fac = 100
+        fac = 660
     else:
         f_ax1.set_title('Spanwise force diagram for no wing loading, full fuel')
         y_range2 = f_ax1.axis()[3]-f_ax1.axis()[2]
-        hl1, hw1 = 0.06, 20*y_range2/y_range1
-        hl2, hw2 = 20*y_range2/y_range1, 0.06
-        w1, w2 = 5*y_range2/y_range1, 0.02
+        hl1, hw1 = 0.06, 132*y_range2/y_range1
+        hl2, hw2 = 132*y_range2/y_range1, 0.06
+        w1, w2 = 33*y_range2/y_range1, 0.02
         fac *= y_range2/y_range1
     # add reaction forces
     if np.sign(Ay) == 1:
@@ -157,6 +158,7 @@ def spanwise_func_2(y):
 ac = UAV_final()
 plot = True
 
+ac.ST_y_strut = ((ac.ST_w_fus+ac.b)/2)*ac.ST_y_strut_frac-ac.ST_w_fus/2
 ac.ST_angle_strut = np.arctan(ac.ST_h_fus/(ac.ST_y_strut-ac.ST_w_fus/2))    # [rad]
 ac.W_wl = 0                                                                 # [kg] for 1 winglet
 

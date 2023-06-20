@@ -1,4 +1,4 @@
-from parameters import UAV, atmosphere, airport
+from parameters import UAV_final, atmosphere, airport, UAV
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,7 +8,8 @@ import structures.wingbox_full as wb
 import flight_performance.simulation as fp
 import operations.sortie as op
 
-aircraft = UAV("aircraft")
+aircraft = UAV_final()
+# aircraft = UAV('aircraft')
 atm      = atmosphere()
 airfield = airport("Sudan")
 
@@ -16,7 +17,7 @@ index_df = ["MTOW", "OEW", "Fuel weight", "Tail weight", "Wing weight"]
 df_iterations = pd.DataFrame(index = index_df)
 
 # start
-plot = False
+plot = True
 jan = False
 
 n_iteration = 1
@@ -24,8 +25,8 @@ running = True
 
 # for wingbox
 jarno = False               # Jarno can't run wingbox
-full_wingbox_loop = True    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
-ele_span = 500              # number of elements in spanwise direction (smaller value is faster, but less accurate)
+full_wingbox_loop = False    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
+ele_span = 100              # number of elements in spanwise direction (smaller value is faster, but less accurate)
 
 #TODO landing distance
 #TODO max ferry range
@@ -35,6 +36,7 @@ ele_span = 500              # number of elements in spanwise direction (smaller 
 
 while running:
     W_check = aircraft.W_OE + aircraft.W_F
+
     print(f"=================== AERO-{n_iteration} =====================")
     ae.run_aero(aircraft)
     print("================================================\n")
@@ -61,8 +63,22 @@ while running:
 
     # op.operations_eval(aircraft)
 
+    # print(f"=================== MANUAL UPDATES-{n_iteration} =======================")
+    # aircraft.A = float(input("Wing aspect ratio: "))
+    # aircraft.taper = float(input("Wing taper ratio: "))
+    # aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
+    # print(f"=================================================\n")
+    
+    aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w
+    aircraft.W_TO = aircraft.W_F + aircraft.W_OE + aircraft.W_PL
+
+    aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w
+    aircraft.W_TO = aircraft.W_F + aircraft.W_OE + aircraft.W_PL
+
     if np.abs((aircraft.W_OE + aircraft.W_F - W_check)/W_check) < 0.001:
         running = False
+    
+    aircraft.Sw = ((aircraft.W_OE + aircraft.W_F + aircraft.n_boxes*aircraft.boxweight)*atm.g)/aircraft.WS
 
     df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w]
 

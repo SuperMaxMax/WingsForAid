@@ -19,6 +19,7 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
         Plot the wingbox of the aircraft
         """
         # Plot airfoil shape
+        plt.figure(constrained_layout=True)
         plt.plot(x, y_u, 'b', zorder=0)
         plt.plot(x, y_l, 'b', zorder=0)
         # Plot front spar, aft spar, top skin and bottom skin (in that order)
@@ -32,8 +33,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
         # plt.scatter(x_mid_bot, y_mid_bot, zorder=20, c='k')
         # Plot centroids
         plt.scatter(xc, yc, c='k')
-        plt.scatter(xc_stringer_top, yc_stringer_top, c='k', zorder=10)
-        plt.scatter(xc_stringer_bot, yc_stringer_bot, c='k', zorder=10)
+        # plt.scatter(xc_stringer_top, yc_stringer_top, c='k', zorder=10)
+        # plt.scatter(xc_stringer_bot, yc_stringer_bot, c='k', zorder=10)
         # Plot stringers
         for i in range(len(xco_stringer_top)):
             if i == 0:
@@ -47,6 +48,8 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                 plot_L_stringer(xco_stringer_bot[i], yco_stringer_bot[i], angle_bot*180/np.pi)
         plt.axis('equal')
         plt.title('Wingbox at spanwise location: {:.2f} m'.format(spanwise_pos))
+        plt.xlabel('x [m]')
+        plt.ylabel('y [m]')
         plt.grid()
         plt.show()
 
@@ -966,13 +969,19 @@ print(f"Number of ribs: {n_ribs_g[np.where(weights == np.min(weights))[0][0]][np
 plt.figure()
 
 for col in MOF_specific.columns:
-    # if the col containts NaN -> only use the non NaN values with their corresponding index
-    if MOF_specific[col].isnull().values.any():
-        plt.plot(MOF_specific.index[~np.isnan(MOF_specific[col])], MOF_specific[col][~np.isnan(MOF_specific[col])], label=col)
-    else:
-        plt.plot(MOF_specific.index, MOF_specific[col], label=col)
+    if col == 'MOF_tau_f_spar' or col == 'MOF_tau_a_spar' or col == 'MOF_sigma_top_s' or col == 'MOF_sigma_top_p' or col == 'MOF_sigma_bot_p' or col == 'MOF_sigma_bot_s':
+        # if the col containts NaN -> only use the non NaN values with their corresponding index
+        if MOF_specific[col].isnull().values.any():
+            plt.plot(MOF_specific.index[~np.isnan(MOF_specific[col])], MOF_specific[col][~np.isnan(MOF_specific[col])], label=col, linewidth=2)
+        else:
+            plt.plot(MOF_specific.index, MOF_specific[col], label=col, linewidth=2)
+# plot line at y = 1 for MOF = 1 in red and thick
+plt.plot(MOF_specific.index, np.ones(len(MOF_specific.index)), 'r--', linewidth=3, label='MOF = 1')
 plt.xlabel('Spanwise position [m]')
 plt.ylabel('MOF [-]')
+# set x and y limits
+plt.xlim(-0.5, 9.620022329579792/2+0.5)
+plt.ylim(-0.5, 5)
 plt.legend()
 plt.grid()
 plt.show()
