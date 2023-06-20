@@ -43,7 +43,7 @@ for j in range(2):
     for i in range(len(variable_list2)):
         if nose[j] == True:
             l_fus_1 = variable_list2[i]
-            l_fus_3 = 0.8
+            l_fus_3 = 2.6
         else:
             l_fus_1 = 0.9342
             l_fus_3 = variable_list2[i]
@@ -208,6 +208,7 @@ for j in range(2):
             plt.scatter(variable_list2[i], CD0_list[4], s = 10, color = 'black')
 
     print(CD0_list[4], variable_list2[-1])
+    print(Swet_list[4], variable_list2[-1])
     #plt.scatter(l_fus_total / d_fus, CD0_list[4], s = 60, color = 'red', label = "Current design")
     if nose:
         plt.scatter(variable_list2[-1], CD0_list[4], s = 60, color = 'red', label = "Current design")
