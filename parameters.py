@@ -56,7 +56,7 @@ class UAV:
         self.h_out = 0.781                    # Outer fuselage height [m]
         # I
         self.i_w = 0.935 * np.pi / 180        # Updated incidence angle of wing wrt fuselage [rad]
-        self.Ixx = 1300                       # mass moment of inertia x-axis [kg m^2]
+        self.Ixx = 800                       # mass moment of inertia x-axis [kg m^2]
 
         # J
 
@@ -171,15 +171,15 @@ class UAV:
         self.W_sc = 25.08                           # Control systems weight [kg]                       constant
         self.W_t = 18.647695670124357               # Tail weight [kg]                                  variable -> needs to be implemented
         self.W_strut = 3.61*2                       # Weight of 2 struts [kg]                           constant
-        self.ST_W_fus_truss = 54.6                # Mass of fuselage structure (only) [kg]              constant
-        self.ST_W_fus_fairing = 25.5286               # Mass of fuselage fairing [kg]                   constant
+        self.ST_W_fus_truss = 54.6                  # Mass of fuselage structure (only) [kg]            constant
+        self.ST_W_fus_fairing = 25.5286             # Mass of fuselage fairing [kg]                     constant
         self.ST_W_fus = self.ST_W_fus_truss + self.ST_W_fus_fairing #Built up off truss and fairing     constant
         # self.W_fus = 116.507                      # Fuselage weight [kg]                              constant  
-        self.ST_W_boom = 12                       # Mass of tail boom, given it is 2.8 m long [kg]    constant
+        self.ST_W_boom = 12                         # Mass of tail boom, given it is 2.8 m long [kg]    constant
         # self.W_boom = 20.3                        # Boom weight [kg]                                  constant
         self.ST_W_lg = 7.75                         # Mass of landing gear struts [kg]                  constant
         self.ST_W_wheels = 10                       # Mass of wheels [kg]                               constant
-        self.ST_W_uc = self.ST_W_lg + self.ST_W_wheels                        # Undercarriage weight [kg]                         constant                                           # constant
+        self.ST_W_uc = self.ST_W_lg + self.ST_W_wheels # Undercarriage weight [kg]                      constant                                           # constant
         self.W_w = 52.72497438003413                 # Wing weight [kg]                                 variable
         self.W_v = 6.5
         self.W_h = 20
@@ -465,7 +465,7 @@ class atmosphere:
 
 class UAV_final:
     def __init__(self):
-        parameters = open("./finaldesign.csv", "r")
+        parameters = open("finaldesign.csv", "r")
         lines = parameters.readlines()
         parameters.close()
         for line in lines[1:]:
