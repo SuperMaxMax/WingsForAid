@@ -101,7 +101,7 @@ def elevator_design(aircraft, plot):
     C_L1 = 2 * aircraft.W_TO * aircraft.g0 /(aircraft.rho_TO * (V_range**2)*aircraft.Sw)
 
     #Calculate for both cg positions, [fwd, aft]
-    l_h = aircraft.l_f - aircraft.l_fus_tail_cone + aircraft.l_f_boom - 3/4 * aircraft.AE_rootchord_h - (aircraft.X_LEMAC+ X_cg*aircraft.MAC_length)
+    l_h = aircraft.l_f - aircraft.l_fus_tail_cone + aircraft.l_f_boom - 1/4 * aircraft.AE_rootchord_h - (aircraft.X_LEMAC+ X_cg*aircraft.MAC_length)
     tail_volume = l_h / aircraft.MAC_length * aircraft.Sh_S
     C_m_delta_e = -aircraft.CLa_Ah_cruise *eta_h * tail_volume * 1
 

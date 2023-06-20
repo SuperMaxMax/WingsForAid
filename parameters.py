@@ -3,105 +3,105 @@ class UAV:
     def __init__(self, name):
         "=== Class I / Class II parameters ==="
         # A
-        self.A = 8.0                       # Aspect ratio [-]
-        self.alpha_f = 0                    # Still to be updated angle of attack of the fuselage [rad]
+        self.A = 8.0                          # Aspect ratio [-]
+        self.alpha_f = 0                      # Still to be updated angle of attack of the fuselage [rad]
 
         # B
         # self.BHP_cruise = 76.3436
         # self.CL_land = 1.6529               # [-]
-        self.b = 9.620022329579792                     # Wing span [m]
+        self.b = 9.620022329579792            # Wing span [m]
         # self.b_v = 1.60                     # Vertical tail span [m] NOTE: Is this value updated during design vertical tail?
-        # self.boom                = True     # Boom, true if boom tail is implemented
+        # self.boom = True                    # Boom, true if boom tail is implemented
         # self.bot_clearance = 0.1            # Bottom clearance [m]
-        # self.braced_wing         = True     # True if wing is braced
-        self.boxweight = 23.0               # weight of a single box [kg]
+        # self.braced_wing = True             # True if wing is braced
+        self.boxweight = 23.0                 # weight of a single box [kg]
         # C
-        self.CD0 =  0.0285                 # Zero lift coefficient [-]
+        self.CD0 =  0.0280911                 # Zero lift coefficient [-]
         # self.CL_LDG = 1.6529                # [-]
         # self.CL_TO = 1.2397                 # [-]
         # self.CL_max_TO = 1.5                # Maximum lift coefficient at take-off [-] 
-        self.CL_max_clean = 1.5615            # Maximum lift coefficient [-] | Range: 1.3 - 1.9
+        self.CL_max_clean = 1.48              # Maximum lift coefficient [-] | Range: 1.3 - 1.9
         # self.CL_max_land = 2.0              # Maximum lift coefficient at landing [-]
         # self.CLa = 4.743                    # Lift curve slope [-] | CHANGE TO ACTUAL VALUE
         # self.c_p = 72E-9                    # Specific fuel consumption [kg/J]
         # self.climb_rate = 2.9889
         # self.cos_lambda_c04 = 1
         # self.cruise_frac = 0.8348           # Assume halfway through the cruise with cruise fuel fraction 0.3 [-]
-        self.CL_h = -1.0                        # CL of full moving tail [-] 
-        self.CL_a_w = 4.743                     # Updated Lift curve slope [1/rad]
-        self.C_r_C_v = 0.4                      # Rudder chord over vertical tail chord
+        self.CL_h = -1.0                      # CL of full moving tail [-] 
+        self.CL_a_w = 4.743                   # Updated Lift curve slope [1/rad]
+        self.C_r_C_v = 0.4                    # Rudder chord over vertical tail chord
 
         # D
         # self.Drag_increase = 1.0            # This is used for the calculations of the strut drag if applicable [-]
         # self.d_eff = 1.241                  # Effective diameter [m]
         # self.d_engine_boxes = 0.4           # Distance between engine and box [m]
         self.dihedral = 0
-        self.d_fuselage = 1.102             # Effective fuselage diameter used for drag estimation [m]
+        self.d_fuselage = 1.102               # Effective fuselage diameter used for drag estimation [m]
         
         # E
-        self.e = 0.776                      # Oswald factor [-]
-        self.engine_cg = 0.267              # Engine cg location [m]
+        self.e = 0.776                        # Oswald factor [-]
+        self.engine_cg = 0.267                # Engine cg location [m]
         # self.engine_fairing = 0.2           # Engine fairing length [m]
-        self.engine_length =  0.6651         # Engine length [m]
+        self.engine_length =  0.6651          # Engine length [m]
         # self.engine_pos = 'tractor'         # Engine position: "tractor" or "pusher" or "fuselage"
-        self.eta_p = 0.82                   # Propulsive efficiency [-]
+        self.eta_p = 0.82                     # Propulsive efficiency [-]
         # F
 
         # G
-        self.g0 = 9.8066                    # Gravitational acceleration [m/s^2]
+        self.g0 = 9.80665                     # Gravitational acceleration [m/s^2]
         # H
-        self.h_TO = 0                       # Take-off altitude, airport altitude [m]
-        self.h_cruise = 3048.0              # Cruise altitude [m]
-        # self.h_in = 0.9                   # Inner fuselage height [m]
-        self.h_out = 0.781                  # Outer fuselage height [m]
+        self.h_TO = 0                         # Take-off altitude, airport altitude [m]
+        self.h_cruise = 3048.0                # Cruise altitude [m]
+        # self.h_in = 0.9                     # Inner fuselage height [m]
+        self.h_out = 0.781                    # Outer fuselage height [m]
         # I
-        self.i_w = 0.935 * np.pi / 180      # Updated incidence angle of wing wrt fuselage [rad]
-        self.Ixx = 1300                     # mass moment of inertia x-axis [kg m^2]
+        self.i_w = 0.935 * np.pi / 180        # Updated incidence angle of wing wrt fuselage [rad]
+        self.Ixx = 1300                       # mass moment of inertia x-axis [kg m^2]
 
         # J
 
         # K
-        # self.kq = 0.95                          # Volume factor used to calculate wetted area of the wing [-]
+        # self.kq = 0.95                      # Volume factor used to calculate wetted area of the wing [-]
 
         # L
-        # self.LDG_dist = 750.0                   # Landing distance [m]
-        # self.L_D = 14.1804                      # Lift to drag ratio [-]
+        # self.LDG_dist = 750.0               # Landing distance [m]
+        # self.L_D = 14.1804                  # Lift to drag ratio [-]
         # self.Lambda = -0.0065
-        self.l_fus_main_cone = 2.9              # Fuselage main cilindrical part length [m]
-        self.l_fus_tail_cone = 0.8              # Fuselage tail cone length [m]
-        self.l_f = 4.6342                       # Fuselage length [m]
-        self.l_f_boom = 3.3                     # Boom length [m]
-        self.l_n = 0.9342                       # Nosecone length [m]
-        # self.l_tc = 0.8                       # Tail cone length [m]
-        # self.lin_par1 = 0.5249                  # [-]
-        # self.lin_par2 = 42.049                  # [-]
-        self.l_h = 3.6                          # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
-        self.position_landing_fwd = [0.2, 0]    # Nose landing gear position [x, y] in [m]
+        self.l_fus_main_cone = 2.9            # Fuselage main cilindrical part length [m]
+        self.l_fus_tail_cone = 0.8            # Fuselage tail cone length [m]
+        self.l_f = 4.6342                     # Fuselage length [m]
+        self.l_f_boom = 2.95                  # Boom length [m]
+        self.l_n = 0.9342                     # Nosecone length [m]
+        # self.l_tc = 0.8                     # Tail cone length [m]
+        # self.lin_par1 = 0.5249              # [-]
+        # self.lin_par2 = 42.049              # [-]
+        self.l_h = 3.6                        # [m] tail length; length of aerodynamic centre of wing to aerodynamic centre tail. NOTE: This is a design choice, so for now it is a guestimate.
+        self.position_landing_fwd = [0.2, 0]  # Nose landing gear position [x, y] in [m]
         self.position_landing_back = [2.33, 0.8]# Main landing gear position [x, y] in [m]
 
         # M
-        self.MAC_length = 1.163723472647304            # Mean aerodynamic chord [m]
-        self.MAC_ac = 0.24                  # Location of aerodynamic center relative to MAC [-]
-        # self.MGC = 1.3061                 # Mean geometric chord [m]
-        self.M_res = 0.1                    # Reserve fuel fraction [-] 
-        # self.Mff = 0.8918                 # Fuel fraction [-]
-        # self.main_gear_type = 'fixed'     # Type of main gear: "fixed" or "retractable"
+        self.MAC_length = 1.163723472647304   # Mean aerodynamic chord [m]
+        self.MAC_ac = 0.24                    # Location of aerodynamic center relative to MAC [-]
+        # self.MGC = 1.3061                   # Mean geometric chord [m]
+        self.M_res = 0.1                      # Reserve fuel fraction [-] 
+        # self.Mff = 0.8918                   # Fuel fraction [-]
+        # self.main_gear_type = 'fixed'       # Type of main gear: "fixed" or "retractable"
         
         # N
-        # self.N_e = 1                      # Number of engines [-]
-        self.n_boxes = 12                   # [-]
-        self.n_boxes_abreast = 2            # [-]
-        self.n_drops = 6                    # [-]
+        # self.N_e = 1                        # Number of engines [-]
+        self.n_boxes = 12                     # [-]
+        self.n_boxes_abreast = 2              # [-]
+        # self.n_drops = 6                    # [-]
         # self.n_rows = 6                     # [-]
-        self.name = name                    # Name of the aircraft
+        self.name = name                      # Name of the aircraft
         # self.nose_gear_type = 'fixed'       # Type of nose gear: "fixed" or "retractable"
         # O
 
         # P
         # self.pos_main_carriage = 'fuselage' # Position of main carriage: "fuselage" or "wing"
-        self.power = 100                    # Power at takeoff [hp]
+        self.power = 100                      # Power at takeoff [hp]
         # self.power_setting = 0.9            # Power setting in cruise [-]
-        self.prop_eff = 0.82                # Propulsive efficiency [-]
+        self.prop_eff = 0.82                  # Propulsive efficiency [-]
         # Q
 
         # R
@@ -136,7 +136,7 @@ class UAV:
         # self.T0 = 288.15                    # Sea level temperature [K]
         # self.TOP_req = 250 
         # self.t_c = 0.15                     # Thickness to chord ratio [-]
-        self.taper = 0.4                   # Taper ratio [-]
+        self.taper = 0.65                   # Taper ratio [-]
         self.tipchord = 0.7093104021809986              # Tip chord [m]
         self.tire_nose_height = 0.24     # Nose landing gear tire height [m] minimum inner diam 8.89 cm
         self.tire_nose_width = 0.08      # Nose landing gear tire width [m] minimum width 7.62cm
@@ -160,28 +160,27 @@ class UAV:
         # self.WP = 0.1215
 
         self.WS = 632.739                           # Wing Loading [N/m^2]
-        self.W_F = 52.69403541333709                # Fuel weight [kg]                                  constant
-        self.W_OE = 375.0                           # Operational empty weight [kg] CALCULATED 15-6-23 14:16  variable
+        self.W_F = 52.69403541333709                # Fuel weight [kg]                                  variable
+        self.W_OE = 375.0                           # Operational empty weight [kg]                     variable
         self.W_PL = 276                             # Payload weight [kg]                               constant
         self.W_TO = 770.539373653824                # Take-off weight [kg]                              variable
         self.W_e = 67.7                             # Definitive weight per engine [kg]                 constant
         self.W_eq = 56.25                           # Equipment weight [kg]                             constant -> needs to be changed
         self.W_n = 8.16                             # Nacelle weight [kg]                               constant
         self.W_pg = 91.95                           # Propulsion group weight [kg]                      constant
-        self.W_sc = 25.08                             # Control systems weight [kg]                       variable -> needs to be implemented
+        self.W_sc = 25.08                           # Control systems weight [kg]                       constant
         self.W_t = 18.647695670124357               # Tail weight [kg]                                  variable -> needs to be implemented
-        self.W_strut = 16.794                       # Weight of 2 struts [kg]                           constant
-        self.ST_W_fus_truss = 40.224                # Mass of fuselage structure (only) [kg]            constant
-        self.ST_W_fus_fairing = 13.78               # Mass of fuselage fairing [kg]                     constant
-        self.ST_W_fus = 55.224                      #Built up off truss and fairing                     constant
+        self.W_strut = 3.61*2                       # Weight of 2 struts [kg]                           constant
+        self.ST_W_fus_truss = 54.6                # Mass of fuselage structure (only) [kg]              constant
+        self.ST_W_fus_fairing = 25.5286               # Mass of fuselage fairing [kg]                   constant
+        self.ST_W_fus = self.ST_W_fus_truss + self.ST_W_fus_fairing #Built up off truss and fairing     constant
         # self.W_fus = 116.507                      # Fuselage weight [kg]                              constant  
-        self.ST_W_boom = 20.3                       # Mass of tail boom, given it is 2.8 m long [kg]    constant
+        self.ST_W_boom = 12                       # Mass of tail boom, given it is 2.8 m long [kg]    constant
         # self.W_boom = 20.3                        # Boom weight [kg]                                  constant
         self.ST_W_lg = 7.75                         # Mass of landing gear struts [kg]                  constant
         self.ST_W_wheels = 10                       # Mass of wheels [kg]                               constant
-        self.ST_W_uc = 18.51                                                # constant
-        # self.W_uc = 66.4175                       # Undercarriage weight [kg]                         constant
-        self.W_w = 52.72497438003413                 # Wing weight [kg]                                  variable
+        self.ST_W_uc = self.ST_W_lg + self.ST_W_wheels                        # Undercarriage weight [kg]                         constant                                           # constant
+        self.W_w = 52.72497438003413                 # Wing weight [kg]                                 variable
         self.W_v = 6.5
         self.W_h = 20
         self.W_t = 26.5
@@ -193,7 +192,7 @@ class UAV:
 
         # X
         self.xc_front_spar = 0.2                   # Front spar location as fraction of MAC
-        self.xc_aft_spar = 0.80                     # Aft spar location as fraction of MAC
+        self.xc_aft_spar = 0.75                     # Aft spar location as fraction of MAC
         self.X_LEMAC = 2.9164800703929266           # Leading edge mean aerodynamic chord [m]
         self.x_lemac = 0.3298932388521987               # Distance from LE root chord to the leading edge mean aerodynamic chord [m]
         self.xc_OEW_p = 0.25                # Center of gravity of OEW as a fraction of the MAC [-]
@@ -393,6 +392,7 @@ class UAV:
         self.ST_W_eng = 65.7 #kg Rotax 912 plus clutch, exhaust, alternator, air guide hood, NO MOUNT
         self.ST_Torque_eng2 = 240 #Nm, UL 260 torque
 
+        self.ST_y_strut_frac = 0.44 #fraction of span where strut is attached
         self.ST_l_strut = 2.563733275367119 #m strut lenght (single)
         self.ST_strut_2a = 0.08 #strut semi major*2 [m]
         self.ST_strut_2b = 0.04 #strut semi minor*2 [m]
@@ -465,7 +465,7 @@ class atmosphere:
 
 class UAV_final:
     def __init__(self):
-        parameters = open("C:\\Users\\ties\\OneDrive\\Documenten\\GitHub\\WingsForAid\\finaldesign.csv", "r")
+        parameters = open("./finaldesign.csv", "r")
         lines = parameters.readlines()
         parameters.close()
         for line in lines[1:]:
