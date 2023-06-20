@@ -70,6 +70,7 @@ def VV_sortiesim_expected(ac_obj, atm_obj, plot = False):
         axes1[1].set_ylabel("Sortie time [sec]")
         fig1.suptitle("Fuel used and Sortie time versus Range")
         fig1.tight_layout()
+        plt.savefig("C:\\Users\\ties\\Downloads\\Sensitivity_range")
         plt.show()
         fig2, axes2 = plt.subplots(nrows = 1, ncols = 2)
         axes2[0].plot(drops, fuel_used[1])
@@ -80,6 +81,7 @@ def VV_sortiesim_expected(ac_obj, atm_obj, plot = False):
         axes2[1].set_ylabel("Sortie time [sec]")
         fig2.suptitle("Fuel used and Sortie time versus number of drops")
         fig2.tight_layout()
+        plt.savefig("C:\\Users\\ties\\Downloads\\Sensitivity_n_drops")
         plt.show()
         fig3, axes3 = plt.subplots(nrows = 1, ncols = 2)
         axes3[0].plot(dropregions, fuel_used[2])
@@ -90,6 +92,7 @@ def VV_sortiesim_expected(ac_obj, atm_obj, plot = False):
         axes3[1].set_ylabel("Sortie time [sec]")
         fig3.suptitle("Fuel used and Sortie time versus dropregion size")
         fig3.tight_layout()
+        plt.savefig("C:\\Users\\ties\\Downloads\\Sensitivity_dropregion_size")
         plt.show()
         fig4, axes4 = plt.subplots(nrows = 1, ncols = 2)
         axes4[0].plot(cruise_V, fuel_used[3])
@@ -100,6 +103,7 @@ def VV_sortiesim_expected(ac_obj, atm_obj, plot = False):
         axes4[1].set_ylabel("Sortie time [sec]")
         fig4.suptitle("Fuel used and Sortie time versus cruise speed")
         fig4.tight_layout()
+        plt.savefig("C:\\Users\\ties\\Downloads\\Sensitivity_cruisespeed")
         plt.show()
         fig5, axes5 = plt.subplots(nrows = 1, ncols = 2)
         axes5[0].plot(cruise_h, fuel_used[4])
@@ -110,6 +114,7 @@ def VV_sortiesim_expected(ac_obj, atm_obj, plot = False):
         axes5[1].set_ylabel("Sortie time [sec]")
         fig5.suptitle("Fuel used and Sortie time versus cruise height")
         fig5.tight_layout()
+        plt.savefig("C:\\Users\\ties\\Downloads\\Sensitivity_cruiseheight")
         plt.show()
         fig6, axes6 = plt.subplots(nrows = 1, ncols = 2)
         axes6[0].plot(n_boxes, fuel_used[5])
@@ -120,6 +125,7 @@ def VV_sortiesim_expected(ac_obj, atm_obj, plot = False):
         axes6[1].set_ylabel("Sortie time [sec]")
         fig5.suptitle("Fuel used and Sortie time versus cruise height")
         fig5.tight_layout()
+        plt.savefig("C:\\Users\\ties\\Downloads\\Sensitivity_n_boxes")
         plt.show()
     return 
 
@@ -261,3 +267,5 @@ def Cessnacomparison(ac_obj, atm_obj, h_cruise, V_cruise, result = False):
         print(f"Sortie time: {round(t/3600, 2)} [hr]")
         print("============================================================")
     return 
+
+Cessnacomparison(Cessna, atm, 10000, 115, result=True)
