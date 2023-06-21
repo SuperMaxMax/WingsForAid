@@ -153,9 +153,11 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
         ax3.set_title('Weight vs Time')
 
         plt.tight_layout()
+        plt.savefig("C:\\Users\\ties\\Downloads\\climbperformance")
 
         plt.show()
     return Time, Height
+
 
 # # ---------------- Assumptions for take-off equations of motion -----------------
 # # Wind is included by take it into account in the speed: V_eff = V - V_wind
@@ -629,10 +631,6 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
 
     plt.show()
 
-
-# descend(aircraft, atm, 90, (aircraft.W_OE+10)*atm.g, 95, 500, 0.6)
-
-
 def cruiseheight(distance, desired_alt):
     if 0.0 <= distance <= 10000.0:
         h_cruise = 1000 * 0.3048
@@ -832,7 +830,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     else:
         V_cruise = V_cruise
     W_TO = ac_obj.W_OE + W_F + n_boxes * ac_obj.boxweight
-    W_F_0 = W_TO
+    W_F_0 = W_F
     W = W_TO
     if Summary:
         print("=====================================================")
@@ -1081,7 +1079,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     W *= ac_obj.WfinalW10
     print(f"W_F_used landing, taxi, shutdown: {round(W_beforelanding - W, 2)} | fraction: {round(W/W_beforelanding, 3)}")
     W_F_used += (W_beforelanding - W)
-    if W_F_used > W_F:
+    if W_F_used > W_F_0:
         print("The fuel used is higher than the fuel loaded, this is not possible")
     # Calculate the fuel use per kg payload per km range (that means half the distance flown)
     F_kg_km = np.round(W_F_used/(n_boxes*ac_obj.boxweight*Range/1000), 5)
@@ -1104,10 +1102,10 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         plt.ylabel("Altitude [m]")
         if savefig:
             if dropregion != None:
-                filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ str(Range) + str(n_drops) + str(dropregion)+ ".png"
+                filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ "Range" + str(Range) + "drops" + str(n_drops) + "dropregion" + str(dropregion)+ ".png"
                 plt.savefig(filepath)
             else:
-                filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ str(Range) + str(n_drops) + ".png"
+                filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ "Range" + str(Range) + "drops" + str(n_drops) + ".png"
                 plt.savefig(filepath)
         plt.show()
 
@@ -1119,7 +1117,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     #ac_obj.Wf = W_F_used
 
     return W_F_used, flight_profile
-# fuelusesortie(aircraft, atm, 12, 6, 10000, aircraft.W_F, 54.012, Range = 250, Summary=True, plot=True)
+fuelusesortie(aircraft, atm, 12, 2, 10000, aircraft.W_F, 54.012, Range = 250, dropregion = 50, Summary=True, plot=True, savefig=True)
 
 def endurance(ac_obj, atm_obj, h_loiter, summary = False):
     W_F  = ac_obj.fuelcapacity*ac_obj.fueldensity                   # Max fuel
