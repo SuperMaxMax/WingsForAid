@@ -130,6 +130,7 @@ def VV_sortiesim_expected(ac_obj, atm_obj, plot = False):
     return 
 
 def ferryrange(ac_obj, atm_obj, aux_fuel_boxes, h0, summary = False, plot = False):
+    h0 *= 0.3048
     # =============== Starting parameters =================
     W_F = ac_obj.fuelcapacity * ac_obj.fueldensity          # Max fuel
     W_F += aux_fuel_boxes * 20                              # aux_fuel_boxes represents the number of boxes swapped for fuel (stowed in boxlike objects)
@@ -205,8 +206,10 @@ def ferryrange(ac_obj, atm_obj, aux_fuel_boxes, h0, summary = False, plot = Fals
         plt.plot(x_arr/1000, h_arr)
         plt.xlabel("Horizontal distance [km]")
         plt.ylabel("Altitude [m]")
+        plt.savefig("C:\\Users\\ties\\Downloads\\flightprofile-ferryrange")
         plt.show()
     return
+# ferryrange(aircraft, atm, 0, 15000, summary=True, plot=True)
 
 def VV_sortiesim_boundary(ac_obj, atm_obj):
     # Boundary value tests for loading
@@ -268,4 +271,4 @@ def Cessnacomparison(ac_obj, atm_obj, h_cruise, V_cruise, result = False):
         print("============================================================")
     return 
 
-Cessnacomparison(Cessna, atm, 10000, 115, result=True)
+# Cessnacomparison(Cessna, atm, 10000, 115, result=True)
