@@ -181,7 +181,8 @@ def on_key(event):
         print(f"\nNosewheel position:\nX-position: {round(aircraft.position_landing_fwd[0],3)} [m]")
         print(f"\nMain landing gear position:\nX-position: {round(aircraft.position_landing_back[0],3)} [m],\
         Y-position:{round(aircraft.position_landing_back[1],3)} [m]")
-        print(f"\nMax CG position Z-axis: {round(Z_position_cg,3)}")       
+        print(f"\nMax CG position Z-axis: {round(Z_position_cg,3)}")
+        plt.savefig('LandingGear.png')       
 
 ##########################################################################################################
 if LGplot:

@@ -25,8 +25,8 @@ running = True
 
 # for wingbox
 jarno = False               # Jarno can't run wingbox
-full_wingbox_loop = True    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
-ele_span = 500              # number of elements in spanwise direction (smaller value is faster, but less accurate)
+full_wingbox_loop = False    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
+ele_span = 100              # number of elements in spanwise direction (smaller value is faster, but less accurate)
 
 #TODO landing distance
 #TODO max ferry range
@@ -68,7 +68,7 @@ while running:
     aircraft.taper = float(input("Wing taper ratio: "))
     aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
     print(f"=================================================\n")
-
+    
     aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w
     aircraft.W_TO = aircraft.W_F + aircraft.W_OE + aircraft.W_PL
 

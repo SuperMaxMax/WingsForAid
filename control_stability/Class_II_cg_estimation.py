@@ -182,6 +182,7 @@ def cg_calc(obj, plot):
     # Plot lines for forward and aft cg positions
     
     if plot:
+        plt.figure(figsize=(8,6))
         for x, w, label, i in zip(Xs, w_fracs, labels, range(len(Xs))):
             if i == 0 or i == len(Xs):
                 rotation_t = 0
@@ -195,12 +196,13 @@ def cg_calc(obj, plot):
         plt.axvline(x=obj.X_cg_aft, color='red', label='most aft c.g. considered', path_effects=[patheffects.withTickedStroke(spacing=8, angle=-45, length=1.1)])
 
         plt.ylim(top = 1.03)
-        plt.xlim(left = 0.15, right = 0.5)
+        plt.xlim(left = obj.X_cg_fwd - 0.02, right = obj.X_cg_aft + 0.02)
         plt.xlabel(r"$\dfrac{x_{cg}}{\bar{c}}$", fontsize = 12, loc='right')
         plt.ylabel(r"$\dfrac{1}{W_{TO}}$",rotation = 0, fontsize = 12, loc='top')
         plt.grid()
         plt.legend(loc='upper center')
         # plt.title(f'Mass fraction vs X_cg/MAC for {obj.name}', loc='left')
+        plt.savefig('LoadingDiagram.png')
         plt.show()
 
     name_list = ['!' + name for name in name_list]
