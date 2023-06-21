@@ -8,8 +8,8 @@ import structures.wingbox_full as wb
 import flight_performance.simulation as fp
 import operations.sortie as op
 
-aircraft = UAV_final()
-# aircraft = UAV('aircraft')
+# aircraft = UAV_final()
+aircraft = UAV('aircraft')
 atm      = atmosphere()
 airfield = airport("Sudan")
 
@@ -63,15 +63,12 @@ while running:
 
     # op.operations_eval(aircraft)
 
-    # print(f"=================== MANUAL UPDATES-{n_iteration} =======================")
-    # aircraft.A = float(input("Wing aspect ratio: "))
-    # aircraft.taper = float(input("Wing taper ratio: "))
-    # aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
-    # print(f"=================================================\n")
+    print(f"=================== MANUAL UPDATES-{n_iteration} =======================")
+    aircraft.A = float(input("Wing aspect ratio: "))
+    aircraft.taper = float(input("Wing taper ratio: "))
+    aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
+    print(f"=================================================\n")
     
-    aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w
-    aircraft.W_TO = aircraft.W_F + aircraft.W_OE + aircraft.W_PL
-
     aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w
     aircraft.W_TO = aircraft.W_F + aircraft.W_OE + aircraft.W_PL
 

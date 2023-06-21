@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib import patches
 import pandas as pd
 
-def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load, MOF_specific, MOF=False, check_twist=False):
+def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_top_func, t_bot_func, a_func, b_func, t_stringer_func, load, MOF_specific, MOF=False, check_twist=False, check_deflection=False):
     def plot_wingbox(spanwise_pos):
         """
         Plot the wingbox of the aircraft
@@ -250,7 +250,7 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
     print(mat)
 
     #### CALCULATIONS ####
-    step_size = 0.00001          # [m] step size for integration
+    step_size = 0.0001          # [m] step size for integration
     ### Spanwise position ###
     spanwise_pos = np.linspace(0, ac.b/2, 1000)
     # split spanwise position in multiple parts based on ribs
@@ -908,11 +908,69 @@ def full_wingbox(n_stringers_func, n_ribs_func, t_f_spar_func, t_a_spar_func, t_
                     plt.title(f"Tip twist: {max_twist:.6f} rad")
                     plt.show()
 
+            if check_deflection and i == spanwise_pos[-1] and runs == 1:
+                # Calculate tip deflection
+                d2v_dy2 = -load[2]/(material[mat]['E']*10**9*Ixs)
+                dv_dy = cumulative_trapezoid(spanwise_pos, d2v_dy2, initial=0)
+                v = cumulative_trapezoid(spanwise_pos, dv_dy, initial=0)
+                max_pos_deflection = max(v)
+                max_neg_deflection = min(v)
+                if abs(max_pos_deflection) > abs(max_neg_deflection):
+                    max_deflection = max_pos_deflection
+                else:
+                    max_deflection = max_neg_deflection
+
+                # Calculate tip twist
+                dtheta_dy = load[3]/((material[mat]['E']*10**9/(2*(1+0.33)))*Js)
+                theta = cumulative_trapezoid(spanwise_pos, dtheta_dy, initial=0)
+                # find maximum twist, can be negative or positive
+                max_pos_twist = max(theta)
+                max_neg_twist = min(theta)
+                if abs(max_pos_twist) > abs(max_neg_twist):
+                    max_twist = max_pos_twist
+                else:
+                    max_twist = max_neg_twist
+                
+                # Plotting
+                if plot == True:
+                    plot_wingbox(i)
+
+                    plt.figure(constrained_layout=True)
+                    plt.subplot(221)
+                    plt.plot(spanwise_pos, Ixs, label='Ix')
+                    plt.plot(spanwise_pos, Iys, label='Iy')
+                    plt.plot(spanwise_pos, Js, label='Torsional constant')
+                    plt.ylabel('[m^4]')
+                    plt.legend()
+                    plt.grid()
+
+                    plt.subplot(222)
+                    plt.plot(spanwise_pos, xcs/chord(spanwise_pos), label='xc')
+                    plt.plot(spanwise_pos, ycs/chord(spanwise_pos), label='yc')
+                    plt.ylabel('Centroid [m]')
+                    plt.legend()
+                    plt.grid()
+
+                    plt.subplot(223)
+                    plt.plot(spanwise_pos, v)
+                    plt.xlabel('Spanwise location [m]')
+                    plt.ylabel('Tip deflection [m]')
+                    plt.grid()
+                    plt.title(f"Tip deflection: {max_deflection:.6f} m")
+
+                    plt.subplot(224)
+                    plt.plot(spanwise_pos, theta)
+                    plt.xlabel('Spanwise location [m]')
+                    plt.ylabel('Tip twist [rad]')
+                    plt.grid()
+                    plt.title(f"Tip twist: {max_twist:.6f} rad")
+                    plt.show()
+
     # Calculate weight
     weight = trapezoid(As, spanwise_pos)*material[mat]['density'] + w_ribs
 
-    # Overwrite strut location 
-    ac.x_strut = xcs[0]/chord(spanwise_pos)[0]
+    # # Overwrite strut location 
+    # ac.x_strut = xcs[0]/chord(spanwise_pos)[0]
     
     return weight, t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer, MOF_specific
 
@@ -949,13 +1007,18 @@ for i in range(len(n_ribs)):
         load = loading_custom
 
         weights[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_2, t_a_spar_func_2, t_top_func_2, t_bot_func_2, a_func_2, b_func_2, t_stringer_func_2, load, MOF_specific, False, True)
-        # print(t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3)
+        print(t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3)
+
+        load = loading_tension
+
+        weights[i][j], t_f_spar_func_4, t_a_spar_func_4, t_top_func_4, t_bot_func_4, a_func_4, b_func_4, t_stringer_func_4, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3, load, MOF_specific, False, False, True)
+        print(t_f_spar_func_4, t_a_spar_func_4, t_top_func_4, t_bot_func_4, a_func_4, b_func_4, t_stringer_func_4)
 
         # Run once more through compression and tension to get the MOFs
         load = loading_compression
-        a,b,c,d,e,f,g,h, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3, load, MOF_specific, True, False)
+        a,b,c,d,e,f,g,h, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3, load, MOF_specific, True)
         load = loading_tension
-        a,b,c,d,e,f,g,h, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3, load, MOF_specific, True, False)
+        a,b,c,d,e,f,g,h, MOF_specific = full_wingbox(n_stringers_g[i][j], n_ribs_g[i][j], t_f_spar_func_3, t_a_spar_func_3, t_top_func_3, t_bot_func_3, a_func_3, b_func_3, t_stringer_func_3, load, MOF_specific, True)
 
         MOF_specific.to_csv('MOF_specific.txt', sep=';')
         print(f"Done: {i*len(n_stringers)+j+1}/{len(n_ribs)*len(n_stringers)}")   

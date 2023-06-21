@@ -201,7 +201,7 @@ class UAV:
         self.X_cg_fwd = 0.0797611294848881              # Forward cg location CG/MAC [-]
         self.X_cg_OEW = 0.25
         self.X_cg_range = 0.3077572147730123          # Range of cg location CG/MAC [-]
-        self.x_strut = 0.48                 # strut location as fraction of chord @ spanwise position [-]
+        self.x_strut = self.xc_front_spar                 # strut location as fraction of chord @ spanwise position [-]
         # Y
         self.y_mac = 2.0607455240541293                # Spanwise location of the MAC [m]
         self.ystart_ail = 3.308             # start location of aileron measured from rootchord
@@ -465,7 +465,7 @@ class atmosphere:
 
 class UAV_final:
     def __init__(self):
-        parameters = open("finaldesign.csv", "r")
+        parameters = open("../finaldesign.csv", "r")
         lines = parameters.readlines()
         parameters.close()
         for line in lines[1:]:
