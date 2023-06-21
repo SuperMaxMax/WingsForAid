@@ -222,7 +222,7 @@ def all_wingbox(ac, ele_span, full_loop=False, opt_loop=False):
         torque = []
         
         # flexural axis assumption # -> replace 0.25 with front spar location variable, also add in location based on wingbox design -> for iteration
-        flex_ax = ac.x_strut
+        flex_ax = 0.468 #ac.x_strut
 
         # define moment arms
         cop = 0.25                      # chord from leading edge
@@ -505,7 +505,7 @@ def all_wingbox(ac, ele_span, full_loop=False, opt_loop=False):
         if full_loop or opt_loop:
             step_size = 0.0001          # [m] step size for integration
         else:
-            step_size = 0.00001
+            step_size = 0.0001
         ### Spanwise position ###
         spanwise_pos = np.linspace(0, ac.b/2, ele_span)
         # split spanwise position in multiple parts based on ribs
@@ -1135,8 +1135,8 @@ def all_wingbox(ac, ele_span, full_loop=False, opt_loop=False):
         # Calculate weight
         weight = trapezoid(As, spanwise_pos)*material[mat]['density'] + w_ribs
 
-        # Overwrite strut location 
-        ac.x_strut = xcs[0]/chord(spanwise_pos)[0]
+        # # Overwrite strut location 
+        # ac.x_strut = xcs[0]/chord(spanwise_pos)[0]
         
         return weight, t_f_spar, t_a_spar, t_top, t_bot, a, b, t_stringer
 
