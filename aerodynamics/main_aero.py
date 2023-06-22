@@ -9,17 +9,22 @@ import aerodynamics.drag_estimation as de
 import numpy as np
 import matplotlib.pyplot as plt
 import copy
+import scipy.integrate as integrate
 
 def run_aero(aircraft):
-    print(aircraft.tipchord, 'taper before')
     plt.figure()
     tapers = np.arange(0.1,1.1,0.1)
     for taper in tapers:
         aircraft_temp = copy.deepcopy(aircraft)
-        print(aircraft.tipchord, 'taper of temp aircraft')
         x, y = wp.main_wing_planform(aircraft_temp, taper)
-        print(aircraft.tipchord, 'taper of temp aircraft after')
         plt.plot(x, y, label = f"taper = {taper}")
+
+    u = 0
+    v = 0
+    a = aircraft.b/2
+    b = -integrate.simps(y,x)*4/np.pi/a
+    t = np.linspace(0, 0.5*np.pi, 30)
+    plt.plot(u+a*np.cos(t), v+b*np.sin(t), label = "Elliptical Lift Distribution", color = 'k', linestyle = 'dashed', linewidth=2)
     plt.legend()
     plt.show()
 
