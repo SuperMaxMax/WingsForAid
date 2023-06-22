@@ -5,6 +5,7 @@ import numpy as np
 import aerodynamics.main_aero as ae
 import control_stability.main_stab_cont as cs
 import structures.wingbox_full as wb
+import structures.fuselage_fairing_buckling as ffb
 import flight_performance.simulation as fp
 import operations.sortie as op
 
@@ -13,7 +14,7 @@ aircraft = UAV('aircraft')
 atm      = atmosphere()
 airfield = airport("Sudan")
 
-index_df = ["MTOW", "OEW", "Fuel weight", "Tail weight", "Wing weight"]
+index_df = ["MTOW", "OEW", "Fuel weight", "Tail weight", "Wing weight", "Fuselage weight"]
 df_iterations = pd.DataFrame(index = index_df)
 
 # start
@@ -54,6 +55,10 @@ while running:
         else:
             wb.all_wingbox(aircraft, ele_span, False)
     print("================================================\n")
+
+    print(f"=================== FFB-{n_iteration} =======================")
+    ffb.fuselage_fairing(aircraft)
+    print("================================================\n")
     
     print(f"=================== FP-{n_iteration} =======================")
     aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
@@ -77,7 +82,7 @@ while running:
     
     aircraft.Sw = ((aircraft.W_OE + aircraft.W_F + aircraft.n_boxes*aircraft.boxweight)*atm.g)/aircraft.WS
 
-    df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w]
+    df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w, aircraft.ST_W_fus]
 
     print(f"================= GENERAL-INFO ==================")
     print(df_iterations)
