@@ -180,7 +180,6 @@ def zero_liftdrag(aircraft):
     #drag_info = drag_info.round(3)
     #print(drag_info)
 
-    drag_info.col.apply(lambda x: round(x, 3 - int(np.floor(np.log10(abs(x))))))
     drag_info.to_csv('drag_estimation.csv', index=True)
 
     #Plotting drag polar
