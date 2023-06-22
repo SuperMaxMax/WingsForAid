@@ -264,7 +264,7 @@ def horizontal_tail_planform(aircraft):
         if not full_print:
             return abs(C_L_wing - C_L_h)
         elif full_print:
-            return AR, b, Lambda, alpha_twist, S, CL_a_h, i_w  #choose whatever
+            return AR, b, Lambda, alpha_twist, S, CL_a_h, i_w, CD_induced, span_eff, MAC, airfoildata.index.tolist() #choose whatever
 
     airfoildata = airfoil_select(required_lift(aircraft)[0], 0)
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
@@ -272,7 +272,7 @@ def horizontal_tail_planform(aircraft):
 
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     #print('pppppppp', a_h_optimal,type(a_h_optimal))
-    AR, b, Lambda, alpha_twist, S, CL_a_v, i_w_v  = plot_lift_distr(a_h_optimal, full_print = True)
+    AR, b, Lambda, alpha_twist, S, CL_a_v, i_w_v, CD_induced, C_L_h, span_eff, MAC, airfoil  = plot_lift_distr(a_h_optimal, full_print = True)
 
     # Vertical tailplane
         #self.AE_Vv_V = 1                       # [-] Ratio betweeen velocity at vertical tail and free-stream velocity
@@ -297,4 +297,8 @@ def horizontal_tail_planform(aircraft):
     # aircraft.W_v = S * MAC_length * 0.09 * 2680 * 0.07 * (AR / np.cos(aircraft.sweep_co4_v))**0.6*Lambda**0.04*V_v**0.2*aircraft.C_r_C_v**0.4
     aircraft.W_v = ((aircraft.AE_b_v * (aircraft.AE_rootchord_v + aircraft.AE_tipchord_v) / 2) / (aircraft.b * (aircraft.rootchord + aircraft.tipchord) / 2)) * 0.5 * aircraft.W_w
     aircraft.W_t = 1.6 * (aircraft.W_h + aircraft.W_v) # 20% Margin
-#horizontal_tail_planform(object)
+    aircraft.AE_CD_i_v = CD_induced
+    aircraft.AE_CL_cruise_v = C_L_h
+    aircraft.AE_e_v = span_eff
+    aircraft.AE_MAC_v = MAC
+    aircraft.AE_airfoil_h = airfoil
