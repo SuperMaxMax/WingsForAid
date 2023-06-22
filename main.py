@@ -93,9 +93,8 @@ while running:
     n_iteration += 1
 
 if theo:
-    fp.fuelusesortie(aircraft, atm, aircraft.n_boxes, aircraft.OP_n_drops, aircraft.h_cruise / 0.3048, aircraft.W_F, None,
-                        aircraft.OP_Range, aircraft.OP_droprange, True,
-                        False, False)
+    fp.fuelusesortie(aircraft, atm, aircraft.n_boxes, 1, aircraft.h_cruise / 0.3048, aircraft.W_F, 54.012,
+                        aircraft.OP_Range, Summary=True, plot = True)            
     op.operations_eval(aircraft)
 
 # # --- saving
