@@ -13,7 +13,7 @@ import time
 # Import other files
 from parameters import UAV, airport, atmosphere, UAV_final
 
-aircraft = UAV_final()
+#aircraft = UAV_final()
 # airfield = airport("Sudan")
 atm      = atmosphere()
 hp_to_watt = 745.699872
@@ -731,7 +731,6 @@ def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     return t, x, W_F_used, h
 
 def loiter(ac_obj, atm_obj, h_loiter, t_loiter, W0, standardrate, goback = True, result = False):
-    h_loiter *= 0.3048
     CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD_opt  = dragpolar(ac_obj, CL_opt)
     p, rho  = atm_parameters(atm_obj, h_loiter)[0], atm_parameters(atm_obj, h_loiter)[2]
@@ -1117,7 +1116,6 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     #ac_obj.Wf = W_F_used
 
     return W_F_used, flight_profile
-fuelusesortie(aircraft, atm, 12, 2, 10000, aircraft.W_F, 54.012, Range = 250, dropregion = 50, Summary=True, plot=True, savefig=True)
 
 def endurance(ac_obj, atm_obj, h_loiter, summary = False):
     W_F  = ac_obj.fuelcapacity*ac_obj.fueldensity                   # Max fuel
@@ -1165,3 +1163,125 @@ def endurance(ac_obj, atm_obj, h_loiter, summary = False):
         print(f"Fuel remaining: {round(W_F, 2)} [kg]")
         print("======================================================================")
     return round(t/3600, 2)
+
+def surveillancemission(ac_obj, atm_obj, n_boxes, h_cruise, h_loiter, W_F, V_cruise, Range, t_loiter, summary = False, plot = False):
+    Range *= 1000
+    if h_loiter > 5000:
+        h_loiter *= 0.3048
+    if h_cruise > 5000:
+        h_cruise *= 0.3048
+    CL_opt  = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD_opt  = dragpolar(ac_obj, CL_opt)
+    LD_max  = CL_opt/CD_opt
+    W_F_0   = W_F
+    W_TO    = ac_obj.W_OE + W_F + n_boxes * ac_obj.boxweight                             # Loiter mission so no payload
+    t   = 0.0
+    dt  = 1.0
+    h   = 15.0
+    x   = 0.0
+    W_F_used= 0.0
+    x_plot  = 0.0
+    x_arr   = np.array([x_plot])
+    h_arr   = np.array([h])
+    W_a_TO  = W_TO * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2
+    W_F_used+= W_TO - W_a_TO
+    W_F     -= W_TO - W_a_TO
+    W       = W_a_TO
+    t_cl, x_cl, W_F_used_cl, h = climbmaneuver(ac_obj, atm_obj, h, h_cruise, W)
+    t += t_cl
+    x += x_cl
+    x_plot  += x_cl
+    W_F_used+= W_F_used_cl
+    W_F     -= W_F_used_cl
+    W       -= W_F_used_cl
+    x_arr   = np.append(x_arr, x_plot)
+    h_arr   = np.append(h_arr, h)
+    d_to_loiter = Range - x_cl
+    if h_cruise != h_loiter:
+        cruisedist = d_to_loiter - (h_cruise - h_loiter) * LD_max
+    else:
+        cruisedist = d_to_loiter
+    t_cr, W_F_used_cr, cruiseNAT = cruisecalc(ac_obj, atm_obj, h_cruise, cruisedist, W, V_cruise)
+    t += t_cr
+    x += cruisedist
+    x_plot  += cruisedist
+    W_F_used+= W_F_used_cr
+    W_F     -= W_F_used_cr
+    W       -= W_F_used_cr
+    x_arr   = np.append(x_arr, x_plot)
+    h_arr   = np.append(h_arr, h)
+    if h_cruise != h_loiter:
+        t_des_tl, x_des_tl, W_F_used_tl, h = descentmaneuver(ac_obj, atm_obj, h_cruise, h_loiter, W)
+        t += t_des_tl
+        x += x_des_tl
+        x_plot += x_des_tl
+        W_F_used += W_F_used_tl
+        W_F      -= W_F_used_tl
+        W        -= W_F_used_tl
+        x_arr   = np.append(x_arr, x_plot)
+        h_arr   = np.append(h_arr, h)
+    t_loit, W_F_used_loit = loiter(ac_obj, atm_obj, h_loiter, t_loiter, W, 1, goback = True)
+    t += t_loit
+    W_F_used += W_F_used_loit
+    W_F      -= W_F_used_loit
+    W        -= W_F_used_loit
+    x_arr   = np.append(x_arr, x_plot)
+    h_arr   = np.append(h_arr, h)
+    if h_cruise != h_loiter:
+        t_cl_fl, x_cl_fl, W_F_used_cl_fl, h = climbmaneuver(ac_obj, atm_obj, h, h_cruise, W)
+        t += t_cl_fl
+        x += x_cl_fl
+        x_plot -= x_cl_fl
+        W_F_used += W_F_used_cl_fl
+        W_F      -= W_F_used_cl_fl
+        W        -= W_F_used_cl_fl
+        x_arr   = np.append(x_arr, x_plot)
+        h_arr   = np.append(h_arr, h)
+    d_cruise_back = x_plot - LD_max * h_cruise
+    t_cr_b, W_F_used_cr_b, cruiseNAT = cruisecalc(ac_obj, atm_obj, h_cruise, d_cruise_back, W, V_cruise)
+    t += t_cr_b
+    x += d_cruise_back
+    x_plot -= d_cruise_back
+    W_F_used += W_F_used_cr_b
+    W_F      -= W_F_used_cr_b
+    W        -= W_F_used_cr_b
+    x_arr   = np.append(x_arr, x_plot)
+    h_arr   = np.append(h_arr, h)
+    t_des_RTB, x_des_RTB, W_F_used_des_RTB, h = descentmaneuver(ac_obj, atm_obj, h_cruise, 15.0, W)
+    t += t_des_RTB
+    x += x_des_RTB
+    x_plot -= x_des_RTB
+    W_F_used += W_F_used_des_RTB
+    W_F      -= W_F_used_des_RTB
+    W        -= W_F_used_des_RTB
+    x_arr   = np.append(x_arr, x_plot)
+    h_arr   = np.append(h_arr, h)
+    W_beforelanding = W
+    W *= ac_obj.WfinalW10
+    W_F_used += W_beforelanding - W
+    W_F      -= W_beforelanding - W
+    if summary:
+        print("============================================================")
+        print(f"Flight time: {round(t/3600, 2)} [hr] of which {round(t_loiter/3600, 2)} [hr] of loitering")
+        print(f"Fuel used: {round(W_F_used, 2)} [kg] | Fuel remaining: {round(W_F, 2)} [kg]")
+        print(f"Horizontal distance flown: {round(x/1000, 2)} [km]")
+        print("============================================================")
+    if plot:
+        plt.plot(x_arr/1000, h_arr)
+        plt.xlabel("Horizontal distance [km]")
+        plt.ylabel("Altitude [m]")
+        plt.savefig("C:\\Users\\ties\\Downloads\\flightprofile-loitermission-Range-"+str(Range))
+        plt.show()
+
+#surveillancemission(aircraft, atm, 0, 10000, 5500, aircraft.W_F + 5, 54.012, Range = 150, t_loiter = 3600, summary=True, plot=True)
+    
+
+    
+
+    
+    
+
+
+
+
+
