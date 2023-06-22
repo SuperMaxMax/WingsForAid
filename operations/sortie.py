@@ -74,7 +74,6 @@ def operations_eval(ac):
     ac.N_sortie_per_day = N_sortie_per_day
     ac.OP_TTFD = TTFD
 
-    ac.T_sortie = T_sortie
     ac.T_fh_sortie = T_s/3600
     ac.T_fhTFD = TTFD_s/3600
     ac.Vol_F_per_sortie = Vol_Fs
@@ -128,7 +127,7 @@ if __name__ == '__main__':
         ac.n_boxes -= 1
 
     # operations_eval(AC)
-    TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, ac.W_F, None,
-                                          AC.OP_Range, AC.OP_droprange, True,
-                                          False, False)
+    # TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, ac.W_F, None,
+    #                                       AC.OP_Range, AC.OP_droprange, True,
+    #                                       False, False)
     operations_eval(ac)

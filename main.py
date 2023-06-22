@@ -1,4 +1,4 @@
-from parameters import UAV_final, atmosphere, airport, UAV
+from parameters import UAV, atmosphere, airport
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,6 +19,7 @@ df_iterations = pd.DataFrame(index = index_df)
 # start
 plot = True
 jan = False
+theo = True
 
 n_iteration = 1
 running = True
@@ -61,20 +62,18 @@ while running:
     fp.LA_eom(aircraft, airfield, atm, -8, 4000, 12.86, -5.14, 5, Plot = False)
     print("=================================================\n")
 
-    # op.operations_eval(aircraft)
-
     print(f"=================== MANUAL UPDATES-{n_iteration} =======================")
     aircraft.A = float(input("Wing aspect ratio: "))
     aircraft.taper = float(input("Wing taper ratio: "))
     aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
     print(f"=================================================\n")
-    
+
     aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w
     aircraft.W_TO = aircraft.W_F + aircraft.W_OE + aircraft.W_PL
 
     if np.abs((aircraft.W_OE + aircraft.W_F - W_check)/W_check) < 0.001:
         running = False
-    
+
     aircraft.Sw = ((aircraft.W_OE + aircraft.W_F + aircraft.n_boxes*aircraft.boxweight)*atm.g)/aircraft.WS
 
     df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w]
@@ -88,6 +87,11 @@ while running:
 if jan: #Jan's path is linked in avl so otherwise code breaks
     import aerodynamics.avl as avl
     avl.export(aircraft)
+if theo:
+    fp.fuelusesortie(aircraft, atm, aircraft.n_boxes, aircraft.n_drops, aircraft.h_cruise / 0.3048, aircraft.W_F, None,
+                        aircraft.OP_Range, aircraft.OP_droprange, True,
+                        False, False)
+    op.operations_eval(aircraft)
 
 # # --- saving
 df = pd.DataFrame()
