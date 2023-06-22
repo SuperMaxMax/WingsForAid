@@ -68,8 +68,10 @@ while running:
     print("=================================================\n")
 
     print(f"=================== MANUAL UPDATES-{n_iteration} =======================")
-    aircraft.A = float(input("Wing aspect ratio: "))
-    aircraft.taper = float(input("Wing taper ratio: "))
+    if jan: #Jan's path is linked in avl so otherwise code breaks
+        import aerodynamics.avl as avl
+        avl.export(aircraft)
+
     aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
     print(f"=================================================\n")
 
@@ -89,9 +91,6 @@ while running:
 
     n_iteration += 1
 
-if jan: #Jan's path is linked in avl so otherwise code breaks
-    import aerodynamics.avl as avl
-    avl.export(aircraft)
 if theo:
     fp.fuelusesortie(aircraft, atm, aircraft.n_boxes, aircraft.OP_n_drops, aircraft.h_cruise / 0.3048, aircraft.W_F, None,
                         aircraft.OP_Range, aircraft.OP_droprange, True,
