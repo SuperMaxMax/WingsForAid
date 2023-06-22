@@ -13,7 +13,7 @@ import time
 # Import other files
 from parameters import UAV, airport, atmosphere, UAV_final
 
-aircraft = UAV_final()
+# aircraft = UAV_final()
 # airfield = airport("Sudan")
 atm      = atmosphere()
 hp_to_watt = 745.699872
@@ -99,7 +99,7 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
     print(f"This calculation took {end_time-start_time} seconds")
     return
 
-def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
+def flightceiling(ac_obj, atm_obj, W_F, plot=False, result = False):
     W   = ac_obj.W_TO * atm_obj.g
     h   = 0.0
     Pa  = ac_obj.power * ac_obj.prop_eff * 735.49875
@@ -1163,7 +1163,7 @@ def endurance(ac_obj, atm_obj, h_loiter, summary = False):
         print(f"Fuel remaining: {round(W_F, 2)} [kg]")
         print("======================================================================")
     return round(t/3600, 2)
-endurance(aircraft, atm, 1524, summary=True)
+# endurance(aircraft, atm, 1524, summary=True)
 
 def surveillancemission(ac_obj, atm_obj, n_boxes, h_cruise, h_loiter, W_F, V_cruise, Range, t_loiter, summary = False, plot = False):
     Range *= 1000
