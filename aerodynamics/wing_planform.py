@@ -286,13 +286,10 @@ def main_wing_planform(aircraft, taper_input):
     aircraft.AE_airfoil_w = "4415"
 
     #print('afoqwbqlbng', aircraft.y_mac, aircraft.x_lemac, aircraft.sweep_LE, aircraft.MAC_length)
-    x_plot = [','.join([str(x) for x in y_s])]
-    y_plot = [','.join([str(x) for x in l])]
+    x_plot = y_s #[','.join([str(x) for x in y_s])]
+    y_plot = l#[','.join([str(x) for x in l])]
 
     return x_plot, y_plot
-
-aircraft = UAV("aircraft")
-main_wing_planform(aircraft)
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 
