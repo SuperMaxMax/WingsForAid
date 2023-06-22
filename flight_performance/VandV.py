@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ========== Import other files =============
+# =========== Import other files ============
 import flight_performance.simulation as fp
 from parameters import UAV, atmosphere, airport, UAV_final, Cessna_172
 
@@ -16,6 +16,7 @@ from parameters import UAV, atmosphere, airport, UAV_final, Cessna_172
 aircraft = UAV_final()
 atm      = atmosphere()
 Cessna   = Cessna_172("tractor", braced_wing=True, boom=False)
+hptowatt = 745.699872
 
 # ========= V&V sortie simulation ===========
 def VV_sortiesim_expected(ac_obj, atm_obj, plot = False):
@@ -224,6 +225,75 @@ def VV_sortiesim_boundary(ac_obj, atm_obj):
     print(f"Sortie 12 boxes 6  drops Range 250 [km] Dropregion 200 km | W_F_used: {round(sortie_largedz[0], 2)} [kg], sortie time: {round(sortie_largedz[2]/3600, 2)} [hr]")
     print("======================================================")
 
+def VV_flightceiling(ac_obj, atm_obj, summary = False, plot = False):
+    test_pass = False
+    # Compare optimum climb CL with CL max (Pr_min)
+    CL_opt = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD_opt = fp.dragpolar(ac_obj, CL_opt)
+    CL_max = ac_obj.CL_max_clean
+    # Find maximum climbrates
+    V_sl_opt_MTOW   = np.sqrt(2*ac_obj.W_TO*atm_obj.g / (atm_obj.rho0 * ac_obj.Sw * CL_opt))
+    V_sl_opt_empt   = np.sqrt(2*(ac_obj.W_OE + ac_obj.fuelcapacity * ac_obj.fueldensity)*atm_obj.g / (atm_obj.rho0 * ac_obj.Sw * CL_opt))
+    Pr_sl_opt_TOW   = 1/2 * atm_obj.rho0 * V_sl_opt_MTOW**3 * ac_obj.Sw * CD_opt
+    Pr_sl_opt_emp   = 1/2 * atm_obj.rho0 * V_sl_opt_empt**3 * ac_obj.Sw * CD_opt
+    ROC_max_MTOW    = (ac_obj.power * 745.699872 * ac_obj.prop_eff - Pr_sl_opt_TOW) / (ac_obj.W_TO * atm_obj.g)
+    ROC_max_empt    = (ac_obj.power * 745.699872 * ac_obj.prop_eff - Pr_sl_opt_emp) / ((ac_obj.W_OE + ac_obj.fuelcapacity * ac_obj.fueldensity) * atm_obj.g)
+    WP_MTOW         = (ac_obj.W_TO * atm_obj.g) / (ac_obj.power * 745.699872 * ac_obj.prop_eff)
+    WP_empt         = (ac_obj.W_OE + ac_obj.fuelcapacity * ac_obj.fueldensity) * atm_obj.g / (ac_obj.power* 745.699872 * ac_obj.prop_eff)
+    if 3.5 <= ROC_max_MTOW <= 6.0:
+        if np.abs(ROC_max_empt/ROC_max_MTOW - WP_empt/WP_MTOW) < 0.25:
+            test_pass = True
+    ROC = ROC_max_MTOW
+    W   = ac_obj.W_TO
+    h   = 0.0
+    t   = 0.0
+    dt  = 1.0
+    h_arr   = np.array([h])
+    ROC_arr = np.array([ROC])
+    t_arr   = np.array([t])
+    W_arr   = np.array([W])
+    while ROC > 0.508:
+        p, rho  = fp.atm_parameters(atm_obj, h)[0], fp.atm_parameters(atm_obj, h)[2]
+        Pa      = ac_obj.power * hptowatt * p/atm_obj.p0 * ac_obj.prop_eff
+        V       = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
+        Pr      = 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
+        ROC     = (Pa - Pr) / (W*atm_obj.g)
+        Pbr     = Pa / ac_obj.prop_eff
+        FF      = Pbr * ac_obj.SFC
+        W       -= FF * dt
+        h       += ROC * dt
+        t       += dt
+        h_arr   = np.append(h_arr, h)
+        ROC_arr = np.append(ROC_arr, ROC)
+        t_arr   = np.append(t_arr, t)
+        W_arr   = np.append(W_arr, W)
+    if plot:
+        fig, axes = plt.subplots(nrows = 3, ncols = 1)
+        axes[0].plot(h_arr, ROC_arr, 'r')
+        axes[0].set_title("Rate of climb versus altitude")
+        axes[0].set_xlabel("Altitude [m]")
+        axes[0].set_ylabel("Rate of climb [m/s]")
+        axes[1].plot(t_arr, h_arr, 'g')
+        axes[1].set_title("Altitude versus time")
+        axes[1].set_xlabel("time [sec]")
+        axes[1].set_ylabel("Altitude [m]")
+        axes[2].plot(t_arr, W_arr, 'r')
+        axes[2].set_title("Weight versus time")
+        axes[2].set_xlabel("time [sec]")
+        axes[2].set_ylabel("Weight [kg]")
+        plt.tight_layout()
+        plt.show()
+    if summary:
+        print("==========================================================================")
+        print(f"Optimum CL: {round(CL_opt, 2)} [-] | CL_max: {CL_max} [-] | Difference: {round(CL_max - CL_opt, 2)} [-]")
+        print(f"Vy at MTOW: {round(V_sl_opt_MTOW, 2)} [m/s] | Vy at ferry configuration: {round(V_sl_opt_empt, 2)} [m/s]")
+        print(f"Max rate of climb at MTOW: {round(ROC_max_MTOW,2)} [m/s] | Max rate of climb at ferry configuration: {round(ROC_max_empt, 2)} [m/s]")
+        print(f"W/P at MTOW: {round(WP_MTOW, 2)} [N/W] | W/P at ferry configuration: {round(WP_empt, 2)} [N/W]")
+        print(f"The service ceiling is {round(np.max(h_arr)/0.3048, 2)} [ft]")
+        print("==========================================================================")
+    return test_pass
+# VV_flightceiling(aircraft, atm, summary=True, plot=True)
+
 def Cessnacomparison(ac_obj, atm_obj, h_cruise, V_cruise, result = False):
     h_cruise *= 0.3048
     V_cruise *= 0.5144
@@ -270,5 +340,5 @@ def Cessnacomparison(ac_obj, atm_obj, h_cruise, V_cruise, result = False):
         print(f"Sortie time: {round(t/3600, 2)} [hr]")
         print("============================================================")
     return 
-
 # Cessnacomparison(Cessna, atm, 10000, 115, result=True)
+
