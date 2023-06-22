@@ -201,7 +201,7 @@ class UAV:
         self.X_cg_fwd = 0.0797611294848881              # Forward cg location CG/MAC [-]
         self.X_cg_OEW = 0.25
         self.X_cg_range = 0.3077572147730123          # Range of cg location CG/MAC [-]
-        self.x_strut = 0.48                 # strut location as fraction of chord @ spanwise position [-]
+        self.x_strut = self.xc_front_spar                 # strut location as fraction of chord @ spanwise position [-]
         # Y
         self.y_mac = 2.0607455240541293                # Spanwise location of the MAC [m]
         self.ystart_ail = 3.308             # start location of aileron measured from rootchord
@@ -325,7 +325,7 @@ class UAV:
         "Operations parameters"                 # NOTE: Add identifier "OP_" before variable names
         # inputs
         self.OP_n_app_max = 3                   # [g]
-        # self.n_drops = 2
+        self.OP_n_drops = 2
         self.n_boxes = 12
         self.OP_Range = 250
         self.OP_droprange = 10

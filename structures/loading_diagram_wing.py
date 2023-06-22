@@ -17,7 +17,7 @@ def plot_diagrams(Ay, Az, By, Bz, load_case, normal, shear, moment, torque):
     fig = plt.figure(constrained_layout=True)
     gs = fig.add_gridspec(4, 2)
     f_ax1 = fig.add_subplot(gs[:, 0])
-    plt.rcParams.update({'font.size': 22})
+    plt.rcParams.update({'font.size': 18})
 
     # Plot forces
     f_ax1.plot(y_span, -spanwise_wing_weight(y_span), label='Wing weight')
@@ -188,7 +188,7 @@ for k in range(3):
     torque = []
     
     # flexural axis assumption # -> replace 0.25 with front spar location variable, also add in location based on wingbox design -> for iteration
-    flex_ax = ac.x_strut
+    flex_ax = 0.468 # ac.x_strut
 
     # define moment arms
     cop = 0.25                      # chord from leading edge
