@@ -9,7 +9,6 @@ class UAV:
         # B
         # self.BHP_cruise = 76.3436
         # self.CL_land = 1.6529               # [-]
-        self.b = 9.620022329579792            # Wing span [m]
         # self.b_v = 1.60                     # Vertical tail span [m] NOTE: Is this value updated during design vertical tail?
         # self.boom = True                    # Boom, true if boom tail is implemented
         # self.bot_clearance = 0.1            # Bottom clearance [m]
@@ -91,7 +90,6 @@ class UAV:
         # self.N_e = 1                        # Number of engines [-]
         self.n_boxes = 12                     # [-]
         self.n_boxes_abreast = 2              # [-]
-        #
         # self.n_drops = 6                    # [-]
         # self.n_rows = 6                     # [-]
         self.name = name                      # Name of the aircraft
@@ -133,6 +131,8 @@ class UAV:
         self.sweep_co4_v = 35 / 180 * np.pi
         self.sweep_LE_v = 0.685533470761878
 
+        self.b = (self.A*self.Sw)**0.5 #9.620022329579792            # Wing span [m]
+
         # T
         # self.T0 = 288.15                    # Sea level temperature [K]
         # self.TOP_req = 250 
@@ -173,8 +173,8 @@ class UAV:
         self.W_t = 18.647695670124357               # Tail weight [kg]                                  variable -> needs to be implemented
         self.W_strut = 3.61*2                       # Weight of 2 struts [kg]                           constant
         self.ST_W_fus_truss = 54.6                  # Mass of fuselage structure (only) [kg]            constant
-        self.ST_W_fus_fairing = 25.5286             # Mass of fuselage fairing [kg]                     constant
-        self.ST_W_fus = self.ST_W_fus_truss + self.ST_W_fus_fairing #Built up off truss and fairing     constant
+        self.ST_W_fus_fairing_tot = 25.5286             # Mass of fuselage fairing [kg]                     constant
+        self.ST_W_fus = self.ST_W_fus_truss + self.ST_W_fus_fairing_tot #Built up off truss and fairing     constant
         # self.W_fus = 116.507                      # Fuselage weight [kg]                              constant  
         self.ST_W_boom = 12                         # Mass of tail boom, given it is 2.8 m long [kg]    constant
         # self.W_boom = 20.3                        # Boom weight [kg]                                  constant
@@ -326,7 +326,7 @@ class UAV:
         "Operations parameters"                 # NOTE: Add identifier "OP_" before variable names
         # inputs
         self.OP_n_app_max = 3                   # [g]
-        self.OP_n_drops = 2
+        # self.n_drops = 2
         self.n_boxes = 12
         self.OP_Range = 250
         self.OP_droprange = 10
