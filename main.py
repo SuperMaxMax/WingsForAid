@@ -82,6 +82,7 @@ while running:
         running = False
 
     aircraft.Sw = ((aircraft.W_OE + aircraft.W_F + aircraft.n_boxes*aircraft.boxweight)*atm.g)/aircraft.WS
+    aircraft.b = np.sqrt(aircraft.A*aircraft.Sw)
 
     df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w, aircraft.ST_W_fus]
 
