@@ -13,7 +13,7 @@ import time
 # Import other files
 from parameters import UAV, airport, atmosphere, UAV_final
 
-aircraft = UAV_final()
+#aircraft = UAV_final()
 # airfield = airport("Sudan")
 atm      = atmosphere()
 hp_to_watt = 745.699872
@@ -1273,7 +1273,7 @@ def surveillancemission(ac_obj, atm_obj, n_boxes, h_cruise, h_loiter, W_F, V_cru
         plt.savefig("C:\\Users\\ties\\Downloads\\flightprofile-loitermission-Range-"+str(Range))
         plt.show()
 
-surveillancemission(aircraft, atm, 0, 10000, 5500, aircraft.W_F + 5, 54.012, Range = 150, t_loiter = 3600, summary=True, plot=True)
+#surveillancemission(aircraft, atm, 0, 10000, 5500, aircraft.W_F + 5, 54.012, Range = 150, t_loiter = 3600, summary=True, plot=True)
     
 
     

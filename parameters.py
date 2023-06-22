@@ -91,6 +91,7 @@ class UAV:
         # self.N_e = 1                        # Number of engines [-]
         self.n_boxes = 12                     # [-]
         self.n_boxes_abreast = 2              # [-]
+        #
         # self.n_drops = 6                    # [-]
         # self.n_rows = 6                     # [-]
         self.name = name                      # Name of the aircraft
@@ -325,7 +326,7 @@ class UAV:
         "Operations parameters"                 # NOTE: Add identifier "OP_" before variable names
         # inputs
         self.OP_n_app_max = 3                   # [g]
-        # self.n_drops = 2
+        self.OP_n_drops = 2
         self.n_boxes = 12
         self.OP_Range = 250
         self.OP_droprange = 10
