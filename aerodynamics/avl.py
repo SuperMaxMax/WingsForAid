@@ -65,7 +65,7 @@ rho = 0.904637
 SURFACE
 wing
 #Horseshoe Vortex Distribution
-""",10, ' ', 1.0, ' ' ,   20, ' ' ,   1.0, ' ' , """   ! Nchord   Cspace   Nspan  Sspace
+""",20, ' ', 1.0, ' ' ,   40, ' ' ,   1.0, ' ' , """   ! Nchord   Cspace   Nspan  Sspace
 #
 # reflect image wing about y=0 plane
 YDUPLICATE
@@ -141,7 +141,7 @@ NACA
 #
 SURFACE
 H-Stab
-""",8, ' ' ,   1.0, ' ' ,   5, ' ' ,   1.0,"""  !  Nchord   Cspace
+""",16, ' ' ,   1.0, ' ' ,   10, ' ' ,   1.0,"""  !  Nchord   Cspace
 #
 # reflect image wing about y=0 plane
 YDUPLICATE
@@ -149,7 +149,7 @@ YDUPLICATE
 
 # twist angle bias for whole surface
 ANGLE
-    """,aircraft.i_w_h,"""  
+    """,aircraft.i_w_h*180*np.pi,"""  
 
 # x,y,z bias for whole surface
 TRANSLATE
@@ -184,7 +184,7 @@ elevator  """,1.0, ' ' ,     0.001, ' ' ,     0.0, ' ' ,  1.0, ' ' ,  0.0, ' ' ,
 #
 SURFACE
 V-Stab
-""",8, ' ' ,   1.0, ' ' ,   10, ' ' ,   aircraft.xc_aft_spar,"""  ! Nchord   Cspace
+""",16, ' ' ,   1.0, ' ' ,   20, ' ' ,   aircraft.xc_aft_spar,"""  ! Nchord   Cspace
 
 # twist angle bias for whole surface
 ANGLE
@@ -201,8 +201,8 @@ SECTION
 NACA 
 0012
 
-#CONTROL
-#rudder    """,1.0, ' ' ,     0.40, ' ' ,    0.0, ' ' ,  0.0, ' ' ,  1.0,"""
+CONTROL
+rudder    """,1.0, ' ' ,     0.40, ' ' ,    0.0, ' ' ,  0.0, ' ' ,  1.0,"""
 #-----------------Upper Section----------------------
 SECTION
 """,np.tan(aircraft.sweep_LE_v) * aircraft.AE_b_v, ' ' ,           0.0, ' ' ,         aircraft.AE_b_v, ' ' ,         aircraft.AE_tipchord_v, ' ' ,       0.000*180/np.pi,"""  
@@ -210,8 +210,8 @@ SECTION
 NACA
 0012
 
-#CONTROL
-#rudder    """,1.0, ' ' ,     0.40, ' ' ,     0.0, ' ' ,  0.0, ' ' ,  1.0,"""
+CONTROL
+rudder    """,1.0, ' ' ,     0.40, ' ' ,     0.0, ' ' ,  0.0, ' ' ,  1.0,"""
 #==============================================================
 
 #Created by Jan Vonken 10-06-2023"""
