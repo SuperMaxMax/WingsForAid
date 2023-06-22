@@ -91,7 +91,7 @@ class UAV:
         # self.N_e = 1                        # Number of engines [-]
         self.n_boxes = 12                     # [-]
         self.n_boxes_abreast = 2              # [-]
-        # self.n_drops = 6                    # [-]
+        self.n_drops = 2                    # [-]
         # self.n_rows = 6                     # [-]
         self.name = name                      # Name of the aircraft
         # self.nose_gear_type = 'fixed'       # Type of nose gear: "fixed" or "retractable"
@@ -465,7 +465,7 @@ class atmosphere:
 
 class UAV_final:
     def __init__(self):
-        parameters = open("finaldesign.csv", "r")
+        parameters = open("../finaldesign.csv", "r")
         lines = parameters.readlines()
         parameters.close()
         for line in lines[1:]:
