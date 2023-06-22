@@ -13,11 +13,10 @@ import time
 # Import other files
 from parameters import UAV, airport, atmosphere, UAV_final
 
-# aircraft = UAV("aircraft")
+aircraft = UAV_final()
 # airfield = airport("Sudan")
 atm      = atmosphere()
 hp_to_watt = 745.699872
-final_aircraft = UAV_final()
 
 def takeoffweight(obj, W_F):
     ZFW = obj.W_OE + obj.n_boxes*obj.boxweight
@@ -100,13 +99,13 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
     print(f"This calculation took {end_time-start_time} seconds")
     return
 
-def flightceiling(ac_obj, atm_obj, W0, plot=False, result = False):
-    W   = W0
-    h   = 15.0                                                          # Start from screenheight
+def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
+    W   = ac_obj.W_TO * atm_obj.g
+    h   = 0.0
     Pa  = ac_obj.power * ac_obj.prop_eff * 735.49875
     CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD_opt  = dragpolar(ac_obj, CL_opt)
-    V   = np.sqrt(2*W*atm_obj.g/(atm_obj.rho0*ac_obj.Sw*CL_opt))
+    V   = np.sqrt(2*W/(atm_obj.rho0*ac_obj.Sw*CL_opt))
     Pr  = 1/2 * atm_obj.rho0 * V**3 * ac_obj.Sw * CD_opt
     roc = (Pa-Pr)/W
     dt  = 1.0
@@ -117,14 +116,14 @@ def flightceiling(ac_obj, atm_obj, W0, plot=False, result = False):
     Height  = np.empty(0)
     while roc > 0.508:
         p, rho = atm_parameters(atm_obj, h)[0], atm_parameters(atm_obj, h)[2]
-        V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL_opt))
+        V   = np.sqrt(2*W/(rho*ac_obj.Sw*CL_opt))
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD_opt
         Pa  = ac_obj.power * ac_obj.prop_eff * p/(atm_obj.p0) * hp_to_watt
         roc = (Pa - Pr)/W
-        if t%50 == 0:
-            print(f"Velocity: {np.round(V, 2)} [m/s]")
+        if t%10 == 0:
+            print(f"Altitude: {np.round(h, 2)} [m] | Power required: {np.round(Pr, 2)} [W] | Power available: {np.round(Pa, 2)} [W] | Rate of Climb: {np.round(roc, 2)} [m/s] | Velocity: {np.round(V, 2)} [m/s]")
         h   += roc * dt
-        W   -= (Pa/ac_obj.prop_eff) * ac_obj.SFC * dt
+        W   -= Pa * ac_obj.SFC * dt * atm_obj.g
         t   += dt
         Time= np.append(Time, t)
         ROC = np.append(ROC, roc)
@@ -154,9 +153,11 @@ def flightceiling(ac_obj, atm_obj, W0, plot=False, result = False):
         ax3.set_title('Weight vs Time')
 
         plt.tight_layout()
+        plt.savefig("C:\\Users\\ties\\Downloads\\climbperformance")
 
         plt.show()
     return Time, Height
+
 
 # # ---------------- Assumptions for take-off equations of motion -----------------
 # # Wind is included by take it into account in the speed: V_eff = V - V_wind
@@ -457,6 +458,7 @@ def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
         plt.ylabel("Weight [kg]")
         plt.legend()
         plt.show()
+# payloadrange(aircraft, atm, 54.012, 3048.0, plot = True)       
 
 
 # -------------------------------- LANDING -----------------------------------
@@ -630,10 +632,6 @@ def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
 
     plt.show()
 
-
-# descend(aircraft, atm, 90, (aircraft.W_OE+10)*atm.g, 95, 500, 0.6)
-
-
 def cruiseheight(distance, desired_alt):
     if 0.0 <= distance <= 10000.0:
         h_cruise = 1000 * 0.3048
@@ -661,11 +659,6 @@ def climbmaneuver(ac_obj, atm_obj, h, h_cruise, W0):
         Pa  = ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt
         CD  = dragpolar(ac_obj, CL_opt) 
         Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
-        Pa_req = Pr + (5.0 * W * atm_obj.g)
-        if Pa > Pa_req:
-            Pa = Pa_req
-        else:
-            Pa = ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt
         ROC = (Pa-Pr)/(W*atm_obj.g)
         gamma = ROC / V
         x   += V*np.cos(gamma)*dt
@@ -700,7 +693,7 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
         Pbr = Pr/ac_obj.prop_eff
         # if n%1000 == 0:
         #     print(f"Break horse power: {Pbr}")
-        if Pbr > ac_obj.power * rho/atm_obj.rho0**(3/4) * hp_to_watt:
+        if Pbr > ac_obj.power * ac_obj.prop_eff * p/atm_obj.p0 * hp_to_watt:
             print("This cruise speed is not obtainable (Pr > Pa)")
             cruiseNAT = True
             break
@@ -710,26 +703,6 @@ def cruisecalc(ac_obj, atm_obj, h_cruise, distance, W0, V_cruise = None):
         t += dt
         n += 1
     return t, W_F_used, cruiseNAT
-
-# def cruiseperf_varying(ac_obj, atm_obj):
-#     W_F_used = np.empty(0)
-#     h_cruise = np.arange(5000, 15000, 500) * 0.3048
-#     V_cruise = np.arange(45, 70, 5)
-#     x_cruise = np.arange(10000, 111000, 1000)
-#     for j in range(3):
-#         V = 50 + 5*j
-#         for i in range(len(h_cruise)):
-#             W_F_used_s = cruisecalc(ac_obj, atm_obj, h_cruise[i], 100000, 710, V)
-#             W_F_used = np.append(W_F_used, W_F_used_s)
-#         plt.plot(h_cruise, W_F_used[20*j:20*j + 20], label=f"Cruise speed: {V} [m/s]")
-#     plt.xlabel("h_cruise [m]")
-#     plt.ylabel("W_F_used [kg]")
-#     plt.title("W_F_used versus h_cruise")
-#     plt.legend()
-#     plt.show()
-
-# cruiseperf_varying(aircraft, atm)
-
 
 def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     CL = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
@@ -759,7 +732,6 @@ def descentmaneuver(ac_obj, atm_obj, h_cruise, h_stop, W0):
     return t, x, W_F_used, h
 
 def loiter(ac_obj, atm_obj, h_loiter, t_loiter, W0, standardrate, goback = True, result = False):
-    h_loiter *= 0.3048
     CL_opt  = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
     CD_opt  = dragpolar(ac_obj, CL_opt)
     p, rho  = atm_parameters(atm_obj, h_loiter)[0], atm_parameters(atm_obj, h_loiter)[2]
@@ -858,7 +830,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     else:
         V_cruise = V_cruise
     W_TO = ac_obj.W_OE + W_F + n_boxes * ac_obj.boxweight
-    W_F_0 = W_TO
+    W_F_0 = W_F
     W = W_TO
     if Summary:
         print("=====================================================")
@@ -896,7 +868,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         W_F_used_array = np.append(W_F_used_array, W_F_used)
         # print(f"W_F_used after cruise {i}: {W_F_used_cruise}")
         W -= W_F_used_cruise
-        t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt, 1524, W)
+        t_descent, x_descent, W_F_used_descent, h = descentmaneuver(ac_obj, atm_obj, cruise_alt, 15.0, W)
         # print(f"Horizontal distance descent: {x_descent} [m]")
         t += t_descent
         x += x_descent
@@ -908,10 +880,9 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         W_F_used_array = np.append(W_F_used_array, W_F_used)
         # print(f"W_F_used after descent {i}: {W_F_used_descent} | time descent {i}: {t_descent}")
         W -= W_F_used_descent
-        t_loiter, W_F_used_loiter = loiter(ac_obj, atm_obj, 1524 ,1200, W, 1, goback=True)
+        t_loiter, W_F_used_loiter = loiter(ac_obj, atm_obj, 5000, 1200, W, 1, goback=True)
         t += t_loiter
         W_F_used += W_F_used_loiter
-        W -= W_F_used_loiter
     elif dropregion == None:                      # either 1 drop or n evenly spaced drops
         target_dist = Range / n_drops
         cruise_alt  = cruiseheight(target_dist, h_cruise)
@@ -967,6 +938,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             W -= boxesperdrop * ac_obj.boxweight
             if i == 0:
                 ttfd = t
+                print(f"time to first drop (printed in loop): {ttfd} [sec] / {np.round(ttfd/3600, 2)} [hr]")
                 ac_obj.TTFD_s = t
                 flight_profile.append(t)
     else:
@@ -1009,6 +981,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         W -= W_F_used_descent
         W -= boxesperdrop * ac_obj.boxweight
         ttfd = t
+        print(f"time to first drop (printed in loop): {ttfd} [sec] / {np.round(ttfd/3600, 2)}")
         ac_obj.TTFD_s = t
         flight_profile.append(t)
         # ============================================================================================================================
@@ -1106,7 +1079,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     W *= ac_obj.WfinalW10
     print(f"W_F_used landing, taxi, shutdown: {round(W_beforelanding - W, 2)} | fraction: {round(W/W_beforelanding, 3)}")
     W_F_used += (W_beforelanding - W)
-    if W_F_used > W_F:
+    if W_F_used > W_F_0:
         print("The fuel used is higher than the fuel loaded, this is not possible")
     # Calculate the fuel use per kg payload per km range (that means half the distance flown)
     F_kg_km = np.round(W_F_used/(n_boxes*ac_obj.boxweight*Range/1000), 5)
@@ -1118,7 +1091,7 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             print(f"Payload: {n_boxes} boxes ({np.round(n_boxes*ac_obj.boxweight, 2)} [kg]) | {n_drops} dropping maneuvers")
             print(f"Range: {np.round(Range/1000, 2)} [km] | Distance flown: {np.round(x/1000, 2)} [km] | Flight time: {np.round(t/3600, 2)} [hrs]")
             if n_drops != 0:
-                print(f"Time to first drop: {ttfd} [sec] / {np.round(t/3600, 2)} [hrs]")
+                print(f"Time to first drop: {ttfd} [sec] / {np.round(ttfd/3600, 2)} [hrs]")
             print(f"Fuel used: {np.round(W_F_used, 2)} [kg]")
             print(f"======================================================================================")
             print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
@@ -1129,10 +1102,10 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
         plt.ylabel("Altitude [m]")
         if savefig:
             if dropregion != None:
-                filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ str(Range) + str(n_drops) + str(dropregion)+ ".png"
+                filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ "Range" + str(Range) + "drops" + str(n_drops) + "dropregion" + str(dropregion)+ ".png"
                 plt.savefig(filepath)
             else:
-                filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ str(Range) + str(n_drops) + ".png"
+                filepath = "C:\\Users\\ties\\Downloads\\flightprofile-"+ "Range" + str(Range) + "drops" + str(n_drops) + ".png"
                 plt.savefig(filepath)
         plt.show()
 
@@ -1143,6 +1116,161 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
     ac_obj.T_s = t
     #ac_obj.Wf = W_F_used
 
-    return W_F_used, flight_profile, t
+    return W_F_used, flight_profile
 
-# fuelusesortie(final_aircraft, atm, 12, 1, 10000, 50, 54.012, Summary=True, plot=True)
+def endurance(ac_obj, atm_obj, h_loiter, summary = False):
+    W_F  = ac_obj.fuelcapacity*ac_obj.fueldensity                   # Max fuel
+    W_F_0= W_F
+    W_TO = ac_obj.W_OE + W_F                                        # Max endurance --> no payload
+    W_F_used = 0.0
+    t    = 0.0
+    dt   = 1.0
+    h    = 15.0
+    W_a_TO  = W_TO * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2
+    W       = W_a_TO
+    W_F_used += W_TO - W_a_TO
+    W_F      -= W_TO - W_a_TO
+    t_climb, x_climb, W_F_used_climb, h = climbmaneuver(ac_obj, atm_obj, h, h_loiter, W)
+    t   += t_climb
+    W_F_used += W_F_used_climb
+    W_F -= W_F_used_climb
+    W   -= W_F_used_climb
+    CL = np.sqrt(3*ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD = dragpolar(ac_obj, CL)
+    p, rho = atm_parameters(atm_obj, h_loiter)[0], atm_parameters(atm_obj, h_loiter)[2]
+    while W_F > 6.0:
+        V   = np.sqrt(2*W*atm_obj.g/(rho*ac_obj.Sw*CL))
+        Pr  = 1/2 * rho * V**3 * ac_obj.Sw * CD
+        Pbr = Pr/ac_obj.prop_eff
+        t   += dt
+        FF  = Pbr * ac_obj.SFC
+        W_F_used += FF * dt
+        W_F      -= FF * dt
+        W        -= FF * dt
+    t_des, x_des, W_F_used_des, h = descentmaneuver(ac_obj, atm_obj, h_loiter, 15.0, W)
+    t += t_des
+    W_F_used += W_F_used_des
+    W_F      -= W_F_used_des
+    W        -= W_F_used_des
+    W_beforelanding = W
+    W *= ac_obj.WfinalW10
+    W_F_used += W_beforelanding - W
+    W_F      -= W_beforelanding - W
+    if summary:
+        print("======================================================================")
+        print(f"Take-off weight: {round(W_TO, 2)} [kg] | Fuel loaded: {round(W_F_0, 2)} [kg]")
+        print(f"Total endurance: {round(t/3600, 2)} [hrs] ({t} [sec])")
+        print(f"Fuel used: {round(W_F_used, 2)} [kg]")
+        print(f"Fuel remaining: {round(W_F, 2)} [kg]")
+        print("======================================================================")
+    return round(t/3600, 2)
+
+def surveillancemission(ac_obj, atm_obj, n_boxes, h_cruise, h_loiter, W_F, V_cruise, Range, t_loiter, summary = False, plot = False):
+    Range *= 1000
+    if h_loiter > 5000:
+        h_loiter *= 0.3048
+    if h_cruise > 5000:
+        h_cruise *= 0.3048
+    CL_opt  = np.sqrt(ac_obj.CD0*np.pi*ac_obj.A*ac_obj.e)
+    CD_opt  = dragpolar(ac_obj, CL_opt)
+    LD_max  = CL_opt/CD_opt
+    W_F_0   = W_F
+    W_TO    = ac_obj.W_OE + W_F + n_boxes * ac_obj.boxweight                             # Loiter mission so no payload
+    t   = 0.0
+    dt  = 1.0
+    h   = 15.0
+    x   = 0.0
+    W_F_used= 0.0
+    x_plot  = 0.0
+    x_arr   = np.array([x_plot])
+    h_arr   = np.array([h])
+    W_a_TO  = W_TO * ac_obj.W1W_TO * ac_obj.W2W1 * ac_obj.W3W2
+    W_F_used+= W_TO - W_a_TO
+    W_F     -= W_TO - W_a_TO
+    W       = W_a_TO
+    t_cl, x_cl, W_F_used_cl, h = climbmaneuver(ac_obj, atm_obj, h, h_cruise, W)
+    t += t_cl
+    x += x_cl
+    x_plot  += x_cl
+    W_F_used+= W_F_used_cl
+    W_F     -= W_F_used_cl
+    W       -= W_F_used_cl
+    x_arr   = np.append(x_arr, x_plot)
+    h_arr   = np.append(h_arr, h)
+    d_to_loiter = Range - x_cl
+    if h_cruise != h_loiter:
+        cruisedist = d_to_loiter - (h_cruise - h_loiter) * LD_max
+    else:
+        cruisedist = d_to_loiter
+    t_cr, W_F_used_cr, cruiseNAT = cruisecalc(ac_obj, atm_obj, h_cruise, cruisedist, W, V_cruise)
+    t += t_cr
+    x += cruisedist
+    x_plot  += cruisedist
+    W_F_used+= W_F_used_cr
+    W_F     -= W_F_used_cr
+    W       -= W_F_used_cr
+    x_arr   = np.append(x_arr, x_plot)
+    h_arr   = np.append(h_arr, h)
+    if h_cruise != h_loiter:
+        t_des_tl, x_des_tl, W_F_used_tl, h = descentmaneuver(ac_obj, atm_obj, h_cruise, h_loiter, W)
+        t += t_des_tl
+        x += x_des_tl
+        x_plot += x_des_tl
+        W_F_used += W_F_used_tl
+        W_F      -= W_F_used_tl
+        W        -= W_F_used_tl
+        x_arr   = np.append(x_arr, x_plot)
+        h_arr   = np.append(h_arr, h)
+    t_loit, W_F_used_loit = loiter(ac_obj, atm_obj, h_loiter, t_loiter, W, 1, goback = True)
+    t += t_loit
+    W_F_used += W_F_used_loit
+    W_F      -= W_F_used_loit
+    W        -= W_F_used_loit
+    x_arr   = np.append(x_arr, x_plot)
+    h_arr   = np.append(h_arr, h)
+    if h_cruise != h_loiter:
+        t_cl_fl, x_cl_fl, W_F_used_cl_fl, h = climbmaneuver(ac_obj, atm_obj, h, h_cruise, W)
+        t += t_cl_fl
+        x += x_cl_fl
+        x_plot -= x_cl_fl
+        W_F_used += W_F_used_cl_fl
+        W_F      -= W_F_used_cl_fl
+        W        -= W_F_used_cl_fl
+        x_arr   = np.append(x_arr, x_plot)
+        h_arr   = np.append(h_arr, h)
+    d_cruise_back = x_plot - LD_max * h_cruise
+    t_cr_b, W_F_used_cr_b, cruiseNAT = cruisecalc(ac_obj, atm_obj, h_cruise, d_cruise_back, W, V_cruise)
+    t += t_cr_b
+    x += d_cruise_back
+    x_plot -= d_cruise_back
+    W_F_used += W_F_used_cr_b
+    W_F      -= W_F_used_cr_b
+    W        -= W_F_used_cr_b
+    x_arr   = np.append(x_arr, x_plot)
+    h_arr   = np.append(h_arr, h)
+    t_des_RTB, x_des_RTB, W_F_used_des_RTB, h = descentmaneuver(ac_obj, atm_obj, h_cruise, 15.0, W)
+    t += t_des_RTB
+    x += x_des_RTB
+    x_plot -= x_des_RTB
+    W_F_used += W_F_used_des_RTB
+    W_F      -= W_F_used_des_RTB
+    W        -= W_F_used_des_RTB
+    x_arr   = np.append(x_arr, x_plot)
+    h_arr   = np.append(h_arr, h)
+    W_beforelanding = W
+    W *= ac_obj.WfinalW10
+    W_F_used += W_beforelanding - W
+    W_F      -= W_beforelanding - W
+    if summary:
+        print("============================================================")
+        print(f"Flight time: {round(t/3600, 2)} [hr] of which {round(t_loiter/3600, 2)} [hr] of loitering")
+        print(f"Fuel used: {round(W_F_used, 2)} [kg] | Fuel remaining: {round(W_F, 2)} [kg]")
+        print(f"Horizontal distance flown: {round(x/1000, 2)} [km]")
+        print("============================================================")
+    if plot:
+        plt.plot(x_arr/1000, h_arr)
+        plt.xlabel("Horizontal distance [km]")
+        plt.ylabel("Altitude [m]")
+        plt.savefig("C:\\Users\\ties\\Downloads\\flightprofile-loitermission-Range-"+str(Range))
+        plt.show()
+# surveillancemission(aircraft, atm, 0, 10000, 5500, aircraft.W_F + 5, 54.012, Range = 150, t_loiter = 3600, summary=True, plot=True)   
