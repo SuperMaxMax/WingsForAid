@@ -34,7 +34,7 @@ class UAV:
         # self.Drag_increase = 1.0            # This is used for the calculations of the strut drag if applicable [-]
         # self.d_eff = 1.241                  # Effective diameter [m]
         # self.d_engine_boxes = 0.4           # Distance between engine and box [m]
-        self.dihedral = 0
+        self.dihedral = 1.5
         self.d_fuselage = 1.102               # Effective fuselage diameter used for drag estimation [m]
         
         # E
