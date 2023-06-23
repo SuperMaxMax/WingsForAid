@@ -227,7 +227,7 @@ def horizontal_tail_planform(aircraft):
         if not full_print:
             return abs(C_L_wing - C_L_h)
         elif full_print:
-            return AR, b, Lambda, alpha_twist, S, CL_a_h, i_w, CD_induced, C_L_h, span_eff, MAC, airfoildata.index.tolist() #choose whatever
+            return AR, b, Lambda, alpha_twist, S, CL_a_h, i_w, CD_induced, C_L_h, span_eff, MAC, airfoildata.index.tolist()[0] #choose whatever
 
     airfoildata = airfoil_select(required_lift(aircraft)[0], 0)
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]

@@ -1,4 +1,4 @@
-from parameters import UAV, atmosphere, airport
+from parameters import UAV_final, atmosphere, airport
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,7 +10,7 @@ import flight_performance.simulation as fp
 import operations.sortie as op
 
 # aircraft = UAV_final()
-aircraft = UAV('aircraft')
+aircraft = UAV_final()
 atm      = atmosphere()
 airfield = airport("Sudan")
 
@@ -28,7 +28,7 @@ running = True
 # for wingbox
 jarno = False               # Jarno can't run wingbox
 full_wingbox_loop = True    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
-ele_span = 1000              # number of elements in spanwise direction (smaller value is faster, but less accurate)
+ele_span = 500              # number of elements in spanwise direction (smaller value is faster, but less accurate)
 
 #TODO landing distance
 #TODO max ferry range
@@ -96,6 +96,7 @@ if theo:
     fp.fuelusesortie(aircraft, atm, aircraft.n_boxes, 1, aircraft.h_cruise / 0.3048, aircraft.W_F, 54.012,
                         aircraft.OP_Range, Summary=True, plot = True)            
     op.operations_eval(aircraft)
+
 
 # # --- saving
 df = pd.DataFrame()
