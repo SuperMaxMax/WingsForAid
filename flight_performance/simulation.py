@@ -1277,7 +1277,7 @@ def surveillancemission(ac_obj, atm_obj, n_boxes, h_cruise, h_loiter, W_F, V_cru
 #surveillancemission(aircraft, atm, 0, 10000, 5500, aircraft.W_F + 5, 54.012, Range = 150, t_loiter = 3600, summary=True, plot=True)
     
 
-print(np.sqrt(2*aircraft.W_TO*atm.g/(atm.rho0*aircraft.Sw*aircraft.CL_max_clean)))
+# print(np.sqrt(2*aircraft.W_TO*atm.g/(atm.rho0*aircraft.Sw*aircraft.CL_max_clean)))
 
     
     
