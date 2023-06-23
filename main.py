@@ -19,7 +19,7 @@ df_iterations = pd.DataFrame(index = index_df)
 
 # start
 plot = True
-jan = False
+jan = True
 theo = True
 
 n_iteration = 1
@@ -27,8 +27,8 @@ running = True
 
 # for wingbox
 jarno = False               # Jarno can't run wingbox
-full_wingbox_loop = False    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
-ele_span = 100              # number of elements in spanwise direction (smaller value is faster, but less accurate)
+full_wingbox_loop = True    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
+ele_span = 1000              # number of elements in spanwise direction (smaller value is faster, but less accurate)
 
 #TODO landing distance
 #TODO max ferry range

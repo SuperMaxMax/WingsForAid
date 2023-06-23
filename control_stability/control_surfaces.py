@@ -59,7 +59,7 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
                 P_roll_rate = Pss**2/(2*phi_1)
 
                 t = sqrt(2*phi_des/P_roll_rate)
-                print(f"{phi_des}: t: {t}")
+                #print(f"{phi_des}: t: {t}")
             ystart_a_list.append(ystart_a)
       
             aircraft.ystart_ail = min(ystart_a_list) - aircraft.w_out/2  # to account for wing starting at fuselage border

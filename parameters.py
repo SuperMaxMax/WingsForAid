@@ -409,7 +409,7 @@ class UAV:
         self.ST_z_prop = 0.3 #m propeller clearance
         self.ST_h_fus = 0.67 #m fuselage height ##KEEP IN MIND THAT THE ATTACHMENT OF THE WING IS ABOVE THE FUSELAGE CEILING
         self.ST_w_fus = 1.0 #m fuselage width
-        self.ST_h_prop_axis = 1.1 #m height of the propeller axis above the ground
+        self.ST_h_prop_axis = 1.02 #m height of the propeller axis above the ground
         self.ST_top_eng = 1.87 #m ceiling of the engine above the ground
         self.ST_eng_w = 0.56 #m width of engine box
         self.ST_eng_h = 0.335 #m height of engine box (NOT INCLUDING PROP obviously)

@@ -41,7 +41,7 @@ def run_aero(aircraft):
     # plt.show()
 
     aircraft.taper = tapers[np.argmin(diffs)]
-    print(aircraft.taper)
+    print('chosen optimum taper = ', aircraft.taper)
 
     wp.main_wing_planform(aircraft, aircraft.taper)
     htd.horizontal_tail_planform(aircraft)

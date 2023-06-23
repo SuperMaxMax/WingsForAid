@@ -223,7 +223,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             break
         else:
             CL_to = max(CL_all)
-            print(CL_to, CL_max)
+            #print(CL_to, CL_max)
             obj.FP_CL_max_TO = CL_max
             obj.FP_CL_TO = CL_to
 
@@ -514,7 +514,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             break
         else:
             CL_land = min(CL_all)
-            print(CL_all, round(CL_land, 1))
+            #print(CL_all, round(CL_land, 1))
             obj.FP_CL_max_land = CL_max
             obj.FP_CL_land = CL_land
 
@@ -1092,9 +1092,9 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             if n_drops != 0:
                 print(f"Time to first drop: {ttfd} [sec] / {np.round(ttfd/3600, 2)} [hrs]")
             print(f"Fuel used: {np.round(W_F_used, 2)} [kg]")
-            print(f"======================================================================================")
-            print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
-            print(f"======================================================================================")
+            #print(f"======================================================================================")
+            #print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
+            #print(f"======================================================================================")
     if plot:
         plt.plot(x_array, h_array)
         plt.xlabel("Horizontal distance [m]")
