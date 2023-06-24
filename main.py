@@ -19,15 +19,15 @@ df_iterations = pd.DataFrame(index = index_df)
 
 # start
 plot = True
-jan = True
-theo = True
+jan = False
+theo = False
 
 n_iteration = 1
 running = True
 
 # for wingbox
 jarno = False               # Jarno can't run wingbox
-full_wingbox_loop = True    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
+full_wingbox_loop = False    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
 ele_span = 500              # number of elements in spanwise direction (smaller value is faster, but less accurate)
 
 #TODO landing distance
@@ -72,7 +72,7 @@ while running:
         import aerodynamics.avl as avl
         avl.export(aircraft)
 
-    aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
+    # aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
     print(f"=================================================\n")
 
     aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w

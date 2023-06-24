@@ -174,9 +174,9 @@ def cg_calc(obj, plot):
     # Save most forward and most aft and fully loaded c.g. in object
     obj.X_cg_OEW = Xs[0]
     obj.X_cg_full = Xs[-1]
-    obj.X_cg_range = Xs[labels.index(LimBoxConfigAft)] - Xs[labels.index(LimBoxConfigFwd)]
     obj.X_cg_fwd = Xs[labels.index(LimBoxConfigFwd)] - obj.X_cg_range * 0.05
     obj.X_cg_aft = Xs[labels.index(LimBoxConfigAft)] + obj.X_cg_range * 0.05
+    obj.X_cg_range = obj.X_cg_aft - obj.X_cg_fwd
 
     obj.l_h = obj.l_f - obj.l_fus_tail_cone + obj.l_f_boom - 1/4 * obj.AE_rootchord_h - (obj.X_LEMAC+ obj.X_cg_aft*obj.MAC_length)
     # Plot lines for forward and aft cg positions
