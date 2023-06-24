@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from parameters import UAV
-ac=UAV("aircraft")
+from parameters import UAV_final
+ac=UAV_final()
 from parameters import atmosphere
 at=atmosphere()
 #from loading_diagram_wing import aircraft

@@ -182,6 +182,9 @@ for k in range(3):
     By = Bz/tan(ac.ST_angle_strut)
     Ay = -By
 
+    print('Ay',Ay, "Az",Az)
+    print('By',By,'Bz',Bz)
+
     # Calculate normal, shear, moment and torque
     normal = []
     shear = []

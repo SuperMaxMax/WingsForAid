@@ -7,17 +7,17 @@ from parameters import atmosphere
 at=atmosphere()
 
 # # # s-steel 410
-yield_stress = 1225*10**6
-yield_stress_shear = yield_stress*0.58
-density=7800
-E = 200*10**9
+# yield_stress = 1225*10**6
+# yield_stress_shear = yield_stress*0.58
+# density=7800
+# E = 200*10**9
 
 
 # # # steel 4130 parameters
-# yield_stress = 460*10**6
-# yield_stress_shear= 0.58*yield_stress
-# density = 7850
-# E=205*10**9
+yield_stress = 460*10**6
+yield_stress_shear= 0.58*yield_stress
+density = 7850
+E=205*10**9
 
 
 
@@ -26,10 +26,10 @@ G = E/(2*(1+v))
 
 
 r_h_tail_spar = 0.035
-l_h_tail_spar = 3.74*1/3+0.2 #changed for final value
-F_h_max = 4338 #abs(dF_h_man)
-T_max = 0.25*F_h_max * 0.7012 #ac.AE_MAC_length_h
-arm = 1/3*0.5*3.74 #ac.b_h #5/2*1/3 # conservative, assuming hor tail up to 5m
+l_h_tail_spar = 3.09*1/3+0.2 #changed for final value
+F_h_max = 1987 #abs(dF_h_man)
+T_max = 0.25*F_h_max * 0.58 #ac.AE_MAC_length_h
+arm = 1/3*0.5*3.09 #ac.b_h #5/2*1/3 # conservative, assuming hor tail up to 5m
 M_h_max = abs(F_h_max*arm)
 A_m = np.pi*r_h_tail_spar**2
 
@@ -61,7 +61,7 @@ plt.legend()
 plt.show()
 
 
-t=1.6/1000
+t=0.6/1000
 print("mass kg",P*t*l_h_tail_spar*density)
 print("area", 2*np.pi*r_h_tail_spar*t)
 print('min area', A_min[0])

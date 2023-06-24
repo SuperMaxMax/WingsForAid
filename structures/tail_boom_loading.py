@@ -11,8 +11,8 @@ a_b = dF_h_gust/dF_v_gust #ellipsoid cross sectio a/b optimal ratio
 
 
 
-M_h_max = 4838.8 #5569.2  4364
-F_h_max =  17859 #65865 7626
+M_h_max = 2958 #5569.2  4364
+F_h_max = 8486 #65865 7626
 M_v_max = dF_h_man/a_b*1.8
 F_v_max = dF_h_man/a_b
 shear_stress = 0.58*yield_stress
@@ -71,7 +71,7 @@ plt.plot(t,A_min,label='A_min')
 plt.legend()
 plt.show()
 
-t=1.1/1000
+t=0.7/1000
 a1=a+t/2
 a2=a-t/2
 b1=b+t/2
