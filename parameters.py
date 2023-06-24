@@ -100,7 +100,7 @@ class UAV:
         # self.pos_main_carriage = 'fuselage' # Position of main carriage: "fuselage" or "wing"
         self.power = 100                      # Power at takeoff [hp]
         # self.power_setting = 0.9            # Power setting in cruise [-]
-        self.prop_eff = 0.82                  # Propulsive efficiency [-]
+        self.prop_eff = 0.82                  # Propulsive efficiency [-] 
         # Q
 
         # R
