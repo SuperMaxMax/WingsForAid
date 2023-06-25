@@ -51,7 +51,7 @@ v = np.zeros(Y_tuple)
 
 
 strm = plt.streamplot(X, Y, u, v, color = u,
-                     linewidth = 2, cmap ='jet', density = 0.7)
+                     linewidth = 2, cmap ='jet', density = 1)
 plt.colorbar(strm.lines)
 
 
