@@ -168,7 +168,7 @@ def flightceiling(ac_obj, atm_obj, W_F, plot=False, result = False):
 # # Thrust and lift are taken as average values
 
 
-def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, W_f, Plot=True):
+def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, W_f, Plot=True, save = True):
 
     CL_all = []
     figure, axis = plt.subplots(2, 2)
@@ -248,7 +248,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             elif i == 1:
                 axis[1, 0].plot(dic_constants['wind speed'], S, color='red')
                 axis[1, 0].set_title('Headwind vs Runway length')
-                axis[1, 0].set_xlabel('Headwind speed [m/sec]')
+                axis[1, 0].set_xlabel('Headwind speed [m/s]')
                 axis[1, 0].set_ylabel('Runway length [m]')
 
             elif i == 2:
@@ -263,21 +263,19 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
                 axis[0, 1].set_xlabel('Airport altitude [m]')
                 axis[0, 1].set_ylabel('Runway length [m]')
 
+
     plt.subplots_adjust(hspace=0.6)
     plt.subplots_adjust(wspace=0.5)
     plt.suptitle('Take-Off')
     plt.show()
+    
+
+            
 
     return S
 
 
-TO_eom(aircraft, airfield, atm, 6, 1000, 12, -10.4, 65)
-
-
-
-
-
-
+# TO_eom(aircraft, airfield, atm, 6, 1000, 12, -10.4, 65)
 
 # Result:
 # - If 12 boxes, then the slope limit is 11 degrees and max tailwind of 13 m/s = 25.3 kts
@@ -478,7 +476,7 @@ def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
 
 # -------------------------------- LANDING -----------------------------------
 def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, w_fuel, Plot=True):
-
+    figure, axis = plt.subplots(2, 2)
     CL_all = []
     for i in range(0, 4):
         if i == 0:
@@ -534,41 +532,40 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             obj.FP_CL_max_land = CL_max
             obj.FP_CL_land = CL_land
 
-    if Plot:
-        figure, axis = plt.subplots(2, 2)
-        if i == 0:
-            axis[0, 0].plot(dic_constants['runway slope'], S)
-            axis[0, 0].set_title('Runway slope vs Runway length')
-            axis[0, 0].set_xlabel('Runway slope[deg]')
-            axis[0, 0].set_ylabel('Runway length [m]')
+        if Plot:
+            if i == 0:
+                axis[0, 0].plot(dic_constants['runway slope'], S)
+                axis[0, 0].set_title('Runway slope vs Runway length')
+                axis[0, 0].set_xlabel('Runway slope[deg]')
+                axis[0, 0].set_ylabel('Runway length [m]')
 
-        elif i == 1:
-            axis[1, 0].plot(dic_constants['wind speed'], S, color='red')
-            axis[1, 0].set_title('Headwind vs Runway length')
-            axis[1, 0].set_xlabel('Headwind speed [m/sec]')
-            axis[1, 0].set_ylabel('Runway length [m]')
+            elif i == 1:
+                axis[1, 0].plot(dic_constants['wind speed'], S, color='red')
+                axis[1, 0].set_title('Headwind vs Runway length')
+                axis[1, 0].set_xlabel('Headwind speed [m/sec]')
+                axis[1, 0].set_ylabel('Runway length [m]')
 
-        elif i == 2:
-            axis[1, 1].plot(dic_constants['wind speed'], S, color='green')
-            axis[1, 1].set_title('Tailwind vs Runway length')
-            axis[1, 1].set_xlabel('Tailwind speed [m/sec]')
-            axis[1, 1].set_ylabel('Runway length [m]')
+            elif i == 2:
+                axis[1, 1].plot(dic_constants['wind speed'], S, color='green')
+                axis[1, 1].set_title('Tailwind vs Runway length')
+                axis[1, 1].set_xlabel('Tailwind speed [m/sec]')
+                axis[1, 1].set_ylabel('Runway length [m]')
 
-        else:
-            axis[0, 1].plot(dic_constants['airport altitude'], S, color='black')
-            axis[0, 1].set_title('Airport altitude vs Runway length')
-            axis[0, 1].set_xlabel('Airport altitude [m]')
-            axis[0, 1].set_ylabel('Runway length [m]')
+            else:
+                axis[0, 1].plot(dic_constants['airport altitude'], S, color='black')
+                axis[0, 1].set_title('Airport altitude vs Runway length')
+                axis[0, 1].set_xlabel('Airport altitude [m]')
+                axis[0, 1].set_ylabel('Runway length [m]')
 
-        plt.subplots_adjust(hspace=0.6)
-        plt.subplots_adjust(wspace=0.5)
-        plt.suptitle('Landing')
-        plt.show()
+    plt.subplots_adjust(hspace=0.6)
+    plt.subplots_adjust(wspace=0.5)
+    plt.suptitle('Landing')
+    plt.show()
 
     return CL_max
 
 
-# LA_eom(aircraft, airfield, atm, -8, 4000, 14, -5.144, 5)
+LA_eom(aircraft, airfield, atm, -8, 4000, 14, -5.144, 5)
 
 # ------------------------------------------------------------------------------
 def descend(obj, atmos, V, W, P_br_max, h_descend, P_descend):
