@@ -176,18 +176,12 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
         if i == 0:
             dic_constants = {'runway slope': np.arange(0, max_runwayslope),
                              'airport altitude': 0, 'wing surface area': obj.Sw,
-                             'weight': takeoffweight(obj, W_f) * atmos.g,
+                             'weight': obj.W_TO * atmos.g,
                              'wind speed': 0, 'propeller power': obj.power * hp_to_watt,
                              'propeller efficiency': 0.6}
             p, T, rho, a = atm_parameters(atmos, dic_constants['airport altitude'])
 
         if i == 1:
-            dic_constants = {'runway slope': np.arange(0, max_runwayslope),
-                             'airport altitude': 0, 'wing surface area': obj.Sw,
-                             'weight': takeoffweight(obj, W_f) * atmos.g,
-                             'wind speed': 0, 'propeller power': obj.power * hp_to_watt,
-                             'propeller efficiency': 0.6}
-            p, T, rho, a = atm_parameters(atmos, dic_constants['airport altitude'])
             dic_constants['runway slope'] = 0
             dic_constants['wind speed'] = np.arange(0, max_headwind)
 
@@ -234,30 +228,35 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             break
         else:
             CL_to = max(CL_all)
-            #print(CL_to, CL_max)
             obj.FP_CL_max_TO = CL_max
             obj.FP_CL_TO = CL_to
 
+
         if Plot:
             if i == 0:
+                axis[0, 0].set_yticks(range(155, 255, 20))
                 axis[0, 0].plot(dic_constants['runway slope'], S)
                 axis[0, 0].set_title('Runway slope vs Runway length')
                 axis[0, 0].set_xlabel('Runway slope[deg]')
                 axis[0, 0].set_ylabel('Runway length [m]')
 
             elif i == 1:
+                axis[1, 0].set_yticks(range(60, 170, 20))
                 axis[1, 0].plot(dic_constants['wind speed'], S, color='red')
                 axis[1, 0].set_title('Headwind vs Runway length')
                 axis[1, 0].set_xlabel('Headwind speed [m/s]')
                 axis[1, 0].set_ylabel('Runway length [m]')
 
             elif i == 2:
+                axis[1, 1].set_yticks(range(160, 305, 30))
                 axis[1, 1].plot(dic_constants['wind speed'], S, color='green')
                 axis[1, 1].set_title('Tailwind vs Runway length')
                 axis[1, 1].set_xlabel('Tailwind speed [m/sec]')
+                #axis[1, 1].set_ylim(50, 300)
                 axis[1, 1].set_ylabel('Runway length [m]')
 
             else:
+                axis[0, 1].set_yticks(range(60, 200, 5))
                 axis[0, 1].plot(dic_constants['airport altitude'], S, color='black')
                 axis[0, 1].set_title('Airport altitude vs Runway length')
                 axis[0, 1].set_xlabel('Airport altitude [m]')
@@ -269,9 +268,6 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     plt.suptitle('Take-Off')
     plt.show()
     
-
-            
-
     return S
 
 
@@ -478,6 +474,7 @@ def payloadrange(ac_obj, atm_obj, V_cruise=None, h_cruise=None, plot=True):
 def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tailwind, w_fuel, Plot=True):
     figure, axis = plt.subplots(2, 2)
     CL_all = []
+    figure, axis = plt.subplots(2, 2)
     for i in range(0, 4):
         if i == 0:
             dic_constants = {'runway slope': np.arange(0, max_runwayslope, -1),
@@ -501,20 +498,24 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
 
         S = [600.0]
         CL = 0.8
-        CL_max = 2
+        CL_max = obj.CL_max_clean
         while max(S) <= 750:
             S_old = S.copy()
             CL += 0.01
             V_T = 1.2 * np.sqrt(
-                dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max) - dic_constants['wind speed']
-            V_avg_sq = V_T ** 2 / 2
+                dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max)
+            V_T_g = V_T - dic_constants['wind speed']
+            if i == 2:
+                V_avg_sq = (V_T ** 2 - dic_constants['wind speed'] ** 2) / 2
+            else:
+                V_avg_sq = (V_T ** 2 + dic_constants['wind speed'] ** 2) / 2
             CD = obj.CD0 + CL**2 / (np.pi * obj.A * obj.e)
             D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             L = CL * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             D_g = ap.mu_ground_break * (dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])) - L)
             # print(L/dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])))
             a = atmos.g / dic_constants['weight'] * (-D-D_g-dic_constants['weight']*np.sin(np.radians(dic_constants['runway slope'])))
-            S = - V_T**2 / (2 * a)
+            S = - V_T_g**2 / (2 * a)
             if abs(CL - (CL_max+0.01)) <= 0.0001:
                 break
 
@@ -531,15 +532,18 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             #print(CL_all, round(CL_land, 1))
             obj.FP_CL_max_land = CL_max
             obj.FP_CL_land = CL_land
+            print(CL_land)
 
         if Plot:
             if i == 0:
+                axis[0, 0].set_yticks(range(240, 750, 100))
                 axis[0, 0].plot(dic_constants['runway slope'], S)
                 axis[0, 0].set_title('Runway slope vs Runway length')
                 axis[0, 0].set_xlabel('Runway slope[deg]')
                 axis[0, 0].set_ylabel('Runway length [m]')
 
             elif i == 1:
+                axis[1, 0].set_yticks(range(50, 400, 50))
                 axis[1, 0].plot(dic_constants['wind speed'], S, color='red')
                 axis[1, 0].set_title('Headwind vs Runway length')
                 axis[1, 0].set_xlabel('Headwind speed [m/sec]')
@@ -552,6 +556,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
                 axis[1, 1].set_ylabel('Runway length [m]')
 
             else:
+                axis[0, 1].set_yticks(range(255, 285, 10))
                 axis[0, 1].plot(dic_constants['airport altitude'], S, color='black')
                 axis[0, 1].set_title('Airport altitude vs Runway length')
                 axis[0, 1].set_xlabel('Airport altitude [m]')
