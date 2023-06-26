@@ -172,7 +172,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
 
     CL_all = []
     figure, axis = plt.subplots(2, 2)
-    for i in range(1, 2):
+    for i in range(0, 4):
         if i == 0:
             dic_constants = {'runway slope': np.arange(0, max_runwayslope),
                              'airport altitude': 0, 'wing surface area': obj.Sw,
@@ -200,7 +200,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             p, T, rho, a = atm_parameters(atmos, dic_constants['airport altitude'])
 
         CL_max = obj.CL_max_clean
-        CL = CL_max
+        CL = 0.45
         S = [600]
         while max(S) <= 750:
             S_old = S.copy()
@@ -208,7 +208,10 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             V_LOF = 1.05 * (np.sqrt(
                 dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max))
             V_LOF_g = V_LOF - dic_constants['wind speed']
-            V_avg_sq = (V_LOF ** 2 + dic_constants['wind speed']**2) / 2
+            if i == 2:
+                V_avg_sq = (V_LOF ** 2 - dic_constants['wind speed']**2) / 2
+            else:
+                V_avg_sq = (V_LOF ** 2 + dic_constants['wind speed']**2) / 2
             CD = obj.CD0 + CL ** 2 / (np.pi * obj.A * obj.e)
             D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             L = CL * V_avg_sq * rho / 2 * dic_constants['wing surface area']
@@ -216,8 +219,8 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             D_g = ap.mu_ground * (dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])) - L)
             a = atmos.g / dic_constants['weight'] * (
                         T - D - D_g - dic_constants['weight'] * np.sin(np.radians(dic_constants['runway slope'])))
-            print("acc", a)
-            S = (V_LOF - dic_constants['wind speed'])**2 / (2 * a)
+            S = V_LOF_g**2 / (2 * a)
+            
             if CL <= 0.4:
                 break
 
