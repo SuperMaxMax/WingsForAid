@@ -227,14 +227,14 @@ def horizontal_tail_planform(aircraft):
         if not full_print:
             return abs(C_L_wing - C_L_h)
         elif full_print:
-            return AR, b, Lambda, alpha_twist, S, CL_a_h, i_w  #choose whatever
+            return AR, b, Lambda, alpha_twist, S, CL_a_h, i_w, CD_induced, C_L_h, span_eff, MAC, airfoildata.index.tolist()[0] #choose whatever
 
     airfoildata = airfoil_select(required_lift(aircraft)[0], 0)
     C_l_alpha = airfoildata['C_l_alpha'].tolist()[0]
     initial_guess = required_lift(aircraft)[0]/C_l_alpha
     a_h_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
     #print(a_h_optimal)
-    AR, b, Lambda, alpha_twist, S, CL_a_h, i_w  = plot_lift_distr(a_h_optimal, full_print = True)
+    AR, b, Lambda, alpha_twist, S, CL_a_h, i_w, CD_induced, C_L_h, span_eff, MAC, airfoil  = plot_lift_distr(a_h_optimal, full_print = True)
 
     #Adding effect of downwash
     C_L_W_c = required_lift(aircraft)[1]
@@ -264,7 +264,11 @@ def horizontal_tail_planform(aircraft):
     aircraft.y_mac_h = 1/3*(aircraft.b_h/2)*(1+2*Lambda)/(1+Lambda)   
     aircraft.x_lemac_h = aircraft.y_mac_h*np.tan(aircraft.sweep_LE_h)
     aircraft.AE_CL_a_h = CL_a_h
-
+    aircraft.AE_CD_i_h = CD_induced
+    aircraft.AE_CL_cruise_h = C_L_h
+    aircraft.AE_e_h = span_eff
+    aircraft.AE_MAC_h = MAC
+    aircraft.AE_airfoil_h = airfoil
 
     MAC_length = 2/3 * aircraft.AE_rootchord_h * (1 + Lambda + Lambda**2) / (1 + Lambda)
     V_h = aircraft.Sh_S * aircraft.l_h / aircraft.b

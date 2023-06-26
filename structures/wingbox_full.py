@@ -1268,5 +1268,12 @@ def all_wingbox(ac, ele_span, full_loop=False, opt_loop=False):
     # print(np.where(weights == np.min(weights[weights != 0])))
 
     ac.W_w = 2*np.min(weights[weights != 0])
+    ac.t_f_spar = t_f_spar_func_2
+    ac.t_a_spar = t_a_spar_func_2
+    ac.t_top = t_top_func_2
+    ac.t_bot = t_bot_func_2
+    ac.a_stringer = a_func_2
+    ac.b_stringer = b_func_2
+    ac.t_stringer = t_stringer_func_2
 
     return np.min(weights[weights != 0]), n_stringers, n_ribs

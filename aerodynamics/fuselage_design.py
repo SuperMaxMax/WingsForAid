@@ -28,9 +28,9 @@ for j in range(2):
     nose = [False,True]
 
     if nose[j]:
-        variable_list2 = np.linspace(0.,1.5,50)
+        variable_list2 = np.linspace(0.0,7,50)
     else:
-        variable_list2 = np.linspace(0.5,3,50)
+        variable_list2 = np.linspace(0.,7,50)
 
 
 

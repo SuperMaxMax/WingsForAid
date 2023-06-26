@@ -72,13 +72,13 @@ def iw(airfoil):
     return Iw, cl_alpha, alpha_zero_lift
 
 
-def main_wing_planform(aircraft):
+def main_wing_planform(aircraft, taper_input):
     def plot_lift_distr(i_w, full_print = False):
         i_w = i_w[0]
         variable = "Lambda"      #Lambda, AR or Twist
         plot_mode = "Normalize"         #"Normalized" for normalized plots
         if variable == "Lambda":    
-            variable_list2 = [aircraft.taper] #[0.65]
+            variable_list2 = [taper_input] #[0.65]
         elif variable == "AR":  
             variable_list2 = [aircraft.A] #[4,5,6,7,8,9,10]
         elif variable == "Twist":
@@ -95,7 +95,7 @@ def main_wing_planform(aircraft):
             if variable == "Lambda":
                 Lambda = parameter
             else:
-                Lambda = aircraft.taper
+                Lambda = taper_input
             if variable == "Twist":
                 alpha_twist = parameter
             else:
@@ -249,12 +249,12 @@ def main_wing_planform(aircraft):
         if not full_print:
             return abs(C_L_wing-C_L_req)
         elif full_print:
-            return AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean, oswald
+            return AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean, oswald, C_L_req, span_eff, MAC
     
     airfoil = aircraft.airfoil
     initial_guess = iw(airfoil)[0]
     i_w_optimal = optimize.minimize(plot_lift_distr,initial_guess, method = 'Nelder-Mead', tol=1e-06)['x']
-    AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean, oswald = plot_lift_distr(i_w_optimal, full_print=True)
+    AR, Lambda, alpha_twist, span_eff, CD_induced, i_w, tau, CL_a_w, y_s, l, CL_max_clean, oswald, C_L_req, span_eff, MAC = plot_lift_distr(i_w_optimal, full_print=True)
     #plt.plot(y_s, l)
     #plt.show()
     # print(','.join([str(x) for x in y_s]))
@@ -280,13 +280,16 @@ def main_wing_planform(aircraft):
     # aircraft.CL_max_clean = 1.48
     aircraft.oswald = oswald 
     aircraft.AE_CD_i_w = CD_induced
+    aircraft.AE_CL_cruise_w = C_L_req
+    aircraft.AE_e_w = span_eff
+    aircraft.AE_MAC_w = MAC
+    aircraft.AE_airfoil_w = "4415"
 
     #print('afoqwbqlbng', aircraft.y_mac, aircraft.x_lemac, aircraft.sweep_LE, aircraft.MAC_length)
-               
-    return 
+    x_plot = y_s #[','.join([str(x) for x in y_s])]
+    y_plot = l#[','.join([str(x) for x in l])]
 
-aircraft = UAV("aircraft")
-main_wing_planform(aircraft)
+    return x_plot, y_plot
 
 def fuel_volume(airfoil, Croot, Lambda, b):
     if len(airfoil) != 4: 

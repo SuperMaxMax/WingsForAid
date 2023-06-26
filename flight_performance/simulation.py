@@ -99,7 +99,7 @@ def climbrate(ac_obj, atm_obj, W_F, V, P_climb, plot=True):
     print(f"This calculation took {end_time-start_time} seconds")
     return
 
-def flightceiling(ac_obj, atm_obj, W_F, plot=True, result = False):
+def flightceiling(ac_obj, atm_obj, W_F, plot=False, result = False):
     W   = ac_obj.W_TO * atm_obj.g
     h   = 0.0
     Pa  = ac_obj.power * ac_obj.prop_eff * 735.49875
@@ -183,15 +183,8 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             p, T, rho, a = atm_parameters(atmos, dic_constants['airport altitude'])
 
         if i == 1:
-            dic_constants = {'runway slope': np.arange(0, max_runwayslope),
-                             'airport altitude': 0, 'wing surface area': obj.Sw,
-                             'weight': takeoffweight(obj, W_f) * atmos.g,
-                             'wind speed': 0, 'propeller power': obj.power * hp_to_watt,
-                             'propeller efficiency': 0.6}
             dic_constants['runway slope'] = 0
             dic_constants['wind speed'] = np.arange(0, max_headwind)
-            p, T, rho, a = atm_parameters(atmos, dic_constants['airport altitude'])
-            print("density", rho)
 
         if i == 2:
             dic_constants['wind speed'] = np.arange(0, max_tailwind, -1)
@@ -207,29 +200,22 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
         while max(S) <= 750:
             S_old = S.copy()
             CL -= 0.01
-            print("stall speed", np.sqrt(
-                dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max))
             V_LOF = 1.05 * (np.sqrt(
                 dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max) - dic_constants[
                         'wind speed'])
-            print("head wind", dic_constants['wind speed'])
-            print("lift off", V_LOF)
             V_avg_sq = V_LOF ** 2 / 2
             CD = obj.CD0 + CL ** 2 / (np.pi * obj.A * obj.e)
             D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             L = CL * V_avg_sq * rho / 2 * dic_constants['wing surface area']
             T = dic_constants['propeller power'] * dic_constants['propeller efficiency'] / np.sqrt(V_avg_sq)
-            print(dic_constants['propeller efficiency'])
             D_g = ap.mu_ground * (dic_constants['weight'] * np.cos(np.radians(dic_constants['runway slope'])) - L)
             a = atmos.g / dic_constants['weight'] * (
                         T - D - D_g - dic_constants['weight'] * np.sin(np.radians(dic_constants['runway slope'])))
-            print("acc", a)
             S = V_LOF ** 2 / (2 * a)
             if CL <= 0.75:
                 break
 
         S = S_old
-        print("runway length", S)
         CL += 0.01
         CL_all.append(CL)
         if len(S) == 1:
@@ -239,11 +225,12 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             break
         else:
             CL_to = max(CL_all)
-            print(CL_to, CL_max)
+            #print(CL_to, CL_max)
             obj.FP_CL_max_TO = CL_max
             obj.FP_CL_TO = CL_to
 
         if Plot:
+            figure, axis = plt.subplots(2, 2)
             if i == 0:
                 axis[0, 0].plot(dic_constants['runway slope'], S)
                 axis[0, 0].set_title('Runway slope vs Runway length')
@@ -529,7 +516,7 @@ def LA_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             break
         else:
             CL_land = min(CL_all)
-            print(CL_all, round(CL_land, 1))
+            #print(CL_all, round(CL_land, 1))
             obj.FP_CL_max_land = CL_max
             obj.FP_CL_land = CL_land
 
@@ -1107,9 +1094,9 @@ def fuelusesortie(ac_obj, atm_obj, n_boxes, n_drops, h_cruise, W_F, V_cruise = N
             if n_drops != 0:
                 print(f"Time to first drop: {ttfd} [sec] / {np.round(ttfd/3600, 2)} [hrs]")
             print(f"Fuel used: {np.round(W_F_used, 2)} [kg]")
-            print(f"======================================================================================")
-            print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
-            print(f"======================================================================================")
+            #print(f"======================================================================================")
+            #print(f"This simulation took {np.round((endtime-starttime), 2)} [s]")
+            #print(f"======================================================================================")
     if plot:
         plt.plot(x_array, h_array)
         plt.xlabel("Horizontal distance [m]")
@@ -1291,7 +1278,7 @@ def surveillancemission(ac_obj, atm_obj, n_boxes, h_cruise, h_loiter, W_F, V_cru
 # surveillancemission(aircraft, atm, 0, 10000, 5500, aircraft.W_F + 5, 54.012, Range = 150, t_loiter = 3600, summary=True, plot=True)
     
 
-    
+# print(np.sqrt(2*aircraft.W_TO*atm.g/(atm.rho0*aircraft.Sw*aircraft.CL_max_clean)))
 
     
     

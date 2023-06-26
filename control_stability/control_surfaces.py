@@ -59,7 +59,7 @@ def aileron_design(aircraft):  # Using Aircraft design: A Systems Engineering Ap
                 P_roll_rate = Pss**2/(2*phi_1)
 
                 t = sqrt(2*phi_des/P_roll_rate)
-                print(f"{phi_des}: t: {t}")
+                #print(f"{phi_des}: t: {t}")
             ystart_a_list.append(ystart_a)
       
             aircraft.ystart_ail = min(ystart_a_list) - aircraft.w_out/2  # to account for wing starting at fuselage border
@@ -133,8 +133,8 @@ def elevator_design(aircraft, plot):
 
     if plot:
         plt.figure(figsize=(8,8))
-        plt.scatter(V_range, delta_e_req_fwd, marker='x', color='black')
-        plt.scatter(V_range, delta_e_req_aft, marker='x', color='steelblue')
+        plt.scatter(V_range, delta_e_req_fwd, marker='x', color='black', label = "Most forward c.g.")
+        plt.scatter(V_range, delta_e_req_aft, marker='x', color='steelblue', label = "Most aft c.g.")
 
         plt.xlabel(r"V [m/s]")
         plt.ylabel(r"$\delta_E$ [deg]")
@@ -143,6 +143,7 @@ def elevator_design(aircraft, plot):
         plt.text(aircraft.V_cruise - 2.5, min(delta_e_req_aft), r'$V_{cruise}$', rotation=90, color='red')
 
         plt.grid()
+        plt.legend()
         plt.savefig('ElevatorDeflection.png')
         plt.show(block=True)
 

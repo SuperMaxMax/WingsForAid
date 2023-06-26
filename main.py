@@ -1,25 +1,26 @@
-from parameters import UAV, atmosphere, airport
+from parameters import UAV_final, atmosphere, airport
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import aerodynamics.main_aero as ae
 import control_stability.main_stab_cont as cs
 import structures.wingbox_full as wb
+import structures.fuselage_fairing_buckling as ffb
 import flight_performance.simulation as fp
 import operations.sortie as op
 
 # aircraft = UAV_final()
-aircraft = UAV('aircraft')
+aircraft = UAV_final()
 atm      = atmosphere()
 airfield = airport("Sudan")
 
-index_df = ["MTOW", "OEW", "Fuel weight", "Tail weight", "Wing weight"]
+index_df = ["MTOW", "OEW", "Fuel weight", "Tail weight", "Wing weight", "Fuselage weight"]
 df_iterations = pd.DataFrame(index = index_df)
 
 # start
 plot = True
 jan = False
-theo = True
+theo = False
 
 n_iteration = 1
 running = True
@@ -27,7 +28,7 @@ running = True
 # for wingbox
 jarno = False               # Jarno can't run wingbox
 full_wingbox_loop = False    # if true the full optimization will run, else it will calculate the weight for 36 stringers, 17 ribs
-ele_span = 100              # number of elements in spanwise direction (smaller value is faster, but less accurate)
+ele_span = 500              # number of elements in spanwise direction (smaller value is faster, but less accurate)
 
 #TODO landing distance
 #TODO max ferry range
@@ -55,6 +56,10 @@ while running:
         else:
             wb.all_wingbox(aircraft, ele_span, False)
     print("================================================\n")
+
+    print(f"=================== FFB-{n_iteration} =======================")
+    ffb.fuselage_fairing(aircraft)
+    print("================================================\n")
     
     print(f"=================== FP-{n_iteration} =======================")
     aircraft.W_F = fp.fuelusesortie(aircraft, atm, 12, 1, 10000, aircraft.W_F, 54.012, Summary = True)[0] + 5
@@ -63,9 +68,11 @@ while running:
     print("=================================================\n")
 
     print(f"=================== MANUAL UPDATES-{n_iteration} =======================")
-    aircraft.A = float(input("Wing aspect ratio: "))
-    aircraft.taper = float(input("Wing taper ratio: "))
-    aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
+    if jan: #Jan's path is linked in avl so otherwise code breaks
+        import aerodynamics.avl as avl
+        avl.export(aircraft)
+
+    # aircraft.CL_max_clean = float(input("Wing CL_max_clean: "))
     print(f"=================================================\n")
 
     aircraft.W_OE = aircraft.W_eq + aircraft.W_n + aircraft.W_pg + aircraft.W_sc + aircraft.W_t + aircraft.W_strut + aircraft.ST_W_fus + aircraft.ST_W_boom + aircraft.ST_W_uc + aircraft.W_w
@@ -75,8 +82,9 @@ while running:
         running = False
 
     aircraft.Sw = ((aircraft.W_OE + aircraft.W_F + aircraft.n_boxes*aircraft.boxweight)*atm.g)/aircraft.WS
+    aircraft.b = np.sqrt(aircraft.A*aircraft.Sw)
 
-    df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w]
+    df_iterations[f"Iteration {n_iteration}"] = [aircraft.W_TO, aircraft.W_OE, aircraft.W_F, aircraft.W_t, aircraft.W_w, aircraft.ST_W_fus]
 
     print(f"================= GENERAL-INFO ==================")
     print(df_iterations)
@@ -84,14 +92,11 @@ while running:
 
     n_iteration += 1
 
-if jan: #Jan's path is linked in avl so otherwise code breaks
-    import aerodynamics.avl as avl
-    avl.export(aircraft)
 if theo:
-    fp.fuelusesortie(aircraft, atm, aircraft.n_boxes, aircraft.n_drops, aircraft.h_cruise / 0.3048, aircraft.W_F, None,
-                        aircraft.OP_Range, aircraft.OP_droprange, True,
-                        False, False)
+    fp.fuelusesortie(aircraft, atm, aircraft.n_boxes, 1, aircraft.h_cruise / 0.3048, aircraft.W_F, 54.012,
+                        aircraft.OP_Range, Summary=True, plot = True)            
     op.operations_eval(aircraft)
+
 
 # # --- saving
 df = pd.DataFrame()

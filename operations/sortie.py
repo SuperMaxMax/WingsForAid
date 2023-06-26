@@ -12,7 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import flight_performance.simulation as fpsim
 
-aircraft = UAV_final()
+#aircraft = UAV_final()
 
 def operations_eval(ac):
     print("=====================================================")
@@ -80,8 +80,6 @@ def operations_eval(ac):
 
     return CST_per_kg, N_sortie_per_day, TTFD
 
-operations_eval(aircraft)
-
 if __name__ == '__main__':
     AC = UAV('aircraft')
     print("AC default:", AC.__dict__)
@@ -130,4 +128,4 @@ if __name__ == '__main__':
     # TTFD_s, T_s, Wf = fpsim.fuelusesortie(ac, atm, ac.n_boxes, ac.n_drops, ac.h_cruise / 0.3048, ac.W_F, None,
     #                                       AC.OP_Range, AC.OP_droprange, True,
     #                                       False, False)
-    operations_eval(ac)
+    #operations_eval(ac)

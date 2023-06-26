@@ -9,7 +9,6 @@ class UAV:
         # B
         # self.BHP_cruise = 76.3436
         # self.CL_land = 1.6529               # [-]
-        self.b = 9.620022329579792            # Wing span [m]
         # self.b_v = 1.60                     # Vertical tail span [m] NOTE: Is this value updated during design vertical tail?
         # self.boom = True                    # Boom, true if boom tail is implemented
         # self.bot_clearance = 0.1            # Bottom clearance [m]
@@ -35,7 +34,7 @@ class UAV:
         # self.Drag_increase = 1.0            # This is used for the calculations of the strut drag if applicable [-]
         # self.d_eff = 1.241                  # Effective diameter [m]
         # self.d_engine_boxes = 0.4           # Distance between engine and box [m]
-        self.dihedral = 0
+        self.dihedral = 1.5
         self.d_fuselage = 1.102               # Effective fuselage diameter used for drag estimation [m]
         
         # E
@@ -91,7 +90,7 @@ class UAV:
         # self.N_e = 1                        # Number of engines [-]
         self.n_boxes = 12                     # [-]
         self.n_boxes_abreast = 2              # [-]
-        # self.n_drops = 6                    # [-]
+        self.n_drops = 2                    # [-]
         # self.n_rows = 6                     # [-]
         self.name = name                      # Name of the aircraft
         # self.nose_gear_type = 'fixed'       # Type of nose gear: "fixed" or "retractable"
@@ -131,6 +130,8 @@ class UAV:
         self.sweep_co2_v = 0.5274976173187572
         self.sweep_co4_v = 35 / 180 * np.pi
         self.sweep_LE_v = 0.685533470761878
+
+        self.b = (self.A*self.Sw)**0.5 #9.620022329579792            # Wing span [m]
 
         # T
         # self.T0 = 288.15                    # Sea level temperature [K]
@@ -172,8 +173,8 @@ class UAV:
         self.W_t = 18.647695670124357               # Tail weight [kg]                                  variable -> needs to be implemented
         self.W_strut = 3.61*2                       # Weight of 2 struts [kg]                           constant
         self.ST_W_fus_truss = 54.6                  # Mass of fuselage structure (only) [kg]            constant
-        self.ST_W_fus_fairing = 25.5286             # Mass of fuselage fairing [kg]                     constant
-        self.ST_W_fus = self.ST_W_fus_truss + self.ST_W_fus_fairing #Built up off truss and fairing     constant
+        self.ST_W_fus_fairing_tot = 25.5286             # Mass of fuselage fairing [kg]                     constant
+        self.ST_W_fus = self.ST_W_fus_truss + self.ST_W_fus_fairing_tot #Built up off truss and fairing     constant
         # self.W_fus = 116.507                      # Fuselage weight [kg]                              constant  
         self.ST_W_boom = 12                         # Mass of tail boom, given it is 2.8 m long [kg]    constant
         # self.W_boom = 20.3                        # Boom weight [kg]                                  constant
@@ -408,7 +409,7 @@ class UAV:
         self.ST_z_prop = 0.3 #m propeller clearance
         self.ST_h_fus = 0.67 #m fuselage height ##KEEP IN MIND THAT THE ATTACHMENT OF THE WING IS ABOVE THE FUSELAGE CEILING
         self.ST_w_fus = 1.0 #m fuselage width
-        self.ST_h_prop_axis = 1.1 #m height of the propeller axis above the ground
+        self.ST_h_prop_axis = 1.02 #m height of the propeller axis above the ground
         self.ST_top_eng = 1.87 #m ceiling of the engine above the ground
         self.ST_eng_w = 0.56 #m width of engine box
         self.ST_eng_h = 0.335 #m height of engine box (NOT INCLUDING PROP obviously)
@@ -465,7 +466,7 @@ class atmosphere:
 
 class UAV_final:
     def __init__(self):
-        parameters = open("C:\\Users\\linda\\OneDrive\\Desktop\\Study\\B3\\DSE\\finaldesign.csv", "r")
+        parameters = open("../finaldesign.csv", "r")
         lines = parameters.readlines()
         parameters.close()
         for line in lines[1:]:
