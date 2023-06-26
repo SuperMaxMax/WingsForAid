@@ -172,14 +172,13 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
 
     CL_all = []
     figure, axis = plt.subplots(2, 2)
-    for i in range(1, 2):
-        print(i)
+    for i in range(0, 4):
         if i == 0:
             dic_constants = {'runway slope': np.arange(0, max_runwayslope),
                              'airport altitude': 0, 'wing surface area': obj.Sw,
                              'weight': takeoffweight(obj, W_f) * atmos.g,
                              'wind speed': 0, 'propeller power': obj.power * hp_to_watt,
-                             'propeller efficiency': obj.prop_eff}
+                             'propeller efficiency': 0.6}
             p, T, rho, a = atm_parameters(atmos, dic_constants['airport altitude'])
 
         if i == 1:
@@ -201,8 +200,8 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             S_old = S.copy()
             CL -= 0.01
             V_LOF = 1.05 * (np.sqrt(
-                dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max) - dic_constants[
-                        'wind speed'])
+                dic_constants['weight'] / dic_constants['wing surface area'] * 2 / rho * 1 / CL_max)) - dic_constants[
+                        'wind speed']
             V_avg_sq = V_LOF ** 2 / 2
             CD = obj.CD0 + CL ** 2 / (np.pi * obj.A * obj.e)
             D = CD * V_avg_sq * rho / 2 * dic_constants['wing surface area']
@@ -230,7 +229,6 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
             obj.FP_CL_TO = CL_to
 
         if Plot:
-            figure, axis = plt.subplots(2, 2)
             if i == 0:
                 axis[0, 0].plot(dic_constants['runway slope'], S)
                 axis[0, 0].set_title('Runway slope vs Runway length')
@@ -263,7 +261,7 @@ def TO_eom(obj, ap, atmos, max_runwayslope, max_hairport, max_headwind, max_tail
     return S
 
 
-TO_eom(aircraft, airfield, atm, 12, 4000, 12, -15.4, 65)
+TO_eom(aircraft, airfield, atm, 6, 1000, 12, -10.4, 65)
 
 # Result:
 # - If 12 boxes, then the slope limit is 11 degrees and max tailwind of 13 m/s = 25.3 kts
